@@ -20,8 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'          # OIDC requires npm >=11.5.1, bundled with Node 24
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '24'
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
@@ -35,6 +34,7 @@ jobs:
       - run: pnpm build:unified
       - run: pnpm smoke
 
+      # Trusted publishing: pnpm exchanges the GitHub OIDC token for npm auth.
       - name: Publish
         working-directory: packages/jaamd
-        run: npm publish --provenance --access public
+        run: pnpm publish --provenance --access public --no-git-checks
