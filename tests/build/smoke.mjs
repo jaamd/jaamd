@@ -136,7 +136,8 @@ check(
 
 check(
   "toc: heading-link hover covers h3-h6",
-  css.includes("h6:hover .jaamd-heading-link"),
+  css.includes("h6:hover .jaamd-heading-link") ||
+    /:is\(h1,h2,h3,h4,h5,h6\)\{[^}]*&:hover \.jaamd-heading-link\{/.test(css),
   "the anchor icon stays invisible on the deeper levels",
 );
 
