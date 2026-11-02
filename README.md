@@ -22,10 +22,11 @@ npx astro add @lancher-dev/jaamd
 
 ```astro
 ---
-import MarkdownContent from "@lancher-dev/jaamd/components";
+import MarkdownContent from '@lancher-dev/jaamd/components'
 ---
+
 <MarkdownContent>
-  <slot />
+    <slot />
 </MarkdownContent>
 ```
 
@@ -33,11 +34,11 @@ Showcase: [jaamd.lancher.dev](https://jaamd.lancher.dev)
 
 ## Repository
 
-| Path | What |
-|---|---|
+| Path                                | What                                                                |
+| ----------------------------------- | ------------------------------------------------------------------- |
 | [`packages/jaamd`](/packages/jaamd) | The integration, and its [documentation](/packages/jaamd/README.md) |
-| [`www`](/www) | The showcase, itself rendered with jaamd |
-| [`tests`](/tests) | Slug parity, the theme contract, and post-build assertions |
+| [`www`](/www)                       | The showcase, itself rendered with jaamd                            |
+| [`tests`](/tests)                   | Slug parity, the theme contract, and post-build assertions          |
 
 ```bash
 pnpm install

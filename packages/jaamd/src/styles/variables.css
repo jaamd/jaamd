@@ -9,16 +9,16 @@
 @layer jaamd.defaults;
 
 @layer jaamd.defaults {
-:root {
-  /* ── Typography ─────────────────────────────────────────── */
+    :root {
+        /* ── Typography ─────────────────────────────────────────── */
 
-  --jaamd-font-sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  --jaamd-font-serif: Georgia, "Times New Roman", Times, serif;
-  --jaamd-font-mono:  "SF Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  --jaamd-font-size:  1.125rem;
-  --jaamd-line-height: 1.6;
+        --jaamd-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        --jaamd-font-serif: Georgia, 'Times New Roman', Times, serif;
+        --jaamd-font-mono: 'SF Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        --jaamd-font-size: 1.125rem;
+        --jaamd-line-height: 1.6;
 
-  /* Per-element sizes are not declared here. Each is read as
+        /* Per-element sizes are not declared here. Each is read as
    * var(--jaamd-font-size-<x>, <current value>) in markdown.css, so unset they
    * leave --jaamd-font-size the single knob for the whole scale. Declare one
    * to break it out:
@@ -33,173 +33,158 @@
    *   --jaamd-font-size-footnotes
    */
 
+        /* ══ SEED TOKENS ═════════════════════════════════════════ */
+        /* Override these to rebrand. Everything below derives from them. */
 
-  /* ══ SEED TOKENS ═════════════════════════════════════════ */
-  /* Override these to rebrand. Everything below derives from them. */
+        /** Page background these surfaces sit on */
+        --jaamd-bg: #faf8f5;
 
-  /** Page background these surfaces sit on */
-  --jaamd-bg:                  #faf8f5;
+        /** Default body/paragraph text color */
+        --jaamd-color-fg: #3a3a3a;
 
-  /** Default body/paragraph text color */
-  --jaamd-color-fg:            #3a3a3a;
+        /** Headings, strong, table headers, summary. Brighter than fg */
+        --jaamd-color-fg-bright: #1a1a1a;
 
-  /** Headings, strong, table headers, summary. Brighter than fg */
-  --jaamd-color-fg-bright:     #1a1a1a;
+        /** Accent color (links, active tab label, summary arrow) */
+        --jaamd-color-primary: #2d2d2d;
 
-  /** Accent color (links, active tab label, summary arrow) */
-  --jaamd-color-primary:       #2d2d2d;
+        /** Confirmation colour: the copy button flashes it after a copy */
+        --jaamd-color-success: #22c55e;
 
-  /** Confirmation colour: the copy button flashes it after a copy */
-  --jaamd-color-success:       #22c55e;
+        /** Alert accent hues: the only alert values that cannot be derived */
+        --jaamd-alert-note-color: #0969da;
+        --jaamd-alert-tip-color: #1a7f37;
+        --jaamd-alert-important-color: #8250df;
+        --jaamd-alert-warning-color: #9a6700;
+        --jaamd-alert-caution-color: #cf222e;
 
-  /** Alert accent hues: the only alert values that cannot be derived */
-  --jaamd-alert-note-color:      #0969da;
-  --jaamd-alert-tip-color:       #1a7f37;
-  --jaamd-alert-important-color: #8250df;
-  --jaamd-alert-warning-color:   #9a6700;
-  --jaamd-alert-caution-color:   #cf222e;
+        /* ══ DERIVED SCALE ═══════════════════════════════════════ */
+        /* Tints of fg over bg, used by every surface below. */
 
+        --jaamd-surface-1: color-mix(in oklab, var(--jaamd-color-fg) 6%, var(--jaamd-bg));
+        --jaamd-surface-2: color-mix(in oklab, var(--jaamd-color-fg) 10%, var(--jaamd-bg));
+        --jaamd-surface-3: color-mix(in oklab, var(--jaamd-color-fg) 15%, var(--jaamd-bg));
+        --jaamd-surface-4: color-mix(in oklab, var(--jaamd-color-fg) 20%, var(--jaamd-bg));
+        --jaamd-border: color-mix(in oklab, var(--jaamd-color-fg) 26%, var(--jaamd-bg));
+        --jaamd-border-strong: color-mix(in oklab, var(--jaamd-color-fg) 42%, var(--jaamd-bg));
 
-  /* ══ DERIVED SCALE ═══════════════════════════════════════ */
-  /* Tints of fg over bg, used by every surface below. */
+        /** Slightly lighter accent (link :hover, blockquote text) */
+        --jaamd-color-primary-light: color-mix(in oklab, var(--jaamd-color-primary) 83%, var(--jaamd-bg));
 
-  --jaamd-surface-1: color-mix(in oklab, var(--jaamd-color-fg)  6%, var(--jaamd-bg));
-  --jaamd-surface-2: color-mix(in oklab, var(--jaamd-color-fg) 10%, var(--jaamd-bg));
-  --jaamd-surface-3: color-mix(in oklab, var(--jaamd-color-fg) 15%, var(--jaamd-bg));
-  --jaamd-surface-4: color-mix(in oklab, var(--jaamd-color-fg) 20%, var(--jaamd-bg));
-  --jaamd-border:        color-mix(in oklab, var(--jaamd-color-fg) 26%, var(--jaamd-bg));
-  --jaamd-border-strong: color-mix(in oklab, var(--jaamd-color-fg) 42%, var(--jaamd-bg));
+        /* ── Headings ───────────────────────────────────────────── */
 
-  /** Slightly lighter accent (link :hover, blockquote text) */
-  --jaamd-color-primary-light: color-mix(in oklab, var(--jaamd-color-primary) 83%, var(--jaamd-bg));
+        --jaamd-heading-border-color: rgb(from var(--jaamd-color-primary) r g b / 0.4);
 
+        /** Rest offset of an anchored heading (raise it to clear a sticky header) */
+        --jaamd-scroll-margin-top: 80px;
 
-  /* ── Headings ───────────────────────────────────────────── */
+        /* ── Inline code (<code> outside a <pre>) ───────────────── */
 
-  --jaamd-heading-border-color: rgb(from var(--jaamd-color-primary) r g b / 0.4);
+        --jaamd-code-bg: var(--jaamd-surface-2);
+        --jaamd-code-border: var(--jaamd-surface-4);
+        --jaamd-code-fg: var(--jaamd-color-fg-bright);
 
-  /** Rest offset of an anchored heading (raise it to clear a sticky header) */
-  --jaamd-scroll-margin-top: 80px;
+        /* ── Fenced code blocks (<pre>) ─────────────────────────── */
 
+        --jaamd-pre-bg: var(--jaamd-surface-1);
+        --jaamd-pre-border: var(--jaamd-border);
+        --jaamd-pre-fg: var(--jaamd-color-primary);
 
-  /* ── Inline code (<code> outside a <pre>) ───────────────── */
+        /* ── Copy-to-clipboard button ───────────────────────────── */
 
-  --jaamd-code-bg:     var(--jaamd-surface-2);
-  --jaamd-code-border: var(--jaamd-surface-4);
-  --jaamd-code-fg:     var(--jaamd-color-fg-bright);
+        --jaamd-copy-btn-bg: var(--jaamd-surface-4);
+        --jaamd-copy-btn-border: var(--jaamd-border-strong);
+        --jaamd-copy-btn-fg: var(--jaamd-color-primary);
+        --jaamd-copy-btn-hover-bg: var(--jaamd-border);
+        --jaamd-copy-btn-hover-border: color-mix(in oklab, var(--jaamd-color-fg) 48%, var(--jaamd-bg));
+        --jaamd-copy-btn-hover-fg: var(--jaamd-color-fg-bright);
 
+        /* ── Blockquote ─────────────────────────────────────────── */
 
-  /* ── Fenced code blocks (<pre>) ─────────────────────────── */
+        --jaamd-blockquote-bg: var(--jaamd-surface-1);
+        --jaamd-blockquote-border: var(--jaamd-border-strong);
+        --jaamd-blockquote-fg: var(--jaamd-color-primary-light);
 
-  --jaamd-pre-bg:     var(--jaamd-surface-1);
-  --jaamd-pre-border: var(--jaamd-border);
-  --jaamd-pre-fg:     var(--jaamd-color-primary);
+        /* ── Emphasis ───────────────────────────────────────────── */
 
+        --jaamd-em-fg: var(--jaamd-color-primary-light);
 
-  /* ── Copy-to-clipboard button ───────────────────────────── */
+        /* ── Horizontal rule (<hr>) ─────────────────────────────── */
 
-  --jaamd-copy-btn-bg:           var(--jaamd-surface-4);
-  --jaamd-copy-btn-border:       var(--jaamd-border-strong);
-  --jaamd-copy-btn-fg:           var(--jaamd-color-primary);
-  --jaamd-copy-btn-hover-bg:     var(--jaamd-border);
-  --jaamd-copy-btn-hover-border: color-mix(in oklab, var(--jaamd-color-fg) 48%, var(--jaamd-bg));
-  --jaamd-copy-btn-hover-fg:     var(--jaamd-color-fg-bright);
+        --jaamd-hr-color: rgb(from var(--jaamd-color-primary) r g b / 0.4);
 
+        /* ── Tables ─────────────────────────────────────────────── */
 
-  /* ── Blockquote ─────────────────────────────────────────── */
+        --jaamd-table-border: color-mix(in oklab, var(--jaamd-color-fg) 34%, var(--jaamd-bg));
+        --jaamd-table-header-bg: var(--jaamd-surface-1);
+        --jaamd-table-hover-bg: var(--jaamd-surface-3);
 
-  --jaamd-blockquote-bg:     var(--jaamd-surface-1);
-  --jaamd-blockquote-border: var(--jaamd-border-strong);
-  --jaamd-blockquote-fg:     var(--jaamd-color-primary-light);
+        /* ── Code tabs (.code-tabs) ─────────────────────────────── */
 
+        --jaamd-tabs-border: var(--jaamd-border);
+        --jaamd-tabs-header-bg: var(--jaamd-surface-3);
+        --jaamd-tabs-btn-hover-bg: color-mix(in oklab, var(--jaamd-color-fg) 18%, var(--jaamd-bg));
+        --jaamd-tabs-btn-active-bg: var(--jaamd-surface-1);
 
-  /* ── Emphasis ───────────────────────────────────────────── */
+        /* ── Table of contents (.jaamd-toc) ─────────────────────── */
 
-  --jaamd-em-fg: var(--jaamd-color-primary-light);
+        --jaamd-toc-bg: var(--jaamd-surface-1);
+        --jaamd-toc-border: var(--jaamd-border);
 
+        /* ── Details / Summary ──────────────────────────────────── */
 
-  /* ── Horizontal rule (<hr>) ─────────────────────────────── */
+        --jaamd-details-bg: var(--jaamd-surface-1);
+        --jaamd-details-border: var(--jaamd-border);
 
-  --jaamd-hr-color: rgb(from var(--jaamd-color-primary) r g b / 0.4);
+        /* ── Spoiler ────────────────────────────────────────────── */
 
+        /** Hidden spoiler text+background color (same value hides text) */
+        --jaamd-spoiler-hidden-color: var(--jaamd-color-fg-bright);
+        --jaamd-spoiler-revealed-bg: var(--jaamd-surface-1);
+        --jaamd-spoiler-revealed-fg: var(--jaamd-color-fg);
 
-  /* ── Tables ─────────────────────────────────────────────── */
+        /* ── Alert blocks (.markdown-alert) ─────────────────────── */
 
-  --jaamd-table-border:     color-mix(in oklab, var(--jaamd-color-fg) 34%, var(--jaamd-bg));
-  --jaamd-table-header-bg:  var(--jaamd-surface-1);
-  --jaamd-table-hover-bg:   var(--jaamd-surface-3);
+        --jaamd-alert-note-bg: color-mix(in oklab, var(--jaamd-alert-note-color) 12%, var(--jaamd-bg));
+        --jaamd-alert-tip-bg: color-mix(in oklab, var(--jaamd-alert-tip-color) 12%, var(--jaamd-bg));
+        --jaamd-alert-important-bg: color-mix(in oklab, var(--jaamd-alert-important-color) 12%, var(--jaamd-bg));
+        --jaamd-alert-warning-bg: color-mix(in oklab, var(--jaamd-alert-warning-color) 12%, var(--jaamd-bg));
+        --jaamd-alert-caution-bg: color-mix(in oklab, var(--jaamd-alert-caution-color) 12%, var(--jaamd-bg));
+    }
 
-
-  /* ── Code tabs (.code-tabs) ─────────────────────────────── */
-
-  --jaamd-tabs-border:        var(--jaamd-border);
-  --jaamd-tabs-header-bg:     var(--jaamd-surface-3);
-  --jaamd-tabs-btn-hover-bg:  color-mix(in oklab, var(--jaamd-color-fg) 18%, var(--jaamd-bg));
-  --jaamd-tabs-btn-active-bg: var(--jaamd-surface-1);
-
-
-  /* ── Table of contents (.jaamd-toc) ─────────────────────── */
-
-  --jaamd-toc-bg:     var(--jaamd-surface-1);
-  --jaamd-toc-border: var(--jaamd-border);
-
-
-  /* ── Details / Summary ──────────────────────────────────── */
-
-  --jaamd-details-bg:     var(--jaamd-surface-1);
-  --jaamd-details-border: var(--jaamd-border);
-
-
-  /* ── Spoiler ────────────────────────────────────────────── */
-
-  /** Hidden spoiler text+background color (same value hides text) */
-  --jaamd-spoiler-hidden-color: var(--jaamd-color-fg-bright);
-  --jaamd-spoiler-revealed-bg:  var(--jaamd-surface-1);
-  --jaamd-spoiler-revealed-fg:  var(--jaamd-color-fg);
-
-
-  /* ── Alert blocks (.markdown-alert) ─────────────────────── */
-
-  --jaamd-alert-note-bg:      color-mix(in oklab, var(--jaamd-alert-note-color)      12%, var(--jaamd-bg));
-  --jaamd-alert-tip-bg:       color-mix(in oklab, var(--jaamd-alert-tip-color)       12%, var(--jaamd-bg));
-  --jaamd-alert-important-bg: color-mix(in oklab, var(--jaamd-alert-important-color) 12%, var(--jaamd-bg));
-  --jaamd-alert-warning-bg:   color-mix(in oklab, var(--jaamd-alert-warning-color)   12%, var(--jaamd-bg));
-  --jaamd-alert-caution-bg:   color-mix(in oklab, var(--jaamd-alert-caution-color)   12%, var(--jaamd-bg));
-}
-
-/* ── Dark mode ──────────────────────────────────────────────
+    /* ── Dark mode ──────────────────────────────────────────────
    Only the seeds change; every derived token follows. */
 
-html.dark {
-  --jaamd-bg:                  #0d1117;
-  --jaamd-color-fg:            #c9d1d9;
-  --jaamd-color-fg-bright:     #e6edf3;
-  --jaamd-color-primary:       #c9d1d9;
+    html.dark {
+        --jaamd-bg: #0d1117;
+        --jaamd-color-fg: #c9d1d9;
+        --jaamd-color-fg-bright: #e6edf3;
+        --jaamd-color-primary: #c9d1d9;
 
-  --jaamd-surface-1: color-mix(in oklab, var(--jaamd-color-fg)  7%, var(--jaamd-bg));
-  --jaamd-surface-2: color-mix(in oklab, var(--jaamd-color-fg) 10%, var(--jaamd-bg));
-  --jaamd-surface-3: color-mix(in oklab, var(--jaamd-color-fg) 13%, var(--jaamd-bg));
-  --jaamd-surface-4: color-mix(in oklab, var(--jaamd-color-fg) 18%, var(--jaamd-bg));
-  --jaamd-border:        color-mix(in oklab, var(--jaamd-color-fg) 22%, var(--jaamd-bg));
-  --jaamd-border-strong: color-mix(in oklab, var(--jaamd-color-fg) 36%, var(--jaamd-bg));
+        --jaamd-surface-1: color-mix(in oklab, var(--jaamd-color-fg) 7%, var(--jaamd-bg));
+        --jaamd-surface-2: color-mix(in oklab, var(--jaamd-color-fg) 10%, var(--jaamd-bg));
+        --jaamd-surface-3: color-mix(in oklab, var(--jaamd-color-fg) 13%, var(--jaamd-bg));
+        --jaamd-surface-4: color-mix(in oklab, var(--jaamd-color-fg) 18%, var(--jaamd-bg));
+        --jaamd-border: color-mix(in oklab, var(--jaamd-color-fg) 22%, var(--jaamd-bg));
+        --jaamd-border-strong: color-mix(in oklab, var(--jaamd-color-fg) 36%, var(--jaamd-bg));
 
-  --jaamd-table-border:          var(--jaamd-border);
-  --jaamd-copy-btn-hover-border: var(--jaamd-border-strong);
+        --jaamd-table-border: var(--jaamd-border);
+        --jaamd-copy-btn-hover-border: var(--jaamd-border-strong);
 
-  --jaamd-alert-note-color:      #58a6ff;
-  --jaamd-alert-tip-color:       #3fb950;
-  --jaamd-alert-important-color: #a371f7;
-  --jaamd-alert-warning-color:   #d29922;
-  --jaamd-alert-caution-color:   #f85149;
+        --jaamd-alert-note-color: #58a6ff;
+        --jaamd-alert-tip-color: #3fb950;
+        --jaamd-alert-important-color: #a371f7;
+        --jaamd-alert-warning-color: #d29922;
+        --jaamd-alert-caution-color: #f85149;
 
-  --jaamd-color-primary-light: color-mix(in oklab, var(--jaamd-color-primary) 71%, var(--jaamd-bg));
-  --jaamd-heading-border-color: rgb(from var(--jaamd-color-primary) r g b / 0.3);
-  --jaamd-hr-color:             rgb(from var(--jaamd-color-primary) r g b / 0.3);
+        --jaamd-color-primary-light: color-mix(in oklab, var(--jaamd-color-primary) 71%, var(--jaamd-bg));
+        --jaamd-heading-border-color: rgb(from var(--jaamd-color-primary) r g b / 0.3);
+        --jaamd-hr-color: rgb(from var(--jaamd-color-primary) r g b / 0.3);
 
-  --jaamd-alert-note-bg:      color-mix(in oklab, var(--jaamd-alert-note-color)      10%, var(--jaamd-bg));
-  --jaamd-alert-tip-bg:       color-mix(in oklab, var(--jaamd-alert-tip-color)       10%, var(--jaamd-bg));
-  --jaamd-alert-important-bg: color-mix(in oklab, var(--jaamd-alert-important-color) 10%, var(--jaamd-bg));
-  --jaamd-alert-warning-bg:   color-mix(in oklab, var(--jaamd-alert-warning-color)   10%, var(--jaamd-bg));
-  --jaamd-alert-caution-bg:   color-mix(in oklab, var(--jaamd-alert-caution-color)   10%, var(--jaamd-bg));
-}
+        --jaamd-alert-note-bg: color-mix(in oklab, var(--jaamd-alert-note-color) 10%, var(--jaamd-bg));
+        --jaamd-alert-tip-bg: color-mix(in oklab, var(--jaamd-alert-tip-color) 10%, var(--jaamd-bg));
+        --jaamd-alert-important-bg: color-mix(in oklab, var(--jaamd-alert-important-color) 10%, var(--jaamd-bg));
+        --jaamd-alert-warning-bg: color-mix(in oklab, var(--jaamd-alert-warning-color) 10%, var(--jaamd-bg));
+        --jaamd-alert-caution-bg: color-mix(in oklab, var(--jaamd-alert-caution-color) 10%, var(--jaamd-bg));
+    }
 }

@@ -1,12 +1,12 @@
-import type { HTMLTag, Polymorphic } from "astro/types";
+import type { HTMLTag, Polymorphic } from 'astro/types'
 
-export type Props<Tag extends HTMLTag = "div"> = Polymorphic<{
-  as: Tag;
-  /** Appended to the always-present `jaamd-content` class, which the JS
-   *  enhancements select on. */
-  class?: string;
-}>;
+export type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+    as: Tag
+    /** Appended to the always-present `jaamd-content` class, which the JS
+     *  enhancements select on. */
+    class?: string
+}>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const MarkdownContent: <Tag extends HTMLTag = "div">(_props: Props<Tag>) => any;
-export default MarkdownContent;
+declare const MarkdownContent: <Tag extends HTMLTag = 'div'>(_props: Props<Tag>) => any
+export default MarkdownContent

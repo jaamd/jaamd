@@ -10,45 +10,45 @@
 
 /** @type {import("./index.d.ts").JaamdTheme[]} */
 export const themes = [
-  {
-    slug: "catppuccin",
-    name: "Catppuccin",
-    mode: "dual",
-    shiki: { light: "catppuccin-latte", dark: "catppuccin-mocha" },
-  },
-  { slug: "dracula", name: "Dracula", mode: "dark", shiki: "dracula" },
-  {
-    slug: "gruvbox",
-    name: "Gruvbox",
-    mode: "dual",
-    shiki: { light: "gruvbox-light-medium", dark: "gruvbox-dark-medium" },
-  },
-  { slug: "nord", name: "Nord", mode: "dark", shiki: "nord" },
-  { slug: "one-dark", name: "One Dark", mode: "dark", shiki: "one-dark-pro" },
-  {
-    slug: "rose-pine",
-    name: "Rosé Pine",
-    mode: "dual",
-    shiki: { light: "rose-pine-dawn", dark: "rose-pine" },
-  },
-  {
-    slug: "rose-pine-moon",
-    name: "Rosé Pine Moon",
-    mode: "dual",
-    shiki: { light: "rose-pine-dawn", dark: "rose-pine-moon" },
-  },
-  { slug: "tokyo-night", name: "Tokyo Night", mode: "dark", shiki: "tokyo-night" },
-];
+    {
+        slug: 'catppuccin',
+        name: 'Catppuccin',
+        mode: 'dual',
+        shiki: { light: 'catppuccin-latte', dark: 'catppuccin-mocha' },
+    },
+    { slug: 'dracula', name: 'Dracula', mode: 'dark', shiki: 'dracula' },
+    {
+        slug: 'gruvbox',
+        name: 'Gruvbox',
+        mode: 'dual',
+        shiki: { light: 'gruvbox-light-medium', dark: 'gruvbox-dark-medium' },
+    },
+    { slug: 'nord', name: 'Nord', mode: 'dark', shiki: 'nord' },
+    { slug: 'one-dark', name: 'One Dark', mode: 'dark', shiki: 'one-dark-pro' },
+    {
+        slug: 'rose-pine',
+        name: 'Rosé Pine',
+        mode: 'dual',
+        shiki: { light: 'rose-pine-dawn', dark: 'rose-pine' },
+    },
+    {
+        slug: 'rose-pine-moon',
+        name: 'Rosé Pine Moon',
+        mode: 'dual',
+        shiki: { light: 'rose-pine-dawn', dark: 'rose-pine-moon' },
+    },
+    { slug: 'tokyo-night', name: 'Tokyo Night', mode: 'dark', shiki: 'tokyo-night' },
+]
 
 /** Seeds a theme must declare; everything else derives from them in variables.css. */
 export const REQUIRED_TOKENS = [
-  "--jaamd-bg",
-  "--jaamd-color-fg",
-  "--jaamd-color-fg-bright",
-  "--jaamd-color-primary",
-  "--jaamd-alert-note-color",
-  "--jaamd-alert-tip-color",
-  "--jaamd-alert-important-color",
-  "--jaamd-alert-warning-color",
-  "--jaamd-alert-caution-color",
-];
+    '--jaamd-bg',
+    '--jaamd-color-fg',
+    '--jaamd-color-fg-bright',
+    '--jaamd-color-primary',
+    '--jaamd-alert-note-color',
+    '--jaamd-alert-tip-color',
+    '--jaamd-alert-important-color',
+    '--jaamd-alert-warning-color',
+    '--jaamd-alert-caution-color',
+]

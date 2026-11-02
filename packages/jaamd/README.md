@@ -12,19 +12,19 @@
 - [Setup](#setup)
 - [Integration Options](#integration-options)
 - [Markdown Syntax](#markdown-syntax)
-  - [Alerts](#alerts)
-  - [Code tabs](#code-tabs)
-  - [Table of contents](#table-of-contents-1)
-  - [Spoilers](#spoilers)
+    - [Alerts](#alerts)
+    - [Code tabs](#code-tabs)
+    - [Table of contents](#table-of-contents-1)
+    - [Spoilers](#spoilers)
 - [MarkdownContent Component](#markdowncontent-component)
 - [Client-side Enhancements](#client-side-enhancements)
 - [Markup and classes](#markup-and-classes)
 - [Theming](#theming)
-  - [Customizing variables](#customizing-variables)
-  - [Font sizes](#font-sizes)
-  - [Dark mode](#dark-mode)
-  - [Theme presets](#theme-presets)
-  - [Dual-theme Shiki](#dual-theme-shiki)
+    - [Customizing variables](#customizing-variables)
+    - [Font sizes](#font-sizes)
+    - [Dark mode](#dark-mode)
+    - [Theme presets](#theme-presets)
+    - [Dual-theme Shiki](#dual-theme-shiki)
 - [Manual / Advanced Usage](#manual--advanced-usage)
 
 ---
@@ -39,13 +39,13 @@ npx astro add @lancher-dev/jaamd
 
 ## Requirements
 
-| Requirement | Detail |
-|---|---|
-| Astro | `^7.3.0` |
-| Node | `>=22.12.0` |
-| Markdown processor | Sätteri (Astro's default) or `unified()` |
+| Requirement                | Detail                                                    |
+| -------------------------- | --------------------------------------------------------- |
+| Astro                      | `^7.3.0`                                                  |
+| Node                       | `>=22.12.0`                                               |
+| Markdown processor         | Sätteri (Astro's default) or `unified()`                  |
 | `@astrojs/markdown-remark` | Only with `unified()`: an optional peer, installed by you |
-| Toolchain | Must compile TypeScript and `.astro` sources |
+| Toolchain                  | Must compile TypeScript and `.astro` sources              |
 
 JAAMD is published as source, with no compiled `dist/` and no emitted `.d.ts`.
 It works out of the box in any Astro project, but is not consumable from plain
@@ -91,13 +91,13 @@ Node, a CommonJS build, or a TypeScript project using
 Add the integration to your Astro config:
 
 ```ts
+import jaamd from '@lancher-dev/jaamd'
 // astro.config.mjs
-import { defineConfig } from "astro/config";
-import jaamd from "@lancher-dev/jaamd";
+import { defineConfig } from 'astro/config'
 
 export default defineConfig({
-  integrations: [jaamd()],
-});
+    integrations: [jaamd()],
+})
 ```
 
 Wrap your markdown content with the `MarkdownContent` component in your layout:
@@ -105,10 +105,11 @@ Wrap your markdown content with the `MarkdownContent` component in your layout:
 ```astro
 ---
 // src/layouts/BlogPost.astro
-import MarkdownContent from "@lancher-dev/jaamd/components";
+import MarkdownContent from '@lancher-dev/jaamd/components'
 ---
+
 <MarkdownContent>
-  <slot />
+    <slot />
 </MarkdownContent>
 ```
 
@@ -125,8 +126,8 @@ left alone, with a warning.
 >
 > ```astro
 > ---
-> import "@lancher-dev/jaamd/default.css";
-> import "@lancher-dev/jaamd/styles.css";
+> import '@lancher-dev/jaamd/default.css'
+> import '@lancher-dev/jaamd/styles.css'
 > ---
 > ```
 
@@ -134,17 +135,17 @@ left alone, with a warning.
 
 ```ts
 jaamd({
-  selector:   ".jaamd-content", // CSS selector for the JS enhancements
-  theme:      "github-light",   // Shiki theme name (or { light, dark }); see below
-  noDefault:  false,            // skip injecting @lancher-dev/jaamd/default variable fallbacks
-  plugins: {
-    codeTabs:  true,            // :::code-tabs directive blocks
-    toc:       true,            // :::toc directive blocks
-    alerts:    true,            // > [!NOTE] / [!WARNING] blockquote alerts
-    directive: true,            // `:::` syntax (prerequisite for codeTabs and toc)
-    tables:    true,            // scroll container around tables
-    headingLinks: true,         // anchor link on every heading
-  },
+    selector: '.jaamd-content', // CSS selector for the JS enhancements
+    theme: 'github-light', // Shiki theme name (or { light, dark }); see below
+    noDefault: false, // skip injecting @lancher-dev/jaamd/default variable fallbacks
+    plugins: {
+        codeTabs: true, // :::code-tabs directive blocks
+        toc: true, // :::toc directive blocks
+        alerts: true, // > [!NOTE] / [!WARNING] blockquote alerts
+        directive: true, // `:::` syntax (prerequisite for codeTabs and toc)
+        tables: true, // scroll container around tables
+        headingLinks: true, // anchor link on every heading
+    },
 })
 ```
 
@@ -203,6 +204,7 @@ used as the tab label; it falls back to the language, then to `Tab N`.
 ```bash npm
 npm install
 ```
+
 ```bash pnpm
 pnpm install
 ```
@@ -219,7 +221,7 @@ The text in brackets is an optional title.
 :::toc[On this page]
 - [Installation](#installation)
 - [Setup](#setup)
-  - [Integration options](#integration-options)
+    - [Integration options](#integration-options)
 :::
 ```
 
@@ -227,8 +229,10 @@ It renders as:
 
 ```html
 <nav class="jaamd-toc" aria-label="On this page">
-  <p class="jaamd-toc-title">On this page</p>
-  <ul>…your list…</ul>
+    <p class="jaamd-toc-title">On this page</p>
+    <ul>
+        …your list…
+    </ul>
 </nav>
 ```
 
@@ -242,13 +246,13 @@ JavaScript disabled; with it, the entry whose section is on screen is marked
 Heading ids come from Astro, slugged with
 [`github-slugger`](https://github.com/Flet/github-slugger):
 
-| Heading | Anchor |
-|---|---|
-| `## Getting started` | `#getting-started` |
+| Heading                  | Anchor                                                                   |
+| ------------------------ | ------------------------------------------------------------------------ |
+| `## Getting started`     | `#getting-started`                                                       |
 | `## Details / accordion` | `#details--accordion` (one dash per space, the `/` dropped between them) |
-| `## What's new?` | `#whats-new` (punctuation removed, not replaced) |
-| `## snake_case` | `#snake_case` (underscores survive) |
-| a second `## Setup` | `#setup-1` |
+| `## What's new?`         | `#whats-new` (punctuation removed, not replaced)                         |
+| `## snake_case`          | `#snake_case` (underscores survive)                                      |
+| a second `## Setup`      | `#setup-1`                                                               |
 
 The client-side fallback follows the same rules, so ids match for markdown that
 never went through Astro's pipeline (`set:html`, HTML from a CMS).
@@ -273,38 +277,38 @@ Any element with the `spoiler` class is hidden until activated:
 and accepts any valid HTML tag via the `as` prop.
 
 ```ts
-import MarkdownContent from "@lancher-dev/jaamd/components";
+import MarkdownContent from '@lancher-dev/jaamd/components'
 ```
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `as` | `HTMLTag` | `"div"` | The HTML element to render as. |
-| `class` | `string` | - | Extra CSS classes appended to the wrapper. |
-| *...rest* | - | - | All standard HTML attributes for the chosen `as` element (e.g. `id`, `data-*`, `aria-*`). |
+| Prop      | Type      | Default | Description                                                                               |
+| --------- | --------- | ------- | ----------------------------------------------------------------------------------------- |
+| `as`      | `HTMLTag` | `"div"` | The HTML element to render as.                                                            |
+| `class`   | `string`  | -       | Extra CSS classes appended to the wrapper.                                                |
+| _...rest_ | -         | -       | All standard HTML attributes for the chosen `as` element (e.g. `id`, `data-*`, `aria-*`). |
 
 The `jaamd-content` class is always present on the wrapper element. It is the
 selector used by the JS enhancements and must not be removed.
 
 ```astro
 ---
-import MarkdownContent from "@lancher-dev/jaamd/components";
+import MarkdownContent from '@lancher-dev/jaamd/components'
 ---
 
 <!-- Default: renders as <div class="jaamd-content"> -->
 <MarkdownContent>
-  <slot />
+    <slot />
 </MarkdownContent>
 
 <!-- Custom tag: renders as <article class="jaamd-content"> -->
 <MarkdownContent as="article">
-  <slot />
+    <slot />
 </MarkdownContent>
 
 <!-- Extra classes: renders as <article class="jaamd-content prose mx-auto"> -->
 <MarkdownContent as="article" class="prose mx-auto">
-  <slot />
+    <slot />
 </MarkdownContent>
 ```
 
@@ -317,23 +321,23 @@ so it keeps working across View Transitions.
 Table wrappers and heading anchors come from the build. The module adds them
 only to markup that skipped the processor (`set:html`, HTML from a CMS).
 
-| Enhancement | Behaviour |
-|---|---|
-| Heading links | Adds an anchor link to `h1`–`h6` where the build did not. Fills in a missing `id` with a `github-slugger`-compatible slug, de-duplicated across the page. |
-| Table of contents | Marks the `:::toc` entry whose section is on screen with `aria-current="location"`. |
-| Copy buttons | Adds a copy button to every `pre`. Without clipboard access it selects the code instead. The only clipboard write in the package. |
-| Image lightbox | Wraps each image in a button that opens it in a modal `<dialog>`. Closes on <kbd>Esc</kbd>, the ✕ button or a click outside the image. |
-| Responsive tables | Wraps a `table` in a horizontally scrollable container where the build did not. |
-| Code tabs | Drives the `:::code-tabs` tablist. |
-| Spoilers | Reveals `.spoiler` content on click or <kbd>Enter</kbd>/<kbd>Space</kbd>. |
+| Enhancement       | Behaviour                                                                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Heading links     | Adds an anchor link to `h1`–`h6` where the build did not. Fills in a missing `id` with a `github-slugger`-compatible slug, de-duplicated across the page. |
+| Table of contents | Marks the `:::toc` entry whose section is on screen with `aria-current="location"`.                                                                       |
+| Copy buttons      | Adds a copy button to every `pre`. Without clipboard access it selects the code instead. The only clipboard write in the package.                         |
+| Image lightbox    | Wraps each image in a button that opens it in a modal `<dialog>`. Closes on <kbd>Esc</kbd>, the ✕ button or a click outside the image.                    |
+| Responsive tables | Wraps a `table` in a horizontally scrollable container where the build did not.                                                                           |
+| Code tabs         | Drives the `:::code-tabs` tablist.                                                                                                                        |
+| Spoilers          | Reveals `.spoiler` content on click or <kbd>Enter</kbd>/<kbd>Space</kbd>.                                                                                 |
 
 ### Keyboard
 
-| Element | Keys |
-|---|---|
+| Element   | Keys                                                                                                                                                  |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Code tabs | <kbd>←</kbd> <kbd>→</kbd> move between tabs, <kbd>Home</kbd> <kbd>End</kbd> jump to first/last. Panels are focusable so wide samples can be scrolled. |
-| Spoilers | <kbd>Tab</kbd> to focus, <kbd>Enter</kbd> or <kbd>Space</kbd> to reveal. Hover does not reveal. |
-| Lightbox | <kbd>Tab</kbd> to an image, <kbd>Enter</kbd> or <kbd>Space</kbd> to open, <kbd>Esc</kbd> to close. Focus returns to the image. |
+| Spoilers  | <kbd>Tab</kbd> to focus, <kbd>Enter</kbd> or <kbd>Space</kbd> to reveal. Hover does not reveal.                                                       |
+| Lightbox  | <kbd>Tab</kbd> to an image, <kbd>Enter</kbd> or <kbd>Space</kbd> to open, <kbd>Esc</kbd> to close. Focus returns to the image.                        |
 
 `<details>` animates in CSS, no script: height where the browser supports
 `interpolate-size`, a fade elsewhere.
@@ -349,11 +353,11 @@ Opening and closing are the browser's own: the image button and the ✕ button
 are [invoker commands](https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API)
 on the `<dialog>`, and `closedby="any"` closes it on a click outside the image.
 
-| Browser | Lightbox | Click outside closes |
-|---|---|---|
-| Chrome / Edge | 135+ | 134+ |
-| Firefox | 144+ | 141+ |
-| Safari | 26.2+ | not yet: <kbd>Esc</kbd> and ✕ only |
+| Browser       | Lightbox | Click outside closes               |
+| ------------- | -------- | ---------------------------------- |
+| Chrome / Edge | 135+     | 134+                               |
+| Firefox       | 144+     | 141+                               |
+| Safari        | 26.2+    | not yet: <kbd>Esc</kbd> and ✕ only |
 
 Older browsers show the image as a plain image.
 
@@ -373,25 +377,25 @@ Opt a standalone image out with `data-no-lightbox`:
 
 ## Markup and classes
 
-What JAAMD emits, for styling it or writing a custom wrapper. *Build* markup is
-in the HTML from the markdown processor; *client* markup is added at runtime by
+What JAAMD emits, for styling it or writing a custom wrapper. _Build_ markup is
+in the HTML from the markdown processor; _client_ markup is added at runtime by
 the enhancement script.
 
-| Feature | Elements | Attributes and states | From |
-|---|---|---|---|
-| Wrapper | `.jaamd-content` | — | `<MarkdownContent>` or your own |
-| Heading anchor | `a.jaamd-heading-link`, last child of `h1`–`h6` | `href="#<id>"`, `aria-label` | build; client where the build did not |
-| Table wrapper | `div.jaamd-table-wrapper` around `table` | — | build; client where the build did not |
-| Alert | `div.markdown-alert.markdown-alert-<type>`, type `note`, `tip`, `important`, `warning` or `caution` | `dir="auto"` | build |
-| Alert title | `p.markdown-alert-title` with an `svg.octicon` | — | build |
-| Code tabs | `div.code-tabs#jaamd-tabs-<hash>` › `div.code-tab-buttons[role=tablist]` › `button.code-tab-btn[role=tab]` | `.active`, `aria-selected`, roving `tabindex`, `data-tab-index`, `aria-controls` | build; `data-tabs-init` on the group from the client |
-| Code tab panel | `div.code-tab-panel[role=tabpanel]` wrapping the `pre` | `.active`, `data-tab-index`, `aria-labelledby` | build |
-| Table of contents | `nav.jaamd-toc` › optional `p.jaamd-toc-title`, then your list | `aria-label`; the current link gets `aria-current="location"` | build; current link from the client |
-| Copy button | `button.jaamd-copy-btn`, last child of `pre`, with `svg.jaamd-copy-icon` and `svg.jaamd-copied-icon` | `data-copied="true"` after a copy, `"manual"` when the code was selected instead | client |
-| Announcements | `div#jaamd-live.jaamd-live[role=status]` in `body` | — | client |
-| Lightbox trigger | `button.jaamd-lightbox-trigger` around each `img` | `commandfor="jaamd-lightbox"`, `command="show-modal"` | client |
-| Lightbox | `dialog#jaamd-lightbox.jaamd-lightbox` in `body`, with `img.jaamd-lightbox__img` and `button.jaamd-lightbox__close` | `closedby="any"`, `[open]` | client |
-| Spoiler | `.spoiler`, written by you | `.revealed`, `role="button"`, `tabindex`, `aria-expanded`, `data-spoiler-init` | client |
+| Feature           | Elements                                                                                                            | Attributes and states                                                            | From                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Wrapper           | `.jaamd-content`                                                                                                    | —                                                                                | `<MarkdownContent>` or your own                      |
+| Heading anchor    | `a.jaamd-heading-link`, last child of `h1`–`h6`                                                                     | `href="#<id>"`, `aria-label`                                                     | build; client where the build did not                |
+| Table wrapper     | `div.jaamd-table-wrapper` around `table`                                                                            | —                                                                                | build; client where the build did not                |
+| Alert             | `div.markdown-alert.markdown-alert-<type>`, type `note`, `tip`, `important`, `warning` or `caution`                 | `dir="auto"`                                                                     | build                                                |
+| Alert title       | `p.markdown-alert-title` with an `svg.octicon`                                                                      | —                                                                                | build                                                |
+| Code tabs         | `div.code-tabs#jaamd-tabs-<hash>` › `div.code-tab-buttons[role=tablist]` › `button.code-tab-btn[role=tab]`          | `.active`, `aria-selected`, roving `tabindex`, `data-tab-index`, `aria-controls` | build; `data-tabs-init` on the group from the client |
+| Code tab panel    | `div.code-tab-panel[role=tabpanel]` wrapping the `pre`                                                              | `.active`, `data-tab-index`, `aria-labelledby`                                   | build                                                |
+| Table of contents | `nav.jaamd-toc` › optional `p.jaamd-toc-title`, then your list                                                      | `aria-label`; the current link gets `aria-current="location"`                    | build; current link from the client                  |
+| Copy button       | `button.jaamd-copy-btn`, last child of `pre`, with `svg.jaamd-copy-icon` and `svg.jaamd-copied-icon`                | `data-copied="true"` after a copy, `"manual"` when the code was selected instead | client                                               |
+| Announcements     | `div#jaamd-live.jaamd-live[role=status]` in `body`                                                                  | —                                                                                | client                                               |
+| Lightbox trigger  | `button.jaamd-lightbox-trigger` around each `img`                                                                   | `commandfor="jaamd-lightbox"`, `command="show-modal"`                            | client                                               |
+| Lightbox          | `dialog#jaamd-lightbox.jaamd-lightbox` in `body`, with `img.jaamd-lightbox__img` and `button.jaamd-lightbox__close` | `closedby="any"`, `[open]`                                                       | client                                               |
+| Spoiler           | `.spoiler`, written by you                                                                                          | `.revealed`, `role="button"`, `tabindex`, `aria-expanded`, `data-spoiler-init`   | client                                               |
 
 ## Theming
 
@@ -404,12 +408,12 @@ Override any variable on `:root` in your own stylesheet:
 
 ```css
 :root {
-  --jaamd-color-fg:            #334155;
-  --jaamd-color-fg-bright:     #0f172a;
-  --jaamd-color-primary:       #6366f1;
-  --jaamd-color-primary-light: #818cf8;
-  --jaamd-font-mono: ui-monospace, monospace;
-  --jaamd-font-size: 1rem;
+    --jaamd-color-fg: #334155;
+    --jaamd-color-fg-bright: #0f172a;
+    --jaamd-color-primary: #6366f1;
+    --jaamd-color-primary-light: #818cf8;
+    --jaamd-font-mono: ui-monospace, monospace;
+    --jaamd-font-size: 1rem;
 }
 ```
 
@@ -426,7 +430,7 @@ derived from it, so moving it moves the entire scale in proportion:
 
 ```css
 :root {
-  --jaamd-font-size: 1rem; /* headings, code, tables… all follow */
+    --jaamd-font-size: 1rem; /* headings, code, tables… all follow */
 }
 ```
 
@@ -436,26 +440,26 @@ they are opt-in, one at a time:
 
 ```css
 :root {
-  --jaamd-font-size: 1rem; /* the baseline */
-  --jaamd-font-size-h1: 2.5rem; /* but h1 is fixed, not proportional */
-  --jaamd-font-size-code-block: 0.8rem; /* and code blocks are tighter */
+    --jaamd-font-size: 1rem; /* the baseline */
+    --jaamd-font-size-h1: 2.5rem; /* but h1 is fixed, not proportional */
+    --jaamd-font-size-code-block: 0.8rem; /* and code blocks are tighter */
 }
 ```
 
-| Token | Applies to | Default when unset |
-|---|---|---|
-| `--jaamd-font-size-h1` … `-h4` | `h1`–`h4` | `2.22` / `1.67` / `1.33` / `1.11` × base |
-| `--jaamd-font-size-h5`, `-h6` | `h5`, `h6` | base |
-| `--jaamd-font-size-p`, `-li` | paragraphs, list items | base |
-| `--jaamd-font-size-blockquote` | `blockquote`, contents included | base |
-| `--jaamd-font-size-code` | inline `` `code` `` | `0.78` × base |
-| `--jaamd-font-size-code-block` | fenced code blocks | `0.85` × base |
-| `--jaamd-font-size-table` | `th` and `td` together | `0.78` × base |
-| `--jaamd-font-size-summary` | `<details>` summary | `0.89` × base |
-| `--jaamd-font-size-alert-title` | alert titles | `0.83` × base |
-| `--jaamd-font-size-toc` | `:::toc` block, contents included | `0.94` × base |
-| `--jaamd-font-size-toc-title` | `:::toc` title | `0.83` × base |
-| `--jaamd-font-size-footnotes` | footnotes block, contents included | `0.85` × base |
+| Token                           | Applies to                         | Default when unset                       |
+| ------------------------------- | ---------------------------------- | ---------------------------------------- |
+| `--jaamd-font-size-h1` … `-h4`  | `h1`–`h4`                          | `2.22` / `1.67` / `1.33` / `1.11` × base |
+| `--jaamd-font-size-h5`, `-h6`   | `h5`, `h6`                         | base                                     |
+| `--jaamd-font-size-p`, `-li`    | paragraphs, list items             | base                                     |
+| `--jaamd-font-size-blockquote`  | `blockquote`, contents included    | base                                     |
+| `--jaamd-font-size-code`        | inline `` `code` ``                | `0.78` × base                            |
+| `--jaamd-font-size-code-block`  | fenced code blocks                 | `0.85` × base                            |
+| `--jaamd-font-size-table`       | `th` and `td` together             | `0.78` × base                            |
+| `--jaamd-font-size-summary`     | `<details>` summary                | `0.89` × base                            |
+| `--jaamd-font-size-alert-title` | alert titles                       | `0.83` × base                            |
+| `--jaamd-font-size-toc`         | `:::toc` block, contents included  | `0.94` × base                            |
+| `--jaamd-font-size-toc-title`   | `:::toc` title                     | `0.83` × base                            |
+| `--jaamd-font-size-footnotes`   | footnotes block, contents included | `0.85` × base                            |
 
 A block that owns a token governs what is inside it: paragraphs in a blockquote
 follow `-blockquote`, not `-p`. Alert bodies have no token of their own and
@@ -474,27 +478,27 @@ Eight presets restyle the `--jaamd-*` palette to match popular editor colour
 schemes. A **dual** preset carries a light and a dark palette and follows
 `html.dark`; the others are one palette that applies in both modes.
 
-| Preset | Import | Kind | Recommended Shiki theme |
-|--------|--------|------|------------------------|
-| Catppuccin | `@lancher-dev/jaamd/themes/catppuccin` | dual | `catppuccin-latte` / `catppuccin-mocha` |
-| Dracula | `@lancher-dev/jaamd/themes/dracula` | dark | `dracula` |
-| Gruvbox | `@lancher-dev/jaamd/themes/gruvbox` | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
-| Nord | `@lancher-dev/jaamd/themes/nord` | dark | `nord` |
-| One Dark | `@lancher-dev/jaamd/themes/one-dark` | dark | `one-dark-pro` |
-| Rosé Pine | `@lancher-dev/jaamd/themes/rose-pine` | dual | `rose-pine-dawn` / `rose-pine` |
-| Rosé Pine Moon | `@lancher-dev/jaamd/themes/rose-pine-moon` | dual | `rose-pine-dawn` / `rose-pine-moon` |
-| Tokyo Night | `@lancher-dev/jaamd/themes/tokyo-night` | dark | `tokyo-night` |
+| Preset         | Import                                     | Kind | Recommended Shiki theme                        |
+| -------------- | ------------------------------------------ | ---- | ---------------------------------------------- |
+| Catppuccin     | `@lancher-dev/jaamd/themes/catppuccin`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
+| Dracula        | `@lancher-dev/jaamd/themes/dracula`        | dark | `dracula`                                      |
+| Gruvbox        | `@lancher-dev/jaamd/themes/gruvbox`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
+| Nord           | `@lancher-dev/jaamd/themes/nord`           | dark | `nord`                                         |
+| One Dark       | `@lancher-dev/jaamd/themes/one-dark`       | dark | `one-dark-pro`                                 |
+| Rosé Pine      | `@lancher-dev/jaamd/themes/rose-pine`      | dual | `rose-pine-dawn` / `rose-pine`                 |
+| Rosé Pine Moon | `@lancher-dev/jaamd/themes/rose-pine-moon` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
+| Tokyo Night    | `@lancher-dev/jaamd/themes/tokyo-night`    | dark | `tokyo-night`                                  |
 
 As a standalone theme, replacing the default light theme:
 
 ```ts
-jaamd({ theme: "dracula" })
+jaamd({ theme: 'dracula' })
 ```
 
 ```css
-@import "@lancher-dev/jaamd/default.css";
-@import "@lancher-dev/jaamd/themes/dracula.css";
-@import "@lancher-dev/jaamd/styles.css";
+@import '@lancher-dev/jaamd/default.css';
+@import '@lancher-dev/jaamd/themes/dracula.css';
+@import '@lancher-dev/jaamd/styles.css';
 ```
 
 A single-palette preset can also be scoped to `html.dark` via the `/dark` variant,
@@ -502,11 +506,11 @@ to use it as the dark half of your own light theme. Dual presets already cover b
 modes and have no `/dark`:
 
 ```css
-@import "@lancher-dev/jaamd/themes/dracula/dark.css";
+@import '@lancher-dev/jaamd/themes/dracula/dark.css';
 ```
 
 ```ts
-import "@lancher-dev/jaamd/themes/dracula/dark";
+import '@lancher-dev/jaamd/themes/dracula/dark'
 ```
 
 > [!IMPORTANT]
@@ -518,7 +522,7 @@ import "@lancher-dev/jaamd/themes/dracula/dark";
 Each theme declares itself, so a picker can be built from data:
 
 ```ts
-import { themes } from "@lancher-dev/jaamd/themes";
+import { themes } from '@lancher-dev/jaamd/themes'
 // [{ slug: "dracula", name: "Dracula", mode: "dark", shiki: "dracula" }, …]
 ```
 
@@ -534,7 +538,7 @@ the `dark` class:
 
 ```ts
 jaamd({
-  theme: { light: "github-light", dark: "github-dark" },
+    theme: { light: 'github-light', dark: 'github-dark' },
 })
 ```
 
@@ -542,11 +546,11 @@ Add an inline script in `<head>` to prevent a flash of the wrong theme:
 
 ```html
 <script is:inline>
-  (function () {
-    var t = localStorage.getItem("theme");
-    if (t === "dark" || (!t && matchMedia("(prefers-color-scheme: dark)").matches))
-      document.documentElement.classList.add("dark");
-  })();
+    ;(function () {
+        var t = localStorage.getItem('theme')
+        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches))
+            document.documentElement.classList.add('dark')
+    })()
 </script>
 ```
 
@@ -557,25 +561,25 @@ use. On Sätteri, Astro's default:
 
 ```ts
 // astro.config.mjs
-import { satteri } from "@astrojs/markdown-satteri";
+import { satteri } from '@astrojs/markdown-satteri'
 import {
-  satteriAlert,
-  satteriCodeTabs,
-  satteriToc,
-  satteriDirectiveFallback,
-  satteriTableWrapper,
-  satteriHeadingLinks,
-} from "@lancher-dev/jaamd";
+    satteriAlert,
+    satteriCodeTabs,
+    satteriToc,
+    satteriDirectiveFallback,
+    satteriTableWrapper,
+    satteriHeadingLinks,
+} from '@lancher-dev/jaamd'
 
 export default defineConfig({
-  markdown: {
-    processor: satteri({
-      features: { directive: true },
-      mdastPlugins: [satteriAlert, satteriCodeTabs, satteriToc, satteriDirectiveFallback],
-      hastPlugins: [satteriTableWrapper, satteriHeadingLinks],
-    }),
-  },
-});
+    markdown: {
+        processor: satteri({
+            features: { directive: true },
+            mdastPlugins: [satteriAlert, satteriCodeTabs, satteriToc, satteriDirectiveFallback],
+            hastPlugins: [satteriTableWrapper, satteriHeadingLinks],
+        }),
+    },
+})
 ```
 
 `satteriDirectiveFallback` keeps directives no plugin handles, which Sätteri
@@ -586,45 +590,48 @@ links the ids it finds:
 
 ```ts
 // astro.config.mjs
-import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark";
+import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark'
 import {
-  remarkAlert,
-  remarkCodeTabs,
-  remarkDirective,
-  remarkToc,
-  rehypeTableWrapper,
-  rehypeHeadingLinks,
-} from "@lancher-dev/jaamd";
+    remarkAlert,
+    remarkCodeTabs,
+    remarkDirective,
+    remarkToc,
+    rehypeTableWrapper,
+    rehypeHeadingLinks,
+} from '@lancher-dev/jaamd'
 
 export default defineConfig({
-  markdown: {
-    processor: unified({
-      remarkPlugins: [remarkAlert, remarkDirective, remarkCodeTabs, remarkToc],
-      rehypePlugins: [rehypeTableWrapper, rehypeHeadingIds, rehypeHeadingLinks],
-    }),
-  },
-});
+    markdown: {
+        processor: unified({
+            remarkPlugins: [remarkAlert, remarkDirective, remarkCodeTabs, remarkToc],
+            rehypePlugins: [rehypeTableWrapper, rehypeHeadingIds, rehypeHeadingLinks],
+        }),
+    },
+})
 ```
 
 ```astro
 ---
-import "@lancher-dev/jaamd/default";  // variable fallbacks; omit if you provide your own
-import "@lancher-dev/jaamd/styles";
+import '@lancher-dev/jaamd/default' // variable fallbacks; omit if you provide your own
+import '@lancher-dev/jaamd/styles'
 ---
+
 <div class="jaamd-content">
-  <slot />
+    <slot />
 </div>
 <script>
-  import { initMarkdownEnhancements } from "@lancher-dev/jaamd/client";
-  function run() { initMarkdownEnhancements(".jaamd-content"); }
-  run();
-  document.addEventListener("astro:page-load", run);
+    import { initMarkdownEnhancements } from '@lancher-dev/jaamd/client'
+    function run() {
+        initMarkdownEnhancements('.jaamd-content')
+    }
+    run()
+    document.addEventListener('astro:page-load', run)
 </script>
 ```
 
 The CSS files can also be imported from plain `.css`:
 
 ```css
-@import "@lancher-dev/jaamd/default.css";
-@import "@lancher-dev/jaamd/styles.css";
+@import '@lancher-dev/jaamd/default.css';
+@import '@lancher-dev/jaamd/styles.css';
 ```

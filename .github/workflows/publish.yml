@@ -1,40 +1,40 @@
 name: Publish to npm
 
 on:
-  push:
-    tags:
-      - "v*"
+    push:
+        tags:
+            - 'v*'
 
 permissions:
-  id-token: write
-  contents: read
+    id-token: write
+    contents: read
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
 
-      # Version comes from "packageManager" in package.json.
-      - uses: pnpm/action-setup@v6
+            # Version comes from "packageManager" in package.json.
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: '24'
+                  cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+            - run: pnpm install --frozen-lockfile
 
-      - run: pnpm typecheck
+            - run: pnpm typecheck
 
-      # Never publish a version whose markdown pipeline silently stopped
-      # working: build the showcase and assert on the HTML it produces.
-      - run: pnpm build
-      - run: pnpm smoke
-      - run: pnpm build:unified
-      - run: pnpm smoke
+            # Never publish a version whose markdown pipeline silently stopped
+            # working: build the showcase and assert on the HTML it produces.
+            - run: pnpm build
+            - run: pnpm smoke
+            - run: pnpm build:unified
+            - run: pnpm smoke
 
-      # Trusted publishing: pnpm exchanges the GitHub OIDC token for npm auth.
-      - name: Publish
-        working-directory: packages/jaamd
-        run: pnpm publish --provenance --access public --no-git-checks
+            # Trusted publishing: pnpm exchanges the GitHub OIDC token for npm auth.
+            - name: Publish
+              working-directory: packages/jaamd
+              run: pnpm publish --provenance --access public --no-git-checks

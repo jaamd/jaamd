@@ -1,48 +1,48 @@
 name: Deploy to GitHub Pages
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+    release:
+        types: [published]
+    workflow_dispatch:
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+    group: pages
+    cancel-in-progress: false
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+    contents: read
+    pages: write
+    id-token: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
 
-      # Version comes from "packageManager" in package.json.
-      - uses: pnpm/action-setup@v6
+            # Version comes from "packageManager" in package.json.
+            - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-          cache: pnpm
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: '24'
+                  cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: pnpm smoke
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm build
+            - run: pnpm smoke
 
-      - uses: actions/upload-pages-artifact@v5
-        with:
-          path: www/dist
+            - uses: actions/upload-pages-artifact@v5
+              with:
+                  path: www/dist
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v5

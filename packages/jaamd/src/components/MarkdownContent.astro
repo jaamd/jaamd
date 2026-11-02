@@ -1,22 +1,21 @@
 ---
-import type { HTMLTag } from "astro/types";
-
-import "../styles/variables.css";
-import "../styles/markdown.css";
+import type { HTMLTag } from 'astro/types'
+import '../styles/variables.css'
+import '../styles/markdown.css'
 
 /**
  * Kept deliberately non-generic: Astro's parser reads `<Tag extends HTMLTag>` as
  * an HTML tag. The real generic type lives in MarkdownContent.astro.d.ts.
  */
 type Props = {
-  as?: HTMLTag;
-  class?: string;
-};
+    as?: HTMLTag
+    class?: string
+}
 
-const { as: Tag = "div", class: extraClass, ...attrs } = Astro.props;
-const className = extraClass ? `jaamd-content ${extraClass}` : "jaamd-content";
+const { as: Tag = 'div', class: extraClass, ...attrs } = Astro.props
+const className = extraClass ? `jaamd-content ${extraClass}` : 'jaamd-content'
 ---
 
 <Tag class={className} {...attrs}>
-  <slot />
+    <slot />
 </Tag>

@@ -14,10 +14,10 @@ you see below is the integration's own output.
 - [Spoilers](#spoilers)
 - [Tables](#tables)
 - [Typography scale](#typography-scale)
-  - [Third level](#third-level)
-  - [Fourth level](#fourth-level)
-  - [Fifth level](#fifth-level)
-  - [Sixth level](#sixth-level)
+    - [Third level](#third-level)
+    - [Fourth level](#fourth-level)
+    - [Fifth level](#fifth-level)
+    - [Sixth level](#sixth-level)
 :::
 
 ---
@@ -32,10 +32,11 @@ Then wrap your content, and everything below this line is what you get.
 
 ```astro
 ---
-import MarkdownContent from "@lancher-dev/jaamd/components";
+import MarkdownContent from '@lancher-dev/jaamd/components'
 ---
+
 <MarkdownContent>
-  <slot />
+    <slot />
 </MarkdownContent>
 ```
 
@@ -49,8 +50,8 @@ included: Shiki bakes one variable per theme at build time and the switch is pur
 CSS.
 
 ```css
-@import "@lancher-dev/jaamd/default.css";
-@import "@lancher-dev/jaamd/themes/nord.css";
+@import '@lancher-dev/jaamd/default.css';
+@import '@lancher-dev/jaamd/themes/nord.css';
 ```
 
 A theme declares nine seed colours and everything else derives from them. Adding
@@ -68,7 +69,7 @@ the entry whose section is on screen is marked as current.
 :::toc[Components]
 - [Alerts](#alerts)
 - [Code tabs](#code-tabs)
-  - [Nested entries work too](#nested-entries-work-too)
+    - [Nested entries work too](#nested-entries-work-too)
 :::
 ```
 
@@ -104,12 +105,14 @@ be scrolled by keyboard.
 
 :::code-tabs
 ```js JavaScript
-console.log("Hello from JavaScript!");
+console.log('Hello from JavaScript!')
 ```
+
 ```ts TypeScript
-const msg: string = "Hello from TypeScript!";
-console.log(msg);
+const msg: string = 'Hello from TypeScript!'
+console.log(msg)
 ```
+
 ```py Python
 print("Hello from Python!")
 ```
@@ -123,7 +126,7 @@ Every fenced block gets one, top right on hover.
 
 ```ts
 export function hello(name: string): string {
-  return `Hello, ${name}!`;
+    return `Hello, ${name}!`
 }
 ```
 
@@ -159,7 +162,7 @@ The height is animated on open and close. Any markdown goes inside, lists and
 code included.
 
 ```js
-console.log("Inside an accordion!");
+console.log('Inside an accordion!')
 ```
 
 </details>
@@ -186,16 +189,16 @@ Click the blurred text, or focus it with <kbd>Tab</kbd> and press
 
 Wrapped in a scroll container, so a wide table never pushes the page sideways.
 
-| Component        | Trigger                    | Notes                     |
-|------------------|----------------------------|---------------------------|
-| Table of contents| `:::toc`                   | Marks the entry in view   |
-| Alerts           | `> [!NOTE]`                | Five variants             |
-| Code tabs        | `:::code-tabs`             | Keyboard navigable        |
-| Copy buttons     | any `pre`                  | Resets after 2 s          |
-| Heading links    | `h1`–`h6`                  | Copies the section URL    |
-| Image lightbox   | any `img`                  | Backdrop + Esc to close   |
-| Details          | `<details>`                | Animated in CSS           |
-| Spoilers         | `class="spoiler"`          | Click or Enter to reveal  |
+| Component         | Trigger           | Notes                    |
+| ----------------- | ----------------- | ------------------------ |
+| Table of contents | `:::toc`          | Marks the entry in view  |
+| Alerts            | `> [!NOTE]`       | Five variants            |
+| Code tabs         | `:::code-tabs`    | Keyboard navigable       |
+| Copy buttons      | any `pre`         | Resets after 2 s         |
+| Heading links     | `h1`–`h6`         | Copies the section URL   |
+| Image lightbox    | any `img`         | Backdrop + Esc to close  |
+| Details           | `<details>`       | Animated in CSS          |
+| Spoilers          | `class="spoiler"` | Click or Enter to reveal |
 
 ---
 
@@ -218,7 +221,7 @@ A paragraph, for the baseline size, with some `inline code` in it and a
 
 - A tight list item
 - Another one, with `code` inside it
-  - And a nested one
+    - And a nested one
 
 1. A tight ordered item
 2. Followed by a loose list, whose items are wrapped in paragraphs:

@@ -1,13 +1,13 @@
 ---
-import MarkdownContent from "@lancher-dev/jaamd/components";
-import SiteLayout from "../layouts/SiteLayout.astro";
-import Hero from "../components/Hero.astro";
-import { Content } from "../content/showcase.md";
+import MarkdownContent from '@lancher-dev/jaamd/components'
+import Hero from '../components/Hero.astro'
+import { Content } from '../content/showcase.md'
+import SiteLayout from '../layouts/SiteLayout.astro'
 ---
 
 <SiteLayout>
-  <Hero />
-  <MarkdownContent as="article">
-    <Content />
-  </MarkdownContent>
+    <Hero />
+    <MarkdownContent as="article">
+        <Content />
+    </MarkdownContent>
 </SiteLayout>

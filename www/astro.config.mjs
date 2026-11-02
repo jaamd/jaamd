@@ -1,7 +1,7 @@
-import { defineConfig, fontProviders } from "astro/config";
-import { unified } from "@astrojs/markdown-remark";
-import jaamd from "@lancher-dev/jaamd";
-import { shikiThemes } from "./src/themes.ts";
+import { unified } from '@astrojs/markdown-remark'
+import jaamd from '@lancher-dev/jaamd'
+import { defineConfig, fontProviders } from 'astro/config'
+import { shikiThemes } from './src/themes.ts'
 
 // Shiki takes arbitrary theme keys and emits --shiki-<key> per token, so every
 // theme is baked at build time and switched with CSS. jaamd's own option accepts
@@ -9,39 +9,36 @@ import { shikiThemes } from "./src/themes.ts";
 
 /** @type {import("astro").AstroIntegration} */
 const shikiMultiTheme = {
-  name: "www:shiki-themes",
-  hooks: {
-    "astro:config:setup": ({ updateConfig }) => {
-      updateConfig({
-        markdown: { shikiConfig: { themes: shikiThemes, defaultColor: false } },
-      });
+    name: 'www:shiki-themes',
+    hooks: {
+        'astro:config:setup': ({ updateConfig }) => {
+            updateConfig({
+                markdown: { shikiConfig: { themes: shikiThemes, defaultColor: false } },
+            })
+        },
     },
-  },
-};
+}
 
 // `pnpm build:unified` builds on unified. Default: Sätteri.
-const onUnified = process.env.JAAMD_PROCESSOR === "unified";
+const onUnified = process.env.JAAMD_PROCESSOR === 'unified'
 
 export default defineConfig({
-  site: "https://jaamd.lancher.dev",
-  ...(onUnified ? { markdown: { processor: unified() } } : {}),
-  integrations: [
-    jaamd({ theme: { light: "github-light", dark: "one-dark-pro" } }),
-    shikiMultiTheme,
-  ],
-  fonts: [
-    {
-      provider: fontProviders.google(),
-      name: "Inter",
-      cssVariable: "--font-inter",
-      weights: ["400 600"],
-    },
-    {
-      provider: fontProviders.google(),
-      name: "Merriweather",
-      cssVariable: "--font-merriweather",
-      weights: ["300 700"],
-      styles: ["normal", "italic"],
-    },
-  ],
-});
+    site: 'https://jaamd.lancher.dev',
+    ...(onUnified ? { markdown: { processor: unified() } } : {}),
+    integrations: [jaamd({ theme: { light: 'github-light', dark: 'one-dark-pro' } }), shikiMultiTheme],
+    fonts: [
+        {
+            provider: fontProviders.google(),
+            name: 'Inter',
+            cssVariable: '--font-inter',
+            weights: ['400 600'],
+        },
+        {
+            provider: fontProviders.google(),
+            name: 'Merriweather',
+            cssVariable: '--font-merriweather',
+            weights: ['300 700'],
+            styles: ['normal', 'italic'],
+        },
+    ],
+})

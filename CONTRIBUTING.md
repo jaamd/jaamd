@@ -3,7 +3,7 @@
 ```bash
 pnpm install
 pnpm dev                    # the showcase, on localhost:4321
-pnpm typecheck && pnpm lint
+pnpm typecheck && pnpm lint && pnpm format:check
 pnpm test:slug && pnpm test:themes
 pnpm build && pnpm smoke           # on Sätteri, Astro's default
 pnpm build:unified && pnpm smoke   # on unified
@@ -24,23 +24,22 @@ others leave one `null`.
 
 ```js
 export default {
-  light: null,
-  dark: {
-    recessed: "#21222c",   // below the background: code-tab header
-    base:     "#282a36",   // the background itself
-    surface:  "#44475a",   // raised: code, table rows, spoilers
-    overlay:  "#6272a4",   // borders and rules
-    text:     "#f8f8f2",
-    bright:   "#ffffff",   // headings, strong
+    light: null,
+    dark: {
+        recessed: '#21222c', // below the background: code-tab header
+        base: '#282a36', // the background itself
+        surface: '#44475a', // raised: code, table rows, spoilers
+        overlay: '#6272a4', // borders and rules
+        text: '#f8f8f2',
+        bright: '#ffffff', // headings, strong
 
-    primary:      "#bd93f9",
-    primaryLight: "#ff79c6",
-    accent:       "#8be9fd",   // emphasis
+        primary: '#bd93f9',
+        primaryLight: '#ff79c6',
+        accent: '#8be9fd', // emphasis
 
-    alert: { note: "#8be9fd", tip: "#50fa7b", important: "#bd93f9",
-             warning: "#f1fa8c", caution: "#ff5555" },
-  },
-};
+        alert: { note: '#8be9fd', tip: '#50fa7b', important: '#bd93f9', warning: '#f1fa8c', caution: '#ff5555' },
+    },
+}
 ```
 
 Most palettes document these levels already: Catppuccin has `mantle/base/surface0/
@@ -58,10 +57,10 @@ Where a palette wants a token off the recipe, add it under `overrides`:
 Add an entry to `src/themes/index.js` with the directory name as `slug` and a
 readable `name`, plus:
 
-| `mode` | The palette is | `shiki` |
-|---|---|---|
-| `"light"` / `"dark"` | one palette, applying in both modes | one theme name |
-| `"dual"` | two palettes, `:root` and `html.dark` | `{ light, dark }` |
+| `mode`               | The palette is                        | `shiki`           |
+| -------------------- | ------------------------------------- | ----------------- |
+| `"light"` / `"dark"` | one palette, applying in both modes   | one theme name    |
+| `"dual"`             | two palettes, `:root` and `html.dark` | `{ light, dark }` |
 
 ### 3. Generate and check
 
