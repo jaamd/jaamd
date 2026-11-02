@@ -12,11 +12,9 @@ function decodeId(raw: string): string {
   }
 }
 
-function scrollMarginTop(nav: HTMLElement): number {
-  const raw = getComputedStyle(nav)
-    .getPropertyValue("--jaamd-scroll-margin-top")
-    .trim();
-  const parsed = Number.parseFloat(raw);
+/** Where an anchored heading comes to rest, in px, whatever unit the CSS uses. */
+function scrollMarginTop(heading: Element): number {
+  const parsed = Number.parseFloat(getComputedStyle(heading).scrollMarginTop);
   return Number.isFinite(parsed) ? parsed : 80;
 }
 
@@ -61,7 +59,7 @@ export function initToc(selector: string): void {
       },
       {
         // Band from where an anchored heading rests down to 30% of the viewport.
-        rootMargin: `-${scrollMarginTop(nav)}px 0px -70% 0px`,
+        rootMargin: `-${scrollMarginTop(order[0])}px 0px -70% 0px`,
       },
     );
 

@@ -24,13 +24,6 @@ export function uniqueElementId(base: string): string {
   return `${seed}-${n}`;
 }
 
-export function prefersReducedMotion(): boolean {
-  return (
-    typeof matchMedia === "function" &&
-    matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
-
 export function qs<T extends Element = Element>(
   root: ParentNode,
   sel: string,
