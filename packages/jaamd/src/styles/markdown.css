@@ -435,25 +435,25 @@
 
 /* ─── Lightbox ─────────────────────────────────────────────────────────────── */
 
-/* A modal <dialog> filling the viewport: a click outside the image lands on it. */
+/* Sized to the image: a click on the backdrop around it closes the dialog. */
 .jaamd-lightbox {
-  width: 100vw;
-  height: 100dvh;
   max-width: none;
   max-height: none;
-  margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
-  overflow: hidden;
-  cursor: pointer;
+  overflow: visible;
 }
 
 .jaamd-lightbox[open] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: jaamd-fade-in 0.2s ease-in-out;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+@starting-style {
+  .jaamd-lightbox[open] {
+    opacity: 0;
+  }
 }
 
 .jaamd-lightbox::backdrop {
@@ -466,9 +466,9 @@ html:has(.jaamd-lightbox[open]) {
 }
 
 .jaamd-lightbox__img {
+  display: block;
   max-width: 95vw;
-  max-height: 95vh;
-  cursor: default;
+  max-height: 95dvh;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -506,14 +506,29 @@ html:has(.jaamd-lightbox[open]) {
   transform: scale(0.95);
 }
 
-.jaamd-content img.jaamd-lightbox-enabled {
-  cursor: pointer;
+.jaamd-content .jaamd-lightbox-trigger {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.jaamd-content .jaamd-lightbox-trigger:focus-visible {
+  outline: 2px solid var(--jaamd-color-primary);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+.jaamd-content .jaamd-lightbox-trigger img {
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
 }
 
-.jaamd-content img.jaamd-lightbox-enabled:hover {
+.jaamd-content .jaamd-lightbox-trigger:hover img {
   opacity: 0.9;
   transform: scale(1.02);
 }
@@ -819,17 +834,6 @@ html:has(.jaamd-lightbox[open]) {
 
 .jaamd-content .data-footnote-backref:hover {
   color: var(--jaamd-color-primary-light);
-}
-
-/* ─── Animation ─────────────────────────────────────────────── */
-
-@keyframes jaamd-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 /* ─── Table of contents (:::toc) ─────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import { addHeadingLinks } from "./modules/heading-links.js";
 import { addCopyButtons, onCopyClick } from "./modules/copy-buttons.js";
-import { addImageLightbox, onLightboxClick } from "./modules/lightbox.js";
+import { addImageLightbox } from "./modules/lightbox.js";
 import { wrapTables } from "./modules/tables.js";
 import { initCodeTabs, onTabClick, onTabKeydown } from "./modules/code-tabs.js";
 import { initSpoilers, onSpoilerClick, onSpoilerKeydown } from "./modules/spoilers.js";
@@ -19,7 +19,6 @@ function bindEvents(): void {
     onCopyClick(e.target);
     onTabClick(e.target);
     onSpoilerClick(e.target);
-    onLightboxClick(e.target, e);
   });
 
   document.addEventListener("keydown", (e) => {
