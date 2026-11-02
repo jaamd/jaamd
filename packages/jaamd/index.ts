@@ -1,10 +1,5 @@
-import type {
-  MarkdownProcessor,
-  ShikiConfig,
-  UnifiedResolvedOptions,
-} from "@astrojs/markdown-remark";
-import type { SatteriResolvedOptions } from "@astrojs/markdown-satteri";
-import type { AstroIntegration } from "astro";
+import { isSatteriProcessor } from "@astrojs/markdown-satteri";
+import type { AstroConfig, AstroIntegration, ShikiConfig } from "astro";
 import remarkDirective from "remark-directive";
 import { remarkAlert } from "./src/plugins/remark-alert.js";
 import remarkCodeTabs from "./src/plugins/remark-code-tabs.js";
@@ -18,14 +13,43 @@ import {
   satteriTableWrapper,
   satteriToc,
 } from "./src/plugins/satteri.js";
-import { paths } from "./src/paths.js";
+import { paths, rehypeHeadingIdsEntry } from "./src/paths.js";
 import { DEFAULT_SELECTOR } from "./src/scripts/utils.js";
 
-// Same check as Astro's `isSatteriProcessor` / `isUnifiedProcessor`.
-const isSatteri = (p: MarkdownProcessor): p is MarkdownProcessor<SatteriResolvedOptions> =>
-  p.name === "satteri";
-const isUnified = (p: MarkdownProcessor): p is MarkdownProcessor<UnifiedResolvedOptions> =>
+type MarkdownProcessor = AstroConfig["markdown"]["processor"];
+
+/** The `unified()` options jaamd extends. Typed here: `@astrojs/markdown-remark` is optional. */
+interface UnifiedOptions {
+  remarkPlugins: unknown[];
+  rehypePlugins: unknown[];
+}
+
+// Same check as Astro's `isUnifiedProcessor`.
+const isUnified = (p: MarkdownProcessor): p is MarkdownProcessor & { options: UnifiedOptions } =>
   p.name === "unified";
+
+/** Astro's default `shikiConfig.theme`, filled in before integrations run. */
+const ASTRO_DEFAULT_THEME = "github-dark";
+
+/** Names of a Sätteri entry: definitions carry `name`, groups nest, factories have none. */
+const satteriNames = (entry: unknown): string[] =>
+  Array.isArray(entry)
+    ? entry.flatMap(satteriNames)
+    : entry && typeof entry === "object" && "name" in entry
+      ? [String(entry.name)]
+      : [];
+
+/** Name of a unified entry: the plugin function, alone or as `[plugin, options]`. */
+const unifiedNames = (entry: unknown): string[] => {
+  const fn = Array.isArray(entry) ? entry[0] : entry;
+  return typeof fn === "function" && fn.name ? [fn.name] : [];
+};
+
+/** Plugins whose names are not registered yet. Registering one twice would run it twice. */
+function missing<T>(existing: readonly unknown[], plugins: T[], names: (entry: unknown) => string[]): T[] {
+  const taken = new Set(existing.flatMap(names));
+  return plugins.filter((p) => !names(p).some((name) => taken.has(name)));
+}
 
 export interface JaamdOptions {
   /**
@@ -38,6 +62,9 @@ export interface JaamdOptions {
   /**
    * Shiki theme. `{ light, dark }` enables dual-theme mode, which switches on a
    * `.dark` class on `<html>`.
+   *
+   * Unset, `markdown.shikiConfig` is left as configured; "github-light" replaces
+   * only Astro's own default ("github-dark" with no `themes`).
    * @default "github-light"
    */
   theme?: string | { light: string; dark: string };
@@ -75,7 +102,7 @@ export interface JaamdOptions {
 export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
   const {
     selector  = DEFAULT_SELECTOR,
-    theme     = "github-light",
+    theme,
     noDefault = false,
     plugins   = {},
   } = options;
@@ -95,18 +122,19 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
         const needsDirective = directive || codeTabs || toc;
 
         const shikiConfig: ShikiConfig = { ...config.markdown.shikiConfig };
+        const userThemes = Object.keys(shikiConfig.themes ?? {}).length > 0;
+        const userTheme = shikiConfig.theme !== ASTRO_DEFAULT_THEME;
+        const resolvedTheme = theme ?? (userThemes || userTheme ? undefined : "github-light");
 
         // Dual-theme mode: { light, dark } → Shiki "themes" with CSS variables
-        const isDualTheme = typeof theme === "object" && !!theme.light && !!theme.dark;
+        const isDualTheme = typeof resolvedTheme === "object" && !!resolvedTheme.light && !!resolvedTheme.dark;
         if (isDualTheme) {
           delete shikiConfig.theme;
-          shikiConfig.themes = { light: theme.light, dark: theme.dark } as ShikiConfig["themes"];
+          shikiConfig.themes = { light: resolvedTheme.light, dark: resolvedTheme.dark } as ShikiConfig["themes"];
           shikiConfig.defaultColor = false;
-        } else {
-          shikiConfig.theme = (typeof theme === "string" ? theme : "github-light") as ShikiConfig["theme"];
+        } else if (typeof resolvedTheme === "string") {
+          shikiConfig.theme = resolvedTheme as ShikiConfig["theme"];
         }
-
-        shikiConfig.wrap ??= true;
 
         // Extended in place. New arrays, not unshift: a shared processor
         // would stack duplicates across setup runs.
@@ -114,49 +142,35 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
         let registered: number;
         let total: number;
 
-        if (isSatteri(processor)) {
-          const plugins = [
+        if (isSatteriProcessor(processor)) {
+          const mdast = [
             ...(alerts ? [satteriAlert] : []),
             ...(codeTabs ? [satteriCodeTabs] : []),
             ...(toc ? [satteriToc] : []),
           ];
           const existing = processor.options.mdastPlugins;
-          // Entries nest. Factories have no name.
-          const namesIn = (entry: unknown): string[] =>
-            Array.isArray(entry)
-              ? entry.flatMap(namesIn)
-              : entry && typeof entry === "object" && "name" in entry
-                ? [String(entry.name)]
-                : [];
-          const existingNames = new Set(namesIn(existing));
-          const missing = plugins.filter((p) => !existingNames.has(p.name));
-
+          const addedMdast = missing(existing, mdast, satteriNames);
           // After the user's plugins.
-          const fallback =
-            needsDirective && !existingNames.has(satteriDirectiveFallback.name)
-              ? [satteriDirectiveFallback]
-              : [];
+          const fallback = needsDirective
+            ? missing(existing, [satteriDirectiveFallback], satteriNames)
+            : [];
 
-          processor.options.mdastPlugins = [...missing, ...existing, ...fallback];
+          processor.options.mdastPlugins = [...addedMdast, ...existing, ...fallback];
           if (needsDirective) {
             processor.options.features = { ...processor.options.features, directive: true };
           }
 
-          const hastPlugins = [
+          const hast = [
             ...(tables ? [satteriTableWrapper] : []),
             ...(headingLinks ? [satteriHeadingLinks] : []),
           ];
           const existingHast = processor.options.hastPlugins;
-          const hastNames = new Set(namesIn(existingHast));
-          const missingHast = hastPlugins.filter((p) => !hastNames.has(p.name));
+          const addedHast = missing(existingHast, hast, satteriNames);
 
-          processor.options.hastPlugins = [...existingHast, ...missingHast];
-          [registered, total] = [
-            missing.length + missingHast.length,
-            plugins.length + hastPlugins.length,
-          ];
+          processor.options.hastPlugins = [...existingHast, ...addedHast];
+          [registered, total] = [addedMdast.length + addedHast.length, mdast.length + hast.length];
         } else if (isUnified(processor)) {
-          const plugins = [
+          const remark = [
             ...(alerts ? [remarkAlert] : []),
             // directive must come before its consumers
             ...(needsDirective ? [remarkDirective] : []),
@@ -164,32 +178,22 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
             ...(toc ? [remarkToc] : []),
           ];
           const existing = processor.options.remarkPlugins;
+          const addedRemark = missing(existing, remark, unifiedNames);
+          processor.options.remarkPlugins = [...addedRemark, ...existing];
 
-          // Registering a plugin twice re-registers its micromark extensions.
-          const nameOf = (p: unknown): string => {
-            const fn = Array.isArray(p) ? p[0] : p;
-            return typeof fn === "function" ? fn.name : "";
-          };
-          const existingNames = new Set(existing.map(nameOf).filter(Boolean));
-          const missing = plugins.filter(
-            (p) => !existing.includes(p) && !existingNames.has(nameOf(p)),
-          );
-
-          processor.options.remarkPlugins = [...missing, ...existing];
-
-          const rehypePlugins = [
+          const rehype = [
             ...(tables ? [rehypeTableWrapper] : []),
             ...(headingLinks ? [rehypeHeadingLinks] : []),
           ];
           const existingRehype = processor.options.rehypePlugins;
-          const rehypeNames = new Set(existingRehype.map(nameOf).filter(Boolean));
-          const missingRehype = rehypePlugins.filter((p) => !rehypeNames.has(nameOf(p)));
-
-          processor.options.rehypePlugins = [...existingRehype, ...missingRehype];
-          [registered, total] = [
-            missing.length + missingRehype.length,
-            plugins.length + rehypePlugins.length,
+          const addedRehype = missing(existingRehype, rehype, unifiedNames);
+          processor.options.rehypePlugins = [
+            ...existingRehype,
+            // Astro's own id plugin, ahead of the links that read the ids.
+            ...addedRehype.flatMap((p) => (p === rehypeHeadingLinks ? [rehypeHeadingIdsEntry, p] : [p])),
           ];
+
+          [registered, total] = [addedRemark.length + addedRehype.length, remark.length + rehype.length];
         } else {
           logger.warn(
             `markdown processor "${processor.name}" is neither Sätteri nor unified; jaamd's markdown plugins were not added. Pass them to your processor manually.`,
@@ -212,8 +216,7 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
           markdown: { shikiConfig },
         });
 
-        // Stylesheets go through "page-ssr". CSS imported from the client "page"
-        // stage is dropped by Rollup in static builds.
+        // "page-ssr": the stylesheets render as <link> tags in every page's <head>.
         injectScript(
           "page-ssr",
           [

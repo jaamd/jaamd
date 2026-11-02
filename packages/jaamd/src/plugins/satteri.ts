@@ -1,7 +1,12 @@
 /** Sätteri mdast and hast plugins. `:::` blocks require `features.directive`. */
 
+import {
+  satteriCollectHastText,
+  satteriHeadingIdsPlugin,
+} from "@astrojs/markdown-satteri";
 import type {
   HastPluginDefinition,
+  HastPluginEntry,
   MdastPluginDefinition,
   MdastVisitorContext,
 } from "satteri";
@@ -12,8 +17,8 @@ import {
   alertData,
   alertTitle,
   codeTabLabel,
+  codeTabsGroupId,
   codeTabsHtml,
-  createSlugger,
   headingLinkHtml,
   tocOpenHtml,
 } from "./render.js";
@@ -26,8 +31,9 @@ export const satteriAlert: MdastPluginDefinition = {
       if (paragraph.type !== "paragraph") continue;
 
       const [first, second] = paragraph.children;
-      const match = first?.type === "text" ? first.value.match(ALERT_MARKER) : null;
-      if (!first || first.type !== "text" || !match) continue;
+      if (first?.type !== "text") continue;
+      const match = first.value.match(ALERT_MARKER);
+      if (!match) continue;
 
       const alertType = match[1].toLowerCase();
 
@@ -66,7 +72,7 @@ export const satteriCodeTabs: MdastPluginDefinition = {
     tabGroups.set(ctx.data, groupIndex + 1);
 
     const html = codeTabsHtml(
-      `jaamd-tabs-${groupIndex}`,
+      codeTabsGroupId(groupIndex, codeNodes.map((code) => code.value)),
       codeNodes.map(codeTabLabel),
     );
 
@@ -155,30 +161,26 @@ export const satteriTableWrapper: HastPluginDefinition = {
   },
 };
 
-// One slugger per document, keyed on its data bag.
-const sluggers = new WeakMap<object, (text: string) => string>();
-
-/**
- * Appends the anchor to headings. Astro assigns ids after user plugins, so the
- * id is set here, with the same slug; Astro keeps an id it finds.
- */
-export const satteriHeadingLinks: HastPluginDefinition = {
+const headingLinks: HastPluginDefinition = {
   name: "jaamd-heading-links",
   element: {
     filter: ["h1", "h2", "h3", "h4", "h5", "h6"],
     visit(node, ctx) {
-      const text = ctx.textContent(node);
-      // Astro resolves frontmatter expressions in these: left to the client.
-      if (text.includes("frontmatter")) return;
+      const id = node.properties?.id;
+      if (typeof id !== "string") return;
 
-      let id = node.properties?.id;
-      if (typeof id !== "string") {
-        const slug = sluggers.get(ctx.data) ?? createSlugger();
-        sluggers.set(ctx.data, slug);
-        id = slug(text);
-        ctx.setProperty(node, "id", id);
-      }
+      // Same text Astro records for the heading, frontmatter expressions resolved.
+      const raw = ctx.textContent(node);
+      const text = raw.includes("frontmatter")
+        ? satteriCollectHastText(node, ctx.data.astro?.frontmatter ?? {})
+        : raw;
       ctx.appendChild(node, { type: "raw", value: headingLinkHtml(id, text) });
     },
   },
 };
+
+/**
+ * Appends the anchor to headings. Astro assigns ids after user plugins, so its
+ * own id plugin runs first here; Astro's later pass keeps the ids it finds.
+ */
+export const satteriHeadingLinks: HastPluginEntry = [satteriHeadingIdsPlugin(), headingLinks];

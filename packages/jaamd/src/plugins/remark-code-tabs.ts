@@ -1,7 +1,7 @@
-import { visit } from "unist-util-visit";
+import type { Code, Root, RootContent } from "mdast";
 import type { Plugin } from "unified";
-import type { Root } from "mdast";
-import { codeTabLabel, codeTabsHtml } from "./render.js";
+import { visit } from "unist-util-visit";
+import { codeTabLabel, codeTabsGroupId, codeTabsHtml } from "./render.js";
 
 /**
  * Tabbed code blocks: a `:::code-tabs` container wrapping fenced blocks.
@@ -10,40 +10,35 @@ import { codeTabLabel, codeTabsHtml } from "./render.js";
  *
  * Requires remark-directive to run before this plugin.
  */
-const remarkCodeTabs: Plugin<[], Root> = () => {
-  return (tree: Root) => {
-    // Per-document, so several blocks on one page get distinct ids.
-    let groupIndex = 0;
+const remarkCodeTabs: Plugin<[], Root> = () => (tree) => {
+  // Position of the group in the document, hashed into its id.
+  let groupIndex = 0;
 
-    visit(tree, "containerDirective", (node: any, index, parent: any) => {
-      if (node.name !== "code-tabs") return;
-      if (index === undefined || !parent) return;
+  visit(tree, "containerDirective", (node, index, parent) => {
+    if (node.name !== "code-tabs" || index === undefined || !parent) return;
 
-      const codeNodes = node.children.filter(
-        (child: any) => child.type === "code",
-      );
-      if (codeNodes.length === 0) return;
+    const codeNodes = node.children.filter((child): child is Code => child.type === "code");
+    if (codeNodes.length === 0) return;
 
-      const html = codeTabsHtml(
-        `jaamd-tabs-${groupIndex++}`,
-        codeNodes.map(codeTabLabel),
-      );
+    const html = codeTabsHtml(
+      codeTabsGroupId(groupIndex++, codeNodes.map((code) => code.value)),
+      codeNodes.map(codeTabLabel),
+    );
 
-      const replacement: any[] = [{ type: "html", value: html.open }];
-
-      codeNodes.forEach((codeNode: any, i: number) => {
-        replacement.push({ type: "html", value: html.panelOpen(i) });
+    const replacement: RootContent[] = [
+      { type: "html", value: html.open },
+      ...codeNodes.flatMap((code, i): RootContent[] => [
+        { type: "html", value: html.panelOpen(i) },
         // Strip meta so Shiki doesn't render it as a title annotation
-        replacement.push({ ...codeNode, meta: null });
-        replacement.push({ type: "html", value: html.panelClose });
-      });
+        { ...code, meta: null },
+        { type: "html", value: html.panelClose },
+      ]),
+      { type: "html", value: html.close },
+    ];
 
-      replacement.push({ type: "html", value: html.close });
-      parent.children.splice(index, 1, ...replacement);
-
-      return index + replacement.length;
-    });
-  };
+    (parent.children as RootContent[]).splice(index, 1, ...replacement);
+    return index + replacement.length;
+  });
 };
 
 export default remarkCodeTabs;

@@ -135,6 +135,10 @@ Hover any heading on this page to reveal the anchor icon. It links to that
 section. All six levels have one, and an anchored heading comes to rest
 clear of the sticky header above.
 
+### Headings that mention frontmatter
+
+Get their anchor at build time too.
+
 ---
 
 ## Image lightbox

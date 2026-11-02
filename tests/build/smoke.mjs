@@ -60,13 +60,13 @@ check(
 
 check(
   "code-tabs: tabs linked to panels",
-  countOf(/aria-controls="jaamd-tabs-\d+-panel-\d+"/g) === 3,
+  countOf(/aria-controls="jaamd-tabs-[a-z0-9]+-panel-\d+"/g) === 3,
   "each tab must reference its panel via aria-controls",
 );
 
 check(
   "code-tabs: panels linked back to tabs",
-  countOf(/aria-labelledby="jaamd-tabs-\d+-tab-\d+"/g) === 3,
+  countOf(/aria-labelledby="jaamd-tabs-[a-z0-9]+-tab-\d+"/g) === 3,
   "each panel must reference its tab via aria-labelledby",
 );
 

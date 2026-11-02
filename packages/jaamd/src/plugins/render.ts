@@ -1,11 +1,7 @@
 /** Markup shared by the remark and Sätteri plugins. */
 
-import {
-  HEADING_LINK_CLASS,
-  HEADING_LINK_ICON,
-  headingLinkLabel,
-  slugify,
-} from "../scripts/utils.js";
+import type { Data, Emphasis, Paragraph } from "mdast";
+import { HEADING_LINK_CLASS, HEADING_LINK_ICON, headingLinkLabel } from "../scripts/utils.js";
 import { escapeHtml } from "./utils.js";
 
 export const ALERT_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i;
@@ -14,44 +10,44 @@ export const ALERT_LEGACY_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)(\/.
 export const DEFAULT_TOC_LABEL = "Table of contents";
 
 /** Blockquote `data` for the alert wrapper. */
-export function alertData(alertType: string, tagName = "div") {
-  return {
-    hName: tagName,
-    hProperties: {
-      className: ["markdown-alert", `markdown-alert-${alertType}`],
-      dir: "auto",
-    },
-  };
+export function alertData(alertType: string, tagName = "div"): Data {
+  return asHast(
+    { className: ["markdown-alert", `markdown-alert-${alertType}`], dir: "auto" },
+    tagName,
+  );
+}
+
+/** mdast `data` that renders the node as another hast element. */
+function asHast(hProperties: Record<string, unknown>, hName?: string): Data {
+  return (hName ? { hName, hProperties } : { hProperties }) as Data;
 }
 
 /** Title paragraph: icon plus label. */
-export function alertTitle(alertType: string, title: string): any {
+export function alertTitle(alertType: string, title: string): Paragraph {
   return {
     type: "paragraph",
     children: [alertIcon(alertType), { type: "text", value: title }],
-    data: {
-      hProperties: { className: "markdown-alert-title", dir: "auto" },
-    },
+    data: asHast({ className: "markdown-alert-title", dir: "auto" }),
   };
 }
 
-function alertIcon(type: string): any {
+function alertIcon(type: string): Emphasis {
   return {
     type: "emphasis",
-    data: {
-      hName: "svg",
-      hProperties: {
+    data: asHast(
+      {
         className: ["octicon"],
         viewBox: "0 0 16 16",
         width: "16",
         height: "16",
         ariaHidden: "true",
       },
-    },
+      "svg",
+    ),
     children: [
       {
         type: "emphasis",
-        data: { hName: "path", hProperties: { d: pathData[type] ?? "" } },
+        data: asHast({ d: pathData[type] ?? "" }, "path"),
         children: [],
       },
     ],
@@ -61,6 +57,20 @@ function alertIcon(type: string): any {
 /** Tab label: meta, then language, then "Tab N". */
 export function codeTabLabel(code: { meta?: string | null; lang?: string | null }, i: number): string {
   return code.meta || code.lang || `Tab ${i + 1}`;
+}
+
+/**
+ * Id of one `:::code-tabs` group: a hash of its position and code, so groups
+ * from different documents on one page do not collide.
+ */
+export function codeTabsGroupId(index: number, codes: string[]): string {
+  // FNV-1a, 32-bit.
+  let hash = 0x811c9dc5;
+  for (const char of `${index}\0${codes.join("\0")}`) {
+    hash ^= char.codePointAt(0)!;
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `jaamd-tabs-${(hash >>> 0).toString(36)}`;
 }
 
 /** HTML around the code blocks of one `:::code-tabs` group. */
@@ -107,23 +117,6 @@ export function tocOpenHtml(label: string): string {
 }
 
 export const TOC_CLOSE_HTML = `</nav>`;
-
-/** Heading ids as Astro assigns them: `github-slugger`, "setup", "setup-1", "setup-2". */
-export function createSlugger(): (text: string) => string {
-  const counts = new Map<string, number>();
-
-  return (text) => {
-    const slug = slugify(text);
-    let result = slug;
-    while (counts.has(result)) {
-      const n = (counts.get(slug) ?? 0) + 1;
-      counts.set(slug, n);
-      result = `${slug}-${n}`;
-    }
-    counts.set(result, 0);
-    return result;
-  };
-}
 
 /** Anchor appended to a heading. */
 export function headingLinkHtml(id: string, text: string): string {

@@ -12,3 +12,6 @@ export const paths = {
   markdown: own("./styles/markdown.css"),
   client: own("./scripts/enhancements.ts"),
 };
+
+/** URL of the module re-exporting Astro's `rehypeHeadingIds`, for a string plugin entry. */
+export const rehypeHeadingIdsEntry = new URL("./plugins/rehype-heading-ids.js", import.meta.url).href;

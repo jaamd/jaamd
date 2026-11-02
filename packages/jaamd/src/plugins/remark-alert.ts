@@ -20,12 +20,13 @@ export function remarkAlert(options: RemarkAlertOptions = {}) {
   const marker = legacyTitle ? ALERT_LEGACY_MARKER : ALERT_MARKER;
 
   return (tree: Root) => {
-    visit(tree, "blockquote", (node: any) => {
+    visit(tree, "blockquote", (node) => {
       for (const paragraph of node.children) {
         if (paragraph.type !== "paragraph") continue;
 
         const first = paragraph.children[0];
-        const match = first?.type === "text" ? first.value.match(marker) : null;
+        if (first?.type !== "text") continue;
+        const match = first.value.match(marker);
         if (!match) continue;
 
         const alertType = match[1].toLowerCase();

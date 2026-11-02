@@ -1,13 +1,13 @@
 /** rehype plugins for the unified processor. */
 
-import type { RehypePlugin } from "@astrojs/markdown-remark";
-import type { Element, ElementContent } from "hast";
+import type { Element, ElementContent, Root } from "hast";
+import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 import { TABLE_WRAPPER_CLASS } from "../scripts/utils.js";
-import { createSlugger, headingLinkHtml } from "./render.js";
+import { headingLinkHtml } from "./render.js";
 
 /** Wraps tables in a scroll container. */
-export const rehypeTableWrapper: RehypePlugin<[]> = () => (tree) => {
+export const rehypeTableWrapper: Plugin<[], Root> = () => (tree) => {
   visit(tree, "element", (node, index, parent) => {
     if (node.tagName !== "table" || index === undefined || !parent) return;
 
@@ -34,24 +34,20 @@ function hasExpression(node: ElementContent): boolean {
 }
 
 /**
- * Appends the anchor to headings. Astro assigns ids after user plugins, so the
- * id is set here, with the same slug; Astro keeps an id it finds.
+ * Appends the anchor to headings that have an id. Astro assigns ids after user
+ * plugins: register its `rehypeHeadingIds` before this one, as the integration
+ * does; Astro's later pass keeps the ids it finds.
  */
-export const rehypeHeadingLinks: RehypePlugin<[]> = () => (tree) => {
-  const slug = createSlugger();
-
+export const rehypeHeadingLinks: Plugin<[], Root> = () => (tree) => {
   visit(tree, "element", (node) => {
     if (!/^h[1-6]$/.test(node.tagName)) return;
+    const id = node.properties.id;
     // Astro resolves MDX expressions in these: left to the client.
-    if (hasExpression(node)) return;
-
-    const text = textOf(node);
-    const id = typeof node.properties.id === "string" ? node.properties.id : slug(text);
-    node.properties.id = id;
+    if (typeof id !== "string" || hasExpression(node)) return;
 
     node.children.push({
       type: "raw",
-      value: headingLinkHtml(id, text),
+      value: headingLinkHtml(id, textOf(node)),
     } as unknown as ElementContent);
   });
 };
