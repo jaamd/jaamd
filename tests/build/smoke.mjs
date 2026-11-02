@@ -265,6 +265,17 @@ check(
   "the injected page script did not make it into the build",
 );
 
+// ─── llms.txt ────────────────────────────────────────────────────────────────
+
+const LLMS = join(DIST, "llms.txt");
+const llms = existsSync(LLMS) ? readFileSync(LLMS, "utf8") : "";
+
+check(
+  "llms.txt: the package README, with the markup contract",
+  llms.startsWith("# jaamd\n") && llms.includes("## Markup and classes"),
+  "www/src/pages/llms.txt.ts did not emit the README; check its imports",
+);
+
 // ─── report ──────────────────────────────────────────────────────────────────
 
 const failed = results.filter((r) => !r.ok);
