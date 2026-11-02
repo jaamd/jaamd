@@ -87,8 +87,7 @@
 
 .jaamd-content h2 {
   font-size: var(--jaamd-font-size-h2, calc(var(--jaamd-font-size) * 1.67));
-  border-bottom-width: 2px;
-  border-bottom-color: var(--jaamd-heading-border-color);
+  border-bottom: 2px solid var(--jaamd-heading-border-color);
   padding-bottom: 0.5rem;
 }
 
@@ -256,8 +255,7 @@
 
 .jaamd-content blockquote {
   font-size: var(--jaamd-font-size-blockquote, inherit);
-  border-left-width: 4px;
-  border-left-color: var(--jaamd-blockquote-border);
+  border-left: 4px solid var(--jaamd-blockquote-border);
   background-color: var(--jaamd-blockquote-bg);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -280,8 +278,7 @@
 }
 
 .jaamd-content .markdown-alert {
-  border-left-width: 4px;
-  border-left-color: var(--jaamd-blockquote-border);
+  border-left: 4px solid var(--jaamd-blockquote-border);
   background-color: var(--jaamd-blockquote-bg);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -328,9 +325,8 @@
 }
 
 .jaamd-content hr {
-  border-width: 0;
-  border-top-width: 2px;
-  border-top-color: var(--jaamd-hr-color);
+  border: 0;
+  border-top: 2px solid var(--jaamd-hr-color);
   margin-top: 2rem;
   margin-bottom: 2rem;
 }
