@@ -11,22 +11,21 @@
     "build:unified": "JAAMD_PROCESSOR=unified pnpm --filter www build",
     "preview": "pnpm --filter www preview",
     "typecheck": "tsc --noEmit -p packages/jaamd && pnpm --filter www check",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "build:themes": "node scripts/build-themes.mjs",
     "test:slug": "node tests/unit/slug-parity.mjs",
     "test:themes": "node tests/unit/themes.mjs",
     "smoke": "node tests/build/smoke.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@types/node": "^24.0.0",
-    "eslint": "^10.8.1",
-    "eslint-plugin-astro": "^3.1.0",
     "github-slugger": "^2.0.0",
-    "globals": "^17.11.0",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
     "shiki": "4.4.3",
-    "typescript": "^6.0.0",
-    "typescript-eslint": "^8.67.0"
+    "typescript": "^6.0.0"
   }
 }

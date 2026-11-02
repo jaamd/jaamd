@@ -148,7 +148,7 @@ async function run(check) {
   const slugs = readdirSync(THEMES, { withFileTypes: true })
     .filter((e) => e.isDirectory())
     .map((e) => e.name)
-    .sort();
+    .toSorted();
 
   const stale = [];
 
