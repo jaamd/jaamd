@@ -12,9 +12,9 @@
 import { readdirSync, readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { themes } from '../packages/jaamd/src/themes/index.js'
+import { themes } from '../src/themes/index.js'
 
-const THEMES = join(process.cwd(), 'packages', 'jaamd', 'src', 'themes')
+const THEMES = fileURLToPath(new URL('../src/themes', import.meta.url))
 
 /** Token to palette role, in output order. Groups are separated by a blank line. */
 const GROUPS = [

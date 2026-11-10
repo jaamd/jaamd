@@ -19,7 +19,7 @@ import {
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..");
-const PKG = join(ROOT, "packages", "jaad");
+const PKG = ROOT;
 
 /** A built directory, frozen so the later rebuilds can be compared to it. */
 function snapshot(dist) {

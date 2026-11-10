@@ -11,7 +11,7 @@ import {
   getInjectedRoutes,
   loadTailwindPlugin,
   shouldInjectNotFound,
-} from "../../packages/jaad/src/integration.ts";
+} from "../../src/integration.ts";
 
 test("opening-page discovery follows collection slugging and numeric order", () => {
   const docsDir = mkdtempSync(join(tmpdir(), "jaad-opening-"));

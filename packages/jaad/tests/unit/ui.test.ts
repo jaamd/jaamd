@@ -1,13 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { resolveConfig } from "../../packages/jaad/src/config.ts";
+import { resolveConfig } from "../../src/config.ts";
 import {
   UI_DEFAULTS,
   UI_KEYS,
   UI_SUPPORTED_LOCALES,
   uiString,
-} from "../../packages/jaad/src/ui.ts";
-import { ITALIAN_UI } from "../../packages/jaad/src/ui/it.ts";
+} from "../../src/ui.ts";
+import { ITALIAN_UI } from "../../src/ui/it.ts";
 
 test("a locale's override wins over its bundled catalogue", () => {
   const overrides = { it: { "page.copy": "Copia la pagina" } };

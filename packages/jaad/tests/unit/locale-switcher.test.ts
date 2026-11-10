@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { nextSwitcherMarkup } from "../../packages/jaad/src/components/locale-switcher.ts";
+import { nextSwitcherMarkup } from "../../src/components/locale-switcher.ts";
 
 /** Enough of a Document for the one query the swap makes. */
 const documentWith = (switcher: { innerHTML: string } | null) =>

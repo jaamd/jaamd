@@ -4,6 +4,12 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["**/*.ts", "**/*.astro"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.astro"
+  ],
+  "exclude": [
+    "node_modules",
+    "tests"
+  ]
 }

@@ -7,7 +7,7 @@ import { allCss, packageClasses, missingFrom, themeTokens } from "../dist.mjs";
 
 const SRC = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../../packages/jaad/src",
+  "../../src",
 );
 
 test("every class used by the package ships in the built CSS", () => {
@@ -37,7 +37,7 @@ test("every @theme token ships in the package stylesheet", () => {
 // `tailwind: true` exposes exactly JAAD's colour and font tokens.
 test("tailwind.css names every colour and font token", () => {
   const pick = (tokens) =>
-    tokens.filter((t) => /^--(color|font)-/.test(t)).sort();
+    tokens.filter((t) => /^--(color|font)-/.test(t)).toSorted();
   const declared = pick(themeTokens(source("styles/global.css")));
   const bridged = pick(themeTokens(source("styles/tailwind.css")));
   assert.deepEqual(bridged, declared);
@@ -47,7 +47,7 @@ test("tailwind.css names every colour and font token", () => {
 test("package markup uses only jaad-* and docs-* classes", () => {
   const allowed = /^(jaad-|docs-|font-brand$|dark$)/;
   const utilities = [...packageClasses(SRC)].filter((c) => !allowed.test(c));
-  assert.deepEqual(utilities.sort(), []);
+  assert.deepEqual(utilities.toSorted(), []);
 });
 
 // An unlayered rule beats every Tailwind utility, including the consumer's own.

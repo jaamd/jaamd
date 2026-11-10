@@ -6,7 +6,7 @@ import { join } from "node:path";
 import {
   defineJaadConfig,
   resolveConfig,
-} from "../../packages/jaad/src/config.ts";
+} from "../../src/config.ts";
 
 // Resolved outside a repository, so nothing is inferred and the defaults show.
 const bare = (over = {}) => resolveConfig({ title: "T", ...over }, "/");

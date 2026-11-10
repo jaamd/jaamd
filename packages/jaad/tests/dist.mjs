@@ -3,7 +3,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-export const DIST = join(ROOT, "www", "dist");
+export const DIST = join(ROOT, "tests", "fixture", "dist");
 
 export function walk(dir) {
   if (!existsSync(dir)) {
@@ -78,5 +78,5 @@ export function themeTokens(css) {
 }
 
 export function missingFrom(css, classes) {
-  return [...classes].filter((c) => !css.includes("." + escapeClass(c))).sort();
+  return [...classes].filter((c) => !css.includes("." + escapeClass(c))).toSorted();
 }

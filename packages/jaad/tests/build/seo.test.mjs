@@ -23,10 +23,10 @@ test("social card images are absolute urls", () => {
 
 test("the conventional public social image is discovered", () => {
   const html = page("docs/index.html");
-  assert.equal(meta(html, "og:image"), "https://jaad.lancher.dev/og-image.png");
+  assert.equal(meta(html, "og:image"), "https://docs.example.com/og-image.png");
   assert.equal(
     meta(html, "twitter:image"),
-    "https://jaad.lancher.dev/og-image.png",
+    "https://docs.example.com/og-image.png",
   );
 });
 

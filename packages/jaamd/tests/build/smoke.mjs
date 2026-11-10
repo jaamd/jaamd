@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
- * Post-build assertions on ./www. A green `astro build` proves nothing: jaamd
+ * Post-build assertions on the fixture. A green `astro build` proves nothing: jaamd
  * only warns when it cannot register its plugins.
  */
 
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { themes } from '../../packages/jaamd/src/themes/index.js'
+import { fileURLToPath } from 'node:url'
+import { themes } from '../../src/themes/index.js'
 
-const DIST = join(process.cwd(), 'www', 'dist')
+const DIST = fileURLToPath(new URL('../fixture/dist', import.meta.url))
 const PAGE = join(DIST, 'index.html')
 
 if (!existsSync(PAGE)) {
@@ -51,7 +52,7 @@ check(
 check(
     'code-tabs: one panel per code block',
     countOf(/class="code-tab-panel/g) === 3,
-    'expected the 3 tabs authored in www/src/content/showcase.md',
+    'expected the 3 tabs authored in tests/fixture/src/content/showcase.md',
 )
 
 // ─── accessibility wiring the client script relies on ────────────────────────
@@ -258,7 +259,7 @@ const llms = existsSync(LLMS) ? readFileSync(LLMS, 'utf8') : ''
 check(
     'llms.txt: the package README, with the markup contract',
     llms.startsWith('# jaamd\n') && llms.includes('## Markup and classes'),
-    'www/src/pages/llms.txt.ts did not emit the README; check its imports',
+    'tests/fixture/src/pages/llms.txt.ts did not emit the README; check its imports',
 )
 
 // ─── report ──────────────────────────────────────────────────────────────────

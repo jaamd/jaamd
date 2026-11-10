@@ -9,35 +9,8 @@ test("jaamd's remark plugins ran", () => {
   assert.match(markdown, /code-tabs/);
 });
 
-test("retired documentation routes redirect to their replacements", () => {
-  const markdownPages = [
-    "alerts",
-    "blockquotes",
-    "code-blocks",
-    "combination",
-    "detail--summary",
-    "images--videos",
-    "inner-html",
-    "links",
-    "lists",
-    "reference",
-    "spoiler",
-    "tables",
-    "text-formatting",
-  ];
-
-  for (const slug of markdownPages) {
-    assert.match(
-      page(`docs/markdown/${slug}/index.html`),
-      /url=\/docs\/markdown["']?/,
-      slug,
-    );
-  }
-
-  assert.match(
-    page("docs/getting-started/development/index.html"),
-    /url=\/docs\/getting-started\/installation#run-locally/,
-  );
+test("astro redirects set in the jaad config are emitted", () => {
+  assert.match(page("docs/retired/index.html"), /url=\/docs\/markdown["']?/);
 });
 
 test("dual-theme code colours reach the built CSS", () => {
@@ -67,7 +40,7 @@ test("no third-party host on the critical path", () => {
         (h) => `${f.split("/dist/")[1]}: ${h}`,
       );
     })
-    .sort();
+    .toSorted();
   assert.deepEqual(offenders, []);
 });
 
@@ -169,28 +142,6 @@ test("the chrome is measured against the content, not against a second number", 
     "the header does not use the shared measure",
   );
   assert.match(page("docs/index.html"), /data-jaad-default-frame/);
-});
-
-// With routeBase set, JAAD injects no 404: the site has to bring its own.
-test("the site answers a wrong url with its own page", () => {
-  const missing = page("404.html");
-  assert.match(missing, /<title>404 \| JAAD<\/title>/);
-  assert.match(missing, /<body[^>]*data-site-layout/);
-  assert.match(missing, /href="\/docs"/, "no way back into the documentation");
-});
-
-test("the landing page shares the docs measure without using its frame", () => {
-  const home = page("index.html");
-  const css = allCss().replace(/\s+/g, "");
-
-  assert.match(home, /<body[^>]*data-site-layout/);
-  assert.doesNotMatch(home, /jaad-chrome|data-jaad-default-frame/);
-  assert.match(
-    css,
-    /\.site-chrome\{[^}]*max-width:var\(--site-content-width\)/,
-  );
-  assert.match(css, /\.site-main\{[^}]*max-width:var\(--site-content-width\)/);
-  assert.match(home, /<site-theme-toggle>/);
 });
 
 test("docs and the page layout share one padding token", () => {

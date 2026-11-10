@@ -5,7 +5,7 @@ import {
   getSnippet,
   splitOnMatches,
   type SearchItem,
-} from "../../packages/jaad/src/utils/search.ts";
+} from "../../src/utils/search.ts";
 
 const item = (over: Partial<SearchItem>): SearchItem => ({
   title: "Title",

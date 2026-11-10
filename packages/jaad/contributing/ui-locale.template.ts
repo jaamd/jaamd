@@ -1,4 +1,4 @@
-import type { UiCatalog } from "../packages/jaad/src/ui.ts";
+import type { UiCatalog } from "../src/ui.ts";
 
 /** Copy this file into packages/jaad/src/ui/, rename the constant, then fill
  *  every value. Registering an unfinished catalogue makes the tests fail. */

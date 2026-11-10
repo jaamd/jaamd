@@ -11,11 +11,11 @@ import {
   localePrefix,
   prefixedLocales,
   routedLocales,
-} from "../../packages/jaad/src/locales.ts";
+} from "../../src/locales.ts";
 import {
   detectLocales,
   validateLocaleTree,
-} from "../../packages/jaad/src/locale-tree.ts";
+} from "../../src/locale-tree.ts";
 
 function docsTree(entries: string[]): string {
   const dir = mkdtempSync(join(tmpdir(), "jaad-locales-"));

@@ -12,7 +12,7 @@ import {
 } from "./helpers.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const PKG = join(HERE, "..", "..", "packages", "jaad");
+const PKG = join(HERE, "..", "..");
 
 // pnpm: strict layout, so tailwind.css must reach the site's tailwindcss as a peer.
 describe("`tailwind: true` in a pnpm project", () => {

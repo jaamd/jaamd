@@ -3,15 +3,15 @@ import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { PRESETS } from "../../packages/jaad/src/themes/index.ts";
+import { PRESETS } from "../../src/themes/index.ts";
 import {
   resolveConfig,
   resolveStylesheets,
-} from "../../packages/jaad/src/config.ts";
+} from "../../src/config.ts";
 
 const THEMES = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../../packages/jaad/src/themes",
+  "../../src/themes",
 );
 
 test("every preset resolves to a stylesheet JAAMD actually ships", () => {

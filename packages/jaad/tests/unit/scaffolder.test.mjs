@@ -8,7 +8,7 @@ import {
   parseArgs,
   quoteArg,
   titleFrom,
-} from "../../packages/create-jaad/lib.mjs";
+} from "../../../create-jaad/lib.mjs";
 
 // ── Arguments ────────────────────────────────────────────────────────────────
 

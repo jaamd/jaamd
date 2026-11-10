@@ -14,8 +14,8 @@ import {
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..");
-const PKG = join(ROOT, "packages", "jaad");
-const CREATE_PKG = join(ROOT, "packages", "create-jaad");
+const PKG = ROOT;
+const CREATE_PKG = join(ROOT, "..", "create-jaad");
 const CLI = join(CREATE_PKG, "index.mjs");
 
 /** The generated manifest asks npm for the published jaad; point it at ours. */
@@ -390,7 +390,7 @@ test("the version the scaffolder installs is the one being published", () => {
     readFileSync(join(CREATE_PKG, "index.mjs"), "utf8"),
   )?.[1];
   const published = JSON.parse(
-    readFileSync(join(ROOT, "packages/jaad/package.json"), "utf8"),
+    readFileSync(join(ROOT, "package.json"), "utf8"),
   ).version;
 
   assert.equal(pinned, published, "create-jaad pins a stale @lancher-dev/jaad");

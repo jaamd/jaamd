@@ -5,7 +5,7 @@ import {
   editBaseFrom,
   inferRepo,
   inferDescription,
-} from "../../packages/jaad/src/infer.ts";
+} from "../../src/infer.ts";
 
 test("ssh and https remotes normalise to the same browsable url", () => {
   const expected = "https://github.com/owner/repo";

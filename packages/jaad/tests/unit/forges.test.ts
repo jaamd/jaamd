@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { FORGES, forgeForUrl } from "../../packages/jaad/src/forges.ts";
+import { FORGES, forgeForUrl } from "../../src/forges.ts";
 
 test("the bundled set covers the forges the git inference can meet", () => {
   for (const name of ["github", "gitlab", "codeberg", "gitea", "forgejo"]) {

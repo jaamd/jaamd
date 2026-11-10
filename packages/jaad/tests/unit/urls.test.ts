@@ -5,7 +5,7 @@ import {
   withDeploymentBase,
   docsPageHref,
   docsMarkdownHref,
-} from "../../packages/jaad/src/urls.ts";
+} from "../../src/urls.ts";
 
 test("base paths are normalised without a trailing slash", () => {
   assert.equal(normaliseBasePath("/"), "");

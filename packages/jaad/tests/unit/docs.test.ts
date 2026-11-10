@@ -20,8 +20,8 @@ import {
   docTranslationKey,
   buildSearchIndex,
   validateDocsStructure,
-} from "../../packages/jaad/src/utils/docs.ts";
-import { buildDocsNavigation } from "../../packages/jaad/src/navigation.ts";
+} from "../../src/utils/docs.ts";
+import { buildDocsNavigation } from "../../src/navigation.ts";
 
 const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) =>
   navigation.sections.flatMap((section) =>

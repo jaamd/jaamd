@@ -6,15 +6,15 @@
 
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { bundledThemes } from 'shiki'
-import { themes, REQUIRED_TOKENS } from '../../packages/jaamd/src/themes/index.js'
+import { themes, REQUIRED_TOKENS } from '../../src/themes/index.js'
 import { render, TOKENS } from '../../scripts/build-themes.mjs'
 
 const LEVELS = ['recessed', 'base', 'surface', 'overlay', 'text', 'bright', 'primary', 'primaryLight', 'accent']
 const ALERTS = ['note', 'tip', 'important', 'warning', 'caution']
 
-const THEMES = join(process.cwd(), 'packages', 'jaamd', 'src', 'themes')
+const THEMES = fileURLToPath(new URL('../../src/themes', import.meta.url))
 
 const results = []
 const check = (name, condition, hint) => results.push({ name, ok: Boolean(condition), hint })
