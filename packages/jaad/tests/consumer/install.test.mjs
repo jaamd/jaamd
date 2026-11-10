@@ -66,7 +66,7 @@ describe('a project that installed the published tarball', () => {
                     type: 'module',
                     dependencies: {
                         astro: '7.3.1',
-                        '@lancher-dev/jaad': tarball,
+                        '@jaamd/jaad': tarball,
                     },
                 },
                 null,
@@ -82,7 +82,7 @@ describe('a project that installed the published tarball', () => {
         // every JAAD-owned URL have to move together.
         writeFileSync(
             join(project, 'jaad.config.ts'),
-            `import { defineJaadConfig } from "@lancher-dev/jaad";
+            `import { defineJaadConfig } from "@jaamd/jaad";
 export default defineJaadConfig({
   site: "https://example.dev",
   base: "/repo",
@@ -137,7 +137,7 @@ export default defineJaadConfig({
         )
         writeFileSync(
             join(project, 'jaad.config.ts'),
-            `import { defineJaadConfig } from "@lancher-dev/jaad";
+            `import { defineJaadConfig } from "@jaamd/jaad";
 export default defineJaadConfig({
   site: "https://example.dev",
   title: "Consumer Test",

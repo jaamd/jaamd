@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 export const TEMPLATES = ['docs', 'site']
 export const DEFAULT_TEMPLATE = 'docs'
 
-export const HELP = `Usage: npm create @lancher-dev/jaad@latest [directory] [options]
+export const HELP = `Usage: npm create @jaamd/jaad@latest [directory] [options]
 
   --here                    Set up JAAD in the current directory.
   --template <docs|site>    Docs at / (default), or a landing page with

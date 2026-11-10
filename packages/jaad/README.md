@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://jaad.lancher.dev">
-    <img src="../../assets/readme-header.png" alt="JAAD — Just Another Astro Docs. Documentation, simplified." width="1200" />
+  <a href="https://jaamd.org/docs/jaad">
+    <img src="./assets/readme-header.png" alt="JAAD — Just Another Astro Docs. Documentation, simplified." width="1200" />
   </a>
 </p>
 
@@ -10,30 +10,30 @@
 
 <div align="center">
 
-[![main](https://github.com/lancher-dev/jaad/actions/workflows/ci.yml/badge.svg)](https://github.com/lancher-dev/jaad/actions/workflows/ci.yml)
+[![main](https://github.com/jaamd/jaamd/actions/workflows/ci.yml/badge.svg)](https://github.com/jaamd/jaamd/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/withastro/astro/blob/main/LICENSE)
-[![npm version](https://badge.fury.io/js/@lancher-dev%2Fjaad.svg)](https://badge.fury.io/js/@lancher-dev%2Fjaad)
+[![npm version](https://badge.fury.io/js/@jaamd%2Fjaad.svg)](https://badge.fury.io/js/@jaamd%2Fjaad)
 </div>
 
 ```bash
-npm create @lancher-dev/jaad@latest my-docs
+npm create @jaamd/jaad@latest my-docs
 ```
 
 Or add it to a repository that already has a `docs/` folder:
 
 ```bash
-npm create @lancher-dev/jaad@latest -- --here
+npm create @jaamd/jaad@latest -- --here
 ```
 
 By hand:
 
 ```bash
-npm install @lancher-dev/jaad
+npm install @jaamd/jaad
 ```
 
 ```ts
 // jaad.config.ts
-import { defineJaadConfig } from '@lancher-dev/jaad'
+import { defineJaadConfig } from '@jaamd/jaad'
 
 export default defineJaadConfig({
     site: 'https://example.dev',
@@ -41,7 +41,7 @@ export default defineJaadConfig({
 })
 ```
 
-Documentation: [jaad.lancher.dev](https://jaad.lancher.dev)
+Documentation: [jaamd.org/docs/jaad](https://jaamd.org/docs/jaad)
 
 ## Contributing
 

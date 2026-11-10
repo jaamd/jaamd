@@ -15,7 +15,7 @@ pnpm test:build      # builds each package fixture and asserts on its output
 pnpm test:consumer   # installs the packed tarballs into throwaway projects
 ```
 
-Each check runs per package as well, for example `pnpm --filter @lancher-dev/jaad test`.
+Each check runs per package as well, for example `pnpm --filter @jaamd/jaad test`.
 
 ## Themes
 
@@ -74,7 +74,7 @@ readable `name`, plus:
 
 ```bash
 pnpm build:themes
-pnpm --filter @lancher-dev/jaamd test
+pnpm --filter @jaamd/jaamd test
 ```
 
 The test names the missing level, an unknown Shiki theme, a token no other theme

@@ -17,7 +17,7 @@ const CLI = join(CREATE_PKG, 'index.mjs')
 function useLocalJaad(project, tarball) {
     const file = join(project, 'package.json')
     const manifest = JSON.parse(readFileSync(file, 'utf8'))
-    manifest.dependencies['@lancher-dev/jaad'] = tarball
+    manifest.dependencies['@jaamd/jaad'] = tarball
     writeFileSync(file, JSON.stringify(manifest, null, 2))
 }
 
@@ -60,7 +60,7 @@ test('the scaffolder produces a project that builds', { timeout: 600_000 }, () =
     assert.ok(built.includes('/index.html'), 'no docs index')
     assert.ok(built.includes('/introduction/index.html'), 'no compatibility redirect for the sample page')
     const agents = readFileSync(join(project, 'AGENTS.md'), 'utf8')
-    assert.match(agents, /jaad\.lancher\.dev/, 'no link to the documentation')
+    assert.match(agents, /jaamd\.org\/docs\/jaad/, 'no link to the documentation')
     assert.match(agents, /astro dev --background/)
     assert.match(
         readFileSync(join(project, 'CLAUDE.md'), 'utf8'),
@@ -108,13 +108,13 @@ test('the site template keeps the landing page separate from the docs', { timeou
     assert.doesNotMatch(landing, /jaad-chrome|jaad-theme-toggle/)
     const landingSource = readFileSync(join(project, 'src', 'pages', 'index.astro'), 'utf8')
     assert.match(landingSource, /layouts\/SiteLayout\.astro/)
-    assert.doesNotMatch(landingSource, /@lancher-dev\/jaad\/layouts/)
+    assert.doesNotMatch(landingSource, /@jaamd\/jaad\/layouts/)
     assert.ok(
         existsSync(join(project, 'src', 'layouts', 'SiteLayout.astro')),
         'the site template did not create a local layout',
     )
     const siteLayout = readFileSync(join(project, 'src', 'layouts', 'SiteLayout.astro'), 'utf8')
-    assert.doesNotMatch(siteLayout, /@lancher-dev\/jaad/)
+    assert.doesNotMatch(siteLayout, /@jaamd\/jaad/)
     assert.match(siteLayout, /import "\.\.\/styles\/site\.css"/)
     assert.match(siteLayout, /<footer class="site-chrome site-footer">/)
 
@@ -251,7 +251,7 @@ test('the version the scaffolder installs is the one being published', () => {
     const pinned = /const JAAD = ['"]\^([\d.]+)['"]/.exec(readFileSync(join(CREATE_PKG, 'index.mjs'), 'utf8'))?.[1]
     const published = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version
 
-    assert.equal(pinned, published, 'create-jaad pins a stale @lancher-dev/jaad')
+    assert.equal(pinned, published, 'create-jaad pins a stale @jaamd/jaad')
 })
 
 test('the published scaffolder carries its templates', () => {
@@ -360,18 +360,15 @@ test('--here recognizes canonical JAAD configurations on rerun', () => {
                 private: true,
                 devDependencies: {
                     astro: '^7.3.1',
-                    '@lancher-dev/jaad': '^0.6.1',
+                    '@jaamd/jaad': '^0.6.1',
                 },
             },
             null,
             2,
         ),
     )
-    writeFileSync(join(project, 'astro.config.ts'), 'export { default } from "@lancher-dev/jaad/site";\r\n')
-    writeFileSync(
-        join(project, 'src', 'content.config.js'),
-        'export { collections } from "@lancher-dev/jaad/content";\n',
-    )
+    writeFileSync(join(project, 'astro.config.ts'), 'export { default } from "@jaamd/jaad/site";\r\n')
+    writeFileSync(join(project, 'src', 'content.config.js'), 'export { collections } from "@jaamd/jaad/content";\n')
     writeFileSync(join(project, 'jaad.config.mjs'), 'export default { title: "Already configured" };\n')
 
     // The site template refuses a configuration it cannot read routeBase from,
@@ -389,7 +386,7 @@ test('--here recognizes canonical JAAD configurations on rerun', () => {
     const manifest = JSON.parse(readFileSync(join(project, 'package.json'), 'utf8'))
     assert.equal(manifest.dependencies, undefined)
     assert.equal(manifest.devDependencies.astro, '^7.3.1')
-    assert.equal(manifest.devDependencies['@lancher-dev/jaad'], '^0.6.1')
+    assert.equal(manifest.devDependencies['@jaamd/jaad'], '^0.6.1')
 })
 
 test('--here recognizes every supported custom configuration filename', () => {

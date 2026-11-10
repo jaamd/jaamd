@@ -1,5 +1,5 @@
 {
-    "name": "@lancher-dev/jaamd",
+    "name": "@jaamd/jaamd",
     "version": "0.11.0",
     "description": "Add markdown plugins, client-side enhancements and styles as a single Astro integration for Markdown content.",
     "keywords": [
@@ -10,15 +10,15 @@
         "remark",
         "withastro"
     ],
-    "homepage": "https://github.com/lancher-dev/jaamd#readme",
+    "homepage": "https://jaamd.org",
     "bugs": {
-        "url": "https://github.com/lancher-dev/jaamd/issues"
+        "url": "https://github.com/jaamd/jaamd/issues"
     },
     "license": "MIT",
     "author": "Kasui92 <info@lucapattocchio.dev>",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/lancher-dev/jaamd.git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
         "directory": "packages/jaamd"
     },
     "files": [

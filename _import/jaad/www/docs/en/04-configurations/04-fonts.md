@@ -17,7 +17,7 @@ configuration, then reference its CSS variable:
 ```ts
 // jaad.config.ts
 import { fontProviders } from "astro/config";
-import { defineJaadConfig } from "@lancher-dev/jaad";
+import { defineJaadConfig } from "@jaamd/jaad";
 
 export default defineJaadConfig({
   title: "My Project",

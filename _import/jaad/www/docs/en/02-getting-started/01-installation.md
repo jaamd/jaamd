@@ -5,19 +5,19 @@
 :::code-tabs
 
 ```bash npm
-npm create @lancher-dev/jaad@latest
+npm create @jaamd/jaad@latest
 ```
 
 ```bash pnpm
-pnpm create @lancher-dev/jaad@latest
+pnpm create @jaamd/jaad@latest
 ```
 
 ```bash yarn
-yarn create @lancher-dev/jaad@latest
+yarn create @jaamd/jaad@latest
 ```
 
 ```bash bun
-bun create @lancher-dev/jaad@latest
+bun create @jaamd/jaad@latest
 ```
 
 :::
@@ -31,19 +31,19 @@ To provide every answer as flags:
 :::code-tabs
 
 ```bash npm
-npm create @lancher-dev/jaad@latest my-docs -- --title "My Docs" --install
+npm create @jaamd/jaad@latest my-docs -- --title "My Docs" --install
 ```
 
 ```bash pnpm
-pnpm create @lancher-dev/jaad@latest my-docs --title "My Docs" --install
+pnpm create @jaamd/jaad@latest my-docs --title "My Docs" --install
 ```
 
 ```bash yarn
-yarn create @lancher-dev/jaad@latest my-docs --title "My Docs" --install
+yarn create @jaamd/jaad@latest my-docs --title "My Docs" --install
 ```
 
 ```bash bun
-bun create @lancher-dev/jaad@latest my-docs --title "My Docs" --install
+bun create @jaamd/jaad@latest my-docs --title "My Docs" --install
 ```
 
 :::
@@ -53,19 +53,19 @@ Use `--here` inside an existing repository:
 :::code-tabs
 
 ```bash npm
-npm create @lancher-dev/jaad@latest -- --here
+npm create @jaamd/jaad@latest -- --here
 ```
 
 ```bash pnpm
-pnpm create @lancher-dev/jaad@latest --here
+pnpm create @jaamd/jaad@latest --here
 ```
 
 ```bash yarn
-yarn create @lancher-dev/jaad@latest --here
+yarn create @jaamd/jaad@latest --here
 ```
 
 ```bash bun
-bun create @lancher-dev/jaad@latest --here
+bun create @jaamd/jaad@latest --here
 ```
 
 :::
@@ -113,19 +113,19 @@ Install JAAD in an Astro 7 project running Node.js 22.12 or later:
 :::code-tabs
 
 ```bash npm
-npm install @lancher-dev/jaad
+npm install @jaamd/jaad
 ```
 
 ```bash pnpm
-pnpm add @lancher-dev/jaad
+pnpm add @jaamd/jaad
 ```
 
 ```bash yarn
-yarn add @lancher-dev/jaad
+yarn add @jaamd/jaad
 ```
 
 ```bash bun
-bun add @lancher-dev/jaad
+bun add @jaamd/jaad
 ```
 
 :::
@@ -134,7 +134,7 @@ Add the following files:
 
 ```ts
 // jaad.config.ts
-import { defineJaadConfig } from "@lancher-dev/jaad";
+import { defineJaadConfig } from "@jaamd/jaad";
 
 export default defineJaadConfig({
   site: "https://example.dev",
@@ -144,12 +144,12 @@ export default defineJaadConfig({
 
 ```js
 // astro.config.mjs
-export { default } from "@lancher-dev/jaad/site";
+export { default } from "@jaamd/jaad/site";
 ```
 
 ```ts
 // src/content.config.ts
-export { collections } from "@lancher-dev/jaad/content";
+export { collections } from "@jaamd/jaad/content";
 ```
 
 ```json
@@ -173,7 +173,7 @@ Add the integration to the Astro configuration:
 ```ts
 // astro.config.ts
 import { defineConfig } from "astro/config";
-import jaad from "@lancher-dev/jaad";
+import jaad from "@jaamd/jaad";
 import jaadConfig from "./jaad.config";
 
 export default defineConfig({
@@ -193,7 +193,7 @@ replacing them:
 ```ts
 // src/content.config.ts
 import { defineCollection } from "astro:content";
-import { collections as jaadCollections } from "@lancher-dev/jaad/content";
+import { collections as jaadCollections } from "@jaamd/jaad/content";
 
 const blog = defineCollection({/* existing loader and schema */});
 

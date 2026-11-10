@@ -1,7 +1,7 @@
 # Repository guide
 
 A website with its own documentation. The documentation is built with
-[JAAD](https://jaad.lancher.dev), an Astro integration that turns the `docs/`
+[JAAD](https://jaamd.org/docs/jaad), an Astro integration that turns the `docs/`
 folder into pages mounted at `/docs`; the landing page at `/` is an ordinary
 Astro page. No component is needed for a documentation page: a markdown file
 in `docs/` is a page.
@@ -84,19 +84,19 @@ structure itself has to change.
 
 ## Documentation
 
-Full documentation: https://jaad.lancher.dev
+Full documentation: https://jaamd.org/docs/jaad
 
 Consult these guides before working on related tasks:
 
-- [Creating pages](https://jaad.lancher.dev/docs/getting-started/creating-pages)
-- [Structure and navigation](https://jaad.lancher.dev/docs/configurations/structure)
-- [Frontmatter](https://jaad.lancher.dev/docs/configurations/frontmatter)
-- [Markdown features](https://jaad.lancher.dev/docs/markdown)
-- [Languages](https://jaad.lancher.dev/docs/configurations/i18n)
-- [Search](https://jaad.lancher.dev/docs/configurations/search)
-- [Fonts](https://jaad.lancher.dev/docs/configurations/fonts)
-- [Configuration reference](https://jaad.lancher.dev/docs/configurations/reference)
-- [Styles](https://jaad.lancher.dev/docs/configurations/styles) and [themes](https://jaad.lancher.dev/docs/configurations/themes)
-- [Pages of your own](https://jaad.lancher.dev/docs/configurations/custom-pages)
-- [Advanced layout](https://jaad.lancher.dev/docs/configurations/advanced-layout)
-- [Deployment](https://jaad.lancher.dev/docs/getting-started/deployment)
+- [Creating pages](https://jaamd.org/docs/jaad/getting-started/creating-pages)
+- [Structure and navigation](https://jaamd.org/docs/jaad/configurations/structure)
+- [Frontmatter](https://jaamd.org/docs/jaad/configurations/frontmatter)
+- [Markdown features](https://jaamd.org/docs/jaad/markdown)
+- [Languages](https://jaamd.org/docs/jaad/configurations/i18n)
+- [Search](https://jaamd.org/docs/jaad/configurations/search)
+- [Fonts](https://jaamd.org/docs/jaad/configurations/fonts)
+- [Configuration reference](https://jaamd.org/docs/jaad/configurations/reference)
+- [Styles](https://jaamd.org/docs/jaad/configurations/styles) and [themes](https://jaamd.org/docs/jaad/configurations/themes)
+- [Pages of your own](https://jaamd.org/docs/jaad/configurations/custom-pages)
+- [Advanced layout](https://jaamd.org/docs/jaad/configurations/advanced-layout)
+- [Deployment](https://jaamd.org/docs/jaad/getting-started/deployment)

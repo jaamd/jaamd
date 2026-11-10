@@ -20,7 +20,7 @@ function derivedTokens(file: string): [string, string][] {
 }
 
 // The official site keeps its own palette and maps it onto both surfaces, so
-// nothing forces the two recipes to agree. If they drift, jaad.lancher.dev
+// nothing forces the two recipes to agree. If they drift, jaamd.org/docs/jaad
 // stops showing what a default installation looks like.
 test("the site derives its palette the way the package does", () => {
   const shipped = derivedTokens("src/styles/global.css");

@@ -9,19 +9,19 @@ documentation at `/docs`:
 :::code-tabs
 
 ```bash npm
-npm create @lancher-dev/jaad@latest my-site -- --template site
+npm create @jaamd/jaad@latest my-site -- --template site
 ```
 
 ```bash pnpm
-pnpm create @lancher-dev/jaad@latest my-site --template site
+pnpm create @jaamd/jaad@latest my-site --template site
 ```
 
 ```bash yarn
-yarn create @lancher-dev/jaad@latest my-site --template site
+yarn create @jaamd/jaad@latest my-site --template site
 ```
 
 ```bash bun
-bun create @lancher-dev/jaad@latest my-site --template site
+bun create @jaamd/jaad@latest my-site --template site
 ```
 
 :::
@@ -70,7 +70,7 @@ Import the page layout instead:
 
 ```astro
 ---
-import Page from "@lancher-dev/jaad/layouts/Page.astro";
+import Page from "@jaamd/jaad/layouts/Page.astro";
 ---
 
 <Page title="Changelog">

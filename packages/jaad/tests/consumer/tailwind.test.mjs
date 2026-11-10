@@ -25,13 +25,13 @@ describe('`tailwind: true` in a pnpm project', () => {
                 name: 'tailwind-test',
                 private: true,
                 type: 'module',
-                dependencies: { astro: '7.3.1', '@lancher-dev/jaad': tarball },
+                dependencies: { astro: '7.3.1', '@jaamd/jaad': tarball },
             }),
         )
         writeFileSync(join(project, 'pnpm-workspace.yaml'), 'allowBuilds:\n  esbuild: true\n')
         writeFileSync(
             join(project, 'jaad.config.ts'),
-            `import { defineJaadConfig } from "@lancher-dev/jaad";
+            `import { defineJaadConfig } from "@jaamd/jaad";
 export default defineJaadConfig({
   title: "T",
   routeBase: "/docs",
@@ -43,7 +43,7 @@ export default defineJaadConfig({
         writeFileSync(
             join(project, 'src', 'pages', 'index.astro'),
             `---
-import Page from "@lancher-dev/jaad/layouts/Page.astro";
+import Page from "@jaamd/jaad/layouts/Page.astro";
 ---
 <Page><p class="max-w-200 bg-surface dark:text-primary">x</p></Page>
 `,

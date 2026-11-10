@@ -174,7 +174,7 @@ export function createCoreIntegration(
                                 : []),
                         ],
                         // Package .astro sources must reach the Astro compiler.
-                        ssr: { noExternal: ['@lancher-dev/jaad'] },
+                        ssr: { noExternal: ['@jaamd/jaad'] },
                     },
                     fonts,
                 })
@@ -237,7 +237,7 @@ export function createCoreIntegration(
                 injectTypes({
                     filename: 'jaad.d.ts',
                     content: `declare module "virtual:jaad/config" {
-  const config: import("@lancher-dev/jaad").JaadResolvedConfig;
+  const config: import("@jaamd/jaad").JaadResolvedConfig;
   export default config;
 }`,
                 })

@@ -1,4 +1,4 @@
-import { themes } from '@lancher-dev/jaamd/themes'
+import { themes } from '@jaamd/jaamd/themes'
 
 export interface Preset {
     /** Shiki theme, or a light/dark pair, for code blocks. */

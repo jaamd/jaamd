@@ -2,7 +2,7 @@
 
 JAAD supports [CommonMark](https://commonmark.org/help/) and
 [GitHub Flavored Markdown](https://github.github.com/gfm/).
-[JAAMD](https://github.com/lancher-dev/jaamd) adds the features below
+[JAAMD](https://github.com/jaamd/jaamd) adds the features below
 automatically.
 
 ## Table of contents

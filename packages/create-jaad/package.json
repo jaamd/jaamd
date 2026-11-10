@@ -1,5 +1,5 @@
 {
-    "name": "@lancher-dev/create-jaad",
+    "name": "@jaamd/create-jaad",
     "version": "0.10.2",
     "description": "Scaffold a JAAD documentation site, or add one to a repository that already has a docs folder.",
     "keywords": [
@@ -9,13 +9,13 @@
         "jaad",
         "scaffold"
     ],
-    "homepage": "https://jaad.lancher.dev",
-    "bugs": "https://github.com/lancher-dev/jaad/issues",
+    "homepage": "https://jaamd.org/docs/jaad",
+    "bugs": "https://github.com/jaamd/jaamd/issues",
     "license": "MIT",
     "author": "Kasui92 <info@lucapattocchio.dev>",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/lancher-dev/jaad.git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
         "directory": "packages/create-jaad"
     },
     "bin": {

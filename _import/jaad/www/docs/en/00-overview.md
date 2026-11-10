@@ -9,19 +9,19 @@ Create a documentation-only project:
 :::code-tabs
 
 ```bash npm
-npm create @lancher-dev/jaad@latest my-docs
+npm create @jaamd/jaad@latest my-docs
 ```
 
 ```bash pnpm
-pnpm create @lancher-dev/jaad@latest my-docs
+pnpm create @jaamd/jaad@latest my-docs
 ```
 
 ```bash yarn
-yarn create @lancher-dev/jaad@latest my-docs
+yarn create @jaamd/jaad@latest my-docs
 ```
 
 ```bash bun
-bun create @lancher-dev/jaad@latest my-docs
+bun create @jaamd/jaad@latest my-docs
 ```
 
 :::
@@ -31,19 +31,19 @@ Or add JAAD to a repository that already has documentation:
 :::code-tabs
 
 ```bash npm
-npm create @lancher-dev/jaad@latest -- --here
+npm create @jaamd/jaad@latest -- --here
 ```
 
 ```bash pnpm
-pnpm create @lancher-dev/jaad@latest --here
+pnpm create @jaamd/jaad@latest --here
 ```
 
 ```bash yarn
-yarn create @lancher-dev/jaad@latest --here
+yarn create @jaamd/jaad@latest --here
 ```
 
 ```bash bun
-bun create @lancher-dev/jaad@latest --here
+bun create @jaamd/jaad@latest --here
 ```
 
 :::

@@ -32,9 +32,9 @@
 ## Installation
 
 ```bash
-npm install @lancher-dev/jaamd
+npm install @jaamd/jaamd
 # or
-npx astro add @lancher-dev/jaamd
+npx astro add @jaamd/jaamd
 ```
 
 ## Requirements
@@ -51,6 +51,11 @@ JAAMD is published as source, with no compiled `dist/` and no emitted `.d.ts`.
 It works out of the box in any Astro project, but is not consumable from plain
 Node, a CommonJS build, or a TypeScript project using
 `"moduleResolution": "node16"`.
+
+### Upgrading from @lancher-dev/jaamd
+
+The package is now `@jaamd/jaamd`. Replace the dependency and every import from
+`@lancher-dev/jaamd`; the API is unchanged.
 
 ### Upgrading from 0.10
 
@@ -91,7 +96,7 @@ Node, a CommonJS build, or a TypeScript project using
 Add the integration to your Astro config:
 
 ```ts
-import jaamd from '@lancher-dev/jaamd'
+import jaamd from '@jaamd/jaamd'
 // astro.config.mjs
 import { defineConfig } from 'astro/config'
 
@@ -105,7 +110,7 @@ Wrap your markdown content with the `MarkdownContent` component in your layout:
 ```astro
 ---
 // src/layouts/BlogPost.astro
-import MarkdownContent from '@lancher-dev/jaamd/components'
+import MarkdownContent from '@jaamd/jaamd/components'
 ---
 
 <MarkdownContent>
@@ -126,8 +131,8 @@ left alone, with a warning.
 >
 > ```astro
 > ---
-> import '@lancher-dev/jaamd/default.css'
-> import '@lancher-dev/jaamd/styles.css'
+> import '@jaamd/jaamd/default.css'
+> import '@jaamd/jaamd/styles.css'
 > ---
 > ```
 
@@ -137,7 +142,7 @@ left alone, with a warning.
 jaamd({
     selector: '.jaamd-content', // CSS selector for the JS enhancements
     theme: 'github-light', // Shiki theme name (or { light, dark }); see below
-    noDefault: false, // skip injecting @lancher-dev/jaamd/default variable fallbacks
+    noDefault: false, // skip injecting @jaamd/jaamd/default variable fallbacks
     plugins: {
         codeTabs: true, // :::code-tabs directive blocks
         toc: true, // :::toc directive blocks
@@ -169,7 +174,7 @@ It does not affect the CSS file, which always uses `.jaamd-content`.
 
 Set to `true` when you supply a complete `--jaamd-*` variable set of your own.
 It has no effect on `<MarkdownContent>`, which imports the defaults directly;
-with a custom wrapper, control them by importing `@lancher-dev/jaamd/default` or not.
+with a custom wrapper, control them by importing `@jaamd/jaamd/default` or not.
 
 ## Markdown Syntax
 
@@ -277,7 +282,7 @@ Any element with the `spoiler` class is hidden until activated:
 and accepts any valid HTML tag via the `as` prop.
 
 ```ts
-import MarkdownContent from '@lancher-dev/jaamd/components'
+import MarkdownContent from '@jaamd/jaamd/components'
 ```
 
 ### Props
@@ -293,7 +298,7 @@ selector used by the JS enhancements and must not be removed.
 
 ```astro
 ---
-import MarkdownContent from '@lancher-dev/jaamd/components'
+import MarkdownContent from '@jaamd/jaamd/components'
 ---
 
 <!-- Default: renders as <div class="jaamd-content"> -->
@@ -400,7 +405,7 @@ the enhancement script.
 ## Theming
 
 All styles are driven by CSS custom properties prefixed with `--jaamd-*`. The
-default set (`@lancher-dev/jaamd/default`) is injected automatically.
+default set (`@jaamd/jaamd/default`) is injected automatically.
 
 ### Customizing variables
 
@@ -478,16 +483,16 @@ Eight presets restyle the `--jaamd-*` palette to match popular editor colour
 schemes. A **dual** preset carries a light and a dark palette and follows
 `html.dark`; the others are one palette that applies in both modes.
 
-| Preset         | Import                                     | Kind | Recommended Shiki theme                        |
-| -------------- | ------------------------------------------ | ---- | ---------------------------------------------- |
-| Catppuccin     | `@lancher-dev/jaamd/themes/catppuccin`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
-| Dracula        | `@lancher-dev/jaamd/themes/dracula`        | dark | `dracula`                                      |
-| Gruvbox        | `@lancher-dev/jaamd/themes/gruvbox`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
-| Nord           | `@lancher-dev/jaamd/themes/nord`           | dark | `nord`                                         |
-| One Dark       | `@lancher-dev/jaamd/themes/one-dark`       | dark | `one-dark-pro`                                 |
-| Rosé Pine      | `@lancher-dev/jaamd/themes/rose-pine`      | dual | `rose-pine-dawn` / `rose-pine`                 |
-| Rosé Pine Moon | `@lancher-dev/jaamd/themes/rose-pine-moon` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
-| Tokyo Night    | `@lancher-dev/jaamd/themes/tokyo-night`    | dark | `tokyo-night`                                  |
+| Preset         | Import                               | Kind | Recommended Shiki theme                        |
+| -------------- | ------------------------------------ | ---- | ---------------------------------------------- |
+| Catppuccin     | `@jaamd/jaamd/themes/catppuccin`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
+| Dracula        | `@jaamd/jaamd/themes/dracula`        | dark | `dracula`                                      |
+| Gruvbox        | `@jaamd/jaamd/themes/gruvbox`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
+| Nord           | `@jaamd/jaamd/themes/nord`           | dark | `nord`                                         |
+| One Dark       | `@jaamd/jaamd/themes/one-dark`       | dark | `one-dark-pro`                                 |
+| Rosé Pine      | `@jaamd/jaamd/themes/rose-pine`      | dual | `rose-pine-dawn` / `rose-pine`                 |
+| Rosé Pine Moon | `@jaamd/jaamd/themes/rose-pine-moon` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
+| Tokyo Night    | `@jaamd/jaamd/themes/tokyo-night`    | dark | `tokyo-night`                                  |
 
 As a standalone theme, replacing the default light theme:
 
@@ -496,9 +501,9 @@ jaamd({ theme: 'dracula' })
 ```
 
 ```css
-@import '@lancher-dev/jaamd/default.css';
-@import '@lancher-dev/jaamd/themes/dracula.css';
-@import '@lancher-dev/jaamd/styles.css';
+@import '@jaamd/jaamd/default.css';
+@import '@jaamd/jaamd/themes/dracula.css';
+@import '@jaamd/jaamd/styles.css';
 ```
 
 A single-palette preset can also be scoped to `html.dark` via the `/dark` variant,
@@ -506,11 +511,11 @@ to use it as the dark half of your own light theme. Dual presets already cover b
 modes and have no `/dark`:
 
 ```css
-@import '@lancher-dev/jaamd/themes/dracula/dark.css';
+@import '@jaamd/jaamd/themes/dracula/dark.css';
 ```
 
 ```ts
-import '@lancher-dev/jaamd/themes/dracula/dark'
+import '@jaamd/jaamd/themes/dracula/dark'
 ```
 
 > [!IMPORTANT]
@@ -522,7 +527,7 @@ import '@lancher-dev/jaamd/themes/dracula/dark'
 Each theme declares itself, so a picker can be built from data:
 
 ```ts
-import { themes } from '@lancher-dev/jaamd/themes'
+import { themes } from '@jaamd/jaamd/themes'
 // [{ slug: "dracula", name: "Dracula", mode: "dark", shiki: "dracula" }, …]
 ```
 
@@ -569,7 +574,7 @@ import {
     satteriDirectiveFallback,
     satteriTableWrapper,
     satteriHeadingLinks,
-} from '@lancher-dev/jaamd'
+} from '@jaamd/jaamd'
 
 export default defineConfig({
     markdown: {
@@ -598,7 +603,7 @@ import {
     remarkToc,
     rehypeTableWrapper,
     rehypeHeadingLinks,
-} from '@lancher-dev/jaamd'
+} from '@jaamd/jaamd'
 
 export default defineConfig({
     markdown: {
@@ -612,15 +617,15 @@ export default defineConfig({
 
 ```astro
 ---
-import '@lancher-dev/jaamd/default' // variable fallbacks; omit if you provide your own
-import '@lancher-dev/jaamd/styles'
+import '@jaamd/jaamd/default' // variable fallbacks; omit if you provide your own
+import '@jaamd/jaamd/styles'
 ---
 
 <div class="jaamd-content">
     <slot />
 </div>
 <script>
-    import { initMarkdownEnhancements } from '@lancher-dev/jaamd/client'
+    import { initMarkdownEnhancements } from '@jaamd/jaamd/client'
     function run() {
         initMarkdownEnhancements('.jaamd-content')
     }
@@ -632,6 +637,6 @@ import '@lancher-dev/jaamd/styles'
 The CSS files can also be imported from plain `.css`:
 
 ```css
-@import '@lancher-dev/jaamd/default.css';
-@import '@lancher-dev/jaamd/styles.css';
+@import '@jaamd/jaamd/default.css';
+@import '@jaamd/jaamd/styles.css';
 ```

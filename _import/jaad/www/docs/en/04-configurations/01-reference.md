@@ -3,7 +3,7 @@
 All JAAD options live in `jaad.config.ts`. Only `title` is required.
 
 ```ts
-import { defineJaadConfig } from "@lancher-dev/jaad";
+import { defineJaadConfig } from "@jaamd/jaad";
 
 export default defineJaadConfig({
   site: "https://example.dev",
@@ -191,7 +191,7 @@ defineJaadConfig({
 });
 ```
 
-`astro` is read by `@lancher-dev/jaad/site`. `jaad(config)` ignores it.
+`astro` is read by `@jaamd/jaad/site`. `jaad(config)` ignores it.
 
 For full control, use a regular Astro configuration and add `jaad(config)` to
 its integrations, as shown in

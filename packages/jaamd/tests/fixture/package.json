@@ -10,7 +10,7 @@
         "check": "astro check"
     },
     "dependencies": {
-        "@lancher-dev/jaamd": "workspace:*",
+        "@jaamd/jaamd": "workspace:*",
         "astro": "^7.4.4"
     },
     "devDependencies": {

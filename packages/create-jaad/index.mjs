@@ -23,9 +23,9 @@ const ASTRO = '^7.4.2'
 const ASTRO_CONFIG_NAMES = ['astro.config.ts', 'astro.config.mjs', 'astro.config.js']
 const CONTENT_CONFIG_NAMES = ['src/content.config.ts', 'src/content.config.mjs', 'src/content.config.js']
 const JAAD_CONFIG_NAMES = ['jaad.config.ts', 'jaad.config.mjs', 'jaad.config.js']
-const ASTRO_CONFIG = 'export { default } from "@lancher-dev/jaad/site";\n'
-const CONTENT_CONFIG = 'export { collections } from "@lancher-dev/jaad/content";\n'
-const MANUAL_SETUP_URL = 'https://jaad.lancher.dev/docs/getting-started/installation#existing-astro-project'
+const ASTRO_CONFIG = 'export { default } from "@jaamd/jaad/site";\n'
+const CONTENT_CONFIG = 'export { collections } from "@jaamd/jaad/content";\n'
+const MANUAL_SETUP_URL = 'https://jaamd.org/docs/jaad/getting-started/installation#existing-astro-project'
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
 const FAVICON_NAMES = ['favicon.svg', 'favicon.ico', 'favicon.png']
 
@@ -172,8 +172,8 @@ function writeManifest(target, existing, name) {
     if (!('astro' in dependencies) && !('astro' in (manifest.devDependencies ?? {}))) {
         dependencies.astro = ASTRO
     }
-    if (!('@lancher-dev/jaad' in dependencies) && !('@lancher-dev/jaad' in (manifest.devDependencies ?? {}))) {
-        dependencies['@lancher-dev/jaad'] = JAAD
+    if (!('@jaamd/jaad' in dependencies) && !('@jaamd/jaad' in (manifest.devDependencies ?? {}))) {
+        dependencies['@jaamd/jaad'] = JAAD
     }
 
     if (Object.keys(dependencies).length > 0) manifest.dependencies = dependencies

@@ -31,7 +31,7 @@ Omitting a slot removes that element from every documentation page.
 
 ```astro
 ---
-import type { DocsFrameProps } from "@lancher-dev/jaad/advanced";
+import type { DocsFrameProps } from "@jaamd/jaad/advanced";
 
 type Props = DocsFrameProps;
 const { page, headings } = Astro.props;
@@ -125,7 +125,7 @@ interface DocsNavItem {
 the current page.
 
 `DocsFrameProps`, `DocsNavigation`, `NavSection`, `DocsHeadings`, `DocsNavItem`
-and `DocsEntry` are exported from `@lancher-dev/jaad/advanced`.
+and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
 [`src/jaad.css`](/docs/configurations/styles) instead.

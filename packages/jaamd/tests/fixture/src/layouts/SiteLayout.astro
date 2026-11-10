@@ -1,13 +1,13 @@
 ---
-import type { JaamdTheme } from '@lancher-dev/jaamd/themes'
+import type { JaamdTheme } from '@jaamd/jaamd/themes'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { themes as packageThemes } from '@lancher-dev/jaamd/themes'
+import { themes as packageThemes } from '@jaamd/jaamd/themes'
 import { Font } from 'astro:assets'
 import SiteThemePicker from '../components/SiteThemePicker.astro'
 import { themeModes, THEME_STORAGE_KEY, SITE_THEME, shikiKeys } from '../themes.ts'
-import '@lancher-dev/jaamd/default.css'
-import '@lancher-dev/jaamd/styles.css'
+import '@jaamd/jaamd/default.css'
+import '@jaamd/jaamd/styles.css'
 import '../styles/identity.css'
 import '../styles/jaamd.css'
 import '../styles/site.css'
@@ -34,7 +34,7 @@ ${scope} .jaamd-content .shiki span {
 const themeCss = packageThemes
     .map((theme: JaamdTheme) => {
         const { slug } = theme
-        const source = readFileSync(require.resolve(`@lancher-dev/jaamd/themes/${slug}.css`), 'utf8')
+        const source = readFileSync(require.resolve(`@jaamd/jaamd/themes/${slug}.css`), 'utf8')
         const attr = `[data-jaamd-theme="${slug}"]`
         const keys = shikiKeys(theme)
 
@@ -98,8 +98,8 @@ const themeScript = `(function () {
             </a>
             <div class="site-header-actions">
                 <nav aria-label="Main navigation">
-                    <a href="https://github.com/lancher-dev/jaamd">GitHub</a>
-                    <a href="https://www.npmjs.com/package/@lancher-dev/jaamd">npm</a>
+                    <a href="https://github.com/jaamd/jaamd">GitHub</a>
+                    <a href="https://www.npmjs.com/package/@jaamd/jaamd">npm</a>
                 </nav>
                 <SiteThemePicker />
             </div>

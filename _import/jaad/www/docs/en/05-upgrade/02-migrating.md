@@ -3,6 +3,26 @@
 Changes that need action, by the version you upgrade from. To upgrade, see
 [Upgrading](/docs/upgrade/upgrading).
 
+## From @lancher-dev/jaad
+
+JAAD and JAAMD moved to the `@jaamd` scope. The old packages are deprecated and
+receive no further releases.
+
+Replace the dependency:
+
+```bash
+npm uninstall @lancher-dev/jaad
+npm install @jaamd/jaad
+```
+
+Then replace `@lancher-dev/jaad` with `@jaamd/jaad` in every import:
+`astro.config.*`, `src/content.config.*`, `jaad.config.ts`, and any page using
+`@jaamd/jaad/layouts/Page.astro` or `@jaamd/jaad/advanced`. A project that
+imports `@lancher-dev/jaamd` directly needs `@jaamd/jaamd` instead.
+
+The documentation moved from `jaad.lancher.dev` to `jaamd.org/docs/jaad`: update
+the links in `AGENTS.md` if `create-jaad` generated one.
+
 ## From 0.9
 
 ### Tailwind on your own pages
@@ -51,5 +71,5 @@ from 0.9 those classes are missing unless the site provides Tailwind. Use
 
 ## From 0.7
 
-`@lancher-dev/jaad/layouts/Base.astro` is gone. It forwarded every prop to the
-page layout: change the import to `@lancher-dev/jaad/layouts/Page.astro`.
+`@jaamd/jaad/layouts/Base.astro` is gone. It forwarded every prop to the
+page layout: change the import to `@jaamd/jaad/layouts/Page.astro`.

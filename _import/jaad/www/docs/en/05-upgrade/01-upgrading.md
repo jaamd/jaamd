@@ -28,19 +28,19 @@ To upgrade JAAD alone:
 :::code-tabs
 
 ```bash npm
-npm install @lancher-dev/jaad@latest
+npm install @jaamd/jaad@latest
 ```
 
 ```bash pnpm
-pnpm add @lancher-dev/jaad@latest
+pnpm add @jaamd/jaad@latest
 ```
 
 ```bash yarn
-yarn add @lancher-dev/jaad@latest
+yarn add @jaamd/jaad@latest
 ```
 
 ```bash bun
-bun add @lancher-dev/jaad@latest
+bun add @jaamd/jaad@latest
 ```
 
 :::

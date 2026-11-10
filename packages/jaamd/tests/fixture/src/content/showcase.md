@@ -25,14 +25,14 @@ you see below is the integration's own output.
 ## Installation
 
 ```bash
-npx astro add @lancher-dev/jaamd
+npx astro add @jaamd/jaamd
 ```
 
 Then wrap your content, and everything below this line is what you get.
 
 ```astro
 ---
-import MarkdownContent from '@lancher-dev/jaamd/components'
+import MarkdownContent from '@jaamd/jaamd/components'
 ---
 
 <MarkdownContent>
@@ -50,8 +50,8 @@ included: Shiki bakes one variable per theme at build time and the switch is pur
 CSS.
 
 ```css
-@import '@lancher-dev/jaamd/default.css';
-@import '@lancher-dev/jaamd/themes/nord.css';
+@import '@jaamd/jaamd/default.css';
+@import '@jaamd/jaamd/themes/nord.css';
 ```
 
 A theme declares nine seed colours and everything else derives from them. Adding
