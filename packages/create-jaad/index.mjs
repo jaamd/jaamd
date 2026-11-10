@@ -86,7 +86,7 @@ const TEMPLATE_RENAMES = {
 };
 
 function templateFiles(root, prefix = "") {
-  const entries = readdirSync(join(root, prefix), { withFileTypes: true }).sort(
+  const entries = readdirSync(join(root, prefix), { withFileTypes: true }).toSorted(
     (a, b) => a.name.localeCompare(b.name),
   );
   return entries.flatMap((entry) => {

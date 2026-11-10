@@ -238,7 +238,7 @@ function resolveLocales(config: JaadConfig, cwd: string): string[] {
   if (locales.length === 0 || !existsSync(docsDir)) return [];
 
   validateLocaleTree(docsDir, locales, config.lang);
-  return locales.map((locale) => locale.toLowerCase()).sort();
+  return locales.map((locale) => locale.toLowerCase()).toSorted();
 }
 
 const requireFrom = createRequire(import.meta.url);

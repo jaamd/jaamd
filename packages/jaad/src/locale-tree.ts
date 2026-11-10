@@ -18,7 +18,7 @@ export function detectLocales(docsDir: string, lang: string): string[] {
   const candidates = readdirSync(docsDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && isLocale(entry.name))
     .map((entry) => entry.name.toLowerCase())
-    .sort();
+    .toSorted();
 
   const localised =
     candidates.length >= 2 ||
@@ -40,7 +40,7 @@ export function validateLocaleTree(
   const strays = readdirSync(docsDir, { withFileTypes: true })
     .filter((entry) => !(entry.isDirectory() && isLocale(entry.name)))
     .map((entry) => entry.name)
-    .sort();
+    .toSorted();
 
   for (const stray of strays) {
     issues.push(`docs/${stray} is not a locale, but ${locales.join(", ")} are`);

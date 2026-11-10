@@ -50,7 +50,7 @@ export function scoreItems(index: SearchItem[], query: string): SearchItem[] {
       return { item, score };
     })
     .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score)
+    .toSorted((a, b) => b.score - a.score)
     .slice(0, MAX_RESULTS)
     .map((s) => s.item);
 }

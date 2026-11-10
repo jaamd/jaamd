@@ -42,7 +42,7 @@ function groupByChapter(items: DocsNavItem[]): NavSection[] {
     chapter.items.push(item);
   }
 
-  return sections.sort((a, b) => a.order - b.order);
+  return sections.toSorted((a, b) => a.order - b.order);
 }
 
 /** Build every navigation view from one ordered collection traversal. */

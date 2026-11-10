@@ -127,7 +127,7 @@ export function findOpeningPages(
   }[] = [];
 
   const visit = (current: string) => {
-    for (const entry of readdirSync(current, { withFileTypes: true }).sort(
+    for (const entry of readdirSync(current, { withFileTypes: true }).toSorted(
       (a, b) => a.name.localeCompare(b.name),
     )) {
       const file = join(current, entry.name);

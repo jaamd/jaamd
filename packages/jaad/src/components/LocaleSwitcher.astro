@@ -90,7 +90,8 @@ const t = ui(current);
     #onClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
       if (!target?.closest("[data-trigger]")) return;
-      this.#menu()?.hidden ? this.#open() : this.#close();
+      if (this.#menu()?.hidden) this.#open();
+      else this.#close();
     };
 
     connectedCallback() {

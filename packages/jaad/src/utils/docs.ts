@@ -60,7 +60,7 @@ export function parseDocCollectionId(id: string): ParsedDocsCollectionId {
 export function sortDocPages<T extends DocsPageLike>(pages: T[]): T[] {
   return pages
     .map((page) => ({ page, ...docOrder(page) }))
-    .sort((a, b) => a.primary - b.primary || a.secondary - b.secondary)
+    .toSorted((a, b) => a.primary - b.primary || a.secondary - b.secondary)
     .map((entry) => entry.page);
 }
 
@@ -104,7 +104,7 @@ export function validateDocsStructure(
   // Messages name the file on disk, locale directory included.
   const named = (id: string) => (locale ? `${locale}/${id}` : id);
 
-  for (const id of pages.map(routedId).sort()) {
+  for (const id of pages.map(routedId).toSorted()) {
     const parts = id.split("/");
     if (parts.length > 2) {
       issues.push(
