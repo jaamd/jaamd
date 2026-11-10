@@ -1,22 +1,24 @@
-name: Deploy to GitHub Pages
+name: Deploy jaamd.org
 
 on:
-    release:
-        types: [published]
+    push:
+        branches: [main]
+        paths: ['site/**', 'packages/**', 'pnpm-lock.yaml', '.github/workflows/deploy.yml']
     workflow_dispatch:
 
 concurrency:
-    group: pages
+    group: deploy
     cancel-in-progress: false
 
 permissions:
     contents: read
-    pages: write
-    id-token: write
 
 jobs:
-    build:
+    deploy:
         runs-on: ubuntu-latest
+        environment:
+            name: production
+            url: https://jaamd.org
         steps:
             - uses: actions/checkout@v7
 
@@ -29,20 +31,14 @@ jobs:
                   cache: pnpm
 
             - run: pnpm install --frozen-lockfile
-            - run: pnpm build
-            - run: pnpm smoke
 
-            - uses: actions/upload-pages-artifact@v5
+            - run: pnpm --filter site test
+            - run: pnpm --filter site test:build
+
+            - uses: cloudflare/wrangler-action@v4
               with:
-                  path: www/dist
-
-    deploy:
-        needs: build
-        runs-on: ubuntu-latest
-        environment:
-            name: github-pages
-            url: ${{ steps.deployment.outputs.page_url }}
-        steps:
-            - name: Deploy to GitHub Pages
-              id: deployment
-              uses: actions/deploy-pages@v5
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  workingDirectory: site
+                  packageManager: pnpm
+                  command: deploy
