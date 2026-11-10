@@ -5,7 +5,7 @@ import { join, dirname } from 'node:path'
 import { after, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { walk } from '../dist.mjs'
-import { cleanupTemporaryDirectories, packPackage, run, temporaryDirectory } from './helpers.mjs'
+import { cleanupTemporaryDirectories, jaamdOverride, packPackage, run, temporaryDirectory } from './helpers.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..', '..')
@@ -18,6 +18,7 @@ function useLocalJaad(project, tarball) {
     const file = join(project, 'package.json')
     const manifest = JSON.parse(readFileSync(file, 'utf8'))
     manifest.dependencies['@jaamd/jaad'] = tarball
+    manifest.overrides = jaamdOverride()
     writeFileSync(file, JSON.stringify(manifest, null, 2))
 }
 

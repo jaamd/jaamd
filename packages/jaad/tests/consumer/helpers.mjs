@@ -1,7 +1,8 @@
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { basename, join } from 'node:path'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const temporaryDirectories = new Set()
 
@@ -31,9 +32,18 @@ export function run(command, args, cwd) {
     }
 }
 
-/** Package into an isolated directory so concurrent suites never share a tgz. */
+/** Packs into an isolated directory, with pnpm so `workspace:` ranges become versions. */
 export function packPackage(packageDir) {
     const destination = temporaryDirectory('jaad-pack-')
-    const output = run('npm', ['pack', '--pack-destination', destination], packageDir)
-    return join(destination, basename(output.trim().split('\n').at(-1)))
+    const output = run('pnpm', ['pack', '--pack-destination', destination, '--json'], packageDir)
+    return JSON.parse(output).filename
+}
+
+const JAAMD = fileURLToPath(new URL('../../../jaamd', import.meta.url))
+let jaamd
+
+/** `@jaamd/jaamd` from this workspace instead of the registry. */
+export function jaamdOverride() {
+    jaamd ??= `file:${packPackage(JAAMD)}`
+    return { '@jaamd/jaamd': jaamd }
 }

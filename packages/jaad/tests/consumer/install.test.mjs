@@ -4,7 +4,7 @@ import { join, dirname } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { walk, packageClasses, missingFrom } from '../dist.mjs'
-import { cleanupTemporaryDirectories, packPackage, run, temporaryDirectory } from './helpers.mjs'
+import { cleanupTemporaryDirectories, jaamdOverride, packPackage, run, temporaryDirectory } from './helpers.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..', '..')
@@ -68,6 +68,7 @@ describe('a project that installed the published tarball', () => {
                         astro: '7.3.1',
                         '@jaamd/jaad': tarball,
                     },
+                    overrides: jaamdOverride(),
                 },
                 null,
                 2,

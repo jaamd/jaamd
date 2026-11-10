@@ -4,7 +4,7 @@ import { join, dirname } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { walk } from '../dist.mjs'
-import { cleanupTemporaryDirectories, packPackage, run, temporaryDirectory } from './helpers.mjs'
+import { cleanupTemporaryDirectories, jaamdOverride, packPackage, run, temporaryDirectory } from './helpers.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const PKG = join(HERE, '..', '..')
@@ -28,7 +28,11 @@ describe('`tailwind: true` in a pnpm project', () => {
                 dependencies: { astro: '7.3.1', '@jaamd/jaad': tarball },
             }),
         )
-        writeFileSync(join(project, 'pnpm-workspace.yaml'), 'allowBuilds:\n  esbuild: true\n')
+        const overrides = Object.entries(jaamdOverride()).map(([name, spec]) => `  '${name}': '${spec}'\n`)
+        writeFileSync(
+            join(project, 'pnpm-workspace.yaml'),
+            `allowBuilds:\n  esbuild: true\noverrides:\n${overrides.join('')}`,
+        )
         writeFileSync(
             join(project, 'jaad.config.ts'),
             `import { defineJaadConfig } from "@jaamd/jaad";
