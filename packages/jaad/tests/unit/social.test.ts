@@ -1,92 +1,87 @@
-import { test } from "node:test";
-import assert from "node:assert/strict";
-import { buildSocialLinks } from "../../src/social.ts";
-import type { JaadResolvedConfig } from "../../src/config.ts";
+import type { JaadResolvedConfig } from '../../src/config.ts'
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import { buildSocialLinks } from '../../src/social.ts'
 
-const config = (over: Partial<JaadResolvedConfig>) =>
-  ({ social: {}, repoUrl: null, ...over }) as JaadResolvedConfig;
+const config = (over: Partial<JaadResolvedConfig>) => ({ social: {}, repoUrl: null, ...over }) as JaadResolvedConfig
 
-test("a known key gets the forge label and icon", () => {
-  const [link] = buildSocialLinks(
-    config({ social: { github: "https://github.com/o/r" } }),
-  );
-  assert.equal(link.label, "GitHub");
-  assert.ok(link.path);
-});
+test('a known key gets the forge label and icon', () => {
+    const [link] = buildSocialLinks(config({ social: { github: 'https://github.com/o/r' } }))
+    assert.equal(link.label, 'GitHub')
+    assert.ok(link.path)
+})
 
-test("an unknown key falls back to itself, with the supplied svg", () => {
-  const [link] = buildSocialLinks(
-    config({
-      social: { discord: { href: "https://discord.gg/x", svg: "<svg/>" } },
-    }),
-  );
-  assert.equal(link.label, "discord");
-  assert.equal(link.svg, "<svg/>");
-  assert.equal(link.path, undefined);
-});
+test('an unknown key falls back to itself, with the supplied svg', () => {
+    const [link] = buildSocialLinks(
+        config({
+            social: { discord: { href: 'https://discord.gg/x', svg: '<svg/>' } },
+        }),
+    )
+    assert.equal(link.label, 'discord')
+    assert.equal(link.svg, '<svg/>')
+    assert.equal(link.path, undefined)
+})
 
-test("an explicit label wins over the forge name", () => {
-  const [link] = buildSocialLinks(
-    config({
-      social: { github: { href: "https://github.com/o/r", label: "Source" } },
-    }),
-  );
-  assert.equal(link.label, "Source");
-});
+test('an explicit label wins over the forge name', () => {
+    const [link] = buildSocialLinks(
+        config({
+            social: { github: { href: 'https://github.com/o/r', label: 'Source' } },
+        }),
+    )
+    assert.equal(link.label, 'Source')
+})
 
-test("the inferred repository is appended alongside links that are not forges", () => {
-  const links = buildSocialLinks(
-    config({
-      social: { discord: "https://discord.gg/x" },
-      repoUrl: "https://github.com/o/r",
-    }),
-  );
-  assert.deepEqual(
-    links.map((l) => l.label),
-    ["discord", "GitHub"],
-  );
-});
+test('the inferred repository is appended alongside links that are not forges', () => {
+    const links = buildSocialLinks(
+        config({
+            social: { discord: 'https://discord.gg/x' },
+            repoUrl: 'https://github.com/o/r',
+        }),
+    )
+    assert.deepEqual(
+        links.map((l) => l.label),
+        ['discord', 'GitHub'],
+    )
+})
 
-test("the inferred repository is not repeated when the user listed it", () => {
-  const links = buildSocialLinks(
-    config({
-      social: { github: "https://github.com/o/r" },
-      repoUrl: "https://github.com/o/r",
-    }),
-  );
-  assert.equal(links.length, 1);
-});
+test('the inferred repository is not repeated when the user listed it', () => {
+    const links = buildSocialLinks(
+        config({
+            social: { github: 'https://github.com/o/r' },
+            repoUrl: 'https://github.com/o/r',
+        }),
+    )
+    assert.equal(links.length, 1)
+})
 
-test("naming a forge stops the inference, even at another url", () => {
-  const links = buildSocialLinks(
-    config({
-      social: { github: "https://github.com/o/product" },
-      repoUrl: "https://github.com/o/product.website",
-    }),
-  );
-  assert.deepEqual(
-    links.map((l) => l.href),
-    ["https://github.com/o/product"],
-  );
-});
+test('naming a forge stops the inference, even at another url', () => {
+    const links = buildSocialLinks(
+        config({
+            social: { github: 'https://github.com/o/product' },
+            repoUrl: 'https://github.com/o/product.website',
+        }),
+    )
+    assert.deepEqual(
+        links.map((l) => l.href),
+        ['https://github.com/o/product'],
+    )
+})
 
-test("naming one forge stops the inference of another", () => {
-  const links = buildSocialLinks(
-    config({
-      social: { gitlab: "https://gitlab.com/o/r" },
-      repoUrl: "https://github.com/o/r",
-    }),
-  );
-  assert.deepEqual(
-    links.map((l) => l.label),
-    ["GitLab"],
-  );
-});
+test('naming one forge stops the inference of another', () => {
+    const links = buildSocialLinks(
+        config({
+            social: { gitlab: 'https://gitlab.com/o/r' },
+            repoUrl: 'https://github.com/o/r',
+        }),
+    )
+    assert.deepEqual(
+        links.map((l) => l.label),
+        ['GitLab'],
+    )
+})
 
-test("an unrecognised remote still gets a link, without an icon", () => {
-  const [link] = buildSocialLinks(
-    config({ repoUrl: "https://git.example.dev/o/r" }),
-  );
-  assert.equal(link.label, "Repository");
-  assert.equal(link.path, undefined);
-});
+test('an unrecognised remote still gets a link, without an icon', () => {
+    const [link] = buildSocialLinks(config({ repoUrl: 'https://git.example.dev/o/r' }))
+    assert.equal(link.label, 'Repository')
+    assert.equal(link.path, undefined)
+})

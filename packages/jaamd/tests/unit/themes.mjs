@@ -8,8 +8,8 @@ import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { bundledThemes } from 'shiki'
-import { themes, REQUIRED_TOKENS } from '../../src/themes/index.js'
 import { render, TOKENS } from '../../scripts/build-themes.mjs'
+import { themes, REQUIRED_TOKENS } from '../../src/themes/index.js'
 
 const LEVELS = ['recessed', 'base', 'surface', 'overlay', 'text', 'bright', 'primary', 'primaryLight', 'accent']
 const ALERTS = ['note', 'tip', 'important', 'warning', 'caution']

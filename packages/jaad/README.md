@@ -33,12 +33,12 @@ npm install @lancher-dev/jaad
 
 ```ts
 // jaad.config.ts
-import { defineJaadConfig } from "@lancher-dev/jaad";
+import { defineJaadConfig } from '@lancher-dev/jaad'
 
 export default defineJaadConfig({
-  site: "https://example.dev",
-  title: "My Project",
-});
+    site: 'https://example.dev',
+    title: 'My Project',
+})
 ```
 
 Documentation: [jaad.lancher.dev](https://jaad.lancher.dev)

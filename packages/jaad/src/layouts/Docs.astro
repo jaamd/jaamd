@@ -1,183 +1,168 @@
 ---
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
-import Head from "../components/Head.astro";
-import DocsSidebarLeft from "../components/docs/DocsSidebarLeft.astro";
-import TableOfContents from "../components/docs/TableOfContents.astro";
-import StructuredData from "../components/docs/StructuredData.astro";
-import DocsFrame from "virtual:jaad/docs-frame";
-import {
-  docTitle,
-  docTranslationKey,
-  extractDescription,
-  getCleanSlug,
-  routedId,
-} from "../utils/docs.ts";
-import { getLocaleAlternates } from "../collection.ts";
-import { DEFAULT_LOCALE, LOCALES } from "../docs-config.ts";
-import type { DocsEntry, DocsHeadings } from "../@types/docs.ts";
-import type { DocsNavigation } from "../navigation.ts";
-import type { DocsFrameProps } from "../advanced.ts";
-import { ClientRouter } from "astro:transitions";
-import config from "virtual:jaad/config";
-
-import "../../dist/jaad.css";
-import "../styles/docs.css";
-import "../styles/jaamd.css";
-import "@lancher-dev/jaamd/styles.css";
-import "virtual:jaad/theme.css";
-import "virtual:jaad/bridge.css";
-import "virtual:jaad/user.css";
-import "virtual:jaad/tailwind.css";
+import type { DocsEntry, DocsHeadings } from '../@types/docs.ts'
+import type { DocsFrameProps } from '../advanced.ts'
+import type { DocsNavigation } from '../navigation.ts'
+import { ClientRouter } from 'astro:transitions'
+import config from 'virtual:jaad/config'
+import DocsFrame from 'virtual:jaad/docs-frame'
+import { getLocaleAlternates } from '../collection.ts'
+import DocsSidebarLeft from '../components/docs/DocsSidebarLeft.astro'
+import StructuredData from '../components/docs/StructuredData.astro'
+import TableOfContents from '../components/docs/TableOfContents.astro'
+import Footer from '../components/Footer.astro'
+import Head from '../components/Head.astro'
+import Header from '../components/Header.astro'
+import { DEFAULT_LOCALE, LOCALES } from '../docs-config.ts'
+import { docTitle, docTranslationKey, extractDescription, getCleanSlug, routedId } from '../utils/docs.ts'
+import '../../dist/jaad.css'
+import '../styles/docs.css'
+import '../styles/jaamd.css'
+import '@lancher-dev/jaamd/styles.css'
+import 'virtual:jaad/theme.css'
+import 'virtual:jaad/bridge.css'
+import 'virtual:jaad/user.css'
+import 'virtual:jaad/tailwind.css'
 
 interface Props {
-  title?: string;
-  chapter?: string;
-  entry?: DocsEntry;
-  headings?: DocsHeadings[];
-  navigation: DocsNavigation;
+    title?: string
+    chapter?: string
+    entry?: DocsEntry
+    headings?: DocsHeadings[]
+    navigation: DocsNavigation
 }
 
-const { title, chapter, entry, headings = [], navigation } = Astro.props;
+const { title, chapter, entry, headings = [], navigation } = Astro.props
 
-const pageTitle = title ? `${title} | ${config.title}` : config.title;
+const pageTitle = title ? `${title} | ${config.title}` : config.title
 
 // The opening page gets no `title`; resolve it from the entry.
-const entryTitle = entry ? docTitle(entry) : (title ?? "");
+const entryTitle = entry ? docTitle(entry) : (title ?? '')
 
 const pageDescription =
-  entry?.data.description ??
-  (entry ? extractDescription(entry.body || "", entryTitle) : null) ??
-  config.description ??
-  config.title;
+    entry?.data.description ??
+    (entry ? extractDescription(entry.body || '', entryTitle) : null) ??
+    config.description ??
+    config.title
 
-const locale = entry?.locale ?? DEFAULT_LOCALE;
-const language =
-  LOCALES.find((known) => known.code === locale)?.tag ?? config.lang;
+const locale = entry?.locale ?? DEFAULT_LOCALE
+const language = LOCALES.find((known) => known.code === locale)?.tag ?? config.lang
 
-const switcherAlternates = await getLocaleAlternates(
-  entry ? docTranslationKey(entry) : "",
-);
+const switcherAlternates = await getLocaleAlternates(entry ? docTranslationKey(entry) : '')
 
 // x-default is a landing place, so it takes the fallback when this page has no
 // translation into the default locale.
-const xDefault = switcherAlternates.find(
-  (alternate) => alternate.locale.code === DEFAULT_LOCALE,
-)?.href;
+const xDefault = switcherAlternates.find((alternate) => alternate.locale.code === DEFAULT_LOCALE)?.href
 
 // hreflang describes translations of this page, not the switcher's fallbacks.
 const alternates = switcherAlternates
-  .filter((alternate) => alternate.translated)
-  .map((alternate) => ({
-    code: alternate.locale.code,
-    tag: alternate.locale.tag,
-    href: alternate.href,
-  }));
+    .filter((alternate) => alternate.translated)
+    .map((alternate) => ({
+        code: alternate.locale.code,
+        tag: alternate.locale.tag,
+        href: alternate.href,
+    }))
 
 const frameProps: DocsFrameProps = {
-  page: {
-    id: entry?.id ?? "",
-    slug: entry ? getCleanSlug(routedId(entry)) : "",
-    title: entryTitle,
-    chapter,
-    data: entry?.data ?? { draft: false, keywords: [] },
-  },
-  headings,
-  navigation,
-};
+    page: {
+        id: entry?.id ?? '',
+        slug: entry ? getCleanSlug(routedId(entry)) : '',
+        title: entryTitle,
+        chapter,
+        data: entry?.data ?? { draft: false, keywords: [] },
+    },
+    headings,
+    navigation,
+}
 ---
 
 <!doctype html>
-<html lang={language} class={config.appearance === "dark" ? "dark" : undefined}>
-  <head>
-    <Head
-      title={pageTitle}
-      description={pageDescription}
-      keywords={entry?.data.keywords}
-      author={entry?.data.author}
-      image={entry?.data.ogImage}
-      modified={entry?.data.lastUpdated}
-      language={language}
-      {alternates}
-      {xDefault}
-    />
-    <StructuredData
-      title={entryTitle || config.title}
-      description={pageDescription}
-      chapter={chapter}
-      keywords={entry?.data.keywords}
-      author={entry?.data.author}
-      modified={entry?.data.lastUpdated}
-      {language}
-      {locale}
-    />
-    <ClientRouter />
-  </head>
-  <body data-docs class="jaad-body">
-    <DocsFrame {...frameProps}>
-      <Header slot="header" inDocs {locale} alternates={switcherAlternates} />
-      <DocsSidebarLeft slot="sidebar" sections={navigation.sections} {locale} />
-      <slot name="mobile-navigation" slot="mobile-navigation" />
-      <slot name="breadcrumbs" slot="breadcrumbs" />
-      <slot name="page-actions" slot="page-actions" />
-      <slot name="content" slot="content" />
-      <slot name="page-navigation" slot="page-navigation" />
-      <TableOfContents slot="table-of-contents" headings={headings} {locale} />
-      <Footer slot="footer" />
-    </DocsFrame>
+<html lang={language} class={config.appearance === 'dark' ? 'dark' : undefined}>
+    <head>
+        <Head
+            title={pageTitle}
+            description={pageDescription}
+            keywords={entry?.data.keywords}
+            author={entry?.data.author}
+            image={entry?.data.ogImage}
+            modified={entry?.data.lastUpdated}
+            language={language}
+            {alternates}
+            {xDefault}
+        />
+        <StructuredData
+            title={entryTitle || config.title}
+            description={pageDescription}
+            chapter={chapter}
+            keywords={entry?.data.keywords}
+            author={entry?.data.author}
+            modified={entry?.data.lastUpdated}
+            {language}
+            {locale}
+        />
+        <ClientRouter />
+    </head>
+    <body data-docs class="jaad-body">
+        <DocsFrame {...frameProps}>
+            <Header slot="header" inDocs {locale} alternates={switcherAlternates} />
+            <DocsSidebarLeft slot="sidebar" sections={navigation.sections} {locale} />
+            <slot name="mobile-navigation" slot="mobile-navigation" />
+            <slot name="breadcrumbs" slot="breadcrumbs" />
+            <slot name="page-actions" slot="page-actions" />
+            <slot name="content" slot="content" />
+            <slot name="page-navigation" slot="page-navigation" />
+            <TableOfContents slot="table-of-contents" headings={headings} {locale} />
+            <Footer slot="footer" />
+        </DocsFrame>
 
-    <script>
-      import { navigate } from "astro:transitions/client";
+        <script>
+            import { navigate } from 'astro:transitions/client'
 
-      /** Identified by `rel`. */
-      function getPageLinks(): {
-        prev: HTMLAnchorElement | null;
-        next: HTMLAnchorElement | null;
-      } {
-        const nav = document.querySelector('nav[aria-label="Page navigation"]');
-        if (!nav) return { prev: null, next: null };
-        return {
-          prev: nav.querySelector<HTMLAnchorElement>('a[rel~="prev"][href]'),
-          next: nav.querySelector<HTMLAnchorElement>('a[rel~="next"][href]'),
-        };
-      }
+            /** Identified by `rel`. */
+            function getPageLinks(): {
+                prev: HTMLAnchorElement | null
+                next: HTMLAnchorElement | null
+            } {
+                const nav = document.querySelector('nav[aria-label="Page navigation"]')
+                if (!nav) return { prev: null, next: null }
+                return {
+                    prev: nav.querySelector<HTMLAnchorElement>('a[rel~="prev"][href]'),
+                    next: nav.querySelector<HTMLAnchorElement>('a[rel~="next"][href]'),
+                }
+            }
 
-      /** A wide table or code block: the arrow keys should scroll it instead. */
-      function inHorizontallyScrollable(el: Element | null): boolean {
-        for (let node = el; node && node !== document.body;) {
-          if (node instanceof HTMLElement) {
-            const overflowX = getComputedStyle(node).overflowX;
-            if (
-              (overflowX === "auto" || overflowX === "scroll") &&
-              node.scrollWidth > node.clientWidth
-            )
-              return true;
-          }
-          node = node.parentElement;
-        }
-        return false;
-      }
+            /** A wide table or code block: the arrow keys should scroll it instead. */
+            function inHorizontallyScrollable(el: Element | null): boolean {
+                for (let node = el; node && node !== document.body;) {
+                    if (node instanceof HTMLElement) {
+                        const overflowX = getComputedStyle(node).overflowX
+                        if ((overflowX === 'auto' || overflowX === 'scroll') && node.scrollWidth > node.clientWidth)
+                            return true
+                    }
+                    node = node.parentElement
+                }
+                return false
+            }
 
-      function onKey(e: KeyboardEvent) {
-        // Leave modified chords alone, notably the browser's back/forward.
-        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+            function onKey(e: KeyboardEvent) {
+                // Leave modified chords alone, notably the browser's back/forward.
+                if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
+                if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
 
-        const active = document.activeElement as HTMLElement | null;
-        const tag = active?.tagName;
-        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-        if (active?.isContentEditable) return;
-        if (inHorizontallyScrollable(active)) return;
+                const active = document.activeElement as HTMLElement | null
+                const tag = active?.tagName
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+                if (active?.isContentEditable) return
+                if (inHorizontallyScrollable(active)) return
 
-        const { prev, next } = getPageLinks();
-        const target = e.key === "ArrowLeft" ? prev : next;
-        if (!target) return;
-        e.preventDefault();
-        navigate(target.href);
-      }
+                const { prev, next } = getPageLinks()
+                const target = e.key === 'ArrowLeft' ? prev : next
+                if (!target) return
+                e.preventDefault()
+                navigate(target.href)
+            }
 
-      // `document` survives View Transitions, and this module runs once.
-      document.addEventListener("keydown", onKey);
-    </script>
-  </body>
+            // `document` survives View Transitions, and this module runs once.
+            document.addEventListener('keydown', onKey)
+        </script>
+    </body>
 </html>

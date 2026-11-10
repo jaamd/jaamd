@@ -1,75 +1,75 @@
 {
-  "name": "@lancher-dev/jaad",
-  "version": "0.10.2",
-  "description": "Turn a folder of markdown into a documentation site. An Astro integration.",
-  "type": "module",
-  "license": "MIT",
-  "author": "Kasui92 <info@lucapattocchio.dev>",
-  "homepage": "https://jaad.lancher.dev",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lancher-dev/jaad.git",
-    "directory": "packages/jaad"
-  },
-  "bugs": "https://github.com/lancher-dev/jaad/issues",
-  "keywords": [
-    "astro-integration",
-    "astro",
-    "withastro",
-    "documentation",
-    "docs",
-    "markdown"
-  ],
-  "exports": {
-    ".": "./index.ts",
-    "./advanced": "./src/advanced.ts",
-    "./content": "./src/content.ts",
-    "./layouts/Page.astro": "./src/layouts/Page.astro",
-    "./site": "./site.ts"
-  },
-  "files": [
-    "index.ts",
-    "site.ts",
-    "src",
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "peerDependencies": {
-    "astro": ">=7.0.0 <8.0.0",
-    "tailwindcss": "^4.3.0",
-    "@tailwindcss/vite": "^4.3.0"
-  },
-  "peerDependenciesMeta": {
-    "tailwindcss": {
-      "optional": true
+    "name": "@lancher-dev/jaad",
+    "version": "0.10.2",
+    "description": "Turn a folder of markdown into a documentation site. An Astro integration.",
+    "keywords": [
+        "astro",
+        "astro-integration",
+        "docs",
+        "documentation",
+        "markdown",
+        "withastro"
+    ],
+    "homepage": "https://jaad.lancher.dev",
+    "bugs": "https://github.com/lancher-dev/jaad/issues",
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lancher-dev/jaad.git",
+        "directory": "packages/jaad"
     },
-    "@tailwindcss/vite": {
-      "optional": true
+    "files": [
+        "index.ts",
+        "site.ts",
+        "src",
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "type": "module",
+    "exports": {
+        ".": "./index.ts",
+        "./advanced": "./src/advanced.ts",
+        "./content": "./src/content.ts",
+        "./layouts/Page.astro": "./src/layouts/Page.astro",
+        "./site": "./site.ts"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tailwindcss -i ./src/styles/global.css -o ./dist/jaad.css",
+        "prepare": "pnpm build",
+        "prepack": "pnpm build",
+        "check": "astro check && tsc --noEmit -p tests",
+        "test": "node --test \"tests/unit/**/*.test.ts\" \"tests/unit/**/*.test.mjs\"",
+        "test:consumer": "node --test \"tests/consumer/**/*.test.mjs\"",
+        "test:build": "pnpm --filter jaad-fixture build && node --test \"tests/build/**/*.test.mjs\""
+    },
+    "dependencies": {
+        "@astrojs/sitemap": "^3.7.4",
+        "@lancher-dev/jaamd": "^0.10.0",
+        "github-slugger": "^2.0.0"
+    },
+    "devDependencies": {
+        "@tailwindcss/cli": "^4.3.3",
+        "tailwindcss": "^4.3.3"
+    },
+    "peerDependencies": {
+        "@tailwindcss/vite": "^4.3.0",
+        "astro": ">=7.0.0 <8.0.0",
+        "tailwindcss": "^4.3.0"
+    },
+    "peerDependenciesMeta": {
+        "tailwindcss": {
+            "optional": true
+        },
+        "@tailwindcss/vite": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=22.12.0"
     }
-  },
-  "dependencies": {
-    "@astrojs/sitemap": "^3.7.4",
-    "@lancher-dev/jaamd": "^0.10.0",
-    "github-slugger": "^2.0.0"
-  },
-  "scripts": {
-    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tailwindcss -i ./src/styles/global.css -o ./dist/jaad.css",
-    "prepare": "pnpm build",
-    "prepack": "pnpm build",
-    "check": "astro check && tsc --noEmit -p tests",
-    "test": "node --test \"tests/unit/**/*.test.ts\" \"tests/unit/**/*.test.mjs\"",
-    "test:consumer": "node --test \"tests/consumer/**/*.test.mjs\"",
-    "test:build": "pnpm --filter jaad-fixture build && node --test \"tests/build/**/*.test.mjs\""
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "devDependencies": {
-    "@tailwindcss/cli": "^4.3.3",
-    "tailwindcss": "^4.3.3"
-  }
 }

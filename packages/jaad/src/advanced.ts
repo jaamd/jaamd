@@ -1,26 +1,21 @@
-import type { DocsHeadings, DocsPageData } from "./@types/docs.ts";
-import type { DocsNavigation } from "./navigation.ts";
+import type { DocsHeadings, DocsPageData } from './@types/docs.ts'
+import type { DocsNavigation } from './navigation.ts'
 
 /** Data available to an advanced documentation frame. */
 export interface DocsFrameProps {
-  page: {
-    /** Content collection id, without the Markdown extension. */
-    id: string;
-    /** File-derived slug. The opening page keeps its named slug here. */
-    slug: string;
-    title: string;
-    chapter?: string;
-    /** Raw frontmatter. */
-    data: DocsPageData;
-  };
-  headings: DocsHeadings[];
-  navigation: DocsNavigation;
+    page: {
+        /** Content collection id, without the Markdown extension. */
+        id: string
+        /** File-derived slug. The opening page keeps its named slug here. */
+        slug: string
+        title: string
+        chapter?: string
+        /** Raw frontmatter. */
+        data: DocsPageData
+    }
+    headings: DocsHeadings[]
+    navigation: DocsNavigation
 }
 
-export type {
-  DocsHeadings,
-  DocsNavItem,
-  DocsEntry,
-  DocsPageData,
-} from "./@types/docs.ts";
-export type { DocsNavigation, NavSection } from "./navigation.ts";
+export type { DocsHeadings, DocsNavItem, DocsEntry, DocsPageData } from './@types/docs.ts'
+export type { DocsNavigation, NavSection } from './navigation.ts'

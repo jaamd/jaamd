@@ -1,9 +1,9 @@
 @layer components {
-  .docs-content {
-    @apply w-full leading-relaxed wrap-break-word;
-  }
+    .docs-content {
+        @apply w-full leading-relaxed wrap-break-word;
+    }
 
-  .docs-updated {
-    @apply text-foreground-muted mt-8 text-xs;
-  }
+    .docs-updated {
+        @apply text-foreground-muted mt-8 text-xs;
+    }
 }

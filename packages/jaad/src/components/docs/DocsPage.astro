@@ -1,93 +1,68 @@
 ---
-import MarkdownContent from "@lancher-dev/jaamd/components";
+import type { DocsEntry } from '../../@types/docs.ts'
+import MarkdownContent from '@lancher-dev/jaamd/components'
+import config from 'virtual:jaad/config'
+import { DEFAULT_LOCALE, LOCALES, docsUrls, ui } from '../../docs-config.ts'
+import DocsLayout from '../../layouts/Docs.astro'
+import { buildDocsNavigation } from '../../navigation.ts'
 import {
-  getCleanSlug,
-  parseDocCollectionId,
-  docTitle,
-  extractHeadingsFromMarkdown,
-  routedId,
-} from "../../utils/docs.ts";
-import { buildDocsNavigation } from "../../navigation.ts";
-import type { DocsEntry } from "../../@types/docs.ts";
-import DocsLayout from "../../layouts/Docs.astro";
-import DocsMobileNav from "./DocsMobileNav.astro";
-import DocsPageNav from "./DocsPageNav.astro";
-import Breadcrumbs from "./Breadcrumbs.astro";
-import PageActions from "./PageActions.astro";
-import config from "virtual:jaad/config";
-import { DEFAULT_LOCALE, LOCALES, docsUrls, ui } from "../../docs-config.ts";
+    getCleanSlug,
+    parseDocCollectionId,
+    docTitle,
+    extractHeadingsFromMarkdown,
+    routedId,
+} from '../../utils/docs.ts'
+import Breadcrumbs from './Breadcrumbs.astro'
+import DocsMobileNav from './DocsMobileNav.astro'
+import DocsPageNav from './DocsPageNav.astro'
+import PageActions from './PageActions.astro'
 
 interface Props {
-  entry: DocsEntry;
-  sortedPages: DocsEntry[];
-  /** Left out on the opening page, whose title is the site name alone. */
-  headTitle?: string;
+    entry: DocsEntry
+    sortedPages: DocsEntry[]
+    /** Left out on the opening page, whose title is the site name alone. */
+    headTitle?: string
 }
 
-const { entry, sortedPages, headTitle } = Astro.props;
+const { entry, sortedPages, headTitle } = Astro.props
 
-const cleanSlug = getCleanSlug(routedId(entry));
-const { chapter } = parseDocCollectionId(routedId(entry));
-const title = docTitle(entry);
-const headings = extractHeadingsFromMarkdown(entry.body || "");
-const urls = docsUrls(entry.locale);
-const t = ui(entry.locale);
-const language =
-  LOCALES.find((known) => known.code === (entry.locale ?? DEFAULT_LOCALE))
-    ?.tag ?? config.lang;
-const updated = entry.data.lastUpdated;
-const navigation = buildDocsNavigation(sortedPages, entry.id, urls);
-const contentAttrs = { id: "content" };
+const cleanSlug = getCleanSlug(routedId(entry))
+const { chapter } = parseDocCollectionId(routedId(entry))
+const title = docTitle(entry)
+const headings = extractHeadingsFromMarkdown(entry.body || '')
+const urls = docsUrls(entry.locale)
+const t = ui(entry.locale)
+const language = LOCALES.find((known) => known.code === (entry.locale ?? DEFAULT_LOCALE))?.tag ?? config.lang
+const updated = entry.data.lastUpdated
+const navigation = buildDocsNavigation(sortedPages, entry.id, urls)
+const contentAttrs = { id: 'content' }
 ---
 
-<DocsLayout
-  title={headTitle}
-  chapter={chapter}
-  entry={entry}
-  headings={headings}
-  {navigation}
->
-  <DocsMobileNav
-    slot="mobile-navigation"
-    sections={navigation.sections}
-    headings={headings}
-    locale={entry.locale}
-  />
+<DocsLayout title={headTitle} chapter={chapter} entry={entry} headings={headings} {navigation}>
+    <DocsMobileNav slot="mobile-navigation" sections={navigation.sections} headings={headings} locale={entry.locale} />
 
-  <Breadcrumbs
-    slot="breadcrumbs"
-    chapter={chapter}
-    title={title}
-    locale={entry.locale}
-  />
-  <PageActions
-    slot="page-actions"
-    id={entry.id}
-    cleanSlug={cleanSlug}
-    locale={entry.locale}
-  />
+    <Breadcrumbs slot="breadcrumbs" chapter={chapter} title={title} locale={entry.locale} />
+    <PageActions slot="page-actions" id={entry.id} cleanSlug={cleanSlug} locale={entry.locale} />
 
-  <Fragment slot="content">
-    <MarkdownContent {...contentAttrs} class="docs-content">
-      <slot />
-    </MarkdownContent>
+    <Fragment slot="content">
+        <MarkdownContent {...contentAttrs} class="docs-content">
+            <slot />
+        </MarkdownContent>
 
-    {updated && (
-      <p class="docs-updated">
-        {t("page.lastUpdated")}{" "}
-        <time datetime={updated.toISOString()}>
-          {new Intl.DateTimeFormat(language, { dateStyle: "long" }).format(
-            updated,
-          )}
-        </time>
-      </p>
-    )}
-  </Fragment>
+        {updated && (
+            <p class="docs-updated">
+                {t('page.lastUpdated')}{' '}
+                <time datetime={updated.toISOString()}>
+                    {new Intl.DateTimeFormat(language, { dateStyle: 'long' }).format(updated)}
+                </time>
+            </p>
+        )}
+    </Fragment>
 
-  <DocsPageNav
-    slot="page-navigation"
-    previousPage={navigation.previousPage}
-    nextPage={navigation.nextPage}
-    locale={entry.locale}
-  />
+    <DocsPageNav
+        slot="page-navigation"
+        previousPage={navigation.previousPage}
+        nextPage={navigation.nextPage}
+        locale={entry.locale}
+    />
 </DocsLayout>
