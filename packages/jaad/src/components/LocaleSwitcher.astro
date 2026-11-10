@@ -1,0 +1,135 @@
+---
+import type { LocaleAlternate } from "../collection.ts";
+import { ui } from "../docs-config.ts";
+
+interface Props {
+  alternates: LocaleAlternate[];
+  current: string;
+}
+
+const { alternates, current } = Astro.props;
+const active = alternates.find((entry) => entry.locale.code === current);
+const t = ui(current);
+---
+
+<jaad-locale-switcher class="jaad-locale-switcher">
+  <button
+    type="button"
+    data-trigger
+    aria-expanded="false"
+    aria-haspopup="true"
+    aria-controls="jaad-locale-menu"
+    aria-label={t("locale.change")}
+    title={t("locale.change")}
+    class="jaad-icon-button jaad-locale-trigger"
+  >
+    {active?.locale.flag && (
+      <span aria-hidden="true">{active.locale.flag}</span>
+    )}
+    <span class="jaad-locale-code">{current}</span>
+    <svg
+      class="jaad-locale-chevron"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M19 9l-7 7-7-7"
+      ></path>
+    </svg>
+  </button>
+
+  <div
+    id="jaad-locale-menu"
+    data-menu
+    hidden
+    class="jaad-menu jaad-locale-menu"
+  >
+    {alternates.map((entry) => (
+      <a
+        href={entry.href}
+        hreflang={entry.locale.tag}
+        lang={entry.locale.tag}
+        aria-current={entry.locale.code === current ? "true" : undefined}
+        class="jaad-menu-item jaad-locale-item"
+      >
+        {entry.locale.flag && (
+          <span aria-hidden="true">{entry.locale.flag}</span>
+        )}
+        <span>{entry.locale.name}</span>
+      </a>
+    ))}
+  </div>
+</jaad-locale-switcher>
+
+<script>
+  import { nextSwitcherMarkup } from "./locale-switcher.ts";
+
+  class JaadLocaleSwitcher extends HTMLElement {
+    #onDocumentPointerDown = (event: PointerEvent) => {
+      if (!this.contains(event.target as Node)) this.#close();
+    };
+
+    #onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") this.#close();
+    };
+
+    /** The header persists across navigations; its links must not. */
+    #onBeforeSwap = (event: Event) => {
+      const markup = nextSwitcherMarkup(
+        (event as Event & { newDocument: Document }).newDocument,
+      );
+      if (markup !== null) this.innerHTML = markup;
+    };
+
+    /** Delegated: #onBeforeSwap replaces the button this would bind to. */
+    #onClick = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      if (!target?.closest("[data-trigger]")) return;
+      this.#menu()?.hidden ? this.#open() : this.#close();
+    };
+
+    connectedCallback() {
+      this.addEventListener("click", this.#onClick);
+      document.addEventListener("pointerdown", this.#onDocumentPointerDown);
+      document.addEventListener("keydown", this.#onKeyDown);
+      document.addEventListener("astro:before-swap", this.#onBeforeSwap);
+    }
+
+    disconnectedCallback() {
+      this.removeEventListener("click", this.#onClick);
+      document.removeEventListener("pointerdown", this.#onDocumentPointerDown);
+      document.removeEventListener("keydown", this.#onKeyDown);
+      document.removeEventListener("astro:before-swap", this.#onBeforeSwap);
+    }
+
+    #menu() {
+      return this.querySelector<HTMLElement>("[data-menu]");
+    }
+
+    #open() {
+      const menu = this.#menu();
+      if (menu) menu.hidden = false;
+      this.querySelector("[data-trigger]")?.setAttribute(
+        "aria-expanded",
+        "true",
+      );
+    }
+
+    #close() {
+      const menu = this.#menu();
+      if (menu) menu.hidden = true;
+      const trigger = this.querySelector<HTMLElement>("[data-trigger]");
+      trigger?.setAttribute("aria-expanded", "false");
+      if (this.contains(document.activeElement)) trigger?.focus();
+    }
+  }
+
+  if (!customElements.get("jaad-locale-switcher")) {
+    customElements.define("jaad-locale-switcher", JaadLocaleSwitcher);
+  }
+</script>

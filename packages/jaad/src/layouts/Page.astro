@@ -1,0 +1,42 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import Head from "../components/Head.astro";
+import config from "virtual:jaad/config";
+
+import "../../dist/jaad.css";
+import "virtual:jaad/theme.css";
+import "virtual:jaad/bridge.css";
+import "virtual:jaad/user.css";
+import "virtual:jaad/tailwind.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  bare?: boolean;
+  /** Added to the body. */
+  class?: string;
+}
+
+const { title, description, bare = false, class: className } = Astro.props;
+
+const pageTitle = title ? `${title} | ${config.title}` : config.title;
+const pageDescription = description ?? config.description ?? config.title;
+---
+
+<!doctype html>
+<html
+  lang={config.lang}
+  class={config.appearance === "dark" ? "dark" : undefined}
+>
+  <head>
+    <Head title={pageTitle} description={pageDescription} />
+  </head>
+  <body class:list={["jaad-body", className]}>
+    <Header />
+    <main class={bare ? "jaad-main-bare" : "jaad-main"}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

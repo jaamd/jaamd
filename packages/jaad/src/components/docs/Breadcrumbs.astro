@@ -1,0 +1,36 @@
+---
+import { formatChapterTitle } from "../../utils/docs.ts";
+import config from "virtual:jaad/config";
+import { docsPageHref } from "../../urls.ts";
+import { docsUrls, ui } from "../../docs-config.ts";
+
+interface Props {
+  chapter?: string;
+  title: string;
+  locale?: string;
+}
+
+const { chapter, title, locale } = Astro.props;
+const t = ui(locale);
+const chapterTitle = formatChapterTitle(chapter);
+
+const rootSegment = config.docsBase.split("/").filter(Boolean).at(-1);
+const rootLabel = formatChapterTitle(rootSegment) ?? t("breadcrumb.root");
+const rootHref = docsPageHref("", docsUrls(locale));
+---
+
+<nav aria-label={t("breadcrumb.label")} class="docs-breadcrumbs">
+  <a href={rootHref} class="docs-breadcrumbs-link">
+    {rootLabel}
+  </a>
+  {chapterTitle && (
+    <>
+      <span aria-hidden="true">/</span>
+      <span>{chapterTitle}</span>
+    </>
+  )}
+  <span aria-hidden="true">/</span>
+  <span class="docs-breadcrumbs-current" aria-current="page">
+    {title}
+  </span>
+</nav>

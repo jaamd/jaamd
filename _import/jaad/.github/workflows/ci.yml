@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/setup@v3
+        with:
+          version: 12
+          runtime: node@24
+          cache: true
+
+      - name: Format
+        run: pnpm format
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm check
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Assertions on the built site
+        run: pnpm test:build
+
+  # Packs the tarball and installs it into a throwaway project with npm. This is
+  # the only check that exercises what a reader actually gets.
+  consumer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/setup@v3
+        with:
+          version: 12
+          runtime: node@24
+          cache: true
+
+      - run: pnpm test:consumer

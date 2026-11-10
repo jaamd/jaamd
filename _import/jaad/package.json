@@ -1,0 +1,44 @@
+{
+  "name": "jaad-monorepo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "husky",
+    "dev": "pnpm --filter www dev",
+    "build": "pnpm --filter www build",
+    "preview": "pnpm --filter www preview",
+    "check": "tsc --noEmit && pnpm -r check",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "test": "node --test \"tests/unit/**/*.test.ts\" \"tests/unit/**/*.test.mjs\"",
+    "test:build": "node --test \"tests/build/**/*.test.mjs\"",
+    "test:consumer": "node --test \"tests/consumer/**/*.test.mjs\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.4",
+    "@typescript-eslint/parser": "^8.71.1",
+    "eslint": "^10",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^3.2.1",
+    "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-astro": "1.1.2",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "^6",
+    "typescript-eslint": "^8.71.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,astro}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,json,md}": [
+      "prettier --write"
+    ]
+  }
+}

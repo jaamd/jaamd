@@ -1,0 +1,72 @@
+---
+import { Font } from "astro:assets";
+import SiteThemeToggle from "../components/SiteThemeToggle.astro";
+import { withBase } from "@/utils/base";
+import "../styles/site.css";
+
+interface Props {
+  pageTitle?: string;
+  description?: string;
+}
+
+const {
+  pageTitle,
+  description = "An Astro integration that turns a folder of Markdown into a documentation site.",
+} = Astro.props;
+const title = pageTitle ? `${pageTitle} | JAAD` : "JAAD";
+const canonical = Astro.url.href;
+const ogImage = Astro.site ? new URL("/og-image.png", Astro.site) : null;
+const homeHref = withBase("/");
+const docsHref = withBase("/docs");
+const favicon = withBase("/favicon.svg");
+const themeScript = `(function () {
+  function isDark() {
+    var theme = localStorage.getItem("theme");
+    return theme === "dark" || (!theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  document.documentElement.classList.toggle("dark", isDark());
+})();`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={favicon} />
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-merriweather" preload />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <script is:inline set:html={themeScript} />
+  </head>
+  <body data-site-layout>
+    <header class="site-chrome site-header">
+      <a class="font-brand text-primary text-xl no-underline" href={homeHref}>
+        JAAD
+      </a>
+      <div class="flex items-center gap-2">
+        <nav aria-label="Main navigation">
+          <a class="text-sm no-underline" href={docsHref}>
+            Documentation
+          </a>
+        </nav>
+        <SiteThemeToggle />
+      </div>
+    </header>
+
+    <main class="site-main">
+      <slot />
+    </main>
+
+    <footer class="site-chrome site-footer">
+      JAAD is released under the MIT License.
+    </footer>
+  </body>
+</html>
