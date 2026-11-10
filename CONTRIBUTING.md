@@ -108,3 +108,18 @@ by assistive technology. Keyboard hints such as `search.open` and
 Regional locales automatically inherit their base language. A catalogue for
 `pt`, for example, also supplies the defaults for `pt-BR`; users can still
 override either locale through their JAAD configuration.
+
+## Releasing
+
+Each package is released on its own, from a clean `main`:
+
+```bash
+node scripts/release.mjs jaamd 0.12.0
+git push origin HEAD jaamd@0.12.0
+```
+
+The script sets the version, commits, and creates the `<package>@<version>` tag; the
+tag runs [`publish.yml`](/.github/workflows/publish.yml), which tests the whole
+workspace and publishes with provenance. Releasing `jaad` also updates the version
+`create-jaad` installs, so release `create-jaad` after it. When jaad needs a new
+jaamd, release jaamd first.

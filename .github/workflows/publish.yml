@@ -1,13 +1,27 @@
 name: Publish to npm
 
+# A `<package>@<version>` tag publishes packages/<package>.
 on:
     push:
-        tags:
-            - 'v*'
+        tags: ['*@*']
+    workflow_dispatch:
+        inputs:
+            package:
+                description: Directory under packages/
+                required: true
+                type: string
+
+concurrency:
+    group: publish-${{ inputs.package || github.ref }}
+    cancel-in-progress: false
 
 permissions:
     id-token: write
     contents: read
+
+env:
+    # Only until every package has a trusted publisher on npm.
+    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 jobs:
     publish:
@@ -25,16 +39,55 @@ jobs:
 
             - run: pnpm install --frozen-lockfile
 
-            - run: pnpm typecheck
+            - name: Resolve the package and check the tag against its version
+              id: target
+              env:
+                  PACKAGE: ${{ inputs.package }}
+              run: |
+                  if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+                    dir="$PACKAGE"
+                  else
+                    dir="${GITHUB_REF_NAME%@*}"
+                    tag="${GITHUB_REF_NAME##*@}"
+                  fi
 
-            # Never publish a version whose markdown pipeline silently stopped
-            # working: build the showcase and assert on the HTML it produces.
-            - run: pnpm build
-            - run: pnpm smoke
-            - run: pnpm build:unified
-            - run: pnpm smoke
+                  manifest="packages/$dir/package.json"
+                  if [ ! -f "$manifest" ]; then
+                    echo "no package at packages/$dir" >&2
+                    exit 1
+                  fi
 
-            # Trusted publishing: pnpm exchanges the GitHub OIDC token for npm auth.
+                  name="$(node -p "require('./$manifest').name")"
+                  version="$(node -p "require('./$manifest').version")"
+                  if [ -n "${tag:-}" ] && [ "$tag" != "$version" ]; then
+                    echo "tag $GITHUB_REF_NAME does not match $name@$version" >&2
+                    exit 1
+                  fi
+
+                  echo "dir=packages/$dir" >> "$GITHUB_OUTPUT"
+                  if npm view "$name@$version" version >/dev/null 2>&1; then
+                    echo "published=true" >> "$GITHUB_OUTPUT"
+                    echo "$name@$version is already on npm, nothing to do"
+                  else
+                    echo "releasing $name@$version"
+                  fi
+
+            # The whole suite: create-jaad is tested through jaad, jaad through
+            # the site, and every package through its packed tarball.
+            - name: Check and test
+              if: steps.target.outputs.published != 'true'
+              run: |
+                  pnpm check
+                  pnpm test
+                  pnpm test:build
+                  pnpm test:consumer
+
+            - name: Authenticate with a token
+              if: steps.target.outputs.published != 'true' && env.NPM_TOKEN != ''
+              run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+
+            # pnpm writes the versions behind `workspace:` ranges into the tarball.
             - name: Publish
-              working-directory: packages/jaamd
+              if: steps.target.outputs.published != 'true'
+              working-directory: ${{ steps.target.outputs.dir }}
               run: pnpm publish --provenance --access public --no-git-checks
