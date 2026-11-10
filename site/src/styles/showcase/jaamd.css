@@ -1,0 +1,30 @@
+/* Bridge between the site identity and JAAMD's tokens. Unlayered, so it outranks
+   @layer jaamd.defaults; the themes it competes with are unlayered too, so the
+   attribute selectors are what keep them apart. */
+
+/* Typography is the site's in every theme: the palette changes, the type does not. */
+html {
+    --jaamd-font-sans: var(--identity-font-sans);
+    --jaamd-font-serif: var(--identity-font-serif);
+    --jaamd-font-mono: var(--identity-font-mono);
+    --jaamd-font-size: 1.125rem;
+    --jaamd-line-height: 1.6;
+}
+
+/* The site's own theme, and the state before the boot script runs. */
+html:not([data-jaamd-theme]),
+html[data-jaamd-theme='default'] {
+    --jaamd-bg: var(--identity-background);
+    --jaamd-color-fg: var(--identity-foreground);
+    --jaamd-color-fg-bright: var(--identity-foreground-bright);
+    --jaamd-color-primary: var(--identity-primary);
+}
+
+/* Every package theme, in reverse: the chrome follows the article. Borders and
+   muted text derive from these in identity.css, so four seeds are enough. */
+html[data-jaamd-theme]:not([data-jaamd-theme='default']) {
+    --identity-background: var(--jaamd-bg);
+    --identity-foreground: var(--jaamd-color-fg);
+    --identity-foreground-bright: var(--jaamd-color-fg-bright);
+    --identity-primary: var(--jaamd-color-primary);
+}
