@@ -1,0 +1,18 @@
+/* JAAMD's palette drives JAAD's, the opposite direction to jaamd-forward.css.
+   Never both at once: together they are a cycle, and CSS drops both sides.
+
+   Only the seeds; global.css derives the rest with color-mix(). */
+
+:root,
+html.dark {
+    --color-background: var(--jaamd-bg);
+    --color-surface: var(--jaamd-surface-1);
+    --color-foreground: var(--jaamd-color-fg);
+    --color-foreground-bright: var(--jaamd-color-fg-bright);
+    --color-primary: var(--jaamd-color-primary);
+
+    --color-info: var(--jaamd-alert-note-color);
+    --color-success: var(--jaamd-alert-tip-color);
+    --color-warning: var(--jaamd-alert-warning-color);
+    --color-error: var(--jaamd-alert-caution-color);
+}

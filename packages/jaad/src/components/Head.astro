@@ -1,0 +1,119 @@
+---
+import { Font } from 'astro:assets'
+import config from 'virtual:jaad/config'
+import { openGraphLocale } from '../locales.ts'
+import { withDeploymentBase } from '../urls.ts'
+
+interface Props {
+    title: string
+    description: string
+    /** Page frontmatter; each field overrides the site's. */
+    keywords?: string[]
+    author?: string
+    image?: string | false
+    modified?: Date
+    /** BCP-47 tag of this page's locale. */
+    language?: string
+    /** Every locale that has this page, for hreflang and og:locale:alternate. */
+    alternates?: { code: string; tag: string; href: string }[]
+    /** Where a reader with no matching language should land. */
+    xDefault?: string
+}
+
+const {
+    title,
+    description,
+    keywords = [],
+    author,
+    image,
+    modified,
+    language = config.lang,
+    alternates = [],
+    xDefault,
+} = Astro.props
+const canonical = Astro.site ? Astro.url.href : null
+
+// Open Graph rejects relative paths, so these have to be absolute.
+const resolvedImage = image ?? config.ogImage
+const ogImage =
+    resolvedImage === false
+        ? null
+        : /^https?:\/\//.test(resolvedImage)
+          ? resolvedImage
+          : Astro.site
+            ? new URL(withDeploymentBase(resolvedImage, import.meta.env.BASE_URL), Astro.site).href
+            : null
+const favicon = config.favicon ? withDeploymentBase(config.favicon, import.meta.env.BASE_URL) : null
+
+// Applied before the first paint, so the page never flashes the wrong theme.
+const themeScript = `(function () {
+  function isDark() {
+    var t = localStorage.getItem("theme");
+    return (
+      t === "dark" || (!t && matchMedia("(prefers-color-scheme: dark)").matches)
+    );
+  }
+  function applyTheme(root) {
+    if (isDark()) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }
+  applyTheme(document.documentElement);
+  document.addEventListener("astro:before-swap", function (e) {
+    applyTheme(e.newDocument.documentElement);
+  });
+  document.addEventListener("astro:after-swap", function () {
+    applyTheme(document.documentElement);
+  });
+})();`
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<meta name="description" content={description} />
+{keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
+{author && <meta name="author" content={author} />}
+<title>{title}</title>
+{canonical && <link rel="canonical" href={canonical} />}
+{Astro.site &&
+    alternates.map((alternate) => (
+        <link rel="alternate" hreflang={alternate.tag} href={new URL(alternate.href, Astro.site).href} />
+    ))}
+{Astro.site && xDefault && <link rel="alternate" hreflang="x-default" href={new URL(xDefault, Astro.site).href} />}
+
+{favicon && <link rel="icon" href={favicon} />}
+
+<Font cssVariable="--font-inter" preload />
+<Font cssVariable="--font-merriweather" preload />
+
+{canonical && <meta property="og:url" content={canonical} />}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={config.title} />
+<meta property="og:locale" content={openGraphLocale(language)} />
+{alternates
+    .filter((alternate) => alternate.tag !== language)
+    .map((alternate) => (
+        <meta property="og:locale:alternate" content={openGraphLocale(alternate.tag)} />
+    ))}
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{modified && <meta property="article:modified_time" content={modified.toISOString()} />}
+{ogImage && <meta property="og:image" content={ogImage} />}
+
+<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+{canonical && <meta property="twitter:domain" content={Astro.url.hostname} />}
+{canonical && <meta property="twitter:url" content={canonical} />}
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{ogImage && <meta name="twitter:image" content={ogImage} />}
+
+<meta name="generator" content={Astro.generator} />
+
+{config.head.map((tag) => {
+    const Tag = tag.tag as keyof HTMLElementTagNameMap
+    return <Tag {...tag.attrs} set:html={tag.content ?? ''} />
+})}
+
+{config.appearance === 'auto' && <script is:inline set:html={themeScript} />}

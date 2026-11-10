@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://jaamd.lancher.dev">
+  <a href="https://jaamd.org">
     <img src="./.github/readme-header.png" alt="JAAMD — Just Another Astro Markdown. Markdown, finished." width="1200" />
   </a>
 </p>
@@ -10,19 +10,19 @@
 
 <div align="center">
 
-[![main](https://github.com/lancher-dev/jaamd/actions/workflows/ci.yml/badge.svg)](https://github.com/lancher-dev/jaamd/actions/workflows/ci.yml)
+[![main](https://github.com/jaamd/jaamd/actions/workflows/ci.yml/badge.svg)](https://github.com/jaamd/jaamd/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](/LICENSE)
-[![npm version](https://badge.fury.io/js/@lancher-dev%2Fjaamd.svg)](https://badge.fury.io/js/@lancher-dev%2Fjaamd)
+[![npm version](https://badge.fury.io/js/@jaamd%2Fjaamd.svg)](https://badge.fury.io/js/@jaamd%2Fjaamd)
 
 </div>
 
 ```bash
-npx astro add @lancher-dev/jaamd
+npx astro add @jaamd/jaamd
 ```
 
 ```astro
 ---
-import MarkdownContent from '@lancher-dev/jaamd/components'
+import MarkdownContent from '@jaamd/jaamd/components'
 ---
 
 <MarkdownContent>
@@ -30,25 +30,27 @@ import MarkdownContent from '@lancher-dev/jaamd/components'
 </MarkdownContent>
 ```
 
-Showcase: [jaamd.lancher.dev](https://jaamd.lancher.dev)
+Documentation and showcase: [jaamd.org](https://jaamd.org)
 
-## Repository
+## Packages
 
-| Path                                | What                                                                |
-| ----------------------------------- | ------------------------------------------------------------------- |
-| [`packages/jaamd`](/packages/jaamd) | The integration, and its [documentation](/packages/jaamd/README.md) |
-| [`www`](/www)                       | The showcase, itself rendered with jaamd                            |
-| [`tests`](/tests)                   | Slug parity, the theme contract, and post-build assertions          |
+| Package                                       | What                                                           |
+| --------------------------------------------- | -------------------------------------------------------------- |
+| [`@jaamd/jaamd`](/packages/jaamd)             | Markdown plugins, client-side enhancements, styles and themes  |
+| [`@jaamd/jaad`](/packages/jaad)               | A documentation site from a folder of Markdown, built on jaamd |
+| [`@jaamd/create-jaad`](/packages/create-jaad) | Scaffolds a jaad site: `npm create @jaamd/jaad@latest`         |
+
+Each package keeps its tests in `tests/`, with a fixture site for the build assertions.
 
 ```bash
 pnpm install
-pnpm dev            # the showcase, on localhost:4321
-pnpm build && pnpm smoke             # on Sätteri, Astro's default
-pnpm build:unified && pnpm smoke     # on unified
+pnpm check && pnpm test
+pnpm test:build      # builds each fixture and asserts on its output
+pnpm test:consumer   # installs the packed tarballs into throwaway projects
 ```
 
-Adding a theme is a directory and a manifest entry: see [CONTRIBUTING.md](/CONTRIBUTING.md#themes).
+See [CONTRIBUTING.md](/CONTRIBUTING.md) for themes and interface translations.
 
 ## License
 
-jaamd is released under the [MIT License](/LICENSE).
+The packages are released under the [MIT License](/LICENSE).

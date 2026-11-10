@@ -13,69 +13,73 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    verify:
+    static:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v7
-
-            # Version comes from "packageManager" in package.json.
             - uses: pnpm/action-setup@v6
-
-            # The slug parity test imports a .ts file, which needs Node's native type
-            # stripping.
             - uses: actions/setup-node@v7
               with:
                   node-version: '24'
                   cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm format:check
+            - run: pnpm lint
 
+    # On a pull request that touches only packages/ and site/, runs the changed
+    # projects and their dependents. Anything else runs every project.
+    packages:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: '24'
+                  cache: pnpm
             - run: pnpm install --frozen-lockfile
 
-            - run: pnpm typecheck
-            - run: pnpm lint
-            - run: pnpm format:check
+            - name: Select projects
+              id: scope
+              run: |
+                  if [ "$GITHUB_EVENT_NAME" = pull_request ] &&
+                     ! git diff --name-only "origin/$GITHUB_BASE_REF...HEAD" | grep -qvE '^(packages|site)/'; then
+                    echo "filter=--filter=...[origin/$GITHUB_BASE_REF]" >> "$GITHUB_OUTPUT"
+                  fi
 
-            # The client-side id fallback has to agree with the ids Astro emits.
-            - run: pnpm test:slug
+            - run: pnpm -r ${{ steps.scope.outputs.filter }} --if-present run check
+            - run: pnpm -r ${{ steps.scope.outputs.filter }} --if-present run test
+            # Builds each fixture, jaamd's on Sätteri and unified, and the site.
+            - run: pnpm -r ${{ steps.scope.outputs.filter }} --if-present run test:build
 
-            # A theme that omits a seed still builds; only this says so.
-            - run: pnpm test:themes
+    # Packs the tarballs and installs them into throwaway projects.
+    consumer:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: '24'
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm test:consumer
 
-            - run: pnpm build
-
-            # `astro build` exits 0 when jaamd skips its plugins (warning only).
-            # Asserts on the rendered HTML; catches a renamed markdown processor.
-            - name: Assertions on the built site
-              run: pnpm smoke
-
-            # Same assertions on the remark plugins.
-            - run: pnpm build:unified
-            - name: Assertions on the unified build
-              run: pnpm smoke
-
-    # `www` pins astro ^7, so the job above never sees a new major. Red here means
-    # the next Astro major needs checking, not that main is broken.
+    # The fixtures and the site pin astro ^7, so the jobs above never see a new
+    # major. Red here means the next Astro major needs checking.
     astro-latest:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         runs-on: ubuntu-latest
         continue-on-error: true
         steps:
             - uses: actions/checkout@v7
-
-            # Version comes from "packageManager" in package.json.
             - uses: pnpm/action-setup@v6
-
             - uses: actions/setup-node@v7
               with:
                   node-version: '24'
                   cache: pnpm
-
             - run: pnpm install --frozen-lockfile
-            - run: pnpm --filter www add astro@latest
-            - run: pnpm build
-
-            - name: Assertions against the latest Astro
-              run: pnpm smoke
-
-            - run: pnpm build:unified
-            - name: Assertions against the latest Astro, on unified
-              run: pnpm smoke
+            - run: pnpm --filter jaamd-fixture --filter jaad-fixture --filter site add astro@latest
+            - run: pnpm test:build

@@ -1,0 +1,114 @@
+---
+import type { JaamdTheme } from '@jaamd/jaamd/themes'
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { themes as packageThemes } from '@jaamd/jaamd/themes'
+import { Font } from 'astro:assets'
+import SiteThemePicker from '../components/SiteThemePicker.astro'
+import { themeModes, THEME_STORAGE_KEY, SITE_THEME, shikiKeys } from '../themes.ts'
+import '@jaamd/jaamd/default.css'
+import '@jaamd/jaamd/styles.css'
+import '../styles/identity.css'
+import '../styles/jaamd.css'
+import '../styles/site.css'
+
+const require = createRequire(import.meta.url)
+
+/**
+ * Shiki bakes one variable per configured key; this picks which one the code
+ * reads. `.dark` / `:not(.dark)` raises specificity: without it the selector
+ * ties with shiki-dual.css and injection order decides the winner.
+ */
+function shikiRule(scope: string, key: string) {
+    return `${scope} .jaamd-content .astro-code span,
+${scope} .jaamd-content .shiki span {
+  color: var(--shiki-${key}) !important;
+  font-style: var(--shiki-${key}-font-style) !important;
+  font-weight: var(--shiki-${key}-font-weight) !important;
+  text-decoration: var(--shiki-${key}-text-decoration) !important;
+}`
+}
+
+// Themes are authored on :root: importing more than one lets the last win.
+// Re-scoped at build time so they coexist and can be switched.
+const themeCss = packageThemes
+    .map((theme: JaamdTheme) => {
+        const { slug } = theme
+        const source = readFileSync(require.resolve(`@jaamd/jaamd/themes/${slug}.css`), 'utf8')
+        const attr = `[data-jaamd-theme="${slug}"]`
+        const keys = shikiKeys(theme)
+
+        const scoped = source.replace(/^:root \{$/m, `html${attr} {`).replace(/^html\.dark \{$/m, `html.dark${attr} {`)
+
+        const rules = [
+            keys.light && shikiRule(`html${attr}:not(.dark)`, keys.light),
+            keys.dark && shikiRule(`html.dark${attr}`, keys.dark),
+        ].filter(Boolean)
+
+        return [scoped, ...rules].join('\n')
+    })
+    .join('\n\n')
+
+const title = 'JAAMD'
+const description =
+    'Remark plugins, client-side enhancements and styles as a single Astro integration for Markdown content.'
+const canonical = new URL(Astro.url.pathname, Astro.site).href
+const ogImage = new URL('/og-image.png', Astro.site).href
+
+// Inline and before paint: applied from a module, the wrong theme would flash.
+const themeScript = `(function () {
+  var modes = ${JSON.stringify(themeModes)};
+  var slug;
+  try { slug = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}); } catch (e) {}
+  if (!modes[slug]) slug = ${JSON.stringify(SITE_THEME.slug)};
+
+  var mode = modes[slug];
+  var dark = mode === "dark" ||
+    (mode === "dual" && matchMedia("(prefers-color-scheme: dark)").matches);
+
+  document.documentElement.dataset.jaamdTheme = slug;
+  document.documentElement.classList.toggle("dark", dark);
+})();`
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <Font cssVariable="--font-inter" preload />
+        <Font cssVariable="--font-merriweather" preload />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <style is:inline set:html={themeCss}></style>
+        <script is:inline set:html={themeScript} />
+    </head>
+    <body data-site-layout>
+        <header class="site-chrome site-header">
+            <a class="site-brand font-brand" href="/">
+                JAAMD
+            </a>
+            <div class="site-header-actions">
+                <nav aria-label="Main navigation">
+                    <a href="https://github.com/jaamd/jaamd">GitHub</a>
+                    <a href="https://www.npmjs.com/package/@jaamd/jaamd">npm</a>
+                </nav>
+                <SiteThemePicker />
+            </div>
+        </header>
+
+        <main class="site-main">
+            <slot />
+        </main>
+
+        <footer class="site-chrome site-footer">JAAMD is released under the MIT License.</footer>
+    </body>
+</html>

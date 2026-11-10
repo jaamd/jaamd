@@ -5,26 +5,20 @@
     "author": "Kasui92 <info@lucapattocchio.dev>",
     "type": "module",
     "scripts": {
-        "dev": "pnpm --filter www dev",
-        "build": "pnpm --filter www build",
-        "build:unified": "JAAMD_PROCESSOR=unified pnpm --filter www build",
-        "preview": "pnpm --filter www preview",
-        "typecheck": "tsc --noEmit -p packages/jaamd && pnpm --filter www check",
         "lint": "oxlint",
         "lint:fix": "oxlint --fix",
         "format": "oxfmt",
         "format:check": "oxfmt --check",
-        "build:themes": "node scripts/build-themes.mjs",
-        "test:slug": "node tests/unit/slug-parity.mjs",
-        "test:themes": "node tests/unit/themes.mjs",
-        "smoke": "node tests/build/smoke.mjs"
+        "check": "pnpm -r --if-present run check",
+        "test": "pnpm -r --if-present run test",
+        "test:build": "pnpm -r --if-present run test:build",
+        "test:consumer": "pnpm -r --if-present run test:consumer",
+        "build:themes": "pnpm --filter @jaamd/jaamd run build:themes"
     },
     "devDependencies": {
         "@types/node": "^24.0.0",
-        "github-slugger": "^2.0.0",
         "oxfmt": "^0.75.0",
         "oxlint": "^1.90.0",
-        "shiki": "4.4.3",
         "typescript": "^6.0.0"
     },
     "packageManager": "pnpm@12.16.1"

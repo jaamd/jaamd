@@ -3,13 +3,11 @@ dist/
 # generated types
 .astro/
 
+# wrangler state
+.wrangler/
+
 # dependencies
 node_modules/
-
-# showcase
-www/node_modules/
-www/.astro/
-www/dist/
 
 # logs
 npm-debug.log*

@@ -1,5 +1,5 @@
 {
-    "name": "@lancher-dev/jaamd",
+    "name": "@jaamd/jaamd",
     "version": "0.11.0",
     "description": "Add markdown plugins, client-side enhancements and styles as a single Astro integration for Markdown content.",
     "keywords": [
@@ -10,15 +10,15 @@
         "remark",
         "withastro"
     ],
-    "homepage": "https://github.com/lancher-dev/jaamd#readme",
+    "homepage": "https://jaamd.org",
     "bugs": {
-        "url": "https://github.com/lancher-dev/jaamd/issues"
+        "url": "https://github.com/jaamd/jaamd/issues"
     },
     "license": "MIT",
     "author": "Kasui92 <info@lucapattocchio.dev>",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/lancher-dev/jaamd.git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
         "directory": "packages/jaamd"
     },
     "files": [
@@ -50,7 +50,10 @@
         "access": "public"
     },
     "scripts": {
-        "typecheck": "tsc --noEmit"
+        "check": "tsc --noEmit",
+        "build:themes": "node scripts/build-themes.mjs",
+        "test": "node tests/unit/slug-parity.mjs && node tests/unit/themes.mjs",
+        "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs"
     },
     "dependencies": {
         "@astrojs/markdown-satteri": "^0.4.6",
@@ -61,8 +64,11 @@
         "@astrojs/markdown-remark": "^7.3.5",
         "@types/hast": "^3.0.5",
         "@types/mdast": "^4.0.4",
+        "@types/node": "^24.0.0",
         "astro": "^7.4.4",
+        "github-slugger": "^2.0.0",
         "satteri": "^0.10.5",
+        "shiki": "4.4.3",
         "typescript": "^6.0.0",
         "unified": "^11.0.0"
     },

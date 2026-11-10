@@ -1,0 +1,277 @@
+import assert from 'node:assert/strict'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { test, type TestContext } from 'node:test'
+import { defineJaadConfig, resolveConfig } from '../../src/config.ts'
+
+// Resolved outside a repository, so nothing is inferred and the defaults show.
+const bare = (over = {}) => resolveConfig({ title: 'T', ...over }, '/')
+
+test('title is the only thing you must supply', () => {
+    const config = bare()
+    assert.equal(config.title, 'T')
+    assert.equal(config.docsDir, './docs')
+    assert.equal(config.routeBase, '/')
+    assert.equal(config.docsBase, '')
+    assert.equal(config.lang, 'en')
+    assert.deepEqual(config.nav, [])
+    assert.deepEqual(config.social, {})
+})
+
+test("astro passthrough keeps Astro's option types", () => {
+    const config = defineJaadConfig({
+        title: 'T',
+        astro: { output: 'static', redirects: { '/old': '/new' } },
+    })
+
+    assert.equal(config.astro?.output, 'static')
+
+    defineJaadConfig({
+        title: 'T',
+        astro: {
+            // @ts-expect-error Unknown Astro options must not pass type checking.
+            notAnAstroOption: true,
+        },
+    })
+})
+
+test('a missing title is rejected rather than defaulted', () => {
+    assert.throws(() => resolveConfig({} as never, '/'))
+})
+
+test('the appearance follows the reader unless it is pinned', () => {
+    assert.equal(bare().appearance, 'auto')
+    assert.equal(bare({ appearance: 'dark' }).appearance, 'dark')
+})
+
+test('an appearance that is not a mode lists the ones that are', () => {
+    assert.throws(
+        () => bare({ appearance: 'system' }),
+        (error: Error) => {
+            assert.match(error.message, /\n {2}appearance: /)
+            assert.match(error.message, /auto, light, dark/)
+            return true
+        },
+    )
+})
+
+// ── What the terminal says when the config is wrong ──────────────────────────
+
+test('a misspelt option is an error naming the real one', () => {
+    assert.throws(
+        () => bare({ routebase: '/manual' }),
+        (error: Error) => {
+            assert.match(error.message, /unknown option routebase/)
+            assert.match(error.message, /did you mean routeBase\?/)
+            return true
+        },
+    )
+})
+
+test('an option that does not exist lists the ones that do', () => {
+    assert.throws(() => bare({ sidebar: [] }), /unknown option sidebar[\s\S]*available: title/)
+})
+
+test('every problem is reported at once, one per line', () => {
+    assert.throws(
+        () => resolveConfig({ title: 1, logo: './x.svg' } as never, '/'),
+        (error: Error) => {
+            assert.match(error.message, /^jaad: invalid configuration\n/)
+            assert.match(error.message, /\n {2}title: /)
+            assert.match(error.message, /\n {2}logo: /)
+            return true
+        },
+    )
+})
+
+test('an explicit edit link is used verbatim', () => {
+    assert.equal(
+        bare({ editLink: 'https://git.example.dev/r/edit/main/docs/:path' }).editBase,
+        'https://git.example.dev/r/edit/main/docs/:path',
+    )
+})
+
+test('edit link and repository degrade to null outside a repository', () => {
+    const config = bare()
+    assert.equal(config.editBase, null)
+    assert.equal(config.repoUrl, null)
+})
+
+test('editLink false disables it even inside a repository', () => {
+    assert.equal(resolveConfig({ title: 'T', editLink: false }).editBase, null)
+})
+
+test('the shorthand and full theme forms both parse', () => {
+    assert.equal(bare({ theme: 'dracula' }).theme, 'dracula')
+    assert.deepEqual(bare({ theme: { light: 'a', dark: 'b' } }).theme, {
+        light: 'a',
+        dark: 'b',
+    })
+})
+
+test('social accepts a bare url or a full entry', () => {
+    const { social } = bare({
+        social: {
+            github: 'https://github.com/o/r',
+            forum: { href: 'https://f.dev', label: 'Forum', svg: '<svg/>' },
+        },
+    })
+    assert.equal(social.github, 'https://github.com/o/r')
+    assert.deepEqual(social.forum, {
+        href: 'https://f.dev',
+        label: 'Forum',
+        svg: '<svg/>',
+    })
+})
+
+// ── The footer, which is one free line and not a shape ───────────────────────
+
+test('an unset footer stays unset, so the component supplies the credit', () => {
+    assert.equal(bare().footer, undefined)
+})
+
+test('a footer line is taken verbatim, placeholder and all', () => {
+    assert.equal(bare({ footer: '© 2026 Me' }).footer, '© 2026 Me')
+    assert.equal(bare({ footer: '© 2026 Me · :credit' }).footer, '© 2026 Me · :credit')
+})
+
+// `false` was accepted by the schema but never read, so the footer still rendered.
+test('footer false survives the parse, so the component can act on it', () => {
+    assert.equal(bare({ footer: false }).footer, false)
+})
+
+// The message/copyright pair was dropped; the error has to say where it went.
+test('the old footer object is refused with its replacement spelled out', () => {
+    assert.throws(
+        () => bare({ footer: { message: 'MIT', copyright: '© 2026' } }),
+        (error: Error) => {
+            assert.match(error.message, /\n {2}footer: /)
+            assert.match(error.message, /single string/)
+            assert.match(error.message, /:credit/)
+            return true
+        },
+    )
+})
+
+// A back-reference in an integration used to throw during serialisation.
+test("astro's own options never reach the resolved config", () => {
+    const integration = { name: 'x', hooks: {} } as Record<string, unknown>
+    integration.self = integration
+
+    const config = bare({
+        site: 'https://a.dev',
+        base: '/x',
+        astro: { integrations: [integration] },
+    })
+
+    assert.deepEqual(
+        Object.keys(config).filter((k) => ['site', 'base', 'astro'].includes(k)),
+        [],
+    )
+    assert.doesNotThrow(() => JSON.stringify(config))
+})
+
+// ── The mount point, which every internal link is built from ─────────────────
+
+test('the mount point gets one leading slash and no trailing one', () => {
+    const at = (routeBase: string) => bare({ routeBase }).docsBase
+    assert.equal(at('/docs'), '/docs')
+    assert.equal(at('docs'), '/docs', 'a missing slash made every link relative')
+    assert.equal(at('/docs/'), '/docs')
+    assert.equal(at('/manual/guide'), '/manual/guide')
+})
+
+test('the root mount point is empty, so links stay single-slashed', () => {
+    assert.equal(bare({ routeBase: '/' }).docsBase, '')
+})
+
+test('a logo has to be a public url, not a source path', () => {
+    assert.equal(bare({ logo: '/logo.svg' }).logo, '/logo.svg')
+    assert.equal(bare({ logo: 'https://cdn.dev/l.svg' }).logo, 'https://cdn.dev/l.svg')
+    assert.throws(() => bare({ logo: './src/logo.svg' }), /public url/)
+})
+
+test('a social image is inferred only when the public asset exists', (t) => {
+    const cwd = mkdtempSync(join(tmpdir(), 'jaad-config-'))
+    t.after(() => {
+        rmSync(cwd, { recursive: true })
+    })
+
+    assert.equal(resolveConfig({ title: 'T' }, cwd).ogImage, false)
+
+    mkdirSync(join(cwd, 'public'))
+    writeFileSync(join(cwd, 'public', 'og-image.webp'), 'image')
+    assert.equal(resolveConfig({ title: 'T' }, cwd).ogImage, '/og-image.webp')
+    assert.equal(resolveConfig({ title: 'T', ogImage: false }, cwd).ogImage, false)
+})
+
+test('an explicit social image has to be a public url', () => {
+    assert.equal(bare({ ogImage: '/social.png' }).ogImage, '/social.png')
+    assert.equal(bare({ ogImage: 'https://cdn.example.dev/social.png' }).ogImage, 'https://cdn.example.dev/social.png')
+    assert.throws(() => bare({ ogImage: './src/social.png' }), /public url/)
+})
+
+// ── Locales ──────────────────────────────────────────────────────────────────
+
+const docsTree = (t: TestContext, entries: string[]) => {
+    const cwd = mkdtempSync(join(tmpdir(), 'jaad-config-locales-'))
+    t.after(() => {
+        rmSync(cwd, { recursive: true })
+    })
+    for (const entry of entries) {
+        mkdirSync(join(cwd, 'docs', entry, '..'), { recursive: true })
+        writeFileSync(join(cwd, 'docs', entry), '# Page')
+    }
+    return cwd
+}
+
+test('locale directories reach the resolved config', (t) => {
+    const cwd = docsTree(t, ['en/01-a.md', 'it/01-a.md'])
+    const config = resolveConfig({ title: 'T' }, cwd)
+
+    assert.deepEqual(
+        config.docsLocales.map((locale) => locale.code),
+        ['en', 'it'],
+    )
+    assert.equal(config.defaultLocale, 'en')
+})
+
+test('locales: false leaves the directories as chapters', (t) => {
+    const cwd = docsTree(t, ['en/01-a.md', 'it/01-a.md'])
+    const config = resolveConfig({ title: 'T', locales: false }, cwd)
+
+    assert.deepEqual(config.docsLocales, [])
+    assert.equal(config.defaultLocale, 'en')
+})
+
+test('an explicit list is taken over what detection would find', (t) => {
+    const cwd = docsTree(t, ['en/01-a.md', 'it/01-a.md', 'fr/01-a.md'])
+    const config = resolveConfig({ title: 'T', locales: ['en', 'it'] }, cwd)
+
+    assert.deepEqual(
+        config.docsLocales.map((locale) => locale.code),
+        ['en', 'it'],
+    )
+})
+
+test('two empty locale directories leave the docs unlocalised', (t) => {
+    const cwd = mkdtempSync(join(tmpdir(), 'jaad-config-locales-'))
+    t.after(() => {
+        rmSync(cwd, { recursive: true })
+    })
+    mkdirSync(join(cwd, 'docs', 'en'), { recursive: true })
+    mkdirSync(join(cwd, 'docs', 'it'), { recursive: true })
+
+    assert.deepEqual(resolveConfig({ title: 'T' }, cwd).docsLocales, [])
+})
+
+// A pinned list skips detection, which is what guards against a missing docsDir.
+test('a pinned list does not crash when there is no docs directory', () => {
+    assert.doesNotThrow(() => bare({ locales: ['en'] }))
+    assert.deepEqual(bare({ locales: ['en'] }).docsLocales, [])
+})
+
+test('a locale code the config pins has to be a real one', () => {
+    assert.throws(() => bare({ locales: ['nope'] }), /not a locale code/)
+})

@@ -1,0 +1,41 @@
+{
+    "name": "@jaamd/create-jaad",
+    "version": "0.10.2",
+    "description": "Scaffold a JAAD documentation site, or add one to a repository that already has a docs folder.",
+    "keywords": [
+        "astro",
+        "docs",
+        "documentation",
+        "jaad",
+        "scaffold"
+    ],
+    "homepage": "https://jaamd.org/docs/jaad",
+    "bugs": "https://github.com/jaamd/jaamd/issues",
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
+        "directory": "packages/create-jaad"
+    },
+    "bin": {
+        "create-jaad": "./index.mjs"
+    },
+    "files": [
+        "index.mjs",
+        "lib.mjs",
+        "templates",
+        "README.md",
+        "LICENSE"
+    ],
+    "type": "module",
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@clack/prompts": "^1.7.0"
+    },
+    "engines": {
+        "node": ">=22.12.0"
+    }
+}

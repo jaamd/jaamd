@@ -1,0 +1,95 @@
+# Repository guide
+
+The documentation here is built with [JAAD](https://jaamd.org/docs/jaad), an
+Astro integration that turns the `docs/` folder into a site. There are no page
+components to write: a markdown file in `docs/` is a page.
+
+## Development
+
+Start the dev server in background mode:
+
+```
+astro dev --background
+```
+
+Manage it with `astro dev stop`, `astro dev status` and `astro dev logs`.
+Build the site with `astro build`.
+
+## Layout
+
+| Path             | What it is                                      |
+| ---------------- | ----------------------------------------------- |
+| `docs/`          | The markdown that becomes the site              |
+| `jaad.config.ts` | Every JAAD option                               |
+| `src/jaad.css`   | Colours, fonts and widths (create it if absent) |
+
+JAAD's own stylesheet is precompiled: installing it does not bring Tailwind
+into this project.
+| `astro.config.mjs` | Re-exports JAAD's Astro config; leave it alone |
+| `src/content.config.ts` | Re-exports JAAD's collection; leave it alone |
+
+`src/pages/` is for pages of your own, which keep their own layout.
+
+## Writing pages
+
+- A numeric prefix sets the order and is stripped from the URL:
+  `02-guide.md` becomes `/guide`.
+- A folder becomes a chapter. Only one level of nesting is supported,
+  per language.
+- The first `# Heading` is the page title; `##` and `###` build the table of
+  contents.
+- The first page in sort order opens at `/`, and its named URL redirects there.
+- Removing the prefixes must leave every page with a unique path, or the build
+  stops and names the conflicting files.
+
+Frontmatter is optional, and each field overrides something the file tree or
+the body already supplies:
+
+```markdown
+---
+title: Images & Videos # page title; the filename still sets the URL
+label: Media # shorter name, in navigation only
+translationKey: media # pairs this page with its translations
+description: Add accessible images. # description metadata
+keywords: [markdown, media] # keyword metadata and search weight
+author: Ada Lovelace # author metadata
+ogImage: /og/media.png # social image for this page
+lastUpdated: 2026-09-12 # modification date in metadata
+order: 5 # replaces the number in the filename
+draft: false # true keeps it out of the build
+---
+```
+
+## More than one language
+
+Name the directories directly under `docs/` after language codes — `docs/en/`,
+`docs/it/` — and JAAD builds one site per language with a switcher in the
+header. `lang` in `jaad.config.ts` names the one that keeps the unprefixed
+urls. Two directories are the threshold; a single one counts only when `lang`
+names it.
+
+## Changing the site
+
+Title, logo, navigation, social links, footer and theme are options in
+`jaad.config.ts`. Colours, fonts and layout widths are CSS custom properties
+in `src/jaad.css`. Reach for a custom `src/jaad/DocsFrame.astro` only when the
+structure itself has to change.
+
+## Documentation
+
+Full documentation: https://jaamd.org/docs/jaad
+
+Consult these guides before working on related tasks:
+
+- [Creating pages](https://jaamd.org/docs/jaad/getting-started/creating-pages)
+- [Structure and navigation](https://jaamd.org/docs/jaad/configurations/structure)
+- [Frontmatter](https://jaamd.org/docs/jaad/configurations/frontmatter)
+- [Markdown features](https://jaamd.org/docs/jaad/markdown)
+- [Languages](https://jaamd.org/docs/jaad/configurations/i18n)
+- [Search](https://jaamd.org/docs/jaad/configurations/search)
+- [Fonts](https://jaamd.org/docs/jaad/configurations/fonts)
+- [Configuration reference](https://jaamd.org/docs/jaad/configurations/reference)
+- [Styles](https://jaamd.org/docs/jaad/configurations/styles) and [themes](https://jaamd.org/docs/jaad/configurations/themes)
+- [Pages of your own](https://jaamd.org/docs/jaad/configurations/custom-pages)
+- [Advanced layout](https://jaamd.org/docs/jaad/configurations/advanced-layout)
+- [Deployment](https://jaamd.org/docs/jaad/getting-started/deployment)

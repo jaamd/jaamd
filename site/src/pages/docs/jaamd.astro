@@ -1,0 +1,11 @@
+---
+import MarkdownContent from '@jaamd/jaamd/components'
+import { Content } from '../../../../packages/jaamd/README.md'
+import ShowcaseLayout from '../../layouts/ShowcaseLayout.astro'
+---
+
+<ShowcaseLayout pageTitle="Documentation">
+    <MarkdownContent as="article">
+        <Content />
+    </MarkdownContent>
+</ShowcaseLayout>

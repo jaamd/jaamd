@@ -1,0 +1,82 @@
+---
+import type { NavSection } from '../../navigation.ts'
+import { ui } from '../../docs-config.ts'
+import { formatChapterTitle } from '../../utils/docs.ts'
+
+interface Props {
+    sections: NavSection[]
+    locale?: string
+}
+
+const { sections, locale } = Astro.props
+const t = ui(locale)
+---
+
+<aside class="docs-sidebar-left jaad-sidebar">
+    <nav aria-label={t('nav.documentation')}>
+        {sections.map((section) =>
+            section.type === 'page' ? (
+                <div class="docs-sidebar-page">
+                    <a
+                        href={section.item.href}
+                        class="docs-sidebar-link"
+                        aria-current={section.item.isActive ? 'page' : undefined}
+                    >
+                        {section.item.title}
+                    </a>
+                </div>
+            ) : (
+                <div class="docs-sidebar-chapter">
+                    <h3 class="docs-sidebar-chapter-title">{formatChapterTitle(section.chapter)}</h3>
+                    <ul class="docs-sidebar-chapter-list">
+                        {section.items.map((item) => (
+                            <li>
+                                <a
+                                    href={item.href}
+                                    class="docs-sidebar-sublink"
+                                    aria-current={item.isActive ? 'page' : undefined}
+                                >
+                                    {item.title}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ),
+        )}
+    </nav>
+</aside>
+
+<script>
+    const SELECTOR = '.docs-sidebar-left'
+    let scrollTop = 0
+
+    const sidebar = () => document.querySelector<HTMLElement>(SELECTOR)
+
+    /** Scrolls the sidebar only, never the document, and only when needed. */
+    function revealCurrent() {
+        const el = sidebar()
+        const current = el?.querySelector('[aria-current="page"]')
+        if (!el || !current) return
+
+        const box = el.getBoundingClientRect()
+        const item = current.getBoundingClientRect()
+        if (item.top >= box.top && item.bottom <= box.bottom) return
+
+        el.scrollTop += item.top - box.top - (box.height - item.height) / 2
+    }
+
+    document.addEventListener('astro:before-swap', () => {
+        scrollTop = sidebar()?.scrollTop ?? 0
+    })
+
+    document.addEventListener('astro:after-swap', () => {
+        const el = sidebar()
+        if (!el) return
+        el.scrollTop = scrollTop
+        // A deep link, or a page whose entry sits outside the restored window.
+        revealCurrent()
+    })
+
+    revealCurrent()
+</script>
