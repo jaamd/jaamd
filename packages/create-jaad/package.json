@@ -1,6 +1,6 @@
 {
     "name": "@jaamd/create-jaad",
-    "version": "0.10.2",
+    "version": "0.11.0",
     "description": "Scaffold a JAAD documentation site, or add one to a repository that already has a docs folder.",
     "keywords": [
         "astro",
