@@ -1,7 +1,7 @@
 /** Markup shared by the remark and Sätteri plugins. */
 
 import type { Data, Emphasis, Paragraph } from 'mdast'
-import { HEADING_LINK_CLASS, HEADING_LINK_ICON, headingLinkLabel } from '../scripts/utils.js'
+import { HEADING_LINK_CLASS, HEADING_LINK_ICON, headingLinkLabel } from './client/utils.js'
 import { escapeHtml } from './utils.js'
 
 export const ALERT_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i

@@ -1,5 +1,6 @@
 import type { AstroConfig, AstroIntegration, ShikiConfig } from 'astro'
 import { isSatteriProcessor } from '@astrojs/markdown-satteri'
+import { DEFAULT_SELECTOR } from '@jaamd/core/client/utils'
 import remarkDirective from 'remark-directive'
 import { paths, rehypeHeadingIdsEntry } from './src/paths.js'
 import { rehypeHeadingLinks, rehypeTableWrapper } from './src/plugins/rehype.js'
@@ -14,7 +15,6 @@ import {
     satteriTableWrapper,
     satteriToc,
 } from './src/plugins/satteri.js'
-import { DEFAULT_SELECTOR } from './src/scripts/utils.js'
 
 type MarkdownProcessor = AstroConfig['markdown']['processor']
 
@@ -195,9 +195,8 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
 
                 updateConfig({
                     vite: {
-                        // Without this, jaamd's .astro sources stay pre-bundled externals
-                        // and never reach the Astro compiler.
-                        ssr: { noExternal: ['@jaamd/jaamd'] },
+                        // Both ship sources: left external, they never reach the compiler.
+                        ssr: { noExternal: ['@jaamd/jaamd', '@jaamd/core'] },
                     },
                     markdown: { shikiConfig },
                 })

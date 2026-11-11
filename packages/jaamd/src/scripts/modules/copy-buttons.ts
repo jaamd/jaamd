@@ -1,4 +1,4 @@
-import { qs, qsa } from '../utils.js'
+import { qs, qsa } from '@jaamd/core/client/utils'
 
 const BUTTON_CLASS = 'jaamd-copy-btn'
 const LIVE_ID = 'jaamd-live'

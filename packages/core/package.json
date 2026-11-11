@@ -1,0 +1,48 @@
+{
+    "name": "@jaamd/core",
+    "version": "0.12.0",
+    "description": "Framework-agnostic markdown plugins, markup, client-side enhancements, styles and themes behind JAAMD.",
+    "keywords": [
+        "markdown",
+        "rehype",
+        "remark",
+        "satteri",
+        "unified"
+    ],
+    "homepage": "https://jaamd.org",
+    "bugs": {
+        "url": "https://github.com/jaamd/jaamd/issues"
+    },
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
+        "directory": "packages/core"
+    },
+    "files": [
+        "src",
+        "README.md"
+    ],
+    "type": "module",
+    "exports": {
+        "./render": "./src/render.ts",
+        "./client/utils": "./src/client/utils.ts"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "check": "tsc --noEmit",
+        "test": "node tests/slug-parity.mjs"
+    },
+    "devDependencies": {
+        "@types/mdast": "^4.0.4",
+        "@types/node": "^24.0.0",
+        "github-slugger": "^2.0.0",
+        "typescript": "^6.0.0"
+    },
+    "engines": {
+        "node": ">=22.12.0"
+    }
+}

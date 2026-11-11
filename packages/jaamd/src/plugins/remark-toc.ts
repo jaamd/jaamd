@@ -1,7 +1,7 @@
 import type { Nodes, Root, RootContent } from 'mdast'
 import type { Plugin } from 'unified'
+import { TOC_CLOSE_HTML, tocOpenHtml } from '@jaamd/core/render'
 import { visit } from 'unist-util-visit'
-import { TOC_CLOSE_HTML, tocOpenHtml } from './render.js'
 
 /** Plain text of a label paragraph. */
 function textOf(node: Nodes): string {

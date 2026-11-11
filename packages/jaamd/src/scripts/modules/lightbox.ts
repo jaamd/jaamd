@@ -1,4 +1,4 @@
-import { qs, qsa } from '../utils.js'
+import { qs, qsa } from '@jaamd/core/client/utils'
 
 const DIALOG_ID = 'jaamd-lightbox'
 const TRIGGER = 'jaamd-lightbox-trigger'

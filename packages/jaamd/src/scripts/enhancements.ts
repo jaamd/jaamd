@@ -1,3 +1,4 @@
+import { DEFAULT_SELECTOR } from '@jaamd/core/client/utils'
 import { initCodeTabs, onTabClick, onTabKeydown } from './modules/code-tabs.js'
 import { addCopyButtons, onCopyClick } from './modules/copy-buttons.js'
 import { addHeadingLinks } from './modules/heading-links.js'
@@ -5,7 +6,6 @@ import { addImageLightbox } from './modules/lightbox.js'
 import { initSpoilers, onSpoilerClick, onSpoilerKeydown } from './modules/spoilers.js'
 import { wrapTables } from './modules/tables.js'
 import { initToc } from './modules/toc.js'
-import { DEFAULT_SELECTOR } from './utils.js'
 
 // Bound once on `document`: survives View Transitions swaps and re-inits.
 let eventsBound = false

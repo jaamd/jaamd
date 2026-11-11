@@ -52,11 +52,12 @@
     "scripts": {
         "check": "tsc --noEmit",
         "build:themes": "node scripts/build-themes.mjs",
-        "test": "node tests/unit/slug-parity.mjs && node tests/unit/themes.mjs",
+        "test": "node tests/unit/themes.mjs",
         "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && node tests/build/reference.mjs satteri && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && node tests/build/reference.mjs unified"
     },
     "dependencies": {
         "@astrojs/markdown-satteri": "^0.4.6",
+        "@jaamd/core": "workspace:^",
         "remark-directive": "^4.0.0",
         "unist-util-visit": "^5.0.0"
     },
@@ -66,7 +67,6 @@
         "@types/mdast": "^4.0.4",
         "@types/node": "^24.0.0",
         "astro": "^7.4.4",
-        "github-slugger": "^2.0.0",
         "satteri": "^0.10.5",
         "shiki": "4.4.3",
         "typescript": "^6.0.0",

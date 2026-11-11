@@ -2,7 +2,7 @@
 
 import type { HastPluginDefinition, HastPluginEntry, MdastPluginDefinition, MdastVisitorContext } from 'satteri'
 import { satteriCollectHastText, satteriHeadingIdsPlugin } from '@astrojs/markdown-satteri'
-import { TABLE_WRAPPER_CLASS } from '../scripts/utils.js'
+import { TABLE_WRAPPER_CLASS } from '@jaamd/core/client/utils'
 import {
     ALERT_MARKER,
     TOC_CLOSE_HTML,
@@ -13,7 +13,7 @@ import {
     codeTabsHtml,
     headingLinkHtml,
     tocOpenHtml,
-} from './render.js'
+} from '@jaamd/core/render'
 
 /** GitHub-style `> [!NOTE]` alerts. */
 export const satteriAlert: MdastPluginDefinition = {

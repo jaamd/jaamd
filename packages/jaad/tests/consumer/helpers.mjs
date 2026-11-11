@@ -40,10 +40,14 @@ export function packPackage(packageDir) {
 }
 
 const JAAMD = fileURLToPath(new URL('../../../jaamd', import.meta.url))
-let jaamd
+const CORE = fileURLToPath(new URL('../../../core', import.meta.url))
+let packed
 
-/** `@jaamd/jaamd` from this workspace instead of the registry. */
+/** `@jaamd/jaamd` and `@jaamd/core` from this workspace instead of the registry. */
 export function jaamdOverride() {
-    jaamd ??= `file:${packPackage(JAAMD)}`
-    return { '@jaamd/jaamd': jaamd }
+    packed ??= {
+        '@jaamd/jaamd': `file:${packPackage(JAAMD)}`,
+        '@jaamd/core': `file:${packPackage(CORE)}`,
+    }
+    return packed
 }

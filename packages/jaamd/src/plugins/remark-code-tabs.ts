@@ -1,7 +1,7 @@
 import type { Code, Root, RootContent } from 'mdast'
 import type { Plugin } from 'unified'
+import { codeTabLabel, codeTabsGroupId, codeTabsHtml } from '@jaamd/core/render'
 import { visit } from 'unist-util-visit'
-import { codeTabLabel, codeTabsGroupId, codeTabsHtml } from './render.js'
 
 /**
  * Tabbed code blocks: a `:::code-tabs` container wrapping fenced blocks.
