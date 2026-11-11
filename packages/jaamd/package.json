@@ -53,7 +53,7 @@
         "check": "tsc --noEmit",
         "build:themes": "node scripts/build-themes.mjs",
         "test": "node tests/unit/slug-parity.mjs && node tests/unit/themes.mjs",
-        "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs"
+        "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && node tests/build/reference.mjs satteri && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && node tests/build/reference.mjs unified"
     },
     "dependencies": {
         "@astrojs/markdown-satteri": "^0.4.6",
