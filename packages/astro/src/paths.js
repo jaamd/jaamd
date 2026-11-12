@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 /** Injected scripts resolve from the consumer's project, where a bare
  *  "@jaamd/astro/…" specifier is unreachable when jaamd is a transitive
  *  dependency. */
-const own = (relative: string): string => JSON.stringify(fileURLToPath(new URL(relative, import.meta.url)))
+const own = (relative) => JSON.stringify(fileURLToPath(new URL(relative, import.meta.url)))
 
 export const paths = {
     variables: own('./styles/variables.css'),

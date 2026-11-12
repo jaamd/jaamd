@@ -62,7 +62,6 @@
     },
     "devDependencies": {
         "@astrojs/markdown-remark": "^7.3.5",
-        "@types/node": "^24.0.0",
         "astro": "^7.4.4",
         "satteri": "^0.10.5",
         "typescript": "^6.0.0"
