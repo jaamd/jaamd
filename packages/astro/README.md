@@ -1,0 +1,664 @@
+<h1 align="center">JAAMD</h1>
+<p align="center">
+  <b>Just Another Astro Markdown</b> — markdown plugins, client-side enhancements and styles as a single Astro integration.
+</p>
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Integration Options](#integration-options)
+- [Markdown Syntax](#markdown-syntax)
+    - [Alerts](#alerts)
+    - [Code tabs](#code-tabs)
+    - [Table of contents](#table-of-contents-1)
+    - [Spoilers](#spoilers)
+- [MarkdownContent Component](#markdowncontent-component)
+- [Client-side Enhancements](#client-side-enhancements)
+- [Markup and classes](#markup-and-classes)
+- [Theming](#theming)
+    - [Customizing variables](#customizing-variables)
+    - [Font sizes](#font-sizes)
+    - [Dark mode](#dark-mode)
+    - [Theme presets](#theme-presets)
+    - [Dual-theme Shiki](#dual-theme-shiki)
+- [Manual / Advanced Usage](#manual--advanced-usage)
+- [Frontmatter fields](#frontmatter-fields)
+
+---
+
+## Installation
+
+```bash
+npm install @jaamd/astro
+# or
+npx astro add @jaamd/astro
+```
+
+## Requirements
+
+| Requirement                | Detail                                                    |
+| -------------------------- | --------------------------------------------------------- |
+| Astro                      | `^7.3.0`                                                  |
+| Node                       | `>=22.12.0`                                               |
+| Markdown processor         | Sätteri (Astro's default) or `unified()`                  |
+| `@astrojs/markdown-remark` | Only with `unified()`: an optional peer, installed by you |
+| Toolchain                  | Must compile TypeScript and `.astro` sources              |
+
+JAAMD is published as source, with no compiled `dist/` and no emitted `.d.ts`.
+It works out of the box in any Astro project, but is not consumable from plain
+Node, a CommonJS build, or a TypeScript project using
+`"moduleResolution": "node16"`.
+
+### Upgrading from @jaamd/jaamd
+
+The package is now `@jaamd/astro`. Replace the dependency and every import from
+`@jaamd/jaamd`; the API is unchanged. Coming from `@lancher-dev/jaamd`, do the
+same with that name.
+
+Stylesheets are imported with their extension: `@jaamd/astro/styles.css`, not
+`@jaamd/astro/styles`. The same goes for `default`, `shiki-dual` and the themes.
+
+### Upgrading from 0.10
+
+- `theme` no longer overrides `markdown.shikiConfig`. Unset, your Shiki
+  configuration stays; `"github-light"` replaces only Astro's own default.
+- `@astrojs/markdown-remark` is an optional peer dependency. Install it when you
+  use `unified()`, which you import from it anyway.
+- Code-tab ids are `jaamd-tabs-<hash>`, unique across every document on a page,
+  instead of `jaamd-tabs-<n>`.
+- Lightbox images are wrapped in `<button class="jaamd-lightbox-trigger">`, so
+  they open from the keyboard. `img.jaamd-lightbox-enabled` is gone. See
+  [Image lightbox](#image-lightbox) for browser support.
+- With a manual `unified()` setup, register Astro's `rehypeHeadingIds` before
+  `rehypeHeadingLinks`, which now reads the ids instead of computing them.
+  See [Manual / Advanced Usage](#manual--advanced-usage).
+- Blockquote, alert, `h2` and `hr` borders are drawn without a CSS reset.
+- Heading anchors are always visible below 600px, as intended.
+
+### Upgrading from 0.9
+
+- jaamd no longer switches the markdown processor. With no configuration you
+  are on Sätteri.
+- Set `markdown.processor: unified()` to stay on unified.
+- `markdown.remarkPlugins` and `markdown.rehypePlugins` still work: Astro moves
+  to unified, jaamd adds its remark plugins.
+- Astro `^7.3.0` is required.
+- Heading anchors are plain links: a click navigates, nothing is copied.
+- Table wrappers and heading anchors are in the built HTML. Turn them off with
+  `plugins: { tables: false, headingLinks: false }`.
+- The lightbox is a `<dialog class="jaamd-lightbox">`. `.jaamd-lightbox__backdrop`,
+  `.jaamd-lightbox__content` and `.jaamd-lightbox--hidden` are gone: style
+  `::backdrop` and `[open]`.
+- `<details>` animates in CSS. `.jaamd-details-wrapper` and
+  `.jaamd-details-inner` are gone.
+
+## Setup
+
+Add the integration to your Astro config:
+
+```ts
+import jaamd from '@jaamd/astro'
+// astro.config.mjs
+import { defineConfig } from 'astro/config'
+
+export default defineConfig({
+    integrations: [jaamd()],
+})
+```
+
+Wrap your markdown content with the `MarkdownContent` component in your layout:
+
+```astro
+---
+// src/layouts/BlogPost.astro
+import MarkdownContent from '@jaamd/astro/components'
+---
+
+<MarkdownContent>
+    <slot />
+</MarkdownContent>
+```
+
+The integration registers its plugins on the configured markdown processor and
+injects the stylesheet automatically. No other configuration is required.
+
+The processor is extended, never replaced: Sätteri gets mdast plugins and the
+directive syntax, `unified()` gets the remark plugins. Any other processor is
+left alone, with a warning.
+
+> [!IMPORTANT]
+> `<MarkdownContent>` loads the stylesheets for you. If you render markdown
+> **without** it, import them yourself in your layout frontmatter:
+>
+> ```astro
+> ---
+> import '@jaamd/astro/default.css'
+> import '@jaamd/astro/styles.css'
+> ---
+> ```
+
+## Integration Options
+
+```ts
+jaamd({
+    selector: '.jaamd-content', // CSS selector for the JS enhancements
+    theme: 'github-light', // Shiki theme name (or { light, dark }); see below
+    noDefault: false, // skip injecting @jaamd/astro/default.css variable fallbacks
+    plugins: {
+        codeTabs: true, // :::code-tabs directive blocks
+        toc: true, // :::toc directive blocks
+        alerts: true, // > [!NOTE] / [!WARNING] blockquote alerts
+        directive: true, // `:::` syntax (prerequisite for codeTabs and toc)
+        tables: true, // scroll container around tables
+        headingLinks: true, // anchor link on every heading
+    },
+})
+```
+
+### `theme`
+
+The Shiki theme for code blocks, or `{ light, dark }` for
+[dual-theme mode](#dual-theme-shiki). Unset, `markdown.shikiConfig` is left as
+configured; `"github-light"` replaces only Astro's own default (`"github-dark"`
+with no `themes`).
+
+### `selector`
+
+Controls which element the **client-side JS enhancements** target at runtime.
+It does not affect the CSS file, which always uses `.jaamd-content`.
+
+- With `<MarkdownContent>`, leave it at the default.
+- With a custom wrapper (e.g. `<div data-md>`), set `selector` to match it and
+  provide your own CSS.
+
+### `noDefault`
+
+Set to `true` when you supply a complete `--jaamd-*` variable set of your own.
+It has no effect on `<MarkdownContent>`, which imports the defaults directly;
+with a custom wrapper, control them by importing `@jaamd/astro/default.css` or not.
+
+## Markdown Syntax
+
+### Alerts
+
+GitHub-style blockquote alerts, in five variants:
+
+```markdown
+> [!NOTE]
+> Useful information the reader should know.
+
+> [!TIP]
+> Helpful advice.
+
+> [!IMPORTANT]
+> Key information required to succeed.
+
+> [!WARNING]
+> Urgent information needing immediate attention.
+
+> [!CAUTION]
+> Advises about risks or negative outcomes.
+```
+
+### Code tabs
+
+Group several code blocks into a tabbed panel. The text after the language is
+used as the tab label; it falls back to the language, then to `Tab N`.
+
+````markdown
+:::code-tabs
+```bash npm
+npm install
+```
+
+```bash pnpm
+pnpm install
+```
+:::
+````
+
+### Table of contents
+
+A `:::toc` block wraps the list you write in a navigation landmark. Nothing is
+generated: entries, order, wording and depth are whatever the markdown says.
+The text in brackets is an optional title.
+
+```markdown
+:::toc[On this page]
+- [Installation](#installation)
+- [Setup](#setup)
+    - [Integration options](#integration-options)
+:::
+```
+
+It renders as:
+
+```html
+<nav class="jaamd-toc" aria-label="On this page">
+    <p class="jaamd-toc-title">On this page</p>
+    <ul>
+        …your list…
+    </ul>
+</nav>
+```
+
+The title is a `<p>`: out of `getHeadings()`, no anchor icon. A `-` list loses
+its bullets, `1.` keeps the numbers. Entries are plain anchors and navigate with
+JavaScript disabled; with it, the entry whose section is on screen is marked
+`aria-current="location"`.
+
+#### Writing the anchors
+
+Heading ids come from Astro, slugged with
+[`github-slugger`](https://github.com/Flet/github-slugger):
+
+| Heading                  | Anchor                                                                   |
+| ------------------------ | ------------------------------------------------------------------------ |
+| `## Getting started`     | `#getting-started`                                                       |
+| `## Details / accordion` | `#details--accordion` (one dash per space, the `/` dropped between them) |
+| `## What's new?`         | `#whats-new` (punctuation removed, not replaced)                         |
+| `## snake_case`          | `#snake_case` (underscores survive)                                      |
+| a second `## Setup`      | `#setup-1`                                                               |
+
+The client-side fallback follows the same rules, so ids match for markdown that
+never went through Astro's pipeline (`set:html`, HTML from a CMS).
+
+With a sticky header, raise `--jaamd-scroll-margin-top` (default `80px`).
+
+> [!NOTE]
+> `:::toc` needs the directive syntax, on by default. With `plugins: { toc: false }`
+> the block degrades to a plain `<div>`: list and links intact, unstyled.
+
+### Spoilers
+
+Any element with the `spoiler` class is hidden until activated:
+
+```html
+<span class="spoiler">The butler did it.</span>
+```
+
+## MarkdownContent Component
+
+`MarkdownContent` is a polymorphic component. It renders as `<div>` by default
+and accepts any valid HTML tag via the `as` prop.
+
+```ts
+import MarkdownContent from '@jaamd/astro/components'
+```
+
+### Props
+
+| Prop      | Type      | Default | Description                                                                               |
+| --------- | --------- | ------- | ----------------------------------------------------------------------------------------- |
+| `as`      | `HTMLTag` | `"div"` | The HTML element to render as.                                                            |
+| `class`   | `string`  | -       | Extra CSS classes appended to the wrapper.                                                |
+| _...rest_ | -         | -       | All standard HTML attributes for the chosen `as` element (e.g. `id`, `data-*`, `aria-*`). |
+
+The `jaamd-content` class is always present on the wrapper element. It is the
+selector used by the JS enhancements and must not be removed.
+
+```astro
+---
+import MarkdownContent from '@jaamd/astro/components'
+---
+
+<!-- Default: renders as <div class="jaamd-content"> -->
+<MarkdownContent>
+    <slot />
+</MarkdownContent>
+
+<!-- Custom tag: renders as <article class="jaamd-content"> -->
+<MarkdownContent as="article">
+    <slot />
+</MarkdownContent>
+
+<!-- Extra classes: renders as <article class="jaamd-content prose mx-auto"> -->
+<MarkdownContent as="article" class="prose mx-auto">
+    <slot />
+</MarkdownContent>
+```
+
+## Client-side Enhancements
+
+A dependency-free ES module enhances the rendered markdown. Events are
+delegated on `document`; per-element setup re-runs on every `astro:page-load`,
+so it keeps working across View Transitions.
+
+Table wrappers and heading anchors come from the build. The module adds them
+only to markup that skipped the processor (`set:html`, HTML from a CMS).
+
+| Enhancement       | Behaviour                                                                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Heading links     | Adds an anchor link to `h1`–`h6` where the build did not. Fills in a missing `id` with a `github-slugger`-compatible slug, de-duplicated across the page. |
+| Table of contents | Marks the `:::toc` entry whose section is on screen with `aria-current="location"`.                                                                       |
+| Copy buttons      | Adds a copy button to every `pre`. Without clipboard access it selects the code instead. The only clipboard write in the package.                         |
+| Image lightbox    | Wraps each image in a button that opens it in a modal `<dialog>`. Closes on <kbd>Esc</kbd>, the ✕ button or a click outside the image.                    |
+| Responsive tables | Wraps a `table` in a horizontally scrollable container where the build did not.                                                                           |
+| Code tabs         | Drives the `:::code-tabs` tablist.                                                                                                                        |
+| Spoilers          | Reveals `.spoiler` content on click or <kbd>Enter</kbd>/<kbd>Space</kbd>.                                                                                 |
+
+### Keyboard
+
+| Element   | Keys                                                                                                                                                  |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code tabs | <kbd>←</kbd> <kbd>→</kbd> move between tabs, <kbd>Home</kbd> <kbd>End</kbd> jump to first/last. Panels are focusable so wide samples can be scrolled. |
+| Spoilers  | <kbd>Tab</kbd> to focus, <kbd>Enter</kbd> or <kbd>Space</kbd> to reveal. Hover does not reveal.                                                       |
+| Lightbox  | <kbd>Tab</kbd> to an image, <kbd>Enter</kbd> or <kbd>Space</kbd> to open, <kbd>Esc</kbd> to close. Focus returns to the image.                        |
+
+`<details>` animates in CSS, no script: height where the browser supports
+`interpolate-size`, a fade elsewhere.
+
+Under `prefers-reduced-motion: reduce` JAAMD's CSS transitions are disabled.
+
+With scripting disabled, tables still scroll, heading anchors work and every
+code tab panel is shown.
+
+### Image lightbox
+
+Opening and closing are the browser's own: the image button and the ✕ button
+are [invoker commands](https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API)
+on the `<dialog>`, and `closedby="any"` closes it on a click outside the image.
+
+| Browser       | Lightbox | Click outside closes               |
+| ------------- | -------- | ---------------------------------- |
+| Chrome / Edge | 135+     | 134+                               |
+| Firefox       | 144+     | 141+                               |
+| Safari        | 26.2+    | not yet: <kbd>Esc</kbd> and ✕ only |
+
+Older browsers show the image as a plain image.
+
+### Excluding images from the lightbox
+
+Linked images are skipped automatically, so badges keep navigating:
+
+```markdown
+[![build](https://img.shields.io/badge/build-passing-green)](https://github.com/you/repo)
+```
+
+Opt a standalone image out with `data-no-lightbox`:
+
+```html
+<img src="/diagram.svg" alt="Architecture diagram" data-no-lightbox />
+```
+
+## Markup and classes
+
+What JAAMD emits, for styling it or writing a custom wrapper. _Build_ markup is
+in the HTML from the markdown processor; _client_ markup is added at runtime by
+the enhancement script.
+
+| Feature           | Elements                                                                                                            | Attributes and states                                                            | From                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Wrapper           | `.jaamd-content`                                                                                                    | —                                                                                | `<MarkdownContent>` or your own                      |
+| Heading anchor    | `a.jaamd-heading-link`, last child of `h1`–`h6`                                                                     | `href="#<id>"`, `aria-label`                                                     | build; client where the build did not                |
+| Table wrapper     | `div.jaamd-table-wrapper` around `table`                                                                            | —                                                                                | build; client where the build did not                |
+| Alert             | `div.markdown-alert.markdown-alert-<type>`, type `note`, `tip`, `important`, `warning` or `caution`                 | `dir="auto"`                                                                     | build                                                |
+| Alert title       | `p.markdown-alert-title` with an `svg.octicon`                                                                      | —                                                                                | build                                                |
+| Code tabs         | `div.code-tabs#jaamd-tabs-<hash>` › `div.code-tab-buttons[role=tablist]` › `button.code-tab-btn[role=tab]`          | `.active`, `aria-selected`, roving `tabindex`, `data-tab-index`, `aria-controls` | build; `data-tabs-init` on the group from the client |
+| Code tab panel    | `div.code-tab-panel[role=tabpanel]` wrapping the `pre`                                                              | `.active`, `data-tab-index`, `aria-labelledby`                                   | build                                                |
+| Table of contents | `nav.jaamd-toc` › optional `p.jaamd-toc-title`, then your list                                                      | `aria-label`; the current link gets `aria-current="location"`                    | build; current link from the client                  |
+| Copy button       | `button.jaamd-copy-btn`, last child of `pre`, with `svg.jaamd-copy-icon` and `svg.jaamd-copied-icon`                | `data-copied="true"` after a copy, `"manual"` when the code was selected instead | client                                               |
+| Announcements     | `div#jaamd-live.jaamd-live[role=status]` in `body`                                                                  | —                                                                                | client                                               |
+| Lightbox trigger  | `button.jaamd-lightbox-trigger` around each `img`                                                                   | `commandfor="jaamd-lightbox"`, `command="show-modal"`                            | client                                               |
+| Lightbox          | `dialog#jaamd-lightbox.jaamd-lightbox` in `body`, with `img.jaamd-lightbox__img` and `button.jaamd-lightbox__close` | `closedby="any"`, `[open]`                                                       | client                                               |
+| Spoiler           | `.spoiler`, written by you                                                                                          | `.revealed`, `role="button"`, `tabindex`, `aria-expanded`, `data-spoiler-init`   | client                                               |
+
+## Theming
+
+All styles are driven by CSS custom properties prefixed with `--jaamd-*`. The
+default set (`@jaamd/astro/default.css`) is injected automatically.
+
+### Customizing variables
+
+Override any variable on `:root` in your own stylesheet:
+
+```css
+:root {
+    --jaamd-color-fg: #334155;
+    --jaamd-color-fg-bright: #0f172a;
+    --jaamd-color-primary: #6366f1;
+    --jaamd-color-primary-light: #818cf8;
+    --jaamd-font-mono: ui-monospace, monospace;
+    --jaamd-font-size: 1rem;
+}
+```
+
+Defaults live in `@layer jaamd.defaults`, so an unlayered `:root` block always
+wins regardless of import order.
+
+See [`variables.css`](https://github.com/jaamd/jaamd/blob/main/packages/core/src/styles/variables.css) for all 60 variables
+and their default values.
+
+### Font sizes
+
+`--jaamd-font-size` is the one knob for the whole document. Every other size is
+derived from it, so moving it moves the entire scale in proportion:
+
+```css
+:root {
+    --jaamd-font-size: 1rem; /* headings, code, tables… all follow */
+}
+```
+
+To break a single element out of that scale, set its own token. Each is read
+with the derived value as its fallback, so **an unset token changes nothing**;
+they are opt-in, one at a time:
+
+```css
+:root {
+    --jaamd-font-size: 1rem; /* the baseline */
+    --jaamd-font-size-h1: 2.5rem; /* but h1 is fixed, not proportional */
+    --jaamd-font-size-code-block: 0.8rem; /* and code blocks are tighter */
+}
+```
+
+| Token                           | Applies to                         | Default when unset                       |
+| ------------------------------- | ---------------------------------- | ---------------------------------------- |
+| `--jaamd-font-size-h1` … `-h4`  | `h1`–`h4`                          | `2.22` / `1.67` / `1.33` / `1.11` × base |
+| `--jaamd-font-size-h5`, `-h6`   | `h5`, `h6`                         | base                                     |
+| `--jaamd-font-size-p`, `-li`    | paragraphs, list items             | base                                     |
+| `--jaamd-font-size-blockquote`  | `blockquote`, contents included    | base                                     |
+| `--jaamd-font-size-code`        | inline `` `code` ``                | `0.78` × base                            |
+| `--jaamd-font-size-code-block`  | fenced code blocks                 | `0.85` × base                            |
+| `--jaamd-font-size-table`       | `th` and `td` together             | `0.78` × base                            |
+| `--jaamd-font-size-summary`     | `<details>` summary                | `0.89` × base                            |
+| `--jaamd-font-size-alert-title` | alert titles                       | `0.83` × base                            |
+| `--jaamd-font-size-toc`         | `:::toc` block, contents included  | `0.94` × base                            |
+| `--jaamd-font-size-toc-title`   | `:::toc` title                     | `0.83` × base                            |
+| `--jaamd-font-size-footnotes`   | footnotes block, contents included | `0.85` × base                            |
+
+A block that owns a token governs what is inside it: paragraphs in a blockquote
+follow `-blockquote`, not `-p`. Alert bodies have no token of their own and
+follow `-p`; only their title is separate. The copy button, code-tab labels and
+heading-link icons stay tied to `--jaamd-font-size`: they are JAAMD's chrome,
+not your document's typography.
+
+### Dark mode
+
+The default set includes dark-mode overrides activated by the `dark` class on
+`<html>`. Toggle the class and all JAAMD elements adapt.
+
+### Theme presets
+
+Eight presets restyle the `--jaamd-*` palette to match popular editor colour
+schemes. A **dual** preset carries a light and a dark palette and follows
+`html.dark`; the others are one palette that applies in both modes.
+
+| Preset         | Import                                   | Kind | Recommended Shiki theme                        |
+| -------------- | ---------------------------------------- | ---- | ---------------------------------------------- |
+| Catppuccin     | `@jaamd/astro/themes/catppuccin.css`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
+| Dracula        | `@jaamd/astro/themes/dracula.css`        | dark | `dracula`                                      |
+| Gruvbox        | `@jaamd/astro/themes/gruvbox.css`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
+| Nord           | `@jaamd/astro/themes/nord.css`           | dark | `nord`                                         |
+| One Dark       | `@jaamd/astro/themes/one-dark.css`       | dark | `one-dark-pro`                                 |
+| Rosé Pine      | `@jaamd/astro/themes/rose-pine.css`      | dual | `rose-pine-dawn` / `rose-pine`                 |
+| Rosé Pine Moon | `@jaamd/astro/themes/rose-pine-moon.css` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
+| Tokyo Night    | `@jaamd/astro/themes/tokyo-night.css`    | dark | `tokyo-night`                                  |
+
+As a standalone theme, replacing the default light theme:
+
+```ts
+jaamd({ theme: 'dracula' })
+```
+
+```css
+@import '@jaamd/astro/default.css';
+@import '@jaamd/astro/themes/dracula.css';
+@import '@jaamd/astro/styles.css';
+```
+
+A single-palette preset can also be scoped to `html.dark` via the `/dark` variant,
+to use it as the dark half of your own light theme. Dual presets already cover both
+modes and have no `/dark`:
+
+```css
+@import '@jaamd/astro/themes/dracula/dark.css';
+```
+
+```ts
+import '@jaamd/astro/themes/dracula/dark.css'
+```
+
+> [!IMPORTANT]
+> A preset declares a palette, not the whole variable set: surfaces, borders and
+> the table-of-contents card are derived from it by `default.css`. Load the
+> defaults alongside it. Do **not** pair a preset with `noDefault: true`: those
+> derived tokens fall back to the light palette.
+
+Each theme declares itself, so a picker can be built from data:
+
+```ts
+import { themes } from '@jaamd/astro/themes'
+// [{ slug: "dracula", name: "Dracula", mode: "dark", shiki: "dracula" }, …]
+```
+
+Each preset is generated from a `palette.js` of fourteen colours, so every theme
+declares the same token set. The `.css` files are build output: to customise a
+preset, copy its directory and edit the palette. To add one, see
+[CONTRIBUTING.md](../../CONTRIBUTING.md#themes).
+
+### Dual-theme Shiki
+
+Pass an object to `theme` to highlight code with two colour schemes, switched by
+the `dark` class:
+
+```ts
+jaamd({
+    theme: { light: 'github-light', dark: 'github-dark' },
+})
+```
+
+Add an inline script in `<head>` to prevent a flash of the wrong theme:
+
+```html
+<script is:inline>
+    ;(function () {
+        var t = localStorage.getItem('theme')
+        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches))
+            document.documentElement.classList.add('dark')
+    })()
+</script>
+```
+
+## Manual / Advanced Usage
+
+To bypass the integration, register the plugins yourself on the processor you
+use. On Sätteri, Astro's default:
+
+```ts
+// astro.config.mjs
+import { satteri } from '@astrojs/markdown-satteri'
+import {
+    satteriAlert,
+    satteriCodeTabs,
+    satteriToc,
+    satteriDirectiveFallback,
+    satteriTableWrapper,
+    satteriHeadingLinks,
+} from '@jaamd/astro'
+
+export default defineConfig({
+    markdown: {
+        processor: satteri({
+            features: { directive: true },
+            mdastPlugins: [satteriAlert, satteriCodeTabs, satteriToc, satteriDirectiveFallback],
+            hastPlugins: [satteriTableWrapper, satteriHeadingLinks],
+        }),
+    },
+})
+```
+
+`satteriDirectiveFallback` keeps directives no plugin handles, which Sätteri
+drops: blocks as a plain `<div>`, an inline `:name` as typed. Put it last.
+
+On unified, Astro's `rehypeHeadingIds` goes before `rehypeHeadingLinks`, which
+links the ids it finds:
+
+```ts
+// astro.config.mjs
+import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark'
+import {
+    remarkAlert,
+    remarkCodeTabs,
+    remarkDirective,
+    remarkToc,
+    rehypeTableWrapper,
+    rehypeHeadingLinks,
+} from '@jaamd/astro'
+
+export default defineConfig({
+    markdown: {
+        processor: unified({
+            remarkPlugins: [remarkAlert, remarkDirective, remarkCodeTabs, remarkToc],
+            rehypePlugins: [rehypeTableWrapper, rehypeHeadingIds, rehypeHeadingLinks],
+        }),
+    },
+})
+```
+
+```astro
+---
+import '@jaamd/astro/default.css' // variable fallbacks; omit if you provide your own
+import '@jaamd/astro/styles.css'
+---
+
+<div class="jaamd-content">
+    <slot />
+</div>
+<script>
+    import { initMarkdownEnhancements } from '@jaamd/astro/client'
+    function run() {
+        initMarkdownEnhancements('.jaamd-content')
+    }
+    run()
+    document.addEventListener('astro:page-load', run)
+</script>
+```
+
+The CSS files can also be imported from plain `.css`:
+
+```css
+@import '@jaamd/astro/default.css';
+@import '@jaamd/astro/styles.css';
+```
+
+## Frontmatter fields
+
+`frontmatterFields(z)` returns the fields JAAMD sites share, as a plain object
+to spread into a content collection schema: `title`, `description`, `draft`,
+`keywords`, `author`, `ogImage` and `lastUpdated`.
+
+```ts
+// src/content.config.ts
+import { frontmatterFields } from '@jaamd/astro/frontmatter'
+import { z } from 'astro/zod'
+
+const schema = z.object({
+    ...frontmatterFields(z),
+    order: z.number().int().optional(),
+})
+```

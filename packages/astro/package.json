@@ -1,0 +1,77 @@
+{
+    "name": "@jaamd/astro",
+    "version": "0.12.0",
+    "description": "Add markdown plugins, client-side enhancements and styles as a single Astro integration for Markdown content.",
+    "keywords": [
+        "astro",
+        "astro-component",
+        "astro-integration",
+        "markdown",
+        "remark",
+        "withastro"
+    ],
+    "homepage": "https://jaamd.org",
+    "bugs": {
+        "url": "https://github.com/jaamd/jaamd/issues"
+    },
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
+        "directory": "packages/astro"
+    },
+    "files": [
+        "index.ts",
+        "src",
+        "README.md"
+    ],
+    "type": "module",
+    "exports": {
+        ".": "./index.ts",
+        "./components": "./src/components/MarkdownContent.astro",
+        "./client": "./src/scripts/enhancements.ts",
+        "./frontmatter": "./src/frontmatter.ts",
+        "./default.css": "./src/styles/variables.css",
+        "./styles.css": "./src/styles/markdown.css",
+        "./shiki-dual.css": "./src/styles/shiki-dual.css",
+        "./themes": {
+            "types": "./src/themes/index.d.ts",
+            "default": "./src/themes/index.js"
+        },
+        "./themes/*/dark.css": "./src/themes/*/dark.css",
+        "./themes/*.css": "./src/themes/*/index.css"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "check": "tsc --noEmit",
+        "build:bridges": "node scripts/build-bridges.mjs",
+        "test": "node scripts/build-bridges.mjs --check",
+        "test:consumer": "node --test \"tests/consumer/**/*.test.mjs\"",
+        "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs"
+    },
+    "dependencies": {
+        "@jaamd/core": "workspace:^"
+    },
+    "devDependencies": {
+        "@astrojs/markdown-remark": "^7.3.5",
+        "@astrojs/markdown-satteri": "^0.4.6",
+        "astro": "^7.4.4",
+        "satteri": "^0.10.5",
+        "typescript": "^6.0.0"
+    },
+    "peerDependencies": {
+        "@astrojs/markdown-remark": "^7.3.0",
+        "astro": "^7.3.0"
+    },
+    "peerDependenciesMeta": {
+        "@astrojs/markdown-remark": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=22.12.0"
+    }
+}

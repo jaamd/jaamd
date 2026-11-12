@@ -1,0 +1,13 @@
+---
+import MarkdownContent from '@jaamd/astro/components'
+import Hero from '../components/Hero.astro'
+import { Content } from '../content/showcase.md'
+import SiteLayout from '../layouts/SiteLayout.astro'
+---
+
+<SiteLayout>
+    <Hero />
+    <MarkdownContent as="article">
+        <Content />
+    </MarkdownContent>
+</SiteLayout>

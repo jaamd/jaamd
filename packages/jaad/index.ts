@@ -1,6 +1,6 @@
 import type { AstroIntegration } from 'astro'
 import sitemap from '@astrojs/sitemap'
-import jaamd from '@jaamd/jaamd'
+import jaamd from '@jaamd/astro'
 import { defineConfig } from 'astro/config'
 import { resolveConfig, resolveStylesheets, type JaadUserConfig } from './src/config.ts'
 import { createCoreIntegration, createIntegrationState, createSitemapFilter } from './src/integration.ts'

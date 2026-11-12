@@ -16,6 +16,35 @@ export default defineConfig({
     },
     overrides: [
         {
+            files: ['packages/core/**'],
+            rules: {
+                'no-restricted-imports': [
+                    'error',
+                    {
+                        patterns: [
+                            {
+                                group: [
+                                    'astro',
+                                    'astro/*',
+                                    'astro:*',
+                                    '@astrojs/*',
+                                    'react',
+                                    'react/*',
+                                    'react-dom',
+                                    'react-dom/*',
+                                    '@jaamd/astro',
+                                    '@jaamd/astro/*',
+                                    '@jaamd/jaad',
+                                    '@jaamd/jaad/*',
+                                ],
+                                message: 'core is framework-agnostic and sits below the adapters.',
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        {
             files: ['**/tests/**'],
             rules: { 'unicorn/consistent-function-scoping': 'off' },
         },

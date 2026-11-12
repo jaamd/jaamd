@@ -12,17 +12,17 @@
 
 [![main](https://github.com/jaamd/jaamd/actions/workflows/ci.yml/badge.svg)](https://github.com/jaamd/jaamd/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](/LICENSE)
-[![npm version](https://badge.fury.io/js/@jaamd%2Fjaamd.svg)](https://badge.fury.io/js/@jaamd%2Fjaamd)
+[![npm version](https://badge.fury.io/js/@jaamd%2Fastro.svg)](https://badge.fury.io/js/@jaamd%2Fastro)
 
 </div>
 
 ```bash
-npx astro add @jaamd/jaamd
+npx astro add @jaamd/astro
 ```
 
 ```astro
 ---
-import MarkdownContent from '@jaamd/jaamd/components'
+import MarkdownContent from '@jaamd/astro/components'
 ---
 
 <MarkdownContent>
@@ -36,7 +36,8 @@ Documentation and showcase: [jaamd.org](https://jaamd.org)
 
 | Package                                       | What                                                           |
 | --------------------------------------------- | -------------------------------------------------------------- |
-| [`@jaamd/jaamd`](/packages/jaamd)             | Markdown plugins, client-side enhancements, styles and themes  |
+| [`@jaamd/astro`](/packages/astro)             | The Astro integration: plugins, enhancements, styles, themes   |
+| [`@jaamd/core`](/packages/core)               | The framework-agnostic part `@jaamd/astro` builds on           |
 | [`@jaamd/jaad`](/packages/jaad)               | A documentation site from a folder of Markdown, built on jaamd |
 | [`@jaamd/create-jaad`](/packages/create-jaad) | Scaffolds a jaad site: `npm create @jaamd/jaad@latest`         |
 

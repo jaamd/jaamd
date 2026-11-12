@@ -4,11 +4,13 @@
  *
  * Sets packages/<package> to <version>, updates the version create-jaad installs
  * when <package> is jaad, commits, and creates the `<package>@<version>` tag.
+ * Refuses while a workspace dependency of <package> is not on npm at its
+ * current version.
  * Pushing the tag publishes the package.
  */
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -27,6 +29,27 @@ if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(version)) fail(`${version} is not 
 const manifestPath = join('packages', pkg, 'package.json')
 if (!existsSync(join(ROOT, manifestPath))) fail(`no package at packages/${pkg}`)
 if (git('status', '--porcelain')) fail('the working tree has uncommitted changes')
+
+/** Workspace packages by name: their directory under packages/ and current version. */
+const workspace = new Map(
+    readdirSync(join(ROOT, 'packages'))
+        .map((dir) => [dir, join(ROOT, 'packages', dir, 'package.json')])
+        .filter(([, path]) => existsSync(path))
+        .map(([dir, path]) => [dir, JSON.parse(readFileSync(path, 'utf8'))])
+        .map(([dir, { name, version }]) => [name, { dir, version }]),
+)
+
+// A `workspace:` range is published as a range on the dependency's current version.
+const { dependencies = {} } = JSON.parse(readFileSync(join(ROOT, manifestPath), 'utf8'))
+for (const [name, range] of Object.entries(dependencies)) {
+    if (!range.startsWith('workspace:')) continue
+    const dependency = workspace.get(name)
+    try {
+        execFileSync('npm', ['view', `${name}@${dependency.version}`, 'version'], { stdio: 'pipe' })
+    } catch {
+        fail(`${name}@${dependency.version} is not on npm: release ${dependency.dir} first`)
+    }
+}
 
 const tag = `${pkg}@${version}`
 if (git('tag', '--list', tag)) fail(`${tag} already exists`)
