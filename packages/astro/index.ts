@@ -72,7 +72,7 @@ export interface JaamdOptions {
     theme?: string | { light: string; dark: string }
 
     /**
-     * Skip injecting the default CSS variable fallbacks (`@jaamd/astro/default`).
+     * Skip injecting the default CSS variable fallbacks (`@jaamd/astro/default.css`).
      *
      * No effect with `<MarkdownContent>`, which imports them statically.
      * Applies to custom wrappers.

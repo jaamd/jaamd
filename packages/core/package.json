@@ -37,8 +37,7 @@
             "default": "./src/themes/index.js"
         },
         "./themes/*/dark.css": "./src/themes/*/dark.css",
-        "./themes/*.css": "./src/themes/*/index.css",
-        "./themes/*": "./src/themes/*/index.css"
+        "./themes/*.css": "./src/themes/*/index.css"
     },
     "publishConfig": {
         "access": "public"

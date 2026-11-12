@@ -36,8 +36,20 @@ npm install @jaamd/astro
 ```
 
 Then replace `@jaamd/jaamd` with `@jaamd/astro` in every import, stylesheets
-included. The API and the paths after the package name are unchanged.
-`@jaamd/jaamd` is deprecated and receives no further releases.
+included. The API is unchanged. `@jaamd/jaamd` is deprecated and receives no
+further releases.
+
+### Stylesheets are imported with their extension
+
+The extensionless paths are gone. Add `.css`:
+
+| Before                            | After                                 |
+| --------------------------------- | ------------------------------------- |
+| `@jaamd/jaamd/default`            | `@jaamd/astro/default.css`            |
+| `@jaamd/jaamd/styles`             | `@jaamd/astro/styles.css`             |
+| `@jaamd/jaamd/shiki-dual`         | `@jaamd/astro/shiki-dual.css`         |
+| `@jaamd/jaamd/themes/<slug>`      | `@jaamd/astro/themes/<slug>.css`      |
+| `@jaamd/jaamd/themes/<slug>/dark` | `@jaamd/astro/themes/<slug>/dark.css` |
 
 ## From 0.9
 

@@ -59,6 +59,9 @@ The package is now `@jaamd/astro`. Replace the dependency and every import from
 `@jaamd/jaamd`; the API is unchanged. Coming from `@lancher-dev/jaamd`, do the
 same with that name.
 
+Stylesheets are imported with their extension: `@jaamd/astro/styles.css`, not
+`@jaamd/astro/styles`. The same goes for `default`, `shiki-dual` and the themes.
+
 ### Upgrading from 0.10
 
 - `theme` no longer overrides `markdown.shikiConfig`. Unset, your Shiki
@@ -144,7 +147,7 @@ left alone, with a warning.
 jaamd({
     selector: '.jaamd-content', // CSS selector for the JS enhancements
     theme: 'github-light', // Shiki theme name (or { light, dark }); see below
-    noDefault: false, // skip injecting @jaamd/astro/default variable fallbacks
+    noDefault: false, // skip injecting @jaamd/astro/default.css variable fallbacks
     plugins: {
         codeTabs: true, // :::code-tabs directive blocks
         toc: true, // :::toc directive blocks
@@ -176,7 +179,7 @@ It does not affect the CSS file, which always uses `.jaamd-content`.
 
 Set to `true` when you supply a complete `--jaamd-*` variable set of your own.
 It has no effect on `<MarkdownContent>`, which imports the defaults directly;
-with a custom wrapper, control them by importing `@jaamd/astro/default` or not.
+with a custom wrapper, control them by importing `@jaamd/astro/default.css` or not.
 
 ## Markdown Syntax
 
@@ -407,7 +410,7 @@ the enhancement script.
 ## Theming
 
 All styles are driven by CSS custom properties prefixed with `--jaamd-*`. The
-default set (`@jaamd/astro/default`) is injected automatically.
+default set (`@jaamd/astro/default.css`) is injected automatically.
 
 ### Customizing variables
 
@@ -485,16 +488,16 @@ Eight presets restyle the `--jaamd-*` palette to match popular editor colour
 schemes. A **dual** preset carries a light and a dark palette and follows
 `html.dark`; the others are one palette that applies in both modes.
 
-| Preset         | Import                               | Kind | Recommended Shiki theme                        |
-| -------------- | ------------------------------------ | ---- | ---------------------------------------------- |
-| Catppuccin     | `@jaamd/astro/themes/catppuccin`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
-| Dracula        | `@jaamd/astro/themes/dracula`        | dark | `dracula`                                      |
-| Gruvbox        | `@jaamd/astro/themes/gruvbox`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
-| Nord           | `@jaamd/astro/themes/nord`           | dark | `nord`                                         |
-| One Dark       | `@jaamd/astro/themes/one-dark`       | dark | `one-dark-pro`                                 |
-| Rosé Pine      | `@jaamd/astro/themes/rose-pine`      | dual | `rose-pine-dawn` / `rose-pine`                 |
-| Rosé Pine Moon | `@jaamd/astro/themes/rose-pine-moon` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
-| Tokyo Night    | `@jaamd/astro/themes/tokyo-night`    | dark | `tokyo-night`                                  |
+| Preset         | Import                                   | Kind | Recommended Shiki theme                        |
+| -------------- | ---------------------------------------- | ---- | ---------------------------------------------- |
+| Catppuccin     | `@jaamd/astro/themes/catppuccin.css`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
+| Dracula        | `@jaamd/astro/themes/dracula.css`        | dark | `dracula`                                      |
+| Gruvbox        | `@jaamd/astro/themes/gruvbox.css`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
+| Nord           | `@jaamd/astro/themes/nord.css`           | dark | `nord`                                         |
+| One Dark       | `@jaamd/astro/themes/one-dark.css`       | dark | `one-dark-pro`                                 |
+| Rosé Pine      | `@jaamd/astro/themes/rose-pine.css`      | dual | `rose-pine-dawn` / `rose-pine`                 |
+| Rosé Pine Moon | `@jaamd/astro/themes/rose-pine-moon.css` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
+| Tokyo Night    | `@jaamd/astro/themes/tokyo-night.css`    | dark | `tokyo-night`                                  |
 
 As a standalone theme, replacing the default light theme:
 
@@ -517,7 +520,7 @@ modes and have no `/dark`:
 ```
 
 ```ts
-import '@jaamd/astro/themes/dracula/dark'
+import '@jaamd/astro/themes/dracula/dark.css'
 ```
 
 > [!IMPORTANT]
@@ -619,8 +622,8 @@ export default defineConfig({
 
 ```astro
 ---
-import '@jaamd/astro/default' // variable fallbacks; omit if you provide your own
-import '@jaamd/astro/styles'
+import '@jaamd/astro/default.css' // variable fallbacks; omit if you provide your own
+import '@jaamd/astro/styles.css'
 ---
 
 <div class="jaamd-content">
