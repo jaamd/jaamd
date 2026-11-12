@@ -74,7 +74,7 @@ readable `name`, plus:
 
 ```bash
 pnpm build:themes
-pnpm --filter @jaamd/core --filter @jaamd/jaamd test
+pnpm --filter @jaamd/core --filter @jaamd/astro test
 ```
 
 The test names the missing level, an unknown Shiki theme, a token no other theme

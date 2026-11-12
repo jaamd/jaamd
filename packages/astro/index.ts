@@ -72,7 +72,7 @@ export interface JaamdOptions {
     theme?: string | { light: string; dark: string }
 
     /**
-     * Skip injecting the default CSS variable fallbacks (`@jaamd/jaamd/default`).
+     * Skip injecting the default CSS variable fallbacks (`@jaamd/astro/default`).
      *
      * No effect with `<MarkdownContent>`, which imports them statically.
      * Applies to custom wrappers.
@@ -106,7 +106,7 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
     const { codeTabs = true, toc = true, alerts = true, directive = true, tables = true, headingLinks = true } = plugins
 
     return {
-        name: '@jaamd/jaamd',
+        name: '@jaamd/astro',
         hooks: {
             'astro:config:setup': ({ config, updateConfig, injectScript, logger }) => {
                 const needsDirective = directive || codeTabs || toc
@@ -199,7 +199,7 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
                 updateConfig({
                     vite: {
                         // Both ship sources: left external, they never reach the compiler.
-                        ssr: { noExternal: ['@jaamd/jaamd', '@jaamd/core'] },
+                        ssr: { noExternal: ['@jaamd/astro', '@jaamd/core'] },
                     },
                     markdown: { shikiConfig },
                 })

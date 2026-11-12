@@ -18,10 +18,26 @@ npm install @jaamd/jaad
 Then replace `@lancher-dev/jaad` with `@jaamd/jaad` in every import:
 `astro.config.*`, `src/content.config.*`, `jaad.config.ts`, and any page using
 `@jaamd/jaad/layouts/Page.astro` or `@jaamd/jaad/advanced`. A project that
-imports `@lancher-dev/jaamd` directly needs `@jaamd/jaamd` instead.
+imports `@lancher-dev/jaamd` directly needs `@jaamd/astro` instead.
 
 The documentation moved from `jaad.lancher.dev` to `jaamd.org/docs/jaad`: update
 the links in `AGENTS.md` if `create-jaad` generated one.
+
+## From 0.12
+
+### @jaamd/jaamd is now @jaamd/astro
+
+JAAD installs it for you: a site that only uses `@jaamd/jaad` has nothing to do.
+A project that depends on `@jaamd/jaamd` directly replaces it:
+
+```bash
+npm uninstall @jaamd/jaamd
+npm install @jaamd/astro
+```
+
+Then replace `@jaamd/jaamd` with `@jaamd/astro` in every import, stylesheets
+included. The API and the paths after the package name are unchanged.
+`@jaamd/jaamd` is deprecated and receives no further releases.
 
 ## From 0.9
 

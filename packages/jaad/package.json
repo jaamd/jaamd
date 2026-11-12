@@ -49,7 +49,7 @@
     },
     "dependencies": {
         "@astrojs/sitemap": "^3.7.4",
-        "@jaamd/jaamd": "workspace:^",
+        "@jaamd/astro": "workspace:^",
         "github-slugger": "^2.0.0"
     },
     "devDependencies": {

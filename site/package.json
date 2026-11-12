@@ -12,9 +12,9 @@
         "test": "node --test tests/worker.test.ts"
     },
     "dependencies": {
+        "@jaamd/astro": "workspace:^",
         "@jaamd/core": "workspace:^",
         "@jaamd/jaad": "workspace:^",
-        "@jaamd/jaamd": "workspace:^",
         "astro": "^7.4.2",
         "sharp": "^0.35.5"
     },

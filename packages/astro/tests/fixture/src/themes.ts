@@ -1,5 +1,5 @@
-import type { JaamdTheme, JaamdThemeMode } from '@jaamd/jaamd/themes'
-import { themes as packageThemes } from '@jaamd/jaamd/themes'
+import type { JaamdTheme, JaamdThemeMode } from '@jaamd/astro/themes'
+import { themes as packageThemes } from '@jaamd/astro/themes'
 
 /**
  * The site's own palette. `dual` like any theme that carries both a light and a

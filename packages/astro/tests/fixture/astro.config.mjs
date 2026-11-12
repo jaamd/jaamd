@@ -1,5 +1,5 @@
 import { unified } from '@astrojs/markdown-remark'
-import jaamd from '@jaamd/jaamd'
+import jaamd from '@jaamd/astro'
 import { defineConfig, fontProviders } from 'astro/config'
 import { shikiThemes } from './src/themes.ts'
 

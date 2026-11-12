@@ -1,4 +1,4 @@
-import { themes } from '@jaamd/jaamd/themes'
+import { themes } from '@jaamd/astro/themes'
 
 export interface Preset {
     /** Shiki theme, or a light/dark pair, for code blocks. */

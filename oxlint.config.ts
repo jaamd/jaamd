@@ -34,8 +34,6 @@ export default defineConfig({
                                     'react-dom/*',
                                     '@jaamd/astro',
                                     '@jaamd/astro/*',
-                                    '@jaamd/jaamd',
-                                    '@jaamd/jaamd/*',
                                     '@jaamd/jaad',
                                     '@jaamd/jaad/*',
                                 ],

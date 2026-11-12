@@ -223,7 +223,7 @@ export function resolveStylesheets(
     return {
         user: existsSync(userCss) ? userCss : null,
         // Resolved through JAAMD's export map rather than by path.
-        theme: slug ? requireFrom.resolve(`@jaamd/jaamd/themes/${slug}.css`) : null,
+        theme: slug ? requireFrom.resolve(`@jaamd/astro/themes/${slug}.css`) : null,
         // A preset supplies the palette, so the colours travel the other way.
         bridge: styleInPackage(slug ? 'jaamd-reverse.css' : 'jaamd-forward.css'),
         tailwind: config.tailwind ? styleInPackage('tailwind.css') : null,

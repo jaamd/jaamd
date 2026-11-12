@@ -26,15 +26,16 @@
     - [Theme presets](#theme-presets)
     - [Dual-theme Shiki](#dual-theme-shiki)
 - [Manual / Advanced Usage](#manual--advanced-usage)
+- [Frontmatter fields](#frontmatter-fields)
 
 ---
 
 ## Installation
 
 ```bash
-npm install @jaamd/jaamd
+npm install @jaamd/astro
 # or
-npx astro add @jaamd/jaamd
+npx astro add @jaamd/astro
 ```
 
 ## Requirements
@@ -52,10 +53,11 @@ It works out of the box in any Astro project, but is not consumable from plain
 Node, a CommonJS build, or a TypeScript project using
 `"moduleResolution": "node16"`.
 
-### Upgrading from @lancher-dev/jaamd
+### Upgrading from @jaamd/jaamd
 
-The package is now `@jaamd/jaamd`. Replace the dependency and every import from
-`@lancher-dev/jaamd`; the API is unchanged.
+The package is now `@jaamd/astro`. Replace the dependency and every import from
+`@jaamd/jaamd`; the API is unchanged. Coming from `@lancher-dev/jaamd`, do the
+same with that name.
 
 ### Upgrading from 0.10
 
@@ -96,7 +98,7 @@ The package is now `@jaamd/jaamd`. Replace the dependency and every import from
 Add the integration to your Astro config:
 
 ```ts
-import jaamd from '@jaamd/jaamd'
+import jaamd from '@jaamd/astro'
 // astro.config.mjs
 import { defineConfig } from 'astro/config'
 
@@ -110,7 +112,7 @@ Wrap your markdown content with the `MarkdownContent` component in your layout:
 ```astro
 ---
 // src/layouts/BlogPost.astro
-import MarkdownContent from '@jaamd/jaamd/components'
+import MarkdownContent from '@jaamd/astro/components'
 ---
 
 <MarkdownContent>
@@ -131,8 +133,8 @@ left alone, with a warning.
 >
 > ```astro
 > ---
-> import '@jaamd/jaamd/default.css'
-> import '@jaamd/jaamd/styles.css'
+> import '@jaamd/astro/default.css'
+> import '@jaamd/astro/styles.css'
 > ---
 > ```
 
@@ -142,7 +144,7 @@ left alone, with a warning.
 jaamd({
     selector: '.jaamd-content', // CSS selector for the JS enhancements
     theme: 'github-light', // Shiki theme name (or { light, dark }); see below
-    noDefault: false, // skip injecting @jaamd/jaamd/default variable fallbacks
+    noDefault: false, // skip injecting @jaamd/astro/default variable fallbacks
     plugins: {
         codeTabs: true, // :::code-tabs directive blocks
         toc: true, // :::toc directive blocks
@@ -174,7 +176,7 @@ It does not affect the CSS file, which always uses `.jaamd-content`.
 
 Set to `true` when you supply a complete `--jaamd-*` variable set of your own.
 It has no effect on `<MarkdownContent>`, which imports the defaults directly;
-with a custom wrapper, control them by importing `@jaamd/jaamd/default` or not.
+with a custom wrapper, control them by importing `@jaamd/astro/default` or not.
 
 ## Markdown Syntax
 
@@ -282,7 +284,7 @@ Any element with the `spoiler` class is hidden until activated:
 and accepts any valid HTML tag via the `as` prop.
 
 ```ts
-import MarkdownContent from '@jaamd/jaamd/components'
+import MarkdownContent from '@jaamd/astro/components'
 ```
 
 ### Props
@@ -298,7 +300,7 @@ selector used by the JS enhancements and must not be removed.
 
 ```astro
 ---
-import MarkdownContent from '@jaamd/jaamd/components'
+import MarkdownContent from '@jaamd/astro/components'
 ---
 
 <!-- Default: renders as <div class="jaamd-content"> -->
@@ -405,7 +407,7 @@ the enhancement script.
 ## Theming
 
 All styles are driven by CSS custom properties prefixed with `--jaamd-*`. The
-default set (`@jaamd/jaamd/default`) is injected automatically.
+default set (`@jaamd/astro/default`) is injected automatically.
 
 ### Customizing variables
 
@@ -485,14 +487,14 @@ schemes. A **dual** preset carries a light and a dark palette and follows
 
 | Preset         | Import                               | Kind | Recommended Shiki theme                        |
 | -------------- | ------------------------------------ | ---- | ---------------------------------------------- |
-| Catppuccin     | `@jaamd/jaamd/themes/catppuccin`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
-| Dracula        | `@jaamd/jaamd/themes/dracula`        | dark | `dracula`                                      |
-| Gruvbox        | `@jaamd/jaamd/themes/gruvbox`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
-| Nord           | `@jaamd/jaamd/themes/nord`           | dark | `nord`                                         |
-| One Dark       | `@jaamd/jaamd/themes/one-dark`       | dark | `one-dark-pro`                                 |
-| Rosé Pine      | `@jaamd/jaamd/themes/rose-pine`      | dual | `rose-pine-dawn` / `rose-pine`                 |
-| Rosé Pine Moon | `@jaamd/jaamd/themes/rose-pine-moon` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
-| Tokyo Night    | `@jaamd/jaamd/themes/tokyo-night`    | dark | `tokyo-night`                                  |
+| Catppuccin     | `@jaamd/astro/themes/catppuccin`     | dual | `catppuccin-latte` / `catppuccin-mocha`        |
+| Dracula        | `@jaamd/astro/themes/dracula`        | dark | `dracula`                                      |
+| Gruvbox        | `@jaamd/astro/themes/gruvbox`        | dual | `gruvbox-light-medium` / `gruvbox-dark-medium` |
+| Nord           | `@jaamd/astro/themes/nord`           | dark | `nord`                                         |
+| One Dark       | `@jaamd/astro/themes/one-dark`       | dark | `one-dark-pro`                                 |
+| Rosé Pine      | `@jaamd/astro/themes/rose-pine`      | dual | `rose-pine-dawn` / `rose-pine`                 |
+| Rosé Pine Moon | `@jaamd/astro/themes/rose-pine-moon` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
+| Tokyo Night    | `@jaamd/astro/themes/tokyo-night`    | dark | `tokyo-night`                                  |
 
 As a standalone theme, replacing the default light theme:
 
@@ -501,9 +503,9 @@ jaamd({ theme: 'dracula' })
 ```
 
 ```css
-@import '@jaamd/jaamd/default.css';
-@import '@jaamd/jaamd/themes/dracula.css';
-@import '@jaamd/jaamd/styles.css';
+@import '@jaamd/astro/default.css';
+@import '@jaamd/astro/themes/dracula.css';
+@import '@jaamd/astro/styles.css';
 ```
 
 A single-palette preset can also be scoped to `html.dark` via the `/dark` variant,
@@ -511,11 +513,11 @@ to use it as the dark half of your own light theme. Dual presets already cover b
 modes and have no `/dark`:
 
 ```css
-@import '@jaamd/jaamd/themes/dracula/dark.css';
+@import '@jaamd/astro/themes/dracula/dark.css';
 ```
 
 ```ts
-import '@jaamd/jaamd/themes/dracula/dark'
+import '@jaamd/astro/themes/dracula/dark'
 ```
 
 > [!IMPORTANT]
@@ -527,7 +529,7 @@ import '@jaamd/jaamd/themes/dracula/dark'
 Each theme declares itself, so a picker can be built from data:
 
 ```ts
-import { themes } from '@jaamd/jaamd/themes'
+import { themes } from '@jaamd/astro/themes'
 // [{ slug: "dracula", name: "Dracula", mode: "dark", shiki: "dracula" }, …]
 ```
 
@@ -574,7 +576,7 @@ import {
     satteriDirectiveFallback,
     satteriTableWrapper,
     satteriHeadingLinks,
-} from '@jaamd/jaamd'
+} from '@jaamd/astro'
 
 export default defineConfig({
     markdown: {
@@ -603,7 +605,7 @@ import {
     remarkToc,
     rehypeTableWrapper,
     rehypeHeadingLinks,
-} from '@jaamd/jaamd'
+} from '@jaamd/astro'
 
 export default defineConfig({
     markdown: {
@@ -617,15 +619,15 @@ export default defineConfig({
 
 ```astro
 ---
-import '@jaamd/jaamd/default' // variable fallbacks; omit if you provide your own
-import '@jaamd/jaamd/styles'
+import '@jaamd/astro/default' // variable fallbacks; omit if you provide your own
+import '@jaamd/astro/styles'
 ---
 
 <div class="jaamd-content">
     <slot />
 </div>
 <script>
-    import { initMarkdownEnhancements } from '@jaamd/jaamd/client'
+    import { initMarkdownEnhancements } from '@jaamd/astro/client'
     function run() {
         initMarkdownEnhancements('.jaamd-content')
     }
@@ -637,6 +639,23 @@ import '@jaamd/jaamd/styles'
 The CSS files can also be imported from plain `.css`:
 
 ```css
-@import '@jaamd/jaamd/default.css';
-@import '@jaamd/jaamd/styles.css';
+@import '@jaamd/astro/default.css';
+@import '@jaamd/astro/styles.css';
+```
+
+## Frontmatter fields
+
+`frontmatterFields(z)` returns the fields JAAMD sites share, as a plain object
+to spread into a content collection schema: `title`, `description`, `draft`,
+`keywords`, `author`, `ogImage` and `lastUpdated`.
+
+```ts
+// src/content.config.ts
+import { frontmatterFields } from '@jaamd/astro/frontmatter'
+import { z } from 'astro/zod'
+
+const schema = z.object({
+    ...frontmatterFields(z),
+    order: z.number().int().optional(),
+})
 ```

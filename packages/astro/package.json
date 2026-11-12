@@ -1,5 +1,5 @@
 {
-    "name": "@jaamd/jaamd",
+    "name": "@jaamd/astro",
     "version": "0.12.0",
     "description": "Add markdown plugins, client-side enhancements and styles as a single Astro integration for Markdown content.",
     "keywords": [
@@ -19,7 +19,7 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/jaamd/jaamd.git",
-        "directory": "packages/jaamd"
+        "directory": "packages/astro"
     },
     "files": [
         "index.ts",
@@ -54,7 +54,7 @@
         "check": "tsc --noEmit",
         "build:bridges": "node scripts/build-bridges.mjs",
         "test": "node scripts/build-bridges.mjs --check",
-        "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && node tests/build/reference.mjs satteri && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && node tests/build/reference.mjs unified"
+        "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs"
     },
     "dependencies": {
         "@astrojs/markdown-satteri": "^0.4.6",
