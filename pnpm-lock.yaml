@@ -180,7 +180,17 @@ importers:
         version: 6.0.3
 
   packages/core:
+    dependencies:
+      remark-directive:
+        specifier: ^4.0.0
+        version: 4.0.0(supports-color@10.2.2)
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.1.0
     devDependencies:
+      '@types/hast':
+        specifier: ^3.0.5
+        version: 3.0.5
       '@types/mdast':
         specifier: ^4.0.4
         version: 4.0.4
@@ -190,9 +200,18 @@ importers:
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
+      satteri:
+        specifier: ^0.10.5
+        version: 0.10.5
+      shiki:
+        specifier: 4.4.3
+        version: 4.4.3
       typescript:
         specifier: ^6.0.0
         version: 6.0.3
+      unified:
+        specifier: ^11.0.0
+        version: 11.0.5
 
   packages/create-jaad:
     dependencies:
@@ -249,22 +268,10 @@ importers:
       '@jaamd/core':
         specifier: workspace:^
         version: link:../core
-      remark-directive:
-        specifier: ^4.0.0
-        version: 4.0.0(supports-color@10.2.2)
-      unist-util-visit:
-        specifier: ^5.0.0
-        version: 5.1.0
     devDependencies:
       '@astrojs/markdown-remark':
         specifier: ^7.3.5
         version: 7.3.5(supports-color@10.2.2)
-      '@types/hast':
-        specifier: ^3.0.5
-        version: 3.0.5
-      '@types/mdast':
-        specifier: ^4.0.4
-        version: 4.0.4
       '@types/node':
         specifier: ^24.0.0
         version: 24.13.3
@@ -274,18 +281,15 @@ importers:
       satteri:
         specifier: ^0.10.5
         version: 0.10.5
-      shiki:
-        specifier: 4.4.3
-        version: 4.4.3
       typescript:
         specifier: ^6.0.0
         version: 6.0.3
-      unified:
-        specifier: ^11.0.0
-        version: 11.0.5
 
   packages/jaamd/tests/fixture:
     dependencies:
+      '@jaamd/core':
+        specifier: workspace:*
+        version: link:../../../core
       '@jaamd/jaamd':
         specifier: workspace:*
         version: link:../..
@@ -305,6 +309,9 @@ importers:
 
   site:
     dependencies:
+      '@jaamd/core':
+        specifier: workspace:^
+        version: link:../packages/core
       '@jaamd/jaad':
         specifier: workspace:^
         version: link:../packages/jaad

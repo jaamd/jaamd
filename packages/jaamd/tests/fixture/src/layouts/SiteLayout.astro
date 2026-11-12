@@ -34,7 +34,7 @@ ${scope} .jaamd-content .shiki span {
 const themeCss = packageThemes
     .map((theme: JaamdTheme) => {
         const { slug } = theme
-        const source = readFileSync(require.resolve(`@jaamd/jaamd/themes/${slug}.css`), 'utf8')
+        const source = readFileSync(require.resolve(`@jaamd/core/themes/${slug}.css`), 'utf8')
         const attr = `[data-jaamd-theme="${slug}"]`
         const keys = shikiKeys(theme)
 

@@ -1,4 +1,4 @@
-import { qsa } from '@jaamd/core/client/utils'
+import { qsa } from '../utils.js'
 
 const GROUP = '.code-tabs[data-tabs-init]'
 const BUTTON = '.code-tab-btn'

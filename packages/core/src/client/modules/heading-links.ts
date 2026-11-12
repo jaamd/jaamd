@@ -1,12 +1,4 @@
-import {
-    HEADING_LINK_CLASS,
-    HEADING_LINK_ICON,
-    headingLinkLabel,
-    qs,
-    qsa,
-    slugify,
-    uniqueElementId,
-} from '@jaamd/core/client/utils'
+import { HEADING_LINK_CLASS, HEADING_LINK_ICON, headingLinkLabel, qs, qsa, slugify, uniqueElementId } from '../utils.js'
 
 /** Fallback for markup that skipped the build-time plugin. */
 export function addHeadingLinks(selector: string): void {

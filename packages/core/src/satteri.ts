@@ -1,8 +1,14 @@
 /** Sätteri mdast and hast plugins. `:::` blocks require `features.directive`. */
 
-import type { HastPluginDefinition, HastPluginEntry, MdastPluginDefinition, MdastVisitorContext } from 'satteri'
-import { satteriCollectHastText, satteriHeadingIdsPlugin } from '@astrojs/markdown-satteri'
-import { TABLE_WRAPPER_CLASS } from '@jaamd/core/client/utils'
+import type {
+    HastNode,
+    HastPluginDefinition,
+    HastPluginEntry,
+    HastVisitorContext,
+    MdastPluginDefinition,
+    MdastVisitorContext,
+} from 'satteri'
+import { TABLE_WRAPPER_CLASS } from './client/utils.js'
 import {
     ALERT_MARKER,
     TOC_CLOSE_HTML,
@@ -13,7 +19,7 @@ import {
     codeTabsHtml,
     headingLinkHtml,
     tocOpenHtml,
-} from '@jaamd/core/render'
+} from './render.js'
 
 /** GitHub-style `> [!NOTE]` alerts. */
 export const satteriAlert: MdastPluginDefinition = {
@@ -150,26 +156,25 @@ export const satteriTableWrapper: HastPluginDefinition = {
     },
 }
 
-const headingLinks: HastPluginDefinition = {
-    name: 'jaamd-heading-links',
-    element: {
-        filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-        visit(node, ctx) {
-            const id = node.properties?.id
-            if (typeof id !== 'string') return
-
-            // Same text Astro records for the heading, frontmatter expressions resolved.
-            const raw = ctx.textContent(node)
-            const text = raw.includes('frontmatter')
-                ? satteriCollectHastText(node, ctx.data.astro?.frontmatter ?? {})
-                : raw
-            ctx.appendChild(node, { type: 'raw', value: headingLinkHtml(id, text) })
-        },
-    },
-}
+/** Text of a heading, as the label of its anchor. */
+export type HeadingText = (node: HastNode, ctx: HastVisitorContext) => string
 
 /**
- * Appends the anchor to headings. Astro assigns ids after user plugins, so its
- * own id plugin runs first here; Astro's later pass keeps the ids it finds.
+ * Appends the anchor to headings that have an id. `ids` is the plugin that
+ * assigns them, run first; `text` reads the heading's text.
  */
-export const satteriHeadingLinks: HastPluginEntry = [satteriHeadingIdsPlugin(), headingLinks]
+export function satteriHeadingLinks(ids: HastPluginEntry, text: HeadingText): HastPluginEntry {
+    const headingLinks: HastPluginDefinition = {
+        name: 'jaamd-heading-links',
+        element: {
+            filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+            visit(node, ctx) {
+                const id = node.properties?.id
+                if (typeof id !== 'string') return
+                ctx.appendChild(node, { type: 'raw', value: headingLinkHtml(id, text(node, ctx)) })
+            },
+        },
+    }
+
+    return [ids, headingLinks]
+}

@@ -8,13 +8,13 @@ import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { bundledThemes } from 'shiki'
-import { render, TOKENS } from '../../scripts/build-themes.mjs'
-import { themes, REQUIRED_TOKENS } from '../../src/themes/index.js'
+import { render, TOKENS } from '../scripts/build-themes.mjs'
+import { themes, REQUIRED_TOKENS } from '../src/themes/index.js'
 
 const LEVELS = ['recessed', 'base', 'surface', 'overlay', 'text', 'bright', 'primary', 'primaryLight', 'accent']
 const ALERTS = ['note', 'tip', 'important', 'warning', 'caution']
 
-const THEMES = fileURLToPath(new URL('../../src/themes', import.meta.url))
+const THEMES = fileURLToPath(new URL('../src/themes', import.meta.url))
 
 const results = []
 const check = (name, condition, hint) => results.push({ name, ok: Boolean(condition), hint })
@@ -32,7 +32,7 @@ for (const slug of slugs) {
     check(
         `${slug}: declared in the manifest`,
         entry,
-        'add it to packages/jaamd/src/themes/index.js, or pickers will never show it',
+        'add it to packages/core/src/themes/index.js, or pickers will never show it',
     )
     if (!entry) continue
 

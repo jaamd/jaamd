@@ -1,4 +1,4 @@
-import { qsa } from '@jaamd/core/client/utils'
+import { qsa } from '../utils.js'
 
 const INITIALIZED = '.spoiler[data-spoiler-init]'
 

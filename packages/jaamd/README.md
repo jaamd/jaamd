@@ -425,7 +425,7 @@ Override any variable on `:root` in your own stylesheet:
 Defaults live in `@layer jaamd.defaults`, so an unlayered `:root` block always
 wins regardless of import order.
 
-See [`src/styles/variables.css`](src/styles/variables.css) for all 60 variables
+See [`variables.css`](../core/src/styles/variables.css) for all 60 variables
 and their default values.
 
 ### Font sizes

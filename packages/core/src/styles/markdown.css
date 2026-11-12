@@ -1,0 +1,858 @@
+/* Emitted for all markdown: hidden outside the wrapper. */
+.jaamd-heading-link {
+    display: none;
+}
+
+/* Screen-reader announcements from the client script. */
+.jaamd-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.jaamd-content {
+    color: var(--jaamd-color-fg);
+    line-height: var(--jaamd-line-height);
+    max-width: none;
+    font-family: var(--jaamd-font-sans);
+    font-size: var(--jaamd-font-size);
+
+    /* ─── Headings ───────────────────────────────────────────────────────────── */
+
+    & :is(h1, h2, h3, h4, h5, h6) {
+        color: var(--jaamd-color-fg-bright);
+        font-weight: 600;
+        line-height: 1.4;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        position: relative;
+        text-wrap: balance;
+        /* Every level: a TOC links h3+ too. */
+        scroll-margin-top: var(--jaamd-scroll-margin-top, 80px);
+
+        &:hover .jaamd-heading-link {
+            opacity: 0.6;
+        }
+
+        & .jaamd-heading-link:hover {
+            opacity: 1;
+        }
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    & .jaamd-heading-link {
+        display: inline-flex;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        text-decoration: none;
+        cursor: pointer;
+        vertical-align: middle;
+        margin-left: 0.5rem;
+
+        & svg {
+            width: calc(var(--jaamd-font-size) * 0.95);
+            height: calc(var(--jaamd-font-size) * 0.95);
+            color: var(--jaamd-color-primary);
+            fill: none;
+            stroke: currentColor;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 600px) {
+            opacity: 1;
+
+            & svg {
+                width: calc(var(--jaamd-font-size) * 1.1);
+                height: calc(var(--jaamd-font-size) * 1.1);
+            }
+        }
+    }
+
+    & h1 {
+        font-size: var(--jaamd-font-size-h1, calc(var(--jaamd-font-size) * 2.22));
+        margin-top: 0;
+    }
+
+    & h2 {
+        font-size: var(--jaamd-font-size-h2, calc(var(--jaamd-font-size) * 1.67));
+        border-bottom: 2px solid var(--jaamd-heading-border-color);
+        padding-bottom: 0.5rem;
+    }
+
+    & h3 {
+        font-size: var(--jaamd-font-size-h3, calc(var(--jaamd-font-size) * 1.33));
+    }
+
+    & h4 {
+        font-size: var(--jaamd-font-size-h4, calc(var(--jaamd-font-size) * 1.11));
+    }
+
+    & h5 {
+        font-size: var(--jaamd-font-size-h5, inherit);
+    }
+
+    & h6 {
+        font-size: var(--jaamd-font-size-h6, inherit);
+    }
+
+    /* ─── Text ───────────────────────────────────────────────────────────────── */
+
+    & p {
+        font-size: var(--jaamd-font-size-p, inherit);
+        margin-bottom: 1rem;
+    }
+
+    & a {
+        color: var(--jaamd-color-primary);
+        text-decoration: underline;
+        font-weight: 600;
+        transition: color 300ms ease-in-out;
+
+        &:hover {
+            color: var(--jaamd-color-primary-light);
+        }
+    }
+
+    & code {
+        background-color: var(--jaamd-code-bg);
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--jaamd-code-border);
+        border-radius: 0.25rem;
+        color: var(--jaamd-code-fg);
+        font-size: var(--jaamd-font-size-code, calc(var(--jaamd-font-size) * 0.78));
+        font-family: var(--jaamd-font-mono);
+        white-space: nowrap;
+    }
+
+    /* ─── Code blocks ────────────────────────────────────────────────────────── */
+
+    & pre {
+        /* Beats the inline background Shiki sets on the <pre>. */
+        background-color: var(--jaamd-pre-bg) !important;
+        border: 1px solid var(--jaamd-pre-border);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        line-height: var(--jaamd-line-height);
+    }
+
+    & pre > code {
+        display: block;
+        overflow-x: auto;
+        padding-right: 3rem;
+        mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent 100%);
+    }
+
+    & pre > .jaamd-copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        cursor: pointer;
+        border: 1px solid var(--jaamd-copy-btn-border);
+        background-color: var(--jaamd-copy-btn-bg);
+        color: var(--jaamd-copy-btn-fg);
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        font-size: calc(var(--jaamd-font-size) * 0.67);
+        transition: all 0.2s ease;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.85;
+        pointer-events: auto;
+
+        &:hover {
+            background-color: var(--jaamd-copy-btn-hover-bg);
+            color: var(--jaamd-copy-btn-hover-fg);
+            border-color: var(--jaamd-copy-btn-hover-border);
+        }
+
+        & .jaamd-copied-icon,
+        &[data-copied='true'] .jaamd-copy-icon {
+            display: none;
+        }
+
+        &[data-copied='true'] .jaamd-copied-icon {
+            display: inline;
+        }
+
+        &[data-copied='true'] {
+            color: var(--jaamd-color-success, #22c55e);
+        }
+    }
+
+    & pre:hover > .jaamd-copy-btn {
+        opacity: 1;
+    }
+
+    & pre code {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        color: var(--jaamd-pre-fg);
+        font-size: var(--jaamd-font-size-code-block, calc(var(--jaamd-font-size) * 0.85));
+        white-space: pre;
+        word-break: normal;
+        overflow-wrap: normal;
+        line-height: var(--jaamd-line-height);
+    }
+
+    & :is(pre.shiki, pre.astro-code) code {
+        display: block;
+        font-family: var(--jaamd-font-mono);
+    }
+
+    /* ─── Blockquotes ────────────────────────────────────────────────────────── */
+
+    & blockquote {
+        font-size: var(--jaamd-font-size-blockquote, inherit);
+        border-left: 4px solid var(--jaamd-blockquote-border);
+        background-color: var(--jaamd-blockquote-bg);
+        padding: 1rem 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+        position: relative;
+    }
+
+    /* Outranks `.jaamd-content p`, so the blockquote's own size wins inside it even
+     when --jaamd-font-size-p is set. */
+    & blockquote p {
+        font-size: inherit;
+        margin: 0;
+        font-style: italic;
+        color: var(--jaamd-blockquote-fg);
+    }
+
+    /* ─── Lists and inline emphasis ──────────────────────────────────────────── */
+
+    & :is(ul, ol) {
+        color: var(--jaamd-color-fg);
+        padding-left: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    & ul {
+        list-style-type: disc;
+    }
+
+    & ol {
+        list-style-type: decimal;
+    }
+
+    & li {
+        font-size: var(--jaamd-font-size-li, inherit);
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        line-height: var(--jaamd-line-height);
+    }
+
+    & strong {
+        color: var(--jaamd-color-fg-bright);
+        font-weight: 600;
+    }
+
+    & em {
+        font-style: italic;
+        color: var(--jaamd-em-fg);
+    }
+
+    & hr {
+        border: 0;
+        border-top: 2px solid var(--jaamd-hr-color);
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* ─── Tables ─────────────────────────────────────────────────────────────── */
+
+    & .jaamd-table-wrapper {
+        max-width: 100%;
+        overflow-x: auto;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+
+        & > table {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    & table {
+        --jaamd-table-radius: 0.5rem;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--jaamd-table-border);
+        border-radius: var(--jaamd-table-radius);
+    }
+
+    & :is(th, td) {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--jaamd-table-border);
+        border-right: 1px solid var(--jaamd-table-border);
+        font-size: var(--jaamd-font-size-table, calc(var(--jaamd-font-size) * 0.78));
+    }
+
+    /* The table border already draws the outer edges. */
+    & tr > *:last-child {
+        border-right: none;
+    }
+
+    & table > tbody:last-child > tr:last-child > *,
+    & tfoot > tr:last-child > * {
+        border-bottom: none;
+    }
+
+    /* Corner cells are rounded by hand: `overflow: hidden` on a table is not
+     reliable, and it would break sticky headers. `tbody:first-child` covers
+     tables without a `thead`. */
+    & thead > tr:first-child > *:first-child,
+    & table > tbody:first-child > tr:first-child > *:first-child {
+        border-top-left-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & thead > tr:first-child > *:last-child,
+    & table > tbody:first-child > tr:first-child > *:last-child {
+        border-top-right-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & table > tbody:last-child > tr:last-child > *:first-child,
+    & tfoot > tr:last-child > *:first-child {
+        border-bottom-left-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & table > tbody:last-child > tr:last-child > *:last-child,
+    & tfoot > tr:last-child > *:last-child {
+        border-bottom-right-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & th {
+        background-color: var(--jaamd-table-header-bg);
+        color: var(--jaamd-color-fg-bright);
+        font-weight: 600;
+    }
+
+    & td {
+        color: var(--jaamd-color-fg);
+
+        & code {
+            line-height: 2;
+        }
+    }
+
+    & tbody > tr:hover > td {
+        background-color: var(--jaamd-table-hover-bg);
+    }
+
+    /* ─── Images and videos ──────────────────────────────────────────────────── */
+
+    & :is(img, video) {
+        max-width: 100%;
+        border-radius: 0.5rem;
+        margin: 1.5rem auto;
+    }
+
+    & .jaamd-lightbox-trigger {
+        display: inline-block;
+        padding: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        color: inherit;
+        cursor: zoom-in;
+
+        &:focus-visible {
+            outline: 2px solid var(--jaamd-color-primary);
+            outline-offset: 2px;
+            border-radius: 0.5rem;
+        }
+
+        & img {
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        &:hover img {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+    }
+
+    /* ─── Code tabs ──────────────────────────────────────────────────────────── */
+
+    & .code-tabs {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--jaamd-tabs-border);
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    & .code-tab-buttons {
+        display: flex;
+        gap: 0;
+        background-color: var(--jaamd-tabs-header-bg);
+        border-bottom: 1px solid var(--jaamd-tabs-border);
+        padding: 0.25rem 0.5rem 0;
+    }
+
+    & .code-tab-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        border-bottom: none;
+        border-radius: 0.375rem 0.375rem 0 0;
+        padding: 0.375rem 0.875rem;
+        font-size: calc(var(--jaamd-font-size) * 0.72);
+        font-family: var(--jaamd-font-mono);
+        font-weight: 500;
+        color: var(--jaamd-color-fg);
+        cursor: pointer;
+        transition:
+            background-color 0.15s,
+            color 0.15s;
+        white-space: nowrap;
+        position: relative;
+        bottom: -1px;
+
+        &:hover:not(.active) {
+            background-color: var(--jaamd-tabs-btn-hover-bg);
+            color: var(--jaamd-color-fg-bright);
+        }
+
+        &.active {
+            background-color: var(--jaamd-tabs-btn-active-bg);
+            border-color: var(--jaamd-tabs-border);
+            border-bottom-color: var(--jaamd-tabs-btn-active-bg);
+            color: var(--jaamd-color-primary);
+        }
+    }
+
+    & .code-tab-panel {
+        display: none;
+
+        &.active {
+            display: block;
+        }
+    }
+
+    @media (scripting: none) {
+        & .code-tab-buttons {
+            display: none;
+        }
+        & .code-tab-panel {
+            display: block;
+        }
+    }
+
+    & .code-tabs pre {
+        margin: 0;
+        border: none;
+        border-radius: 0;
+    }
+
+    /* ─── Details / Summary ──────────────────────────────────────────────────── */
+
+    & details {
+        background-color: var(--jaamd-details-bg);
+        border: 1px solid var(--jaamd-details-border);
+        border-radius: 0.5rem;
+        box-sizing: border-box;
+        padding: 0 1.25rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        /* Height animates where `interpolate-size` exists, opacity elsewhere. */
+        interpolate-size: allow-keywords;
+
+        &::details-content {
+            block-size: 0;
+            padding: 0 0.25rem;
+            opacity: 0;
+            overflow: clip;
+            transition:
+                block-size 0.28s ease,
+                padding 0.28s ease,
+                opacity 0.28s ease,
+                content-visibility 0.28s allow-discrete;
+        }
+
+        &[open]::details-content {
+            block-size: auto;
+            padding-bottom: 0.75rem;
+            opacity: 1;
+        }
+    }
+
+    & summary {
+        font-weight: 600;
+        color: var(--jaamd-color-fg-bright);
+        cursor: pointer;
+        padding: 0.75rem 0;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--jaamd-font-size-summary, calc(var(--jaamd-font-size) * 0.89));
+        user-select: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::before {
+            content: '▶';
+            font-size: 0.6em;
+            color: var(--jaamd-color-primary);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+    }
+
+    & details[open] > summary::before {
+        transform: rotate(90deg);
+    }
+
+    & details > summary + * {
+        margin-top: 0;
+    }
+
+    & details > *:last-child {
+        margin-bottom: 0;
+    }
+
+    /* ─── GitHub alerts ──────────────────────────────────────────────────────── */
+
+    & .markdown-alert {
+        border-left: 4px solid var(--jaamd-blockquote-border);
+        background-color: var(--jaamd-blockquote-bg);
+        padding: 0.875rem 1.25rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+        position: relative;
+
+        & p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    & .markdown-alert-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: var(--jaamd-font-size-alert-title, calc(var(--jaamd-font-size) * 0.83));
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.5rem;
+
+        & svg {
+            width: 1em;
+            height: 1em;
+            flex-shrink: 0;
+            fill: currentColor;
+        }
+    }
+
+    & .markdown-alert-note {
+        border-left-color: var(--jaamd-alert-note-color);
+        background-color: var(--jaamd-alert-note-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-note-color);
+        }
+    }
+
+    & .markdown-alert-tip {
+        border-left-color: var(--jaamd-alert-tip-color);
+        background-color: var(--jaamd-alert-tip-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-tip-color);
+        }
+    }
+
+    & .markdown-alert-important {
+        border-left-color: var(--jaamd-alert-important-color);
+        background-color: var(--jaamd-alert-important-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-important-color);
+        }
+    }
+
+    & .markdown-alert-warning {
+        border-left-color: var(--jaamd-alert-warning-color);
+        background-color: var(--jaamd-alert-warning-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-warning-color);
+        }
+    }
+
+    & .markdown-alert-caution {
+        border-left-color: var(--jaamd-alert-caution-color);
+        background-color: var(--jaamd-alert-caution-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-caution-color);
+        }
+    }
+
+    /* ─── Spoiler ────────────────────────────────────────────────────────────── */
+
+    & .spoiler {
+        background-color: var(--jaamd-spoiler-hidden-color);
+        color: var(--jaamd-spoiler-hidden-color);
+        border-radius: 0.2em;
+        padding: 0.1em 0.3em;
+        cursor: pointer;
+        user-select: none;
+        transition:
+            color 0.25s ease,
+            background-color 0.25s ease;
+
+        /* Explicit action only. Hover is not a reveal: it spoils the content on
+       pointer pass-through, and on touch the state sticks after the tap. */
+        &.revealed {
+            background-color: var(--jaamd-spoiler-revealed-bg);
+            color: var(--jaamd-spoiler-revealed-fg);
+        }
+
+        /* The client script makes spoilers focusable, so they need a focus ring. */
+        &:focus-visible {
+            outline: 2px solid var(--jaamd-color-primary);
+            outline-offset: 2px;
+        }
+    }
+
+    /* ─── Footnotes (GFM) ────────────────────────────────────────────────────── */
+
+    & sup a[data-footnote-ref] {
+        color: var(--jaamd-color-primary);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0 0.15em;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    & .footnotes {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--jaamd-table-border);
+        font-size: var(--jaamd-font-size-footnotes, calc(var(--jaamd-font-size) * 0.85));
+        color: var(--jaamd-color-fg);
+
+        & ol {
+            padding-left: 1.25rem;
+        }
+
+        & p {
+            font-size: inherit;
+        }
+
+        & li {
+            font-size: inherit;
+            margin-top: 0.375rem;
+            margin-bottom: 0.375rem;
+
+            & p {
+                display: inline;
+                margin: 0;
+            }
+        }
+    }
+
+    & .data-footnote-backref {
+        margin-left: 0.375rem;
+        color: var(--jaamd-color-primary);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--jaamd-color-primary-light);
+        }
+    }
+
+    /* ─── Table of contents (:::toc) ─────────────────────────────────────────────
+     The list is the author's own markdown, so most of this undoes the global
+     link and list styling. */
+
+    & .jaamd-toc {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        border: 1px solid var(--jaamd-toc-border);
+        border-radius: 0.5rem;
+        background-color: var(--jaamd-toc-bg);
+        font-size: var(--jaamd-font-size-toc, calc(var(--jaamd-font-size) * 0.94));
+
+        & :is(ul, ol) {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        /* `ul` drops its bullets; `ol` keeps its numbers. */
+        & ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        & ol {
+            padding-left: 1.25rem;
+        }
+
+        /* Nested levels: a guide rail instead of deeper bullets. */
+        & :is(ul, ol) :is(ul, ol) {
+            margin-left: 0.25rem;
+            padding-left: 0.85rem;
+            border-left: 1px solid var(--jaamd-toc-border);
+        }
+
+        /* The block token governs its contents, as with blockquotes. */
+        & li {
+            font-size: inherit;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.5;
+        }
+
+        & a {
+            display: inline-block;
+            font-weight: 400;
+            text-decoration: none;
+            color: var(--jaamd-color-fg);
+
+            &:hover,
+            &:focus-visible {
+                color: var(--jaamd-color-primary);
+                text-decoration: underline;
+            }
+
+            /* Set by the client script. */
+            &[aria-current='location'] {
+                color: var(--jaamd-color-primary);
+                font-weight: 600;
+            }
+        }
+    }
+
+    /* A <p>, not a heading; styled like an alert title. */
+    & .jaamd-toc-title {
+        font-weight: 700;
+        font-size: var(--jaamd-font-size-toc-title, calc(var(--jaamd-font-size) * 0.83));
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--jaamd-color-fg-bright);
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* ─── Lightbox ─────────────────────────────────────────────────────────────── */
+
+/* Sized to the image: a click on the backdrop around it closes the dialog. */
+.jaamd-lightbox {
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+
+    &[open] {
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    &::backdrop {
+        background-color: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+    }
+}
+
+@starting-style {
+    .jaamd-lightbox[open] {
+        opacity: 0;
+    }
+}
+
+html:has(.jaamd-lightbox[open]) {
+    overflow: hidden;
+}
+
+.jaamd-lightbox__img {
+    display: block;
+    max-width: 95vw;
+    max-height: 95dvh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.jaamd-lightbox__close {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    z-index: 10;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+/* ─── Reduced motion ────────────────────────────────────────────
+   Scoped to jaamd's own elements, so the host page keeps control of the rest. */
+
+@media (prefers-reduced-motion: reduce) {
+    .jaamd-content *,
+    .jaamd-content *::before,
+    .jaamd-content *::after,
+    .jaamd-content details::details-content,
+    .jaamd-lightbox,
+    .jaamd-lightbox * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

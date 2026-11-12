@@ -10,6 +10,7 @@
         "check": "astro check"
     },
     "dependencies": {
+        "@jaamd/core": "workspace:*",
         "@jaamd/jaamd": "workspace:*",
         "astro": "^7.4.4"
     },

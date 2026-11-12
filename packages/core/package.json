@@ -26,21 +26,41 @@
     ],
     "type": "module",
     "exports": {
-        "./render": "./src/render.ts",
-        "./client/utils": "./src/client/utils.ts"
+        "./unified": "./src/unified/index.ts",
+        "./satteri": "./src/satteri.ts",
+        "./client": "./src/client/enhancements.ts",
+        "./default.css": "./src/styles/variables.css",
+        "./styles.css": "./src/styles/markdown.css",
+        "./shiki-dual.css": "./src/styles/shiki-dual.css",
+        "./themes": {
+            "types": "./src/themes/index.d.ts",
+            "default": "./src/themes/index.js"
+        },
+        "./themes/*/dark.css": "./src/themes/*/dark.css",
+        "./themes/*.css": "./src/themes/*/index.css",
+        "./themes/*": "./src/themes/*/index.css"
     },
     "publishConfig": {
         "access": "public"
     },
     "scripts": {
         "check": "tsc --noEmit",
-        "test": "node tests/slug-parity.mjs"
+        "build:themes": "node scripts/build-themes.mjs",
+        "test": "node tests/slug-parity.mjs && node tests/themes.mjs"
+    },
+    "dependencies": {
+        "remark-directive": "^4.0.0",
+        "unist-util-visit": "^5.0.0"
     },
     "devDependencies": {
+        "@types/hast": "^3.0.5",
         "@types/mdast": "^4.0.4",
         "@types/node": "^24.0.0",
         "github-slugger": "^2.0.0",
-        "typescript": "^6.0.0"
+        "satteri": "^0.10.5",
+        "shiki": "4.4.3",
+        "typescript": "^6.0.0",
+        "unified": "^11.0.0"
     },
     "engines": {
         "node": ">=22.12.0"

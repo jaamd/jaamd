@@ -2,9 +2,9 @@
 
 import type { Element, ElementContent, Root } from 'hast'
 import type { Plugin } from 'unified'
-import { TABLE_WRAPPER_CLASS } from '@jaamd/core/client/utils'
-import { headingLinkHtml } from '@jaamd/core/render'
 import { visit } from 'unist-util-visit'
+import { TABLE_WRAPPER_CLASS } from '../client/utils.js'
+import { headingLinkHtml } from '../render.js'
 
 /** Wraps tables in a scroll container. */
 export const rehypeTableWrapper: Plugin<[], Root> = () => (tree) => {

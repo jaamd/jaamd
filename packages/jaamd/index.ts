@@ -1,20 +1,23 @@
 import type { AstroConfig, AstroIntegration, ShikiConfig } from 'astro'
 import { isSatteriProcessor } from '@astrojs/markdown-satteri'
-import { DEFAULT_SELECTOR } from '@jaamd/core/client/utils'
-import remarkDirective from 'remark-directive'
-import { paths, rehypeHeadingIdsEntry } from './src/paths.js'
-import { rehypeHeadingLinks, rehypeTableWrapper } from './src/plugins/rehype.js'
-import { remarkAlert } from './src/plugins/remark-alert.js'
-import remarkCodeTabs from './src/plugins/remark-code-tabs.js'
-import remarkToc from './src/plugins/remark-toc.js'
+import { DEFAULT_SELECTOR } from '@jaamd/core/client'
 import {
     satteriAlert,
     satteriCodeTabs,
     satteriDirectiveFallback,
-    satteriHeadingLinks,
     satteriTableWrapper,
     satteriToc,
-} from './src/plugins/satteri.js'
+} from '@jaamd/core/satteri'
+import {
+    rehypeHeadingLinks,
+    rehypeTableWrapper,
+    remarkAlert,
+    remarkCodeTabs,
+    remarkDirective,
+    remarkToc,
+} from '@jaamd/core/unified'
+import { paths, rehypeHeadingIdsEntry } from './src/paths.js'
+import { satteriHeadingLinks } from './src/plugins/satteri-heading-links.js'
 
 type MarkdownProcessor = AstroConfig['markdown']['processor']
 
@@ -235,11 +238,12 @@ export {
     satteriHeadingLinks,
     satteriTableWrapper,
     satteriToc,
-} from './src/plugins/satteri.js'
-export { rehypeHeadingLinks, rehypeTableWrapper } from './src/plugins/rehype.js'
-export { default as remarkCodeTabs } from './src/plugins/remark-code-tabs.js'
-export { default as remarkToc } from './src/plugins/remark-toc.js'
-export { remarkAlert } from './src/plugins/remark-alert.js'
-export { default as remarkDirective } from 'remark-directive'
+    rehypeHeadingLinks,
+    rehypeTableWrapper,
+    remarkAlert,
+    remarkCodeTabs,
+    remarkDirective,
+    remarkToc,
+}
 
 export type { JaamdOptions as Options }

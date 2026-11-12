@@ -5,8 +5,8 @@
  */
 
 import type { Root } from 'mdast'
-import { ALERT_LEGACY_MARKER, ALERT_MARKER, alertData, alertTitle } from '@jaamd/core/render'
 import { visit } from 'unist-util-visit'
+import { ALERT_LEGACY_MARKER, ALERT_MARKER, alertData, alertTitle } from '../render.js'
 
 export interface RemarkAlertOptions {
     /** Use legacy title format (allows optional slash-suffix). @default false */

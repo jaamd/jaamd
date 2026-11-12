@@ -1,4 +1,4 @@
-import { TABLE_WRAPPER_CLASS, qsa } from '@jaamd/core/client/utils'
+import { TABLE_WRAPPER_CLASS, qsa } from '../utils.js'
 
 /** Fallback for markup that skipped the build-time plugin. */
 export function wrapTables(selector: string): void {

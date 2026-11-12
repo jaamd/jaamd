@@ -1,4 +1,4 @@
-import { qsa } from '@jaamd/core/client/utils'
+import { qsa } from '../utils.js'
 
 /** Previous run's observers: re-init must not stack them. */
 const observers = new WeakMap<HTMLElement, IntersectionObserver>()
