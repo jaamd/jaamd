@@ -31,6 +31,7 @@
         ".": "./index.ts",
         "./components": "./src/components/MarkdownContent.astro",
         "./client": "./src/scripts/enhancements.ts",
+        "./frontmatter": "./src/frontmatter.ts",
         "./default": "./src/styles/variables.css",
         "./default.css": "./src/styles/variables.css",
         "./styles": "./src/styles/markdown.css",
