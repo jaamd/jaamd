@@ -12,7 +12,7 @@
 
 [![main](https://github.com/jaamd/jaamd/actions/workflows/ci.yml/badge.svg)](https://github.com/jaamd/jaamd/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](/LICENSE)
-[![npm version](https://badge.fury.io/js/@jaamd%2Fjaamd.svg)](https://badge.fury.io/js/@jaamd%2Fjaamd)
+[![npm version](https://badge.fury.io/js/@jaamd%2Fastro.svg)](https://badge.fury.io/js/@jaamd%2Fastro)
 
 </div>
 

@@ -23,7 +23,8 @@ A theme is a directory under `packages/core/src/themes/<slug>/` plus one entry i
 `packages/core/src/themes/index.js`. Themes are welcome as pull requests.
 
 The CSS is generated. You write a palette; `pnpm build:themes` writes `index.css`
-and, for a single-palette theme, `dark.css`. Never edit those by hand.
+and, for a single-palette theme, `dark.css`, then the stylesheets under
+`packages/astro/src/` that re-export them. Never edit those by hand.
 
 ### 1. Write `palette.js`
 

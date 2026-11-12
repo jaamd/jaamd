@@ -198,7 +198,7 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
 
                 updateConfig({
                     vite: {
-                        // Both ship sources: left external, they never reach the compiler.
+                        // Both ship sources, compiled by Vite.
                         ssr: { noExternal: ['@jaamd/astro', '@jaamd/core'] },
                     },
                     markdown: { shikiConfig },

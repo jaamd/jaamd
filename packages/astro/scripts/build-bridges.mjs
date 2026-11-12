@@ -1,40 +1,26 @@
 #!/usr/bin/env node
 /**
- * Stylesheets here are bridges: one `@import` of the `@jaamd/core` file each,
- * so a project reaches them without declaring core.
+ * Writes the bridge stylesheets under src/: one `@import` of the `@jaamd/core`
+ * file each.
  *
  * `--check` verifies the committed files instead of writing them.
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { themes } from '@jaamd/core/themes'
 
 const SRC = fileURLToPath(new URL('../src', import.meta.url))
-const require = createRequire(import.meta.url)
-
-const inCore = (specifier) => {
-    try {
-        require.resolve(specifier)
-        return true
-    } catch {
-        return false
-    }
-}
 
 /** Bridge path under src/, and the core specifier it imports. */
 const bridges = [
     ['styles/variables.css', '@jaamd/core/default.css'],
     ['styles/markdown.css', '@jaamd/core/styles.css'],
     ['styles/shiki-dual.css', '@jaamd/core/shiki-dual.css'],
-    ...themes.flatMap(({ slug }) => [
+    ...themes.flatMap(({ slug, mode }) => [
         [`themes/${slug}/index.css`, `@jaamd/core/themes/${slug}.css`],
-        // Single-palette themes only.
-        ...(inCore(`@jaamd/core/themes/${slug}/dark.css`)
-            ? [[`themes/${slug}/dark.css`, `@jaamd/core/themes/${slug}/dark.css`]]
-            : []),
+        ...(mode === 'dual' ? [] : [[`themes/${slug}/dark.css`, `@jaamd/core/themes/${slug}/dark.css`]]),
     ]),
 ]
 

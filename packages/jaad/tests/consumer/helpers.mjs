@@ -39,14 +39,14 @@ export function packPackage(packageDir) {
     return JSON.parse(output).filename
 }
 
-const JAAMD = fileURLToPath(new URL('../../../astro', import.meta.url))
+const ASTRO = fileURLToPath(new URL('../../../astro', import.meta.url))
 const CORE = fileURLToPath(new URL('../../../core', import.meta.url))
 let packed
 
 /** `@jaamd/astro` and `@jaamd/core` from this workspace instead of the registry. */
 export function jaamdOverride() {
     packed ??= {
-        '@jaamd/astro': `file:${packPackage(JAAMD)}`,
+        '@jaamd/astro': `file:${packPackage(ASTRO)}`,
         '@jaamd/core': `file:${packPackage(CORE)}`,
     }
     return packed
