@@ -49,6 +49,7 @@
         "check": "tsc --noEmit",
         "build:bridges": "node scripts/build-bridges.mjs",
         "test": "node scripts/build-bridges.mjs --check",
+        "test:consumer": "node --test \"tests/consumer/**/*.test.mjs\"",
         "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs"
     },
     "dependencies": {
