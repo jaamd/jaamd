@@ -54,6 +54,13 @@ describe('a pnpm project that installed the packed tarballs', () => {
         assert.match(html, /<h2 id="setup">Setup<a class="jaamd-heading-link" href="#setup"/)
     })
 
+    test('the only copy of @astrojs/markdown-satteri is the one Astro installs', () => {
+        const copies = readdirSync(join(project, 'node_modules', '.pnpm')).filter((dir) =>
+            dir.startsWith('@astrojs+markdown-satteri@'),
+        )
+        assert.equal(copies.length, 1, copies.join(', '))
+    })
+
     test('the client script is bundled', () => {
         assert.match(html, /<script[^>]+type="module"/)
     })

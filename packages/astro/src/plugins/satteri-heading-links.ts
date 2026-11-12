@@ -1,6 +1,6 @@
 import type { HastPluginEntry } from 'satteri'
-import { satteriCollectHastText, satteriHeadingIdsPlugin } from '@astrojs/markdown-satteri'
 import { satteriHeadingLinks as headingLinks } from '@jaamd/core/satteri'
+import { satteriCollectHastText, satteriHeadingIdsPlugin } from '../astro-satteri.js'
 
 /**
  * Appends the anchor to headings. Astro assigns ids after user plugins, so its

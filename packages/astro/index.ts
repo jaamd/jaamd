@@ -1,5 +1,4 @@
 import type { AstroConfig, AstroIntegration, ShikiConfig } from 'astro'
-import { isSatteriProcessor } from '@astrojs/markdown-satteri'
 import { DEFAULT_SELECTOR } from '@jaamd/core/client'
 import {
     satteriAlert,
@@ -16,6 +15,7 @@ import {
     remarkDirective,
     remarkToc,
 } from '@jaamd/core/unified'
+import { isSatteriProcessor } from './src/astro-satteri.js'
 import { paths, rehypeHeadingIdsEntry } from './src/paths.js'
 import { satteriHeadingLinks } from './src/plugins/satteri-heading-links.js'
 
