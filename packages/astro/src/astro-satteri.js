@@ -5,5 +5,5 @@ import { pathToFileURL } from 'node:url'
 const fromAstro = createRequire(createRequire(import.meta.url).resolve('astro/package.json'))
 
 export const { isSatteriProcessor, satteriCollectHastText, satteriHeadingIdsPlugin } = await import(
-    pathToFileURL(fromAstro.resolve('@astrojs/markdown-satteri')).href
+    /* @vite-ignore */ pathToFileURL(fromAstro.resolve('@astrojs/markdown-satteri')).href
 )

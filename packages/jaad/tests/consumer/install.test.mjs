@@ -165,8 +165,8 @@ export default defineJaadConfig({
         )
 
         const index = JSON.parse(built.read('search-index.json'))
-        assert.equal(index.length, 2, 'the search index missed a page')
-        assert.equal(index[0].slug, '', 'search does not point at the docs root')
+        assert.equal(index.pages.length, 2, 'the search index missed a page')
+        assert.equal(index.pages[0].href, '/', 'search does not point at the docs root')
     })
 
     test('frontmatter renames, reorders and describes a page', () => {
@@ -191,14 +191,14 @@ export default defineJaadConfig({
         const home = built.read('index.html')
         assert.match(home, /<meta name="keywords" content="alpha, beta"/)
         assert.match(home, /"keywords":\["alpha","beta"\]/)
-        assert.deepEqual(JSON.parse(built.read('search-index.json'))[0].keywords, ['alpha', 'beta'])
+        assert.deepEqual(JSON.parse(built.read('search-index.json')).pages[0].keywords, ['alpha', 'beta'])
     })
 
     test('a draft is left out of the production build entirely', () => {
         assert.ok(!built.pages.some((file) => file.includes('draft')), 'a draft page was routed')
 
         const index = JSON.parse(built.read('search-index.json'))
-        assert.ok(!index.some((entry) => entry.slug === 'draft'), 'a draft page reached the search index')
+        assert.ok(!index.pages.some((page) => page.href.includes('draft')), 'a draft page reached the search index')
         assert.doesNotMatch(built.read('llms.txt'), /\/draft/)
     })
 
@@ -221,8 +221,8 @@ export default defineJaadConfig({
 
         const italian = JSON.parse(localised.read('it/search-index.json'))
         assert.deepEqual(
-            italian.map((entry) => entry.slug),
-            ['', 'guides/deep-dive', 'guides/solo-italiano', 'guida/installazione'],
+            italian.pages.map((page) => page.href),
+            ['/it', '/it/guides/deep-dive', '/it/guides/solo-italiano', '/it/guida/installazione'],
             'the italian index is not scoped to italian',
         )
         assert.match(localised.read('it/llms.txt'), /\/it\//)
@@ -466,7 +466,6 @@ export default defineJaadConfig({
         const page = remounted.read('docs/guides/deep-dive/index.html')
         assert.match(page, /href="\/repo\/docs"/, 'the opening-page link missed the deployment base')
         assert.match(page, /src="\/repo\/logo\.svg"/, 'a public asset missed the deployment base')
-        assert.match(page, /data-base="\/repo\/docs"/, 'search missed the docs and deployment bases')
         assert.match(
             page,
             /data-index-url="\/repo\/docs\/search-index\.json"/,
@@ -484,6 +483,11 @@ export default defineJaadConfig({
         )
         assert.doesNotMatch(remounted.files.join('\n'), /^\/(?:llms\.txt|search-index\.json)$/m)
         assert.ok(remounted.files.includes('/docs/search-index.json'))
+        assert.equal(
+            JSON.parse(remounted.read('docs/search-index.json')).pages[1].href,
+            '/repo/docs/guides/deep-dive',
+            'search missed the docs and deployment bases',
+        )
         assert.match(
             remounted.read('docs/getting-started/index.html'),
             /url=\/repo\/docs/,
