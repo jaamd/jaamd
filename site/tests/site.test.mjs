@@ -12,26 +12,26 @@ test('the home page is the jaamd showcase, rendered with jaamd', () => {
     assert.match(home, /data-jaamd-theme/)
 })
 
-test('the jaamd documentation is the package README', () => {
-    const docs = page('docs/jaamd/index.html')
-    assert.match(docs, /<title>Documentation \| JAAMD<\/title>/)
-    assert.match(docs, /class="[^"]*jaamd-content/)
-    assert.match(docs, /@jaamd\/jaamd/)
-    assert.match(docs, /id="installation"/)
+test('/docs opens the jaamd section, read from the package', () => {
+    const docs = page('docs/index.html')
+    assert.match(docs, /data-jaad-default-frame/)
+    assert.match(docs, /<h1[^>]*>JAAMD/)
+    assert.match(page('docs/jaamd/index.html'), /url=\/docs["']?/)
+    assert.match(page('docs/jaamd/styling/markup/index.html'), /<title>Markup and classes \| JAAMD<\/title>/)
 })
 
-test('the jaad documentation is mounted below /docs/jaad', () => {
+test('the jaad section keeps its urls below /docs/jaad', () => {
     assert.match(page('docs/jaad/index.html'), /data-jaad-default-frame/)
     assert.match(page('docs/jaad/getting-started/installation/index.html'), /<title>Installation \| JAAMD<\/title>/)
-    assert.match(page('docs/jaad/llms.txt'), /^# /)
+    assert.match(page('docs/llms.txt'), /## JAAMD[\s\S]*## JAAD/)
 })
 
-test('/docs opens the jaamd documentation', () => {
-    assert.match(page('docs/index.html'), /url=\/docs\/jaamd["']?/)
+test('a relative link between the packages becomes a page url', () => {
+    assert.match(page('docs/jaad/markdown/index.html'), /href="\/docs\/jaamd\/overview"/)
 })
 
-test('llms.txt serves the jaamd README', () => {
-    assert.match(page('llms.txt'), /^# jaamd\n/)
+test('llms.txt serves the jaamd documentation', () => {
+    assert.match(page('llms.txt'), /^# jaamd\n[\s\S]*# Markup and classes/)
 })
 
 // With routeBase set, JAAD injects no 404: the site has to bring its own.

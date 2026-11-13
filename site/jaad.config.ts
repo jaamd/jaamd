@@ -16,18 +16,15 @@ export default defineJaadConfig({
     site: 'https://jaamd.org',
     title: 'JAAMD',
     lang: 'en',
-    routeBase: '/docs/jaad',
-    description: 'An Astro integration that turns a folder of Markdown into a documentation site.',
+    routeBase: '/docs',
+    sections: {
+        jaamd: { dir: '../packages/astro/docs', label: 'JAAMD' },
+        jaad: { dir: '../packages/jaad/docs', label: 'JAAD' },
+    },
+    description: 'Markdown plugins, enhancements and styles for Astro, and a documentation site built on them.',
     ogImage: '/og-jaad.png',
-    nav: [
-        { label: 'jaamd', href: '/docs/jaamd' },
-        { label: 'jaad', href: '/docs/jaad' },
-    ],
     tailwind: true,
     astro: {
         integrations: [shikiMultiTheme],
-        redirects: {
-            '/docs': '/docs/jaamd',
-        },
     },
 })

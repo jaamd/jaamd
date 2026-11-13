@@ -17,6 +17,14 @@ pnpm test:consumer   # installs the packed tarballs into throwaway projects
 
 Each check runs per package as well, for example `pnpm --filter @jaamd/jaad test`.
 
+## Documentation
+
+Each package's documentation is the markdown in its `docs/` folder, published
+with it: `packages/astro/docs/` for JAAMD, `packages/jaad/docs/` for JAAD. The
+site renders both, one section each. Link between pages by file, relative to
+the page you are writing, even across the two packages; the build fails on a
+link to a file that does not exist.
+
 ## Themes
 
 A theme is a directory under `packages/core/src/themes/<slug>/` plus one entry in
@@ -97,7 +105,8 @@ To contribute another language:
 3. Import the catalogue in `packages/jaad/src/ui.ts` and add its language code
    to `UI_CATALOGS`.
 4. Add the catalogue to the completeness test in `packages/jaad/tests/unit/ui.test.ts` and
-   update the supported-language list in the i18n documentation.
+   update the supported-language list in
+   `packages/jaad/docs/04-configurations/10-i18n.md`.
 5. Run the checks above.
 
 Translate meaning rather than individual words. Keep labels concise, preserve

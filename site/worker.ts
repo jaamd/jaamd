@@ -4,11 +4,10 @@ interface Env {
 
 const MARKDOWN = 'text/markdown; charset=utf-8'
 
-const REDIRECTS: Record<string, string> = { '/docs': '/docs/jaamd' }
-
-/** Pages whose Markdown is not at `<path>.md`. */
+/** Section openers, whose Markdown is at their named url. */
 const MARKDOWN_SOURCES: Record<string, string> = {
-    '/docs/jaamd': '/llms.txt',
+    '/docs': '/docs/jaamd/overview.md',
+    '/docs/jaamd': '/docs/jaamd/overview.md',
     '/docs/jaad': '/docs/jaad/overview.md',
 }
 
@@ -30,7 +29,7 @@ export function prefersMarkdown(request: Request): boolean {
 
 export function markdownSource(path: string): string | null {
     if (path in MARKDOWN_SOURCES) return MARKDOWN_SOURCES[path]
-    if (path.startsWith('/docs/jaad/') && !path.slice(path.lastIndexOf('/')).includes('.')) return `${path}.md`
+    if (path.startsWith('/docs/') && !path.slice(path.lastIndexOf('/')).includes('.')) return `${path}.md`
     return null
 }
 
@@ -41,7 +40,7 @@ function withHeaders(response: Response, headers: Record<string, string>): Respo
 }
 
 function markdownNotFound(url: URL): Response {
-    const body = `# Not found\n\nNothing is published at ${url.pathname}. The documentation index is ${url.origin}/docs/jaad/llms.txt, and the jaamd reference is ${url.origin}/llms.txt.\n`
+    const body = `# Not found\n\nNothing is published at ${url.pathname}. The documentation index is ${url.origin}/docs/llms.txt.\n`
     return new Response(body, { status: 404, headers: { 'Content-Type': MARKDOWN, Vary: 'Accept' } })
 }
 
@@ -49,8 +48,6 @@ export default {
     async fetch(request: Request, env: Env): Promise<Response> {
         const url = new URL(request.url)
         const path = url.pathname.replace(/\/+$/, '') || '/'
-
-        if (path in REDIRECTS) return Response.redirect(new URL(REDIRECTS[path], url).href, 301)
 
         if (prefersMarkdown(request)) {
             const source = markdownSource(path)
