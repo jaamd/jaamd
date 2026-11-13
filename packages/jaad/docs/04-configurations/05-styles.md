@@ -93,7 +93,7 @@ The complete groups are:
 }
 ```
 
-Use [Advanced layout](/docs/jaad/configurations/advanced-layout) when token changes
+Use [Advanced layout](09-advanced-layout.md) when token changes
 are not enough.
 
 ## Markdown tokens

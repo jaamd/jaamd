@@ -104,7 +104,7 @@ bun run dev
 The development server starts at `http://localhost:4321`.
 
 Add pages to `docs/`, following the conventions in
-[Creating pages](/docs/jaad/getting-started/creating-pages).
+[Creating pages](03-creating-pages.md).
 
 ## Manual installation
 
@@ -160,7 +160,7 @@ export { collections } from '@jaamd/jaad/content'
 ```
 
 Only `title` is required. See the
-[configuration reference](/docs/jaad/configurations/reference) for the remaining
+[configuration reference](../04-configurations/01-reference.md) for the remaining
 options.
 
 ## Existing Astro project
@@ -184,7 +184,7 @@ export default defineConfig({
 ```
 
 `jaad()` returns integrations only. `site` and `base` are lifted above, and the
-[`astro`](/docs/jaad/configurations/reference#extending-astro) field is ignored here.
+[`astro`](../04-configurations/01-reference.md#extending-astro) field is ignored here.
 Write those options in `defineConfig`.
 
 If the project defines content collections, add JAAD's collection without

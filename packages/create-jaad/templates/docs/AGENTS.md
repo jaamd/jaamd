@@ -17,16 +17,16 @@ Build the site with `astro build`.
 
 ## Layout
 
-| Path             | What it is                                      |
-| ---------------- | ----------------------------------------------- |
-| `docs/`          | The markdown that becomes the site              |
-| `jaad.config.ts` | Every JAAD option                               |
-| `src/jaad.css`   | Colours, fonts and widths (create it if absent) |
+| Path                    | What it is                                      |
+| ----------------------- | ----------------------------------------------- |
+| `docs/`                 | The markdown that becomes the site              |
+| `jaad.config.ts`        | Every JAAD option                               |
+| `src/jaad.css`          | Colours, fonts and widths (create it if absent) |
+| `astro.config.mjs`      | Re-exports JAAD's Astro config; leave it alone  |
+| `src/content.config.ts` | Re-exports JAAD's collection; leave it alone    |
 
 JAAD's own stylesheet is precompiled: installing it does not bring Tailwind
 into this project.
-| `astro.config.mjs` | Re-exports JAAD's Astro config; leave it alone |
-| `src/content.config.ts` | Re-exports JAAD's collection; leave it alone |
 
 `src/pages/` is for pages of your own, which keep their own layout.
 
@@ -36,6 +36,8 @@ into this project.
   `02-guide.md` becomes `/guide`.
 - A folder becomes a chapter. Only one level of nesting is supported,
   per language.
+- Link to another page by its file, relative to the one you are writing:
+  `[Setup](./02-guides/01-setup.md)`. JAAD turns it into the page's URL.
 - The first `# Heading` is the page title; `##` and `###` build the table of
   contents.
 - The first page in sort order opens at `/`, and its named URL redirects there.
@@ -77,19 +79,21 @@ structure itself has to change.
 
 ## Documentation
 
-Full documentation: https://jaamd.org/docs/jaad
+The JAAD documentation is installed with it, in `node_modules/@jaamd/jaad/docs/`. Read the
+guide for a task before working on it:
 
-Consult these guides before working on related tasks:
+- Creating pages: `node_modules/@jaamd/jaad/docs/02-getting-started/03-creating-pages.md`
+- Structure, links and sections: `node_modules/@jaamd/jaad/docs/04-configurations/03-structure.md`
+- Frontmatter: `node_modules/@jaamd/jaad/docs/04-configurations/02-frontmatter.md`
+- Markdown features: `node_modules/@jaamd/jaad/docs/03-markdown.md`
+- Languages: `node_modules/@jaamd/jaad/docs/04-configurations/10-i18n.md`
+- Search: `node_modules/@jaamd/jaad/docs/04-configurations/07-search.md`
+- Fonts: `node_modules/@jaamd/jaad/docs/04-configurations/04-fonts.md`
+- Configuration reference: `node_modules/@jaamd/jaad/docs/04-configurations/01-reference.md`
+- Styles: `node_modules/@jaamd/jaad/docs/04-configurations/05-styles.md`
+- Themes: `node_modules/@jaamd/jaad/docs/04-configurations/06-themes.md`
+- Pages of your own: `node_modules/@jaamd/jaad/docs/04-configurations/08-custom-pages.md`
+- Advanced layout: `node_modules/@jaamd/jaad/docs/04-configurations/09-advanced-layout.md`
+- Deployment: `node_modules/@jaamd/jaad/docs/02-getting-started/99-deployment.md`
 
-- [Creating pages](https://jaamd.org/docs/jaad/getting-started/creating-pages)
-- [Structure and navigation](https://jaamd.org/docs/jaad/configurations/structure)
-- [Frontmatter](https://jaamd.org/docs/jaad/configurations/frontmatter)
-- [Markdown features](https://jaamd.org/docs/jaad/markdown)
-- [Languages](https://jaamd.org/docs/jaad/configurations/i18n)
-- [Search](https://jaamd.org/docs/jaad/configurations/search)
-- [Fonts](https://jaamd.org/docs/jaad/configurations/fonts)
-- [Configuration reference](https://jaamd.org/docs/jaad/configurations/reference)
-- [Styles](https://jaamd.org/docs/jaad/configurations/styles) and [themes](https://jaamd.org/docs/jaad/configurations/themes)
-- [Pages of your own](https://jaamd.org/docs/jaad/configurations/custom-pages)
-- [Advanced layout](https://jaamd.org/docs/jaad/configurations/advanced-layout)
-- [Deployment](https://jaamd.org/docs/jaad/getting-started/deployment)
+The same pages are published at https://jaamd.org/docs/jaad.

@@ -69,7 +69,7 @@ defineJaadConfig({
 
 ## Overriding the file tree
 
-Optional [frontmatter](/docs/jaad/configurations/frontmatter) renames a page, moves
+Optional [frontmatter](02-frontmatter.md) renames a page, moves
 it without renaming the file, or keeps it out of the build:
 
 ```markdown
@@ -86,4 +86,4 @@ draft: true
 Directories named after language codes turn the tree into one site per
 language, and the nesting limit then applies inside each of them. With
 sections, every section holds the same language directories. See
-[Languages](/docs/jaad/configurations/i18n).
+[Languages](10-i18n.md).

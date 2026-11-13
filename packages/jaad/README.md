@@ -41,7 +41,13 @@ export default defineJaadConfig({
 })
 ```
 
-Documentation: [jaamd.org/docs/jaad](https://jaamd.org/docs/jaad)
+## Documentation
+
+The documentation ships with the package, in
+[`docs/`](https://github.com/jaamd/jaamd/tree/main/packages/jaad/docs): once
+installed, at `node_modules/@jaamd/jaad/docs/`. Point an agent's `AGENTS.md`
+there; projects made with `create-jaad` already do. It is also published at
+[jaamd.org/docs/jaad](https://jaamd.org/docs/jaad).
 
 ## Contributing
 
