@@ -79,4 +79,4 @@ Sätteri, pass one to `satteriHeadingLinks` as its first argument.
 
 The emitted HTML and its classes are the public contract: stylesheets, themes
 and the client script all rely on them. They are listed in
-[Markup and classes](https://jaamd.org/docs/jaamd#markup-and-classes).
+[Markup and classes](https://jaamd.org/docs/jaamd/styling/markup).

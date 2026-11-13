@@ -257,9 +257,9 @@ const LLMS = join(DIST, 'llms.txt')
 const llms = existsSync(LLMS) ? readFileSync(LLMS, 'utf8') : ''
 
 check(
-    'llms.txt: the package README, with the markup contract',
-    llms.startsWith('# jaamd\n') && llms.includes('## Markup and classes'),
-    'tests/fixture/src/pages/llms.txt.ts did not emit the README; check its imports',
+    'llms.txt: the package documentation, with the markup contract',
+    llms.startsWith('# jaamd\n') && llms.includes('# Markup and classes'),
+    'tests/fixture/src/pages/llms.txt.ts did not emit the docs; check its glob',
 )
 
 // ─── report ──────────────────────────────────────────────────────────────────

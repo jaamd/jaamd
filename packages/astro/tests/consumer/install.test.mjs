@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { cpSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -7,6 +7,7 @@ import { cleanupTemporaryDirectories, jaamdOverride, run, temporaryDirectory } f
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const CORE_STYLES = join(HERE, '..', '..', '..', 'core', 'src', 'styles')
+const DOCS = join(HERE, '..', '..', 'docs')
 
 // pnpm: strict layout, so `@jaamd/core` is reachable only through `@jaamd/astro`.
 describe('a pnpm project that installed the packed tarballs', () => {
@@ -59,6 +60,14 @@ describe('a pnpm project that installed the packed tarballs', () => {
             dir.startsWith('@astrojs+markdown-satteri@'),
         )
         assert.equal(copies.length, 1, copies.join(', '))
+    })
+
+    test('the documentation is installed with the package', () => {
+        const installed = join(project, 'node_modules', '@jaamd', 'astro', 'docs')
+        const missing = readdirSync(DOCS, { recursive: true })
+            .filter((file) => file.endsWith('.md'))
+            .filter((file) => !existsSync(join(installed, file)))
+        assert.deepEqual(missing, [])
     })
 
     test('the client script is bundled', () => {

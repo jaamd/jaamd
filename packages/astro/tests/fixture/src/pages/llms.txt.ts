@@ -1,11 +1,15 @@
 import pkg from '../../../../package.json'
-import readme from '../../../../README.md?raw'
 
-/** The package README as plain text for language models: a markdown title and
- *  summary, then the README without its HTML header block. */
+const pages = import.meta.glob<string>('../../../../docs/**/*.md', { query: '?raw', import: 'default', eager: true })
+
+/** The package documentation as plain text for language models: a title and
+ *  summary, then every page in file order. */
 export const GET = () => {
-    const body = readme.slice(readme.indexOf('\n---\n') + 5).trimStart()
-    return new Response(`# jaamd\n\n> ${pkg.description}\n\n${body}`, {
+    const body = Object.keys(pages)
+        .toSorted()
+        .map((path) => pages[path].trim())
+        .join('\n\n')
+    return new Response(`# jaamd\n\n> ${pkg.description}\n\n${body}\n`, {
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     })
 }
