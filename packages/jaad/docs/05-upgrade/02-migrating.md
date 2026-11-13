@@ -1,7 +1,7 @@
 # Migrating
 
 Changes that need action, by the version you upgrade from. To upgrade, see
-[Upgrading](/docs/jaad/upgrade/upgrading).
+[Upgrading](01-upgrading.md).
 
 ## From @lancher-dev/jaad
 
@@ -88,7 +88,7 @@ defineJaadConfig({ title: 'My Project', tailwind: true })
 - Pages on a local layout keep their own `@import "tailwindcss";`.
 - `tailwindcss` and `@tailwindcss/vite` stay in your devDependencies.
 
-See [Styles](/docs/jaad/configurations/styles#tailwind).
+See [Styles](../04-configurations/05-styles.md#tailwind).
 
 ### Component classes
 

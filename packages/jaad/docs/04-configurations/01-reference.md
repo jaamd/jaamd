@@ -44,10 +44,10 @@ such as `/logo.svg`.
 | `ui`        | `object`            | `{}`       | Interface string overrides, per locale    |
 
 Locale directories under `docsDir` are detected on their own; `locales` only
-overrides that. See [Languages](/docs/jaad/configurations/i18n).
+overrides that. See [Languages](10-i18n.md).
 
 `sections` replaces `docsDir`. See
-[Sections](/docs/jaad/configurations/structure#sections).
+[Sections](03-structure.md#sections).
 
 To keep a landing page at `/`, mount documentation below it:
 
@@ -121,7 +121,7 @@ defineJaadConfig({
 The link is omitted when the git remote, branch or repository root cannot be
 resolved safely.
 
-With [sections](/docs/jaad/configurations/structure#sections), each one links
+With [sections](03-structure.md#sections), each one links
 to its own directory. A URL passed here applies to all of them, and `:path` is
 the file's path inside its section's directory.
 
@@ -158,11 +158,11 @@ defineJaadConfig({
 
 A named theme styles the interface, Markdown and code blocks. A `{ light,
 dark }` object changes only the Shiki code themes. See
-[Themes](/docs/jaad/configurations/themes) for available names and custom themes.
+[Themes](06-themes.md) for available names and custom themes.
 
 `tailwind: true` enables Tailwind utilities with JAAD's tokens on documentation
 pages, `Page` pages and a custom `DocsFrame`; see
-[Styles](/docs/jaad/configurations/styles#tailwind).
+[Styles](05-styles.md#tailwind).
 
 `appearance: "auto"` follows the reader's preference and shows the switcher.
 `"light"` and `"dark"` pin the appearance and remove it.
@@ -203,4 +203,4 @@ defineJaadConfig({
 
 For full control, use a regular Astro configuration and add `jaad(config)` to
 its integrations, as shown in
-[Existing Astro project](/docs/jaad/getting-started/installation#existing-astro-project).
+[Existing Astro project](../02-getting-started/01-installation.md#existing-astro-project).

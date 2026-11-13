@@ -92,7 +92,7 @@ icon is what says so. Clicking it opens the same palette.
 This is the site chrome, not the reading layout: there is no sidebar and no
 table of contents, because a page outside the documentation has no place in
 its navigation. To restructure documentation pages themselves, use
-[Advanced layout](/docs/jaad/configurations/advanced-layout).
+[Advanced layout](09-advanced-layout.md).
 
 ## Matching the documentation's layout
 
@@ -101,7 +101,7 @@ its navigation. To restructure documentation pages themselves, use
 - `.jaad-main`: vertical margin and horizontal padding of the main landmark.
   `bare` swaps it for `.jaad-main-bare`, which has none.
 - Layout tokens (`--jaad-content-width`, `--jaad-page-padding`, …) are listed
-  in [Styles](/docs/jaad/configurations/styles).
+  in [Styles](05-styles.md).
 
 ```astro
 <Page title="Changelog">
@@ -112,4 +112,4 @@ its navigation. To restructure documentation pages themselves, use
 ## Tailwind
 
 With `tailwind: true`, utilities on `Page` pages use JAAD's tokens. See
-[Styles](/docs/jaad/configurations/styles#tailwind).
+[Styles](05-styles.md#tailwind).

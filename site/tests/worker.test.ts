@@ -5,9 +5,9 @@ import worker, { markdownSource, quality } from '../worker.ts'
 const FILES: Record<string, string> = {
     '/docs/jaad/getting-started/installation/': '<html>installation</html>',
     '/docs/jaad/getting-started/installation.md': '# Installation',
-    '/docs/jaad/overview.md': '# Overview',
-    '/docs/jaad/search-index.json': '[]',
-    '/llms.txt': '# jaamd',
+    '/docs/jaad/overview.md': '# JAAD',
+    '/docs/jaamd/overview.md': '# JAAMD',
+    '/docs/search-index.json': '{}',
 }
 
 const env = {
@@ -31,12 +31,6 @@ test('quality reads q values and defaults to 1', () => {
     assert.equal(quality('text/html', 'text/markdown'), 0)
 })
 
-test('/docs redirects permanently to the jaamd documentation', async () => {
-    const response = await get('/docs/')
-    assert.equal(response.status, 301)
-    assert.equal(response.headers.get('Location'), 'https://jaamd.org/docs/jaamd')
-})
-
 test('a browser gets the HTML page', async () => {
     const response = await get('/docs/jaad/getting-started/installation/', 'text/html,application/xhtml+xml,*/*;q=0.8')
     assert.equal(await response.text(), '<html>installation</html>')
@@ -50,15 +44,16 @@ test('an agent asking for Markdown gets the page source', async () => {
     assert.equal(await response.text(), '# Installation')
 })
 
-test('the opening pages map to their own Markdown', async () => {
-    assert.equal(await (await get('/docs/jaad', 'text/markdown')).text(), '# Overview')
-    assert.equal(await (await get('/docs/jaamd/', 'text/markdown')).text(), '# jaamd')
+test('the section openers map to their own Markdown', async () => {
+    assert.equal(await (await get('/docs', 'text/markdown')).text(), '# JAAMD')
+    assert.equal(await (await get('/docs/jaamd/', 'text/markdown')).text(), '# JAAMD')
+    assert.equal(await (await get('/docs/jaad', 'text/markdown')).text(), '# JAAD')
 })
 
 test('files keep their own type when Markdown is preferred', async () => {
-    assert.equal(markdownSource('/docs/jaad/search-index.json'), null)
-    const response = await get('/docs/jaad/search-index.json', 'text/markdown')
-    assert.equal(await response.text(), '[]')
+    assert.equal(markdownSource('/docs/search-index.json'), null)
+    const response = await get('/docs/search-index.json', 'text/markdown')
+    assert.equal(await response.text(), '{}')
 })
 
 test('a missing page answers an agent in Markdown', async () => {

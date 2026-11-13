@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, writeFileSync, readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { after, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -61,7 +61,20 @@ test('the scaffolder produces a project that builds', { timeout: 600_000 }, () =
     assert.ok(built.includes('/index.html'), 'no docs index')
     assert.ok(built.includes('/introduction/index.html'), 'no compatibility redirect for the sample page')
     const agents = readFileSync(join(project, 'AGENTS.md'), 'utf8')
-    assert.match(agents, /jaamd\.org\/docs\/jaad/, 'no link to the documentation')
+    const guides = [...agents.matchAll(/`(node_modules\/@jaamd\/jaad\/docs\/[^`]+\.md)`/g)].map((m) => m[1])
+    assert.ok(guides.length > 0, 'AGENTS.md lists no guide in node_modules')
+    assert.deepEqual(
+        guides.filter((guide) => !existsSync(join(project, guide))),
+        [],
+        'AGENTS.md cites a guide the package does not install',
+    )
+    assert.deepEqual(
+        readdirSync(join(PKG, 'docs'), { recursive: true })
+            .filter((file) => file.endsWith('.md'))
+            .filter((file) => !existsSync(join(project, 'node_modules', '@jaamd', 'jaad', 'docs', file))),
+        [],
+        'a documentation page is missing from the tarball',
+    )
     assert.match(agents, /astro dev --background/)
     assert.match(
         readFileSync(join(project, 'CLAUDE.md'), 'utf8'),
@@ -253,6 +266,16 @@ test('the version the scaffolder installs is the one being published', () => {
     const published = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version
 
     assert.equal(pinned, published, 'create-jaad pins a stale @jaamd/jaad')
+})
+
+test('every guide the agent files cite is a page of the docs', () => {
+    for (const template of ['docs', 'site']) {
+        const agents = readFileSync(join(CREATE_PKG, 'templates', template, 'AGENTS.md'), 'utf8')
+        const missing = [...agents.matchAll(/`node_modules\/@jaamd\/jaad\/(docs\/[^`]+\.md)`/g)]
+            .map((m) => m[1])
+            .filter((guide) => !existsSync(join(PKG, guide)))
+        assert.deepEqual(missing, [], `templates/${template}/AGENTS.md`)
+    }
 })
 
 test('the published scaffolder carries its templates', () => {

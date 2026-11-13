@@ -45,5 +45,5 @@ bun add @jaamd/jaad@latest
 
 :::
 
-Then run a build and read [Migrating](/docs/jaad/upgrade/migrating) for the versions
+Then run a build and read [Migrating](02-migrating.md) for the versions
 you skipped.

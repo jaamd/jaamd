@@ -74,7 +74,7 @@ seeds.
 
 ## Sharing the theme with your own pages
 
-[Pages of your own](/docs/jaad/configurations/custom-pages) use your layout, not
+[Pages of your own](08-custom-pages.md) use your layout, not
 JAAD's. Two values keep both halves of a site in step:
 
 | What                      | Value                         |

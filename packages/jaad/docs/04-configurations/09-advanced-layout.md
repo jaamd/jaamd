@@ -129,4 +129,4 @@ the current page.
 `DocsNavItem` and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
-[`src/jaad.css`](/docs/jaad/configurations/styles) instead.
+[`src/jaad.css`](05-styles.md) instead.

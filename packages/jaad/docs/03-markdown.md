@@ -2,7 +2,7 @@
 
 JAAD supports [CommonMark](https://commonmark.org/help/) and
 [GitHub Flavored Markdown](https://github.github.com/gfm/).
-[JAAMD](/docs/jaamd) adds the features below
+[JAAMD](../../astro/docs/00-overview.md) adds the features below
 automatically.
 
 ## Table of contents

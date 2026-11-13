@@ -61,7 +61,7 @@ label: FAQ
 Without `title`, JAAD uses the first `# Heading`, then the filename.
 
 `translationKey` pairs a page with its translations when their slugs differ.
-See [Languages](/docs/jaad/configurations/i18n).
+See [Languages](10-i18n.md).
 
 ## Ordering and drafts
 
@@ -92,7 +92,7 @@ by the site description.
 structured data, and they rank a page in search below its chapter and above
 its body. They are metadata, not a visible list: JAAD renders nothing for
 them, though a frame of your own can, through
-[`page.data`](/docs/jaad/configurations/advanced-layout).
+[`page.data`](09-advanced-layout.md).
 
 `author` becomes `<meta name="author">` and the structured-data author.
 

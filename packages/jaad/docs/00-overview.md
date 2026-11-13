@@ -58,6 +58,6 @@ docs/
     01-setup.md
 ```
 
-Continue with [Installation](/docs/jaad/getting-started/installation), learn how to
-[create pages](/docs/jaad/getting-started/creating-pages), or open the
-[configuration reference](/docs/jaad/configurations/reference).
+Continue with [Installation](02-getting-started/01-installation.md), learn how to
+[create pages](02-getting-started/03-creating-pages.md), or open the
+[configuration reference](04-configurations/01-reference.md).
