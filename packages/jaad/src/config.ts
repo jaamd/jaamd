@@ -21,6 +21,8 @@ export const jaadConfigSchema = z.object({
             message: 'logo must be a public url, such as "/logo.svg"',
         })
         .optional(),
+    /** Where the site name in the header leads: the site root, or another site. */
+    homeLink: z.string().default('/'),
 
     docsDir: z.string().default('./docs'),
     routeBase: z.string().default('/'),
