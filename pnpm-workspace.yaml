@@ -2,6 +2,7 @@ packages:
     - 'packages/*'
     - 'packages/*/tests/fixture'
     - 'site'
+    - 'docs'
 
 allowBuilds:
     '@parcel/watcher': true

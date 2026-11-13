@@ -21,7 +21,8 @@ Each check runs per package as well, for example `pnpm --filter @jaamd/jaad test
 
 Each package's documentation is the markdown in its `docs/` folder, published
 with it: `packages/astro/docs/` for JAAMD, `packages/jaad/docs/` for JAAD. The
-site renders both, one section each. Link between pages by file, relative to
+`docs/` project renders both as docs.jaamd.org, one section each: preview it
+with `pnpm --filter docs dev`. Link between pages by file, relative to
 the page you are writing, even across the two packages; the build fails on a
 link to a file that does not exist.
 
