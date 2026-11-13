@@ -28,6 +28,14 @@
         @apply border-primary bg-primary/10 text-primary -ml-px border-l-2 pl-2.75 font-semibold;
     }
 
+    .docs-sidebar-section:not(:first-child) {
+        @apply border-border/60 mt-6 border-t pt-6;
+    }
+
+    .docs-sidebar-section-title {
+        @apply text-foreground-bright mb-3 px-3 font-serif text-xl font-light italic;
+    }
+
     .docs-sidebar-chapter {
         @apply mt-5 mb-5;
     }

@@ -56,12 +56,16 @@ defineJaadConfig({
 ```
 
 - The key is the URL segment: `api/01-client.md` is served at `/api/client`.
-- `label` names the section in the header; it defaults to the key.
+- `label` names the section; it defaults to the key.
 - A directory can sit outside the project, such as the `docs/` of a package.
   No section's directory can be inside another's.
-- Sections replace `docsDir`, and appear in the order they are declared.
-- The header links to every section. The sidebar and the previous and next
-  links stay inside the current one.
+- Sections appear in the order they are declared. `docsDir` is read
+  alongside them only when you set it: its pages sit outside every section,
+  come first, and the first of them opens the docs. Its directory cannot hold
+  a section's.
+- The sidebar lists every section, under its label, with its pages and
+  chapters below. Previous and next links run on from one section into the
+  next.
 - The first page of the first section opens at `routeBase`; the first page of
   every other section opens at the section's own URL.
 - The rules above apply inside each section: one level of chapters, unique

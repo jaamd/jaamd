@@ -13,6 +13,28 @@ interface Props {
 
 const { groups, headings, locale } = Astro.props
 const t = ui(locale)
+
+/** Option groups cannot nest: a chapter inside a section is named after both. */
+const options = groups.flatMap((group) => {
+    const entries = group.type === 'section' ? group.entries : [group]
+    const prefix = group.type === 'section' ? group.label : null
+    const loose = entries.flatMap((entry) => (entry.type === 'page' ? [entry.item] : []))
+    return [
+        ...(loose.length > 0 ? [{ label: prefix, items: loose }] : []),
+        ...entries.flatMap((entry) =>
+            entry.type === 'chapter'
+                ? [
+                      {
+                          label: [prefix, formatChapterTitle(entry.chapter) || entry.chapter]
+                              .filter(Boolean)
+                              .join(' · '),
+                          items: entry.items,
+                      },
+                  ]
+                : [],
+        ),
+    ]
+})
 ---
 
 <div class="docs-mobile-nav">
@@ -21,19 +43,21 @@ const t = ui(locale)
             {t('nav.selectPage')}
         </label>
         <select id="page-select" class="docs-select-field">
-            {groups.map((group) =>
-                group.type === 'page' ? (
-                    <option value={group.item.href} selected={group.item.isActive}>
-                        {group.item.title}
-                    </option>
-                ) : (
-                    <optgroup label={formatChapterTitle(group.chapter) || group.chapter}>
-                        {group.items.map((page) => (
+            {options.map((option) =>
+                option.label ? (
+                    <optgroup label={option.label}>
+                        {option.items.map((page) => (
                             <option value={page.href} selected={page.isActive}>
                                 {page.title}
                             </option>
                         ))}
                     </optgroup>
+                ) : (
+                    option.items.map((page) => (
+                        <option value={page.href} selected={page.isActive}>
+                            {page.title}
+                        </option>
+                    ))
                 ),
             )}
         </select>

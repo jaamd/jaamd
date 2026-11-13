@@ -142,6 +142,15 @@ export function validateDocsStructure(pages: DocsPageLike[], locale?: string): v
         }
     }
 
+    // A page outside the sections cannot take a section's url.
+    const keys = new Set(pages.flatMap((page) => page.section ?? []))
+    for (const page of pages) {
+        const first = docSlug(page).split('/')[0]
+        if (!page.section && keys.has(first)) {
+            issues.push(`${named(docPath(page))} resolves into section /${first}`)
+        }
+    }
+
     const byKey = new Map<string, string[]>()
     for (const page of pages) {
         const key = page.data?.translationKey

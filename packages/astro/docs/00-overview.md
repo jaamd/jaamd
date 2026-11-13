@@ -1,3 +1,7 @@
+---
+label: Overview
+---
+
 # JAAMD
 
 **Just Another Astro Markdown**: markdown plugins, client-side enhancements and

@@ -29,9 +29,14 @@ their own layout, styles and metadata.
 | `description` | `string` | `package.json` | Site description                                  |
 | `lang`        | `string` | `"en"`         | Site language, and the default when localised     |
 | `logo`        | `string` | none           | Public path or URL shown instead of the site name |
+| `homeLink`    | `string` | `"/"`          | Where the site name in the header leads           |
 
 A source file path passed to `logo` produces a build error. Use a public path
 such as `/logo.svg`.
+
+When the documentation is part of a larger site, point `homeLink` at that
+site's home: `homeLink: "https://example.dev"`. A path such as `/` gets
+Astro's `base`.
 
 ## Content
 
@@ -46,8 +51,8 @@ such as `/logo.svg`.
 Locale directories under `docsDir` are detected on their own; `locales` only
 overrides that. See [Languages](10-i18n.md).
 
-`sections` replaces `docsDir`. See
-[Sections](03-structure.md#sections).
+With `sections`, `docsDir` is read only when set, for pages outside every
+section. See [Sections](03-structure.md#sections).
 
 To keep a landing page at `/`, mount documentation below it:
 

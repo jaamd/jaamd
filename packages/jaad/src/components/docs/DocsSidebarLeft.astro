@@ -1,5 +1,5 @@
 ---
-import type { DocsNavGroup } from '../../navigation.ts'
+import type { DocsNavEntry, DocsNavGroup } from '../../navigation.ts'
 import { ui } from '../../docs-config.ts'
 import { formatChapterTitle } from '../../utils/docs.ts'
 
@@ -10,40 +10,52 @@ interface Props {
 
 const { groups, locale } = Astro.props
 const t = ui(locale)
+
+/** The pages outside every section, then one block per section. */
+const loose = groups.filter((group): group is DocsNavEntry => group.type !== 'section')
+const blocks = [
+    ...(loose.length > 0 ? [{ label: null, entries: loose }] : []),
+    ...groups.flatMap((group) => (group.type === 'section' ? [{ label: group.label, entries: group.entries }] : [])),
+]
 ---
 
 <aside class="docs-sidebar-left jaad-sidebar">
     <nav aria-label={t('nav.documentation')}>
-        {groups.map((group) =>
-            group.type === 'page' ? (
-                <div class="docs-sidebar-page">
-                    <a
-                        href={group.item.href}
-                        class="docs-sidebar-link"
-                        aria-current={group.item.isActive ? 'page' : undefined}
-                    >
-                        {group.item.title}
-                    </a>
-                </div>
-            ) : (
-                <div class="docs-sidebar-chapter">
-                    <h3 class="docs-sidebar-chapter-title">{formatChapterTitle(group.chapter)}</h3>
-                    <ul class="docs-sidebar-chapter-list">
-                        {group.items.map((item) => (
-                            <li>
-                                <a
-                                    href={item.href}
-                                    class="docs-sidebar-sublink"
-                                    aria-current={item.isActive ? 'page' : undefined}
-                                >
-                                    {item.title}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ),
-        )}
+        {blocks.map((block) => (
+            <div class:list={[block.label && 'docs-sidebar-section']}>
+                {block.label && <p class="docs-sidebar-section-title">{block.label}</p>}
+                {block.entries.map((entry) =>
+                    entry.type === 'page' ? (
+                        <div class="docs-sidebar-page">
+                            <a
+                                href={entry.item.href}
+                                class="docs-sidebar-link"
+                                aria-current={entry.item.isActive ? 'page' : undefined}
+                            >
+                                {entry.item.title}
+                            </a>
+                        </div>
+                    ) : (
+                        <div class="docs-sidebar-chapter">
+                            <h3 class="docs-sidebar-chapter-title">{formatChapterTitle(entry.chapter)}</h3>
+                            <ul class="docs-sidebar-chapter-list">
+                                {entry.items.map((item) => (
+                                    <li>
+                                        <a
+                                            href={item.href}
+                                            class="docs-sidebar-sublink"
+                                            aria-current={item.isActive ? 'page' : undefined}
+                                        >
+                                            {item.title}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ),
+                )}
+            </div>
+        ))}
     </nav>
 </aside>
 

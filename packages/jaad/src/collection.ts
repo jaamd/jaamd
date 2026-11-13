@@ -1,6 +1,7 @@
 import type { DocsEntry } from './@types/docs.ts'
 import type { Locale } from './locales.ts'
 import { getCollection } from 'astro:content'
+import config from 'virtual:jaad/config'
 import { DEFAULT_LOCALE, LOCALES, SECTIONS, docsUrls, prefixedCodes } from './docs-config.ts'
 import { docsPageHref } from './urls.ts'
 import {
@@ -47,8 +48,8 @@ export async function getSortedDocsPages(locale: string = DEFAULT_LOCALE): Promi
     const hit = cached.get(key)
     if (import.meta.env.PROD && hit) return hit
 
-    // One collection per section, or the only one.
-    const sections = KEYS.length > 0 ? KEYS : [undefined]
+    // `docsDir` when in use, then one collection per section.
+    const sections = [...(config.docsDirInUse ? [undefined] : []), ...KEYS]
     const collections = await Promise.all(
         sections.map(async (section) => {
             const entries = await getCollection(collectionName(section) as 'docsPages')

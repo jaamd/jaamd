@@ -192,6 +192,11 @@ test('a logo has to be a public url, not a source path', () => {
     assert.throws(() => bare({ logo: './src/logo.svg' }), /public url/)
 })
 
+test('the site name leads to the site root unless told otherwise', () => {
+    assert.equal(bare({}).homeLink, '/')
+    assert.equal(bare({ homeLink: 'https://example.dev' }).homeLink, 'https://example.dev')
+})
+
 test('a social image is inferred only when the public asset exists', (t) => {
     const cwd = mkdtempSync(join(tmpdir(), 'jaad-config-'))
     t.after(() => {

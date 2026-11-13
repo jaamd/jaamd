@@ -23,7 +23,9 @@ import {
 } from '../../src/utils/docs.ts'
 
 const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) =>
-    navigation.groups.flatMap((section) => (section.type === 'page' ? [section.item] : section.items))
+    navigation.groups.flatMap((group) =>
+        group.type === 'page' ? [group.item] : group.type === 'chapter' ? group.items : [],
+    )
 
 // ── Numeric prefixes: the ordering convention the whole product rests on ──────
 
@@ -259,7 +261,13 @@ test('root pages and chapters interleave by number', () => {
     )
 
     assert.deepEqual(
-        navigation.groups.map((s) => (s.type === 'page' ? s.item.title : `${s.chapter}(${String(s.items.length)})`)),
+        navigation.groups.map((group) =>
+            group.type === 'page'
+                ? group.item.title
+                : group.type === 'chapter'
+                  ? `${group.chapter}(${String(group.items.length)})`
+                  : group.label,
+        ),
         ['Intro', 'guides(2)', 'Changelog'],
     )
 })
