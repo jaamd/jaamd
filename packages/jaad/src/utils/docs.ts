@@ -208,27 +208,37 @@ export function extractTitleFromMarkdown(body: string): string | null {
     return null
 }
 
-/** Skips fenced blocks, so headings written as code samples stay out of the TOC. */
 /** Opening minus closing `tag` elements on one line. */
 function tagBalance(line: string, tag: string): number {
     const count = (re: RegExp) => line.match(re)?.length ?? 0
     return count(new RegExp(`<${tag}[\\s>]`, 'gi')) - count(new RegExp(`</${tag}>`, 'gi'))
 }
 
-export function extractHeadingsFromMarkdown(markdown: string): DocsHeading[] {
-    const headings: DocsHeading[] = []
-    // Per page, like the renderer: repeated headings get -1, -2 suffixes.
+/** A stretch of a page: the markdown under one h2 or h3, or before the first. */
+export interface DocsChunk {
+    heading: DocsHeading | null
+    markdown: string
+}
+
+/** Cuts a page at its h2 and h3 headings. Headings inside fenced code or a
+ *  `data-toc-ignore` element stay in the text of the chunk they sit in. */
+export function splitMarkdownByHeadings(markdown: string): DocsChunk[] {
+    const chunks: DocsChunk[] = [{ heading: null, markdown: '' }]
+    // Per page and across every level, like the renderer: repeats get -1, -2.
     const slugger = new GithubSlugger()
     let insideFence = false
     // The open `data-toc-ignore` element, if any.
     let ignored: { tag: string; depth: number } | null = null
 
     for (const line of markdown.split('\n')) {
-        if (line.match(/^(`{3,}|~{3,})/)) {
-            insideFence = !insideFence
+        const chunk = chunks[chunks.length - 1]
+        const append = () => (chunk.markdown += `${line}\n`)
+
+        if (/^(`{3,}|~{3,})/.test(line)) insideFence = !insideFence
+        if (insideFence || /^(`{3,}|~{3,})/.test(line)) {
+            append()
             continue
         }
-        if (insideFence) continue
 
         if (ignored) {
             ignored.depth += tagBalance(line, ignored.tag)
@@ -239,16 +249,22 @@ export function extractHeadingsFromMarkdown(markdown: string): DocsHeading[] {
             if (tag && depth > 0) ignored = { tag, depth }
         }
 
-        const match = line.match(/^(#{2,3})\s+(.+)$/)
-        if (!match) continue
-        const depth = match[1].length as 2 | 3
-        const text = match[2].trim()
+        const match = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/)
         // Slugged even when skipped, so later duplicates keep the renderer's ids.
-        const slug = slugger.slug(text)
-        if (!ignored) headings.push({ depth, text, slug })
+        const slug = match ? slugger.slug(match[2]) : ''
+        const depth = match?.[1].length ?? 0
+        if (match && !ignored && (depth === 2 || depth === 3)) {
+            chunks.push({ heading: { depth: depth as 2 | 3, text: match[2], slug }, markdown: '' })
+        } else if (depth !== 1) {
+            append()
+        }
     }
 
-    return headings
+    return chunks
+}
+
+export function extractHeadingsFromMarkdown(markdown: string): DocsHeading[] {
+    return splitMarkdownByHeadings(markdown).flatMap((chunk) => (chunk.heading ? [chunk.heading] : []))
 }
 
 export interface DocsPageLike {
@@ -278,16 +294,6 @@ export function docTranslationKey(page: DocsPageLike): string {
 /** The name navigation uses. */
 export function docLabel(page: DocsPageLike): string {
     return page.data?.label ?? docTitle(page)
-}
-
-// ── Search index ────────────────────────────────────────────────────────────
-
-export interface DocsSearchEntry {
-    title: string
-    slug: string
-    chapter: string | null
-    keywords: string[]
-    body: string
 }
 
 /** Strip markdown (and inline HTML) syntax to plain text for search indexing. */
@@ -324,14 +330,4 @@ export function extractDescription(body: string, title: string, maxLength: numbe
     const truncated = firstParagraph.slice(0, maxLength)
     const lastSpace = truncated.lastIndexOf(' ')
     return `${truncated.slice(0, lastSpace > 0 ? lastSpace : maxLength)}…`
-}
-
-export function buildSearchIndex(sortedPages: DocsPageLike[]): DocsSearchEntry[] {
-    return sortedPages.map((page, index) => ({
-        title: docTitle(page),
-        slug: docCanonicalSlug(page, index, sortedPages),
-        chapter: formatChapterTitle(parseDocCollectionId(docPath(page)).chapter),
-        keywords: page.data?.keywords ?? [],
-        body: stripMarkdown(page.body || ''),
-    }))
 }

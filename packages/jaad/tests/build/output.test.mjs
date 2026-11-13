@@ -71,8 +71,24 @@ test('an unset footer renders the credit, not its placeholder', () => {
 
 test('every docs page carries its search index and llms entry', () => {
     const index = JSON.parse(page('docs/search-index.json'))
-    assert.ok(index.length > 0, 'search index is empty')
+    assert.ok(index.pages.length > 0, 'search index is empty')
     assert.match(page('docs/llms.txt'), /^# /)
+})
+
+test('every heading in the search index is an id on its page', () => {
+    const index = JSON.parse(page('docs/search-index.json'))
+    const missing = index.entries
+        .filter((entry) => entry.anchor)
+        .map((entry) => `${index.pages[entry.page].href.slice(1)}/index.html#${entry.anchor}`)
+        .filter((target) => {
+            const [file, anchor] = target.split('#')
+            return !page(file).includes(`id="${anchor}"`)
+        })
+    assert.ok(
+        index.entries.some((entry) => entry.anchor),
+        'no heading reached the index',
+    )
+    assert.deepEqual(missing, [])
 })
 
 test('the sidebar follows the numeric prefixes', () => {

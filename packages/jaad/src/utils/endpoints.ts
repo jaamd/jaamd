@@ -2,18 +2,11 @@ import config from 'virtual:jaad/config'
 import { getSortedDocsPages } from '../collection.ts'
 import { SECTIONS, docsUrls } from '../docs-config.ts'
 import { docsMarkdownHref } from '../urls.ts'
-import {
-    buildSearchIndex,
-    docTitle,
-    extractDescription,
-    formatChapterTitle,
-    docSlug,
-    parseDocCollectionId,
-    docPath,
-} from './docs.ts'
+import { docTitle, extractDescription, formatChapterTitle, docSlug, parseDocCollectionId, docPath } from './docs.ts'
+import { buildSearchIndex } from './search-index.ts'
 
 export async function searchIndexResponse(locale?: string): Promise<Response> {
-    const index = buildSearchIndex(await getSortedDocsPages(locale))
+    const index = buildSearchIndex(await getSortedDocsPages(locale), SECTIONS, docsUrls(locale))
 
     return new Response(JSON.stringify(index), {
         headers: { 'Content-Type': 'application/json; charset=utf-8' },

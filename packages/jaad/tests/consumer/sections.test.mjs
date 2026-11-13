@@ -152,8 +152,20 @@ export default defineJaadConfig({
 
     test('the raw markdown and the search index use the section urls', () => {
         assert.ok(existsSync(join(dist, 'api/server.md')))
-        const slugs = JSON.parse(page('search-index.json')).map((entry) => entry.slug)
-        assert.deepEqual(slugs, ['', 'guide/setup/install', 'api', 'api/server'])
+        const index = JSON.parse(page('search-index.json'))
+        assert.deepEqual(
+            index.pages.map((entry) => [entry.href, entry.section]),
+            [
+                ['/', 'guide'],
+                ['/guide/setup/install', 'guide'],
+                ['/api', 'api'],
+                ['/api/server', 'api'],
+            ],
+        )
+        assert.deepEqual(
+            index.sections.map((section) => section.label),
+            ['The Guide', 'Api'],
+        )
     })
 
     describe('localised, on unified, with a section that has no pages', () => {

@@ -48,8 +48,24 @@
         @apply bg-background-secondary text-foreground-muted shrink-0 cursor-pointer rounded px-1.5 py-0.5 text-xs;
     }
 
+    .jaad-search-filters {
+        @apply border-border flex flex-wrap gap-1.5 border-b px-4 py-2;
+    }
+
+    .jaad-search-filter {
+        @apply border-border text-foreground-muted hover:text-foreground cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors;
+    }
+
+    .jaad-search-filter[aria-pressed='true'] {
+        @apply border-primary/40 bg-primary/10 text-foreground-bright;
+    }
+
     .jaad-search-results {
-        @apply max-h-80 overflow-y-auto p-2;
+        @apply max-h-96 overflow-y-auto p-2;
+    }
+
+    .jaad-search-group {
+        @apply text-foreground-muted px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase;
     }
 
     .jaad-search-footer {
@@ -70,6 +86,10 @@
 
     .jaad-search-result[aria-selected='true'] {
         @apply bg-primary/10 text-foreground-bright;
+    }
+
+    .jaad-search-result-heading {
+        @apply border-border ml-3 rounded-l-none border-l py-2;
     }
 
     .jaad-search-result-head {

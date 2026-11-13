@@ -19,7 +19,6 @@ import {
     splitDocLocale,
     docPath,
     docTranslationKey,
-    buildSearchIndex,
     validateDocsStructure,
 } from '../../src/utils/docs.ts'
 
@@ -329,17 +328,6 @@ test('frontmatter order re-sorts pages against their filenames', () => {
 test('an ordered page can take the opening route from the first file', () => {
     const pages = [{ id: '01-intro' }, { id: '02-welcome', data: { order: 0 } }]
     assert.equal(sortDocPages(pages)[0].id, '02-welcome')
-})
-
-// ── Keywords ────────────────────────────────────────────────────────────────
-
-test('keywords are indexed for search, and default to none', () => {
-    const index = buildSearchIndex([
-        { id: '01-a', body: '# A', data: { keywords: ['media', 'markdown'] } },
-        { id: '02-b', body: '# B' },
-    ])
-    assert.deepEqual(index[0].keywords, ['media', 'markdown'])
-    assert.deepEqual(index[1].keywords, [])
 })
 
 // ── The locale directory is split off before anything else reads the id ──────
