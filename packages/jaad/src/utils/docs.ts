@@ -2,9 +2,15 @@ import type { DocsHeadings, DocsPageData, ParsedDocsCollectionId } from '../@typ
 import GithubSlugger, { slug as githubSlug } from 'github-slugger'
 import { ucfirst } from './helpers.ts'
 
-/** The id without its locale directory: what routing and ordering read. */
+/** The id without its locale and section: what chapters and ordering read. */
 export function routedId(page: DocsPageLike): string {
     return page.localeId ?? page.id
+}
+
+/** The page's path below the docs mount: its section, then its clean slug. */
+export function docSlug(page: DocsPageLike): string {
+    const slug = getCleanSlug(routedId(page))
+    return page.section ? `${page.section}/${slug}` : slug
 }
 
 /** "it/02-guides/01-setup" becomes locale "it" and "02-guides/01-setup". */
@@ -15,6 +21,16 @@ export function splitDocLocale(id: string, locales: string[]): { locale: string 
     const first = id.slice(0, slash)
     if (!locales.includes(first)) return { locale: null, id }
     return { locale: first, id: id.slice(slash + 1) }
+}
+
+/** "jaad/02-guides/01-setup" becomes section "jaad" and "02-guides/01-setup". */
+export function splitDocSection(id: string, sections: string[]): { section: string | null; id: string } {
+    const slash = id.indexOf('/')
+    if (slash === -1) return { section: null, id }
+
+    const first = id.slice(0, slash)
+    if (!sections.includes(first)) return { section: null, id }
+    return { section: first, id: id.slice(slash + 1) }
 }
 
 /** Matches a numeric order prefix, e.g. "01-" or "123-" */
@@ -48,12 +64,12 @@ export function parseDocCollectionId(id: string): ParsedDocsCollectionId {
     return { order, orderChapter, chapter, slug, title: slugToTitle(slug) }
 }
 
-/** Chapter order first, then file order within it. Root pages interleave with
- *  chapters by their own number. */
+/** Section order first, then chapter order, then file order within the
+ *  chapter. Root pages interleave with chapters by their own number. */
 export function sortDocPages<T extends DocsPageLike>(pages: T[]): T[] {
     return pages
-        .map((page) => ({ page, ...docOrder(page) }))
-        .toSorted((a, b) => a.primary - b.primary || a.secondary - b.secondary)
+        .map((page) => ({ page, section: page.sectionOrder ?? 0, ...docOrder(page) }))
+        .toSorted((a, b) => a.section - b.section || a.primary - b.primary || a.secondary - b.secondary)
         .map((entry) => entry.page)
 }
 
@@ -85,6 +101,18 @@ export function getDocCollectionId(filePath: string): string {
         .join('/')
 }
 
+/** The collection holding the docs, or the pages of one section. */
+export function collectionName(section?: string): string {
+    return section ? `docsPages-${section}` : 'docsPages'
+}
+
+/** The id of a file given relative to its docs directory: its locale, the
+ *  section that directory is, then its path. */
+export function collectionIdFor(filePath: string, section: string | undefined, locales: string[]): string {
+    const { locale, id } = splitDocLocale(getDocCollectionId(filePath), locales)
+    return [locale, section, id].filter(Boolean).join('/')
+}
+
 /** Fail before route generation when the file tree cannot produce one clear
  * navigation and URL for every page. */
 export function validateDocsStructure(pages: DocsPageLike[], locale?: string): void {
@@ -94,20 +122,24 @@ export function validateDocsStructure(pages: DocsPageLike[], locale?: string): v
     // Messages name the file on disk, locale directory included.
     const named = (id: string) => (locale ? `${locale}/${id}` : id)
 
-    for (const id of pages.map(routedId).toSorted()) {
-        const parts = id.split('/')
+    // Within a section, like `id`; across them, the section is part of the name.
+    const inSection = (page: DocsPageLike, id: string) => (page.section ? `${page.section}/${id}` : id)
+
+    const byId = pages.map((page) => ({ page, id: inSection(page, routedId(page)) }))
+    for (const { page, id } of byId.toSorted((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+        const parts = routedId(page).split('/')
         if (parts.length > 2) {
             issues.push(`${named(id)}: only one chapter directory is supported inside docs/`)
         }
 
-        const slug = getCleanSlug(id)
+        const slug = docSlug(page)
         const ids = idsBySlug.get(slug) ?? []
         ids.push(id)
         idsBySlug.set(slug, ids)
 
         if (parts.length === 2) {
-            const directory = parts[0]
-            const chapter = getCleanSlug(directory)
+            const directory = inSection(page, parts[0])
+            const chapter = inSection(page, getCleanSlug(parts[0]))
             const directories = directoriesByChapter.get(chapter) ?? new Set()
             directories.add(directory)
             directoriesByChapter.set(chapter, directories)
@@ -125,7 +157,7 @@ export function validateDocsStructure(pages: DocsPageLike[], locale?: string): v
         const key = page.data?.translationKey
         if (!key) continue
         const ids = byKey.get(key) ?? []
-        ids.push(routedId(page))
+        ids.push(inSection(page, routedId(page)))
         byKey.set(key, ids)
     }
     for (const [key, ids] of byKey) {
@@ -145,9 +177,12 @@ export function validateDocsStructure(pages: DocsPageLike[], locale?: string): v
     }
 }
 
-/** The opening page owns routeBase; every later page keeps its named slug. */
-export function getCanonicalDocSlug(page: DocsPageLike, index: number): string {
-    return index === 0 ? '' : getCleanSlug(routedId(page))
+/** The opening page owns routeBase and the first page of a later section owns
+ *  the section; every other page keeps its named slug. */
+export function getCanonicalDocSlug(page: DocsPageLike, index: number, sortedPages: DocsPageLike[]): string {
+    if (index === 0) return ''
+    if (page.section && sortedPages[index - 1]?.section !== page.section) return page.section
+    return docSlug(page)
 }
 
 /** Decodes percent-escapes, so "detail_%26_summary" → "Detail & Summary". */
@@ -218,8 +253,12 @@ export function extractHeadingsFromMarkdown(markdown: string): DocsHeadings[] {
 
 export interface DocsPageLike {
     id: string
-    /** Set when the docs are localised; the id without its locale directory. */
+    /** The id without its locale directory and its section. */
     localeId?: string
+    /** Set when the docs are split into sections. */
+    section?: string
+    /** Position of the section among the declared ones. */
+    sectionOrder?: number
     body?: string
     data?: Partial<DocsPageData>
 }
@@ -235,7 +274,7 @@ export function docTitle(page: DocsPageLike): string {
 
 /** What pairs a page with its translations: the declared key, or the slug. */
 export function docTranslationKey(page: DocsPageLike): string {
-    return page.data?.translationKey ?? getCleanSlug(routedId(page))
+    return page.data?.translationKey ?? docSlug(page)
 }
 
 /** The name navigation uses. */
@@ -292,7 +331,7 @@ export function extractDescription(body: string, title: string, maxLength: numbe
 export function buildSearchIndex(sortedPages: DocsPageLike[]): DocsSearchEntry[] {
     return sortedPages.map((page, index) => ({
         title: docTitle(page),
-        slug: getCanonicalDocSlug(page, index),
+        slug: getCanonicalDocSlug(page, index, sortedPages),
         chapter: formatChapterTitle(parseDocCollectionId(routedId(page)).chapter),
         keywords: page.data?.keywords ?? [],
         body: stripMarkdown(page.body || ''),

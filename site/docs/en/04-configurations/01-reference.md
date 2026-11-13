@@ -35,15 +35,19 @@ such as `/logo.svg`.
 
 ## Content
 
-| Option      | Type                | Default    | Description                              |
-| ----------- | ------------------- | ---------- | ---------------------------------------- |
-| `docsDir`   | `string`            | `"./docs"` | Directory containing Markdown files      |
-| `routeBase` | `string`            | `"/"`      | Route where documentation is mounted     |
-| `locales`   | `string[] \| false` | detected   | Override the detected locale directories |
-| `ui`        | `object`            | `{}`       | Interface string overrides, per locale   |
+| Option      | Type                | Default    | Description                               |
+| ----------- | ------------------- | ---------- | ----------------------------------------- |
+| `docsDir`   | `string`            | `"./docs"` | Directory containing Markdown files       |
+| `routeBase` | `string`            | `"/"`      | Route where documentation is mounted      |
+| `sections`  | `object`            | none       | One directory per section, by URL segment |
+| `locales`   | `string[] \| false` | detected   | Override the detected locale directories  |
+| `ui`        | `object`            | `{}`       | Interface string overrides, per locale    |
 
 Locale directories under `docsDir` are detected on their own; `locales` only
 overrides that. See [Languages](/docs/jaad/configurations/i18n).
+
+`sections` replaces `docsDir`. See
+[Sections](/docs/jaad/configurations/structure#sections).
 
 To keep a landing page at `/`, mount documentation below it:
 
@@ -116,6 +120,10 @@ defineJaadConfig({
 
 The link is omitted when the git remote, branch or repository root cannot be
 resolved safely.
+
+With [sections](/docs/jaad/configurations/structure#sections), each one links
+to its own directory. A URL passed here applies to all of them, and `:path` is
+the file's path inside its section's directory.
 
 ## SEO and head tags
 

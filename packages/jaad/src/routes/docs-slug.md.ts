@@ -1,7 +1,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro'
 import { getSortedDocsPages } from '../collection.ts'
 import { buildLocales, localePrefix } from '../docs-config.ts'
-import { getCleanSlug, routedId } from '../utils/docs.ts'
+import { docSlug } from '../utils/docs.ts'
 
 /** Raw markdown at the page's own url plus `.md`, for readers and for LLMs. */
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -16,7 +16,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
         for (const page of sortedPages) {
             paths.push({
-                params: { slug: `${prefix}${getCleanSlug(routedId(page))}` },
+                params: { slug: `${prefix}${docSlug(page)}` },
                 props: { id: page.id, locale },
             })
         }

@@ -13,7 +13,7 @@ import Footer from '../components/Footer.astro'
 import Head from '../components/Head.astro'
 import Header from '../components/Header.astro'
 import { DEFAULT_LOCALE, LOCALES } from '../docs-config.ts'
-import { docTitle, docTranslationKey, extractDescription, getCleanSlug, routedId } from '../utils/docs.ts'
+import { docSlug, docTitle, docTranslationKey, extractDescription } from '../utils/docs.ts'
 import '../../dist/jaad.css'
 import '../styles/docs.css'
 import '../styles/jaamd.css'
@@ -65,7 +65,7 @@ const alternates = switcherAlternates
 const frameProps: DocsFrameProps = {
     page: {
         id: entry?.id ?? '',
-        slug: entry ? getCleanSlug(routedId(entry)) : '',
+        slug: entry ? docSlug(entry) : '',
         title: entryTitle,
         chapter,
         data: entry?.data ?? { draft: false, keywords: [] },
@@ -103,8 +103,8 @@ const frameProps: DocsFrameProps = {
     </head>
     <body data-docs class="jaad-body">
         <DocsFrame {...frameProps}>
-            <Header slot="header" inDocs {locale} alternates={switcherAlternates} />
-            <DocsSidebarLeft slot="sidebar" sections={navigation.sections} {locale} />
+            <Header slot="header" inDocs {locale} section={entry?.section} alternates={switcherAlternates} />
+            <DocsSidebarLeft slot="sidebar" groups={navigation.groups} {locale} />
             <slot name="mobile-navigation" slot="mobile-navigation" />
             <slot name="breadcrumbs" slot="breadcrumbs" />
             <slot name="page-actions" slot="page-actions" />

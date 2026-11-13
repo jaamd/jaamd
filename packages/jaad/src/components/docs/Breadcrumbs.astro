@@ -1,28 +1,40 @@
 ---
 import config from 'virtual:jaad/config'
+import { getSectionLinks } from '../../collection.ts'
 import { docsUrls, ui } from '../../docs-config.ts'
 import { docsPageHref } from '../../urls.ts'
 import { formatChapterTitle } from '../../utils/docs.ts'
 
 interface Props {
+    /** The key of the section the page belongs to. */
+    section?: string
     chapter?: string
     title: string
     locale?: string
 }
 
-const { chapter, title, locale } = Astro.props
+const { section, chapter, title, locale } = Astro.props
 const t = ui(locale)
 const chapterTitle = formatChapterTitle(chapter)
 
 const rootSegment = config.docsBase.split('/').filter(Boolean).at(-1)
 const rootLabel = formatChapterTitle(rootSegment) ?? t('breadcrumb.root')
 const rootHref = docsPageHref('', docsUrls(locale))
+const sectionLink = section ? (await getSectionLinks(locale)).find((link) => link.key === section) : undefined
 ---
 
 <nav aria-label={t('breadcrumb.label')} class="docs-breadcrumbs">
     <a href={rootHref} class="docs-breadcrumbs-link">
         {rootLabel}
     </a>
+    {sectionLink && (
+        <>
+            <span aria-hidden="true">/</span>
+            <a href={sectionLink.href} class="docs-breadcrumbs-link">
+                {sectionLink.label}
+            </a>
+        </>
+    )}
     {chapterTitle && (
         <>
             <span aria-hidden="true">/</span>

@@ -1,13 +1,13 @@
 import config from 'virtual:jaad/config'
 import { getSortedDocsPages } from '../collection.ts'
-import { docsUrls } from '../docs-config.ts'
+import { SECTIONS, docsUrls } from '../docs-config.ts'
 import { docsMarkdownHref } from '../urls.ts'
 import {
     buildSearchIndex,
     docTitle,
     extractDescription,
     formatChapterTitle,
-    getCleanSlug,
+    docSlug,
     parseDocCollectionId,
     routedId,
 } from './docs.ts'
@@ -35,40 +35,50 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
         return site ? new URL(href, site.origin).href : href
     }
 
-    const standalone: Row[] = []
-    const chapters = new Map<string, Row[]>()
-
-    for (const page of sortedPages) {
-        const id = routedId(page)
-        const { chapter } = parseDocCollectionId(id)
-        const title = docTitle(page)
-        const row: Row = {
-            title,
-            slug: getCleanSlug(id),
-            description: page.data.description ?? extractDescription(page.body || '', title),
-        }
-
-        if (!chapter) {
-            standalone.push(row)
-            continue
-        }
-
-        const rows = chapters.get(chapter) ?? []
-        if (rows.length === 0) chapters.set(chapter, rows)
-        rows.push(row)
-    }
-
     const toLine = (row: Row): string =>
         `- [${row.title}](${markdownHref(row.slug)})${row.description ? `: ${row.description}` : ''}`
 
-    const sections: string[] = []
-    if (standalone.length > 0) {
-        sections.push(standalone.map(toLine).join('\n'))
+    /** Standalone pages first, then one heading per chapter. */
+    const outline = (pages: typeof sortedPages, heading: string): string[] => {
+        const standalone: Row[] = []
+        const chapters = new Map<string, Row[]>()
+
+        for (const page of pages) {
+            const { chapter } = parseDocCollectionId(routedId(page))
+            const title = docTitle(page)
+            const row: Row = {
+                title,
+                slug: docSlug(page),
+                description: page.data.description ?? extractDescription(page.body || '', title),
+            }
+
+            if (!chapter) {
+                standalone.push(row)
+                continue
+            }
+
+            const rows = chapters.get(chapter) ?? []
+            if (rows.length === 0) chapters.set(chapter, rows)
+            rows.push(row)
+        }
+
+        return [
+            ...(standalone.length > 0 ? [standalone.map(toLine).join('\n')] : []),
+            ...[...chapters].map(
+                ([chapter, rows]) =>
+                    `${heading} ${formatChapterTitle(chapter) ?? chapter}\n\n${rows.map(toLine).join('\n')}`,
+            ),
+        ]
     }
-    for (const [chapter, rows] of chapters) {
-        const heading = formatChapterTitle(chapter) ?? chapter
-        sections.push(`## ${heading}\n\n${rows.map(toLine).join('\n')}`)
-    }
+
+    // With sections, each is a heading and its chapters sit one level below.
+    const sections: string[] =
+        SECTIONS.length === 0
+            ? outline(sortedPages, '##')
+            : SECTIONS.flatMap((section) => {
+                  const pages = sortedPages.filter((page) => page.section === section.key)
+                  return pages.length > 0 ? [`## ${section.label}`, ...outline(pages, '###')] : []
+              })
 
     const content = [`# ${config.title}`, ...(config.description ? [`> ${config.description}`] : []), ...sections].join(
         '\n\n',

@@ -1,13 +1,15 @@
 import type { JaadResolvedConfig, resolveStylesheets } from './config.ts'
+import type { DocsRoot } from './utils/links.ts'
 import type { AstroIntegration, AstroUserConfig } from 'astro'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { fonts } from './fonts.ts'
+import { rehypeDocLinks, satteriDocLinks } from './link-plugins.ts'
 import { prefixedLocales } from './locales.ts'
 import { docsPageHref, normaliseBasePath, type DocsUrlOptions } from './urls.ts'
-import { getCleanSlug, getDocCollectionId, sortDocPages, splitDocLocale } from './utils/docs.ts'
+import { docSlug, getCanonicalDocSlug, getDocCollectionId, sortDocPages, splitDocLocale } from './utils/docs.ts'
 import { jaadVirtualPlugin } from './virtual.ts'
 
 type Stylesheets = ReturnType<typeof resolveStylesheets>
@@ -55,6 +57,11 @@ const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 
 
 const NOT_FOUND_PAGE_NAMES = ['404.astro', '404.md', '404.mdx', '404.html', '404.js', '404.ts']
 
+/** A plugin this integration registered on an earlier setup run. */
+const isDocLinks = (plugin: unknown): boolean =>
+    (typeof plugin === 'function' || (typeof plugin === 'object' && plugin !== null)) &&
+    ['jaad-doc-links', 'jaadDocLinks'].includes((plugin as { name?: string }).name ?? '')
+
 const routeEntrypoint = (file: string) => fileURLToPath(new URL(`./routes/${file}`, import.meta.url))
 
 export function shouldInjectNotFound(docsBase: string, srcDir: URL): boolean {
@@ -75,47 +82,58 @@ function readFrontmatter(source: string): { order?: number; draft?: boolean } {
     }
 }
 
-export function findOpeningPages(dir: string, locales: string[] = []): OpeningPage[] {
-    if (!existsSync(dir)) return []
-
+/** The pages whose named url redirects: the first of the docs and of every
+ *  section, per locale. With sections, the first section's key redirects too. */
+export function findOpeningPages(roots: string | DocsRoot[], locales: string[] = []): OpeningPage[] {
     const pages: {
         id: string
         localeId: string
         locale: string | null
+        section?: string
+        sectionOrder: number
         data: { order?: number }
     }[] = []
 
-    const visit = (current: string) => {
+    const visit = (root: DocsRoot, sectionOrder: number, current: string) => {
         for (const entry of readdirSync(current, { withFileTypes: true }).toSorted((a, b) =>
             a.name.localeCompare(b.name),
         )) {
             const file = join(current, entry.name)
-            if (entry.isDirectory()) visit(file)
+            if (entry.isDirectory()) visit(root, sectionOrder, file)
             else if (entry.isFile() && entry.name.endsWith('.md')) {
                 const front = readFrontmatter(readFileSync(file, 'utf8'))
                 if (front.draft) continue
 
-                const id = getDocCollectionId(relative(dir, file))
+                const id = getDocCollectionId(relative(root.dir, file))
                 const split = splitDocLocale(id, locales)
                 pages.push({
                     id,
                     localeId: split.id,
                     locale: split.locale,
+                    section: root.section,
+                    sectionOrder,
                     data: { order: front.order },
                 })
             }
         }
     }
 
-    visit(dir)
+    const all = typeof roots === 'string' ? [{ dir: roots }] : roots
+    all.forEach((root, order) => {
+        if (existsSync(root.dir)) visit(root, order, root.dir)
+    })
 
     const groups = locales.length > 0 ? locales : [null]
     return groups.flatMap((locale) => {
-        const first = sortDocPages(pages.filter((page) => page.locale === locale))[0]
-        // Indexed access is typed as always present; a locale can have no pages.
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (!first) return []
-        return [{ locale: locale ?? undefined, slug: getCleanSlug(first.localeId) }]
+        const sorted = sortDocPages(pages.filter((page) => page.locale === locale))
+        const opening = sorted
+            .filter((page, index) => getCanonicalDocSlug(page, index, sorted) !== docSlug(page))
+            .map((page) => docSlug(page))
+        const firstSection = sorted[0]?.section
+        return [...opening, ...(firstSection ? [firstSection] : [])].map((slug) => ({
+            locale: locale ?? undefined,
+            slug,
+        }))
     })
 }
 
@@ -204,20 +222,56 @@ export function createCoreIntegration(
                     })
                 }
 
-                const docsDirPath = resolve(fileURLToPath(astroConfig.root), config.docsDir)
-                const docsDir = pathToFileURL(docsDirPath)
-                if (!existsSync(docsDir)) {
+                const root = fileURLToPath(astroConfig.root)
+                const roots: DocsRoot[] =
+                    config.docsSections.length > 0
+                        ? config.docsSections.map((section) => ({
+                              dir: resolve(root, section.dir),
+                              section: section.key,
+                          }))
+                        : [{ dir: resolve(root, config.docsDir) }]
+
+                const missing = roots.filter(({ dir }) => !existsSync(dir))
+                for (const { dir } of missing) {
                     logger.warn(
-                        `${config.docsDir} does not exist, so the site has no pages. ` +
-                            'Create it, or point docsDir at your markdown.',
+                        `${relative(root, dir)} does not exist, so it adds no pages. ` +
+                            'Create it, or point docsDir or the section at your markdown.',
                     )
-                } else if (discoverOpeningPage) {
+                }
+                if (discoverOpeningPage && missing.length < roots.length) {
                     state.openingPages = findOpeningPages(
-                        docsDirPath,
+                        roots,
                         config.docsLocales.map((locale) => locale.code),
                     )
                 }
-                addWatchFile(docsDir)
+                for (const { dir } of roots) addWatchFile(pathToFileURL(dir))
+
+                const links = {
+                    roots,
+                    locales: config.docsLocales.map((locale) => locale.code),
+                    urls: (locale?: string): DocsUrlOptions => ({
+                        docsBase: config.docsBase,
+                        deploymentBase: normaliseBasePath(astroConfig.base),
+                        locale,
+                        defaultLocale: config.defaultLocale,
+                    }),
+                }
+                // New arrays: a shared processor would stack duplicates across setup runs.
+                const processor = astroConfig.markdown.processor as {
+                    name: string
+                    options: { hastPlugins?: unknown[]; rehypePlugins?: unknown[] }
+                }
+                if (processor.name === 'satteri') {
+                    processor.options.hastPlugins = [
+                        ...(processor.options.hastPlugins ?? []).filter((plugin) => !isDocLinks(plugin)),
+                        satteriDocLinks(links),
+                    ]
+                } else if (processor.name === 'unified') {
+                    processor.options.rehypePlugins = [
+                        ...(processor.options.rehypePlugins ?? []).filter((plugin) => !isDocLinks(plugin)),
+                        rehypeDocLinks(links),
+                    ]
+                }
 
                 if (config.docsBase === '') {
                     const ownIndex = INDEX_PAGE_NAMES.find((name) =>

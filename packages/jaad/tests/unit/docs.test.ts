@@ -24,7 +24,7 @@ import {
 } from '../../src/utils/docs.ts'
 
 const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) =>
-    navigation.sections.flatMap((section) => (section.type === 'page' ? [section.item] : section.items))
+    navigation.groups.flatMap((section) => (section.type === 'page' ? [section.item] : section.items))
 
 // ── Numeric prefixes: the ordering convention the whole product rests on ──────
 
@@ -66,8 +66,8 @@ test('file paths use the same slug rules as the content collection', () => {
 
 test('only the first sorted page has an empty canonical slug', () => {
     const pages = [{ id: '01-intro' }, { id: '02-guide' }]
-    assert.equal(getCanonicalDocSlug(pages[0], 0), '')
-    assert.equal(getCanonicalDocSlug(pages[1], 1), 'guide')
+    assert.equal(getCanonicalDocSlug(pages[0], 0, pages), '')
+    assert.equal(getCanonicalDocSlug(pages[1], 1, pages), 'guide')
 })
 
 test('a flat tree or one chapter level has an unambiguous structure', () => {
@@ -260,7 +260,7 @@ test('root pages and chapters interleave by number', () => {
     )
 
     assert.deepEqual(
-        navigation.sections.map((s) => (s.type === 'page' ? s.item.title : `${s.chapter}(${String(s.items.length)})`)),
+        navigation.groups.map((s) => (s.type === 'page' ? s.item.title : `${s.chapter}(${String(s.items.length)})`)),
         ['Intro', 'guides(2)', 'Changelog'],
     )
 })
@@ -269,7 +269,7 @@ test('grouping keeps a chapter together even when its pages are apart', () => {
     const navigation = buildDocsNavigation([{ id: '02-a/01-x' }, { id: '02-a/02-y' }], '02-a/01-x', {
         docsBase: '/docs',
     })
-    const sections = navigation.sections
+    const sections = navigation.groups
     assert.equal(sections.length, 1)
     assert.equal(sections[0].type, 'chapter')
 })
@@ -282,7 +282,7 @@ test('navigation derives active, previous and next pages together', () => {
 
     assert.equal(navigation.previousPage?.title, 'Intro')
     assert.equal(navigation.nextPage?.title, 'Api')
-    assert.equal(navigation.sections.filter((section) => section.type === 'page' && section.item.isActive).length, 1)
+    assert.equal(navigation.groups.filter((section) => section.type === 'page' && section.item.isActive).length, 1)
 })
 
 // ── One title rule, wherever a page is named ─────────────────────────────────

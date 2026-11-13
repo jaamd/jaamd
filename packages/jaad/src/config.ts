@@ -1,7 +1,7 @@
 import type { AstroUserConfig, FontProvider, Locales, SessionDriverConfig } from 'astro'
 import { existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { join } from 'node:path'
+import { join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { z } from 'astro/zod'
 import { inferRepo, inferDescription, editBaseFrom, type RepoInfo } from './infer.ts'
@@ -9,6 +9,7 @@ import { detectLocales, validateLocaleTree } from './locale-tree.ts'
 import { describeLocale, isLocale, type Locale } from './locales.ts'
 import { PRESETS, PRESET_NAMES, isPreset } from './themes/index.ts'
 import { normaliseBasePath } from './urls.ts'
+import { slugToTitle } from './utils/docs.ts'
 
 export const jaadConfigSchema = z.object({
     title: z.string(),
@@ -23,6 +24,20 @@ export const jaadConfigSchema = z.object({
 
     docsDir: z.string().default('./docs'),
     routeBase: z.string().default('/'),
+    /** One directory per section, keyed by its url segment. Replaces `docsDir`. */
+    sections: z
+        .record(z.string(), z.object({ dir: z.string(), label: z.string().optional() }))
+        .superRefine((sections, context) => {
+            for (const key of Object.keys(sections)) {
+                if (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(key)) continue
+                context.addIssue({
+                    code: 'custom',
+                    path: [key],
+                    message: 'a section key is its url segment: lowercase letters, digits and dashes',
+                })
+            }
+        })
+        .optional(),
 
     social: z
         .record(
@@ -118,10 +133,21 @@ export interface JaadResolvedConfig extends JaadConfig {
     favicon: string | null
     /** Explicit, inferred from public/, or false when no valid image exists. */
     ogImage: string | false
+    /** Empty when the docs are not split into sections. */
+    docsSections: DocsSection[]
     /** Empty when the docs are not localised. */
     docsLocales: Locale[]
     /** `lang` when the docs are not localised. */
     defaultLocale: string
+}
+
+export interface DocsSection {
+    /** The url segment. */
+    key: string
+    label: string
+    /** As configured, relative to the project. */
+    dir: string
+    editBase: string | null
 }
 
 const FAVICONS = ['favicon.svg', 'favicon.ico', 'favicon.png']
@@ -170,13 +196,43 @@ function parseConfig(options: JaadUserConfig): JaadConfig {
     )
 }
 
+function resolveSections(config: JaadConfig, repo: RepoInfo | null, cwd: string): DocsSection[] {
+    const sections = Object.entries(config.sections ?? {}).map(([key, section]) => ({
+        key,
+        label: section.label ?? slugToTitle(key),
+        dir: section.dir,
+        editBase: resolveEditBase(config.editLink, repo, section.dir),
+    }))
+
+    // No directory may be, or be inside, another.
+    const paths = sections.map((section) => resolve(cwd, section.dir) + sep)
+    const nested = sections.filter((_, at) => paths.some((other, from) => from !== at && paths[at].startsWith(other)))
+    if (nested.length > 0) {
+        throw new Error(
+            'jaad: sections overlap\n' +
+                nested
+                    .map((section) => `  ${section.key}: ${section.dir} is, or is inside, another section`)
+                    .join('\n') +
+                '\nGive every section a directory of its own.',
+        )
+    }
+    return sections
+}
+
 export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd()): JaadResolvedConfig {
     const config = parseConfig(options)
     const repo = inferRepo(cwd)
+    const sections = resolveSections(config, repo, cwd)
     const locales = resolveLocales(config, cwd)
+
+    const ambiguous = sections.find((section) => locales.includes(section.key))
+    if (ambiguous) {
+        throw new Error(`jaad: section "${ambiguous.key}" has the name of a language the docs are written in`)
+    }
 
     return {
         ...config,
+        docsSections: sections,
         description: config.description ?? inferDescription(cwd) ?? undefined,
         repoUrl: repo?.url ?? null,
         favicon: findPublicAsset(cwd, FAVICONS),
@@ -189,12 +245,31 @@ export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd
     }
 }
 
+/** Where the markdown lives: `docsDir`, or the directory of every section. */
+function docsRoots(config: Pick<JaadConfig, 'docsDir' | 'sections'>): string[] {
+    const sections = Object.values(config.sections ?? {})
+    return sections.length > 0 ? sections.map((section) => section.dir) : [config.docsDir]
+}
+
 /** Directory names win; `locales` only overrides what detection found. */
 function resolveLocales(config: JaadConfig, cwd: string): string[] {
     if (config.locales === false) return []
 
-    const docsDir = join(cwd, config.docsDir)
-    const locales = config.locales ?? detectLocales(docsDir, config.lang)
+    const perRoot = docsRoots(config).map((root) => resolveLocalesIn(join(cwd, root), config))
+    const [first, ...rest] = perRoot
+    const differing = rest.find((locales) => locales.join() !== first.join())
+    if (differing) {
+        throw new Error(
+            'jaad: sections disagree on their languages\n' +
+                `  found ${first.join(', ') || 'none'} and ${differing.join(', ') || 'none'}\n` +
+                'Give every section the same locale directories, or none.',
+        )
+    }
+    return first
+}
+
+function resolveLocalesIn(docsDir: string, config: JaadConfig): string[] {
+    const locales = Array.isArray(config.locales) ? config.locales : detectLocales(docsDir, config.lang)
     // A pinned list skips detection, and with it the missing-directory guard;
     // the integration warns about that case with better words than readdir does.
     if (locales.length === 0 || !existsSync(docsDir)) return []

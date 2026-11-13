@@ -1,17 +1,17 @@
 ---
 import type { DocsHeadings } from '../../@types/docs.ts'
-import type { NavSection } from '../../navigation.ts'
+import type { NavGroup } from '../../navigation.ts'
 import { ui } from '../../docs-config.ts'
 import { formatChapterTitle } from '../../utils/docs.ts'
 import ScrollToTop from '../ScrollToTop.astro'
 
 interface Props {
     locale?: string
-    sections: NavSection[]
+    groups: NavGroup[]
     headings: DocsHeadings[]
 }
 
-const { sections, headings, locale } = Astro.props
+const { groups, headings, locale } = Astro.props
 const t = ui(locale)
 ---
 
@@ -21,14 +21,14 @@ const t = ui(locale)
             {t('nav.selectPage')}
         </label>
         <select id="page-select" class="docs-select-field">
-            {sections.map((section) =>
-                section.type === 'page' ? (
-                    <option value={section.item.href} selected={section.item.isActive}>
-                        {section.item.title}
+            {groups.map((group) =>
+                group.type === 'page' ? (
+                    <option value={group.item.href} selected={group.item.isActive}>
+                        {group.item.title}
                     </option>
                 ) : (
-                    <optgroup label={formatChapterTitle(section.chapter) || section.chapter}>
-                        {section.items.map((page) => (
+                    <optgroup label={formatChapterTitle(group.chapter) || group.chapter}>
+                        {group.items.map((page) => (
                             <option value={page.href} selected={page.isActive}>
                                 {page.title}
                             </option>

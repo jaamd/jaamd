@@ -4,11 +4,12 @@ import { getSortedDocsPages } from '../collection.ts'
 import DocsPage from '../components/docs/DocsPage.astro'
 import { buildLocales, docsUrls, localePrefix } from '../docs-config.ts'
 import { docsPageHref, withDeploymentBase } from '../urls.ts'
-import { getCanonicalDocSlug, getCleanSlug, docTitle, routedId } from '../utils/docs.ts'
+import { docSlug, docTitle, getCanonicalDocSlug } from '../utils/docs.ts'
 
 interface DocsPath {
     params: { slug: string }
-    props: { id: string; locale?: string; isOpening: boolean }
+    /** `redirect` is the canonical slug of a page reached by another name. */
+    props: { id: string; locale?: string; redirect?: string }
 }
 
 export async function getStaticPaths() {
@@ -19,29 +20,28 @@ export async function getStaticPaths() {
         const prefix = localePrefix(locale)
 
         sortedPages.forEach((page, index) => {
-            const isOpening = getCanonicalDocSlug(page, index) === ''
-            paths.push({
-                params: { slug: `${prefix}${getCleanSlug(routedId(page))}` },
-                props: { id: page.id, locale, isOpening },
-            })
+            const add = (slug: string, redirect?: string) =>
+                paths.push({ params: { slug }, props: { id: page.id, locale, redirect } })
 
-            // A prefixed locale has no index route of its own: /it is this page.
-            if (isOpening && prefix) {
-                paths.push({
-                    params: { slug: locale! },
-                    props: { id: page.id, locale, isOpening: false },
-                })
-            }
+            const canonical = getCanonicalDocSlug(page, index, sortedPages)
+            const named = docSlug(page)
+
+            // Empty is the index route's; a prefixed locale has none, so /it is this page.
+            const own = `${prefix}${canonical}`.replace(/\/$/, '')
+            if (own) add(own)
+            if (named !== canonical) add(`${prefix}${named}`, canonical)
+            // The first section has no page of its own: its key opens the docs.
+            if (index === 0 && page.section) add(`${prefix}${page.section}`, canonical)
         })
     }
 
     return paths
 }
 
-const { id, locale, isOpening } = Astro.props
+const { id, locale, redirect } = Astro.props
 
-if (isOpening) {
-    return Astro.redirect(docsPageHref('', docsUrls(locale)), 301)
+if (redirect !== undefined) {
+    return Astro.redirect(docsPageHref(redirect, docsUrls(locale)), 301)
 }
 
 const sortedPages = await getSortedDocsPages(locale)

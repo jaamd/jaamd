@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, posix } from 'node:path'
 
 const git = (args: string[], cwd: string): string | null => {
     try {
@@ -52,8 +52,8 @@ export function inferRepo(cwd: string = process.cwd()): RepoInfo | null {
 /** Ends in a slash. `docsDir` resolves against the repository root, not the
  *  Astro project, so a site in a subdirectory still links correctly. */
 export function editBaseFrom(repo: RepoInfo, docsDir: string): string {
-    const dir = docsDir.replace(/^\.\//, '').replace(/\/$/, '')
-    const path = `${repo.prefix}${dir}`.replace(/^\/+/, '')
+    // Normalised: a section can sit outside the project, as `../packages/x/docs`.
+    const path = posix.normalize(`${repo.prefix}${docsDir}`).replace(/^\/+|\/+$/g, '')
     return `${repo.url}/edit/${repo.branch}/${path}/`
 }
 

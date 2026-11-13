@@ -96,19 +96,19 @@ conditional placement. JAAD's internal components are not part of this API.
 | `page.title`              | Resolved page title                          |
 | `page.chapter`            | Chapter slug, when present                   |
 | `headings`                | `{ depth, slug, text }[]` for levels 2 and 3 |
-| `navigation.sections`     | Ordered top-level pages and chapter groups   |
+| `navigation.groups`       | Ordered top-level pages and chapter groups   |
 | `navigation.previousPage` | Previous navigation item or `null`           |
 | `navigation.nextPage`     | Next navigation item or `null`               |
 
-`page.chapter` and `NavSection.chapter` are directory slugs, such as
+`page.chapter` and `NavGroup.chapter` are directory slugs, such as
 `getting-started`. Title-case them for display.
 
 ### Navigation shapes
 
-`NavSection` is a union discriminated on `type`.
+`NavGroup` is a union discriminated on `type`.
 
 ```ts
-type NavSection =
+type NavGroup =
     | { type: 'page'; order: number; item: DocsNavItem }
     | { type: 'chapter'; order: number; chapter: string; items: DocsNavItem[] }
 
@@ -124,7 +124,7 @@ interface DocsNavItem {
 `href` already carries `routeBase` and the deployment `base`. `isActive` marks
 the current page.
 
-`DocsFrameProps`, `DocsNavigation`, `NavSection`, `DocsHeadings`, `DocsNavItem`
+`DocsFrameProps`, `DocsNavigation`, `NavGroup`, `DocsHeadings`, `DocsNavItem`
 and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use

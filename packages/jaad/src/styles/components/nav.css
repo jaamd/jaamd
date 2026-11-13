@@ -8,4 +8,7 @@
     .jaad-nav-link {
         @apply text-foreground-secondary hover:text-foreground-bright no-underline hover:underline;
     }
+    .jaad-nav-link[aria-current] {
+        @apply text-foreground-bright;
+    }
 }

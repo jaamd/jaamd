@@ -51,6 +51,13 @@ The extensionless paths are gone. Add `.css`:
 | `@jaamd/jaamd/themes/<slug>`      | `@jaamd/astro/themes/<slug>.css`      |
 | `@jaamd/jaamd/themes/<slug>/dark` | `@jaamd/astro/themes/<slug>/dark.css` |
 
+### Custom docs frame: `navigation.sections` is `navigation.groups`
+
+A `src/jaad/DocsFrame.astro` that reads the navigation renames two things:
+`navigation.sections` is now `navigation.groups`, and the `NavSection` type is
+`NavGroup`. "Section" now names a part of the documentation with its own
+directory.
+
 ## From 0.9
 
 ### Tailwind on your own pages
