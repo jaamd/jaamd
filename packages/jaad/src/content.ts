@@ -28,10 +28,9 @@ const docs = (base: string, section?: string) =>
         }),
     })
 
-/** `docsPages`, or one collection per section: each watches its own directory. */
-export const collections =
-    config.docsSections.length > 0
-        ? Object.fromEntries(
-              config.docsSections.map((section) => [collectionName(section.key), docs(section.dir, section.key)]),
-          )
-        : { [collectionName()]: docs(config.docsDir) }
+/** `docsPages` for `docsDir`, and one collection per section: each watches its
+ *  own directory. */
+export const collections = Object.fromEntries([
+    ...(config.docsDirInUse ? [[collectionName(), docs(config.docsDir)]] : []),
+    ...config.docsSections.map((section) => [collectionName(section.key), docs(section.dir, section.key)]),
+])

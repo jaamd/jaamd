@@ -1,24 +1,17 @@
 ---
-import { navLinks } from './nav-links.ts'
-
-interface Props {
-    locale?: string
-    section?: string
-}
-
-const links = await navLinks(Astro.props.locale, Astro.props.section)
+import config from 'virtual:jaad/config'
+import { withDeploymentBase } from '../urls.ts'
 ---
 
-{links.length > 0 && (
+{config.nav.length > 0 && (
     <nav class="jaad-nav">
         <ul class="jaad-nav-list">
-            {links.map((link) => (
+            {config.nav.map((link) => (
                 <li>
                     <a
-                        href={link.href}
+                        href={withDeploymentBase(link.href, import.meta.env.BASE_URL)}
                         class="jaad-nav-link"
-                        aria-current={link.current ? 'true' : undefined}
-                        {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                        {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     >
                         {link.label}
                     </a>

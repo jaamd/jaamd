@@ -1,13 +1,9 @@
 ---
+import config from 'virtual:jaad/config'
 import { ui } from '../docs-config.ts'
-import { navLinks } from './nav-links.ts'
+import { withDeploymentBase } from '../urls.ts'
 
-interface Props {
-    locale?: string
-    section?: string
-}
-
-const links = await navLinks(Astro.props.locale, Astro.props.section)
+const links = config.nav
 const t = ui(Astro.props.locale)
 ---
 
@@ -44,10 +40,11 @@ const t = ui(Astro.props.locale)
                     {links.map((link) => (
                         <li>
                             <a
-                                href={link.href}
+                                href={withDeploymentBase(link.href, import.meta.env.BASE_URL)}
                                 class="jaad-menu-item"
-                                aria-current={link.current ? 'true' : undefined}
-                                {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                                {...(link.href.startsWith('http')
+                                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                                    : {})}
                             >
                                 {link.label}
                             </a>

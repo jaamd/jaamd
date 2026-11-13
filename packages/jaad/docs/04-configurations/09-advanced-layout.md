@@ -97,19 +97,22 @@ conditional placement. JAAD's internal components are not part of this API.
 | `page.section`            | Section key, when the docs have sections     |
 | `page.chapter`            | Chapter slug, when present                   |
 | `headings`                | `{ depth, slug, text }[]` for levels 2 and 3 |
-| `navigation.groups`       | Ordered top-level pages and chapter groups   |
+| `navigation.groups`       | The whole tree: sections, chapters and pages |
 | `navigation.previousPage` | Previous navigation item or `null`           |
 | `navigation.nextPage`     | Next navigation item or `null`               |
 
-`page.chapter` and `DocsNavGroup.chapter` are directory slugs, such as
+`page.chapter` and a chapter group's `chapter` are directory slugs, such as
 `getting-started`. Title-case them for display.
 
 ### Navigation shapes
 
-`DocsNavGroup` is a union discriminated on `type`.
+`DocsNavGroup` is a union discriminated on `type`. With sections, every group
+is a `section`, holding the pages and chapters of that section.
 
 ```ts
-type DocsNavGroup = { type: 'page'; item: DocsNavItem } | { type: 'chapter'; chapter: string; items: DocsNavItem[] }
+type DocsNavEntry = { type: 'page'; item: DocsNavItem } | { type: 'chapter'; chapter: string; items: DocsNavItem[] }
+
+type DocsNavGroup = DocsNavEntry | { type: 'section'; section: string; label: string; entries: DocsNavEntry[] }
 
 interface DocsNavItem {
     title: string
@@ -125,8 +128,8 @@ Groups and their items arrive in display order.
 `href` already carries `routeBase` and the deployment `base`. `isActive` marks
 the current page.
 
-`DocsFrameProps`, `DocsNavigation`, `DocsNavGroup`, `DocsHeading`,
-`DocsNavItem` and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
+`DocsFrameProps`, `DocsNavigation`, `DocsNavGroup`, `DocsNavEntry`,
+`DocsHeading`, `DocsNavItem` and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
 [`src/jaad.css`](05-styles.md) instead.

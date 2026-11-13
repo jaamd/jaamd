@@ -105,24 +105,21 @@ export default defineJaadConfig({
         assert.match(page('api/server/index.html'), /<h1[^>]*>Server/)
     })
 
-    test('the header lists the sections and marks the current one', () => {
-        const home = page('index.html')
-        assert.match(home, /<a href="\/" class="jaad-nav-link" aria-current="true"[^>]*>\s*The Guide/)
-        assert.match(home, /<a href="\/api" class="jaad-nav-link"[^>]*>\s*Api/)
-        assert.match(page('api/server/index.html'), /<a href="\/api" class="jaad-nav-link" aria-current="true"/)
+    test('the sidebar lists every section, each with its own pages', () => {
+        const sidebar = (html) => html.slice(html.indexOf('docs-sidebar-left'), html.indexOf('</aside>'))
+        const home = sidebar(page('index.html'))
+        assert.match(
+            home,
+            /docs-sidebar-section-title">The Guide<[\s\S]*Install[\s\S]*docs-sidebar-section-title">Api<[\s\S]*Server/,
+        )
+        assert.match(sidebar(page('api/server/index.html')), /Intro[\s\S]*href="\/api\/server"[^>]*aria-current="page"/)
+
+        const header = page('index.html').match(/<header[\s\S]*?<\/header>/)[0]
+        assert.doesNotMatch(header, /The Guide|Api/, 'the sections are in the header')
     })
 
-    test('the sidebar and the page navigation stay inside the section', () => {
-        const sidebar = (html) => html.slice(html.indexOf('docs-sidebar-left'), html.indexOf('</aside>'))
-        assert.match(sidebar(page('index.html')), /Install/)
-        assert.doesNotMatch(sidebar(page('index.html')), /Client|Server/)
-        assert.doesNotMatch(sidebar(page('api/server/index.html')), /Intro|Install/)
-
-        // The last page of a section has no next page in the following one.
-        assert.doesNotMatch(
-            page('guide/setup/install/index.html'),
-            /href="\/api"[^>]*rel="next"|rel="next"[^>]*href="\/api"/,
-        )
+    test('the page navigation runs on into the next section', () => {
+        assert.match(page('guide/setup/install/index.html'), /href="\/api"[^>]*rel="next"|rel="next"[^>]*href="\/api"/)
     })
 
     test('the breadcrumbs name the section', () => {
@@ -186,12 +183,8 @@ export default defineJaadConfig({
             const home = built('index.html')
             assert.doesNotMatch(home, /Drafts/)
             assert.ok(!existsSync(join(localised, 'drafts')))
-            assert.match(home, /<a href="\/" class="jaad-nav-link" aria-current="true"[^>]*>\s*Guide/)
-            assert.match(
-                built('it/index.html'),
-                /<a href="\/it" class="jaad-nav-link" aria-current="true"[^>]*>\s*Guide/,
-            )
-            assert.match(built('it/index.html'), /<a href="\/it\/api" class="jaad-nav-link"/)
+            assert.match(home, /docs-sidebar-section-title">Guide<[\s\S]*docs-sidebar-section-title">Api</)
+            assert.match(built('it/index.html'), /href="\/it\/api"/)
         })
     })
 })

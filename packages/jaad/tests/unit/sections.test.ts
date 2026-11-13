@@ -9,6 +9,7 @@ import { rehypeDocLinks } from '../../src/link-plugins.ts'
 import { buildDocsNavigation } from '../../src/navigation.ts'
 import {
     collectionIdFor,
+    docAliases,
     docSlug,
     docCanonicalSlug,
     sortDocPages,
@@ -94,22 +95,81 @@ test('one chapter level is the limit inside a section too', () => {
     }, /api\/01-a\/02-b\/03-c: only one chapter directory is supported/)
 })
 
+// ── Pages outside the sections ───────────────────────────────────────────────
+
+const loose = (id: string) => ({ id, path: id })
+
+test('a page outside the sections opens the docs, and every section keeps its url', () => {
+    const pages = sortDocPages(
+        [...inSections('guide/01-intro', 'api/01-client'), loose('01-welcome')],
+        ['guide', 'api'],
+    )
+    assert.deepEqual(
+        pages.map((page, index) => docCanonicalSlug(page, index, pages)),
+        ['', 'guide', 'api'],
+    )
+    assert.deepEqual(
+        pages.flatMap((page, index) => docAliases(page, index, pages)),
+        ['welcome', 'guide/intro', 'api/client'],
+    )
+})
+
+test('a page outside the sections cannot take a section url', () => {
+    assert.throws(
+        () => validateDocsStructure([...inSections('guide/01-intro'), loose('02-guide')]),
+        /02-guide resolves into section \/guide/,
+    )
+})
+
+test('the navigation lists the pages outside the sections first', () => {
+    const pages = [loose('01-welcome'), ...inSections('guide/01-intro')]
+    const { groups, nextPage } = buildDocsNavigation(pages, '01-welcome', urls, [{ key: 'guide', label: 'Guide' }])
+    assert.deepEqual(
+        groups.map((group) => group.type),
+        ['page', 'section'],
+    )
+    assert.equal(nextPage?.href, '/guide')
+})
+
 // ── Navigation ───────────────────────────────────────────────────────────────
 
-test('navigation lists the current section only, and does not leave it', () => {
+const SECTIONS = [
+    { key: 'guide', label: 'Guide' },
+    { key: 'api', label: 'API' },
+]
+
+test('navigation puts every section at the top, with its pages and chapters below', () => {
+    const pages = inSections('guide/01-intro', 'guide/02-setup/01-install', 'api/01-client', 'api/02-server')
+    const { groups } = buildDocsNavigation(pages, 'guide/01-intro', urls, SECTIONS)
+
+    assert.deepEqual(
+        groups.map((group) =>
+            group.type === 'section'
+                ? [group.label, group.entries.map((entry) => (entry.type === 'page' ? entry.item.href : entry.chapter))]
+                : null,
+        ),
+        [
+            ['Guide', ['/', 'setup']],
+            ['API', ['/api', '/api/server']],
+        ],
+    )
+})
+
+test('a section with no pages has no entry', () => {
+    const pages = inSections('guide/01-intro')
+    const { groups } = buildDocsNavigation(pages, 'guide/01-intro', urls, SECTIONS)
+    assert.equal(groups.length, 1)
+})
+
+test('previous and next run across the sections', () => {
     const pages = inSections('guide/01-intro', 'guide/02-next', 'api/01-client', 'api/02-server')
 
-    const last = buildDocsNavigation(pages, 'guide/02-next', urls)
-    assert.deepEqual(
-        last.groups.map((group) => (group.type === 'page' ? group.item.href : group.chapter)),
-        ['/', '/guide/next'],
-    )
+    const last = buildDocsNavigation(pages, 'guide/02-next', urls, SECTIONS)
     assert.equal(last.previousPage?.href, '/')
-    assert.equal(last.nextPage, null)
+    assert.equal(last.nextPage?.href, '/api')
 
-    const opener = buildDocsNavigation(pages, 'api/01-client', urls)
-    assert.equal(opener.previousPage, null)
-    assert.equal(opener.nextPage?.href, '/api/server')
+    const opener = buildDocsNavigation(pages, 'api/01-client', urls, SECTIONS)
+    assert.equal(opener.previousPage?.href, '/guide/next')
 })
 
 // ── Configuration ────────────────────────────────────────────────────────────
@@ -132,7 +192,18 @@ test('a section inside another is refused', () => {
     assert.throws(
         () =>
             resolveConfig({ title: 'T', sections: { docs: { dir: './docs' }, api: { dir: './docs/api' } } }, tmpdir()),
-        /api: \.\/docs\/api is, or is inside, another section/,
+        /api: docs\/api is, or is inside, another/,
+    )
+})
+
+test('docsDir is read alongside sections only when set, and cannot hold one', () => {
+    const sections = { guide: { dir: './guide' } }
+    assert.equal(resolveConfig({ title: 'T', sections }, tmpdir()).docsDirInUse, false)
+    assert.equal(resolveConfig({ title: 'T', sections, docsDir: './intro' }, tmpdir()).docsDirInUse, true)
+    assert.equal(resolveConfig({ title: 'T' }, tmpdir()).docsDirInUse, true)
+    assert.throws(
+        () => resolveConfig({ title: 'T', docsDir: './docs', sections: { api: { dir: './docs/api' } } }, tmpdir()),
+        /api: docs\/api is, or is inside, another/,
     )
 })
 

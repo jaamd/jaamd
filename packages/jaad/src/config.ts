@@ -1,7 +1,7 @@
 import type { AstroUserConfig, FontProvider, Locales, SessionDriverConfig } from 'astro'
 import { existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { join, resolve, sep } from 'node:path'
+import { join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { z } from 'astro/zod'
 import { inferRepo, inferDescription, editBaseFrom, type RepoInfo } from './infer.ts'
@@ -137,6 +137,9 @@ export interface JaadResolvedConfig extends JaadConfig {
     ogImage: string | false
     /** Empty when the docs are not split into sections. */
     docsSections: DocsSection[]
+    /** Whether `docsDir` holds pages: always without sections; with them, only
+     *  when set, for the pages outside every section. */
+    docsDirInUse: boolean
     /** Empty when the docs are not localised. */
     docsLocales: Locale[]
     /** `lang` when the docs are not localised. */
@@ -205,34 +208,38 @@ function parseConfig(options: JaadUserConfig): JaadConfig {
     )
 }
 
-function resolveSections(config: JaadConfig, repo: RepoInfo | null, cwd: string): DocsSection[] {
-    const sections = Object.entries(config.sections ?? {}).map(([key, section]) => ({
+function resolveSections(config: JaadConfig, repo: RepoInfo | null): DocsSection[] {
+    return Object.entries(config.sections ?? {}).map(([key, section]) => ({
         key,
         label: section.label ?? slugToTitle(key),
         dir: section.dir,
         editBase: resolveEditBase(config.editLink, repo, section.dir),
     }))
+}
 
-    // No directory may be, or be inside, another.
-    const paths = sections.map((section) => resolve(cwd, section.dir) + sep)
-    const nested = sections.filter((_, at) => paths.some((other, from) => from !== at && paths[at].startsWith(other)))
-    if (nested.length > 0) {
-        throw new Error(
-            'jaad: sections overlap\n' +
-                nested
-                    .map((section) => `  ${section.key}: ${section.dir} is, or is inside, another section`)
-                    .join('\n') +
-                '\nGive every section a directory of its own.',
-        )
-    }
-    return sections
+/** No directory may be, or be inside, another. */
+function assertSeparateRoots(roots: DocsRoot[], cwd: string): void {
+    const paths = roots.map((root) => root.dir + sep)
+    const nested = roots.filter((_, at) => paths.some((other, from) => from !== at && paths[at].startsWith(other)))
+    if (nested.length === 0) return
+
+    throw new Error(
+        'jaad: sections overlap\n' +
+            nested
+                .map((root) => `  ${root.section ?? 'docsDir'}: ${relative(cwd, root.dir)} is, or is inside, another`)
+                .join('\n') +
+            '\nGive every section, and docsDir, a directory of its own.',
+    )
 }
 
 export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd()): JaadResolvedConfig {
     const config = parseConfig(options)
     const repo = inferRepo(cwd)
-    const sections = resolveSections(config, repo, cwd)
-    const locales = resolveLocales(config, cwd)
+    const sections = resolveSections(config, repo)
+    const docsDirInUse = sections.length === 0 || options.docsDir !== undefined
+    const roots = docsRoots({ ...config, docsDirInUse }, cwd)
+    assertSeparateRoots(roots, cwd)
+    const locales = resolveLocales(config, roots)
 
     const ambiguous = sections.find((section) => locales.includes(section.key))
     if (ambiguous) {
@@ -242,6 +249,7 @@ export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd
     return {
         ...config,
         docsSections: sections,
+        docsDirInUse,
         description: config.description ?? inferDescription(cwd) ?? undefined,
         repoUrl: repo?.url ?? null,
         favicon: findPublicAsset(cwd, FAVICONS),
@@ -254,19 +262,23 @@ export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd
     }
 }
 
-/** Where the markdown lives: `docsDir`, or the directory of every section. */
-export function docsRoots(config: Pick<JaadConfig, 'docsDir' | 'sections'>, cwd: string): DocsRoot[] {
-    const sections = Object.entries(config.sections ?? {})
-    return sections.length > 0
-        ? sections.map(([section, { dir }]) => ({ dir: resolve(cwd, dir), section }))
-        : [{ dir: resolve(cwd, config.docsDir) }]
+/** Where the markdown lives: `docsDir` when in use, then the directory of
+ *  every section. */
+export function docsRoots(
+    config: Pick<JaadResolvedConfig, 'docsDir' | 'sections' | 'docsDirInUse'>,
+    cwd: string,
+): DocsRoot[] {
+    return [
+        ...(config.docsDirInUse ? [{ dir: resolve(cwd, config.docsDir) }] : []),
+        ...Object.entries(config.sections ?? {}).map(([section, { dir }]) => ({ dir: resolve(cwd, dir), section })),
+    ]
 }
 
 /** Directory names win; `locales` only overrides what detection found. */
-function resolveLocales(config: JaadConfig, cwd: string): string[] {
+function resolveLocales(config: JaadConfig, roots: DocsRoot[]): string[] {
     if (config.locales === false) return []
 
-    const perRoot = docsRoots(config, cwd).map((root) => resolveLocalesIn(root.dir, config))
+    const perRoot = roots.map((root) => resolveLocalesIn(root.dir, config))
     const [first, ...rest] = perRoot
     const differing = rest.find((locales) => locales.join() !== first.join())
     if (differing) {

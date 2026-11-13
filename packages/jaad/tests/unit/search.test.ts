@@ -227,6 +227,25 @@ test('an empty query shows the first pages of each section', () => {
     )
 })
 
+test('an empty query starts with the pages outside the sections', () => {
+    const index = indexOf(
+        { page: { title: 'Welcome' }, entries: [] },
+        { page: { title: 'Intro', section: 'guide' }, entries: [] },
+    )
+    index.sections = [{ key: 'guide', label: 'Guide' }]
+    assert.deepEqual(
+        openingPages(index).map((group) => [group.label, group.pages.map((page) => page.title)]),
+        [
+            [undefined, ['Welcome']],
+            ['Guide', ['Intro']],
+        ],
+    )
+    assert.deepEqual(
+        openingPages(index, 'guide').map((group) => group.label),
+        ['Guide'],
+    )
+})
+
 // ── Snippets and marks ───────────────────────────────────────────────────────
 
 test('a snippet is cut around the first match and ellipsised where cut', () => {

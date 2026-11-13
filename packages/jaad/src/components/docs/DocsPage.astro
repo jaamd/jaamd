@@ -32,7 +32,7 @@ const urls = docsUrls(entry.locale)
 const t = ui(entry.locale)
 const language = LOCALES.find((known) => known.code === (entry.locale ?? DEFAULT_LOCALE))?.tag ?? config.lang
 const updated = entry.data.lastUpdated
-const navigation = buildDocsNavigation(sortedPages, entry.id, urls)
+const navigation = buildDocsNavigation(sortedPages, entry.id, urls, SECTIONS)
 const contentAttrs = { id: 'content' }
 ---
 

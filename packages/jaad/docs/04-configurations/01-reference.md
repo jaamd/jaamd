@@ -51,8 +51,8 @@ Astro's `base`.
 Locale directories under `docsDir` are detected on their own; `locales` only
 overrides that. See [Languages](10-i18n.md).
 
-`sections` replaces `docsDir`. See
-[Sections](03-structure.md#sections).
+With `sections`, `docsDir` is read only when set, for pages outside every
+section. See [Sections](03-structure.md#sections).
 
 To keep a landing page at `/`, mount documentation below it:
 

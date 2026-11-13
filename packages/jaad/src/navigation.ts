@@ -2,21 +2,26 @@ import type { DocsNavItem } from './@types/docs.ts'
 import { docsPageHref, type DocsUrlOptions } from './urls.ts'
 import { docCanonicalSlug, docLabel, docPath, parseDocCollectionId, type DocsPageLike } from './utils/docs.ts'
 
-export type DocsNavGroup =
+/** A page, or a chapter and its pages. */
+export type DocsNavEntry =
     | { type: 'page'; item: DocsNavItem }
     | { type: 'chapter'; chapter: string; items: DocsNavItem[] }
 
+/** A top-level entry. With sections, the pages outside them come first, then
+ *  every section and its entries. */
+export type DocsNavGroup = DocsNavEntry | { type: 'section'; section: string; label: string; entries: DocsNavEntry[] }
+
 export interface DocsNavigation {
-    /** Top-level pages and chapters of the current section, or of the whole tree. */
+    /** The whole tree, in reading order. */
     groups: DocsNavGroup[]
     previousPage: DocsNavItem | null
     nextPage: DocsNavItem | null
 }
 
 /** Each chapter sits where its first page does. */
-function groupByChapter(items: DocsNavItem[]): DocsNavGroup[] {
+function groupByChapter(items: DocsNavItem[]): DocsNavEntry[] {
     const chapters = new Map<string, DocsNavItem[]>()
-    const groups: DocsNavGroup[] = []
+    const groups: DocsNavEntry[] = []
 
     for (const item of items) {
         if (!item.chapter) {
@@ -71,22 +76,29 @@ function modelFor(sortedPages: DocsPageLike[], urls: DocsUrlOptions): Model {
     return model
 }
 
+/** Each section with pages, under its label, in the order of `sections`. */
+function groupBySection(items: DocsNavItem[], sections: { key: string; label: string }[]): DocsNavGroup[] {
+    return sections.flatMap(({ key, label }) => {
+        const own = items.filter((item) => item.section === key)
+        return own.length > 0 ? [{ type: 'section' as const, section: key, label, entries: groupByChapter(own) }] : []
+    })
+}
+
 export function buildDocsNavigation(
     sortedPages: DocsPageLike[],
     currentId: string,
     urls: DocsUrlOptions,
+    sections: { key: string; label: string }[] = [],
 ): DocsNavigation {
     const { items, positions } = modelFor(sortedPages, urls)
-    const currentIndex = positions.get(currentId) ?? -1
-    const section = items[currentIndex]?.section
-    // Navigation stays inside the section the page belongs to.
-    const marked = items
-        .map((item, index) => ({ ...item, isActive: index === currentIndex }))
-        .filter((item) => item.section === section)
-    const position = marked.findIndex((item) => item.isActive)
+    const position = positions.get(currentId) ?? -1
+    const marked = items.map((item, index) => ({ ...item, isActive: index === position }))
 
     return {
-        groups: groupByChapter(marked),
+        groups:
+            sections.length > 0
+                ? [...groupByChapter(marked.filter((item) => !item.section)), ...groupBySection(marked, sections)]
+                : groupByChapter(marked),
         previousPage: position > 0 ? marked[position - 1] : null,
         nextPage: position >= 0 && position < marked.length - 1 ? marked[position + 1] : null,
     }

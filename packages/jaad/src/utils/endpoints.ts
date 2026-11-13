@@ -64,14 +64,19 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
         ]
     }
 
-    // With sections, each is a heading and its chapters sit one level below.
+    // With sections, the pages outside them come first; each section is a
+    // heading, and its chapters sit one level below.
+    const loose = sortedPages.filter((page) => !page.section)
     const sections: string[] =
         SECTIONS.length === 0
             ? outline(sortedPages, '##')
-            : SECTIONS.flatMap((section) => {
-                  const pages = sortedPages.filter((page) => page.section === section.key)
-                  return pages.length > 0 ? [`## ${section.label}`, ...outline(pages, '###')] : []
-              })
+            : [
+                  ...(loose.length > 0 ? outline(loose, '##') : []),
+                  ...SECTIONS.flatMap((section) => {
+                      const pages = sortedPages.filter((page) => page.section === section.key)
+                      return pages.length > 0 ? [`## ${section.label}`, ...outline(pages, '###')] : []
+                  }),
+              ]
 
     const content = [`# ${config.title}`, ...(config.description ? [`> ${config.description}`] : []), ...sections].join(
         '\n\n',

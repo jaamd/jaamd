@@ -165,17 +165,21 @@ export function search(index: SearchIndex, query: string, section?: string): Sea
         .map((group) => ({ ...group, hits: group.hits.toSorted((a, b) => b.score - a.score).slice(0, MAX_HITS) }))
 }
 
-/** What an empty query shows: the first pages of each section, or of the docs. */
+/** What an empty query shows: the pages outside the sections, then the first
+ *  pages of each section; without sections, the first pages of the docs. */
 export function openingPages(index: SearchIndex, section?: string): { label?: string; pages: SearchPage[] }[] {
     if (index.sections.length === 0) return [{ pages: index.pages.slice(0, MAX_GROUPS) }]
 
-    return index.sections
-        .filter(({ key }) => !section || key === section)
-        .map(({ key, label }) => ({
-            label,
-            pages: index.pages.filter((page) => page.section === key).slice(0, PAGES_PER_SECTION),
-        }))
-        .filter((group) => group.pages.length > 0)
+    const loose = section ? [] : index.pages.filter((page) => !page.section).slice(0, PAGES_PER_SECTION)
+    return [
+        { pages: loose },
+        ...index.sections
+            .filter(({ key }) => !section || key === section)
+            .map(({ key, label }) => ({
+                label,
+                pages: index.pages.filter((page) => page.section === key).slice(0, PAGES_PER_SECTION),
+            })),
+    ].filter((group) => group.pages.length > 0)
 }
 
 /** The text around the first matching word, or its start when none matches,
