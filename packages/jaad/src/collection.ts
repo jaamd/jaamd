@@ -4,12 +4,11 @@ import { getCollection } from 'astro:content'
 import { DEFAULT_LOCALE, LOCALES, SECTIONS, docsUrls, prefixedCodes } from './docs-config.ts'
 import { docsPageHref } from './urls.ts'
 import {
-    docTranslationKey,
     collectionName,
-    getCanonicalDocSlug,
+    docCanonicalSlug,
+    docTranslationKey,
     sortDocPages,
     splitDocLocale,
-    splitDocSection,
     validateDocsStructure,
 } from './utils/docs.ts'
 
@@ -30,18 +29,14 @@ const CODES = LOCALES.map((locale) => locale.code)
 
 const KEYS = SECTIONS.map((section) => section.key)
 
-/** Attaches the locale, the section and the id routing reads, leaving `id` the
- *  collection id. */
-function localise(page: DocsEntry): DocsEntry {
-    if (CODES.length === 0 && KEYS.length === 0) return page
+/** Attaches the locale, the section and the path, leaving `id` the collection id. */
+function place(page: DocsEntry, section?: string): DocsEntry {
     const { locale, id } = splitDocLocale(page.id, CODES)
-    const split = splitDocSection(id, KEYS)
     return {
         ...page,
         locale: locale ?? undefined,
-        localeId: split.id,
-        section: split.section ?? undefined,
-        sectionOrder: split.section ? KEYS.indexOf(split.section) : undefined,
+        section,
+        path: section ? id.slice(section.length + 1) : id,
     }
 }
 
@@ -52,15 +47,19 @@ export async function getSortedDocsPages(locale: string = DEFAULT_LOCALE): Promi
     const hit = cached.get(key)
     if (import.meta.env.PROD && hit) return hit
 
-    const names = KEYS.length > 0 ? KEYS.map((section) => collectionName(section)) : [collectionName()]
-    const collections = await Promise.all(names.map((name) => getCollection(name as 'docsPages')))
-    const pages = (collections.flat() as unknown as DocsEntry[])
-        .map(localise)
-        .filter((page) => key === '' || page.locale === key)
+    // One collection per section, or the only one.
+    const sections = KEYS.length > 0 ? KEYS : [undefined]
+    const collections = await Promise.all(
+        sections.map(async (section) => {
+            const entries = await getCollection(collectionName(section) as 'docsPages')
+            return (entries as unknown as DocsEntry[]).map((page) => place(page, section))
+        }),
+    )
+    const pages = collections.flat().filter((page) => key === '' || page.locale === key)
 
     // Validated before drafts are dropped, so a draft's slug conflict is an error.
     validateDocsStructure(pages, key || undefined)
-    const sorted = sortDocPages(import.meta.env.PROD ? pages.filter((page) => !page.data.draft) : pages)
+    const sorted = sortDocPages(import.meta.env.PROD ? pages.filter((page) => !page.data.draft) : pages, KEYS)
     if (import.meta.env.PROD) cached.set(key, sorted)
     return sorted
 }
@@ -80,7 +79,7 @@ export async function getSectionLinks(locale: string = DEFAULT_LOCALE): Promise<
     return SECTIONS.flatMap(({ key, label }) => {
         const index = pages.findIndex((page) => page.section === key)
         if (index === -1) return []
-        return [{ key, label, href: docsPageHref(getCanonicalDocSlug(pages[index], index, pages), urls) }]
+        return [{ key, label, href: docsPageHref(docCanonicalSlug(pages[index], index, pages), urls) }]
     })
 }
 
@@ -108,7 +107,7 @@ export async function getLocaleAlternates(key: string): Promise<LocaleAlternate[
         alternates.push({
             locale,
             translated: Boolean(match),
-            href: docsPageHref(match ? getCanonicalDocSlug(match, index, pages) : '', docsUrls(locale.code)),
+            href: docsPageHref(match ? docCanonicalSlug(match, index, pages) : '', docsUrls(locale.code)),
         })
     }
 

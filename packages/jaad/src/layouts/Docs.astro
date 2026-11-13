@@ -1,5 +1,5 @@
 ---
-import type { DocsEntry, DocsHeadings } from '../@types/docs.ts'
+import type { DocsEntry, DocsHeading } from '../@types/docs.ts'
 import type { DocsFrameProps } from '../advanced.ts'
 import type { DocsNavigation } from '../navigation.ts'
 import { ClientRouter } from 'astro:transitions'
@@ -27,7 +27,7 @@ interface Props {
     title?: string
     chapter?: string
     entry?: DocsEntry
-    headings?: DocsHeadings[]
+    headings?: DocsHeading[]
     navigation: DocsNavigation
 }
 
@@ -67,6 +67,7 @@ const frameProps: DocsFrameProps = {
         id: entry?.id ?? '',
         slug: entry ? docSlug(entry) : '',
         title: entryTitle,
+        section: entry?.section,
         chapter,
         data: entry?.data ?? { draft: false, keywords: [] },
     },

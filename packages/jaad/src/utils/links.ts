@@ -1,15 +1,9 @@
+import type { DocsRoot } from '../config.ts'
 import type { DocsUrlOptions } from '../urls.ts'
 import { existsSync } from 'node:fs'
 import { dirname, relative, resolve, sep } from 'node:path'
 import { docsPageHref } from '../urls.ts'
 import { getCleanSlug, getDocCollectionId, splitDocLocale } from './docs.ts'
-
-/** A directory of markdown, and the section it is when the docs have sections. */
-export interface DocsRoot {
-    /** Absolute. */
-    dir: string
-    section?: string
-}
 
 export interface DocLinkContext {
     roots: DocsRoot[]

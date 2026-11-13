@@ -51,12 +51,22 @@ The extensionless paths are gone. Add `.css`:
 | `@jaamd/jaamd/themes/<slug>`      | `@jaamd/astro/themes/<slug>.css`      |
 | `@jaamd/jaamd/themes/<slug>/dark` | `@jaamd/astro/themes/<slug>/dark.css` |
 
-### Custom docs frame: `navigation.sections` is `navigation.groups`
+### Custom docs frame: renamed navigation types
 
-A `src/jaad/DocsFrame.astro` that reads the navigation renames two things:
-`navigation.sections` is now `navigation.groups`, and the `NavSection` type is
-`NavGroup`. "Section" now names a part of the documentation with its own
-directory.
+"Section" now names a part of the documentation with its own directory. A
+`src/jaad/DocsFrame.astro` that reads the navigation follows these renames:
+
+| Before                          | After               |
+| ------------------------------- | ------------------- |
+| `navigation.sections`           | `navigation.groups` |
+| `NavSection`                    | `DocsNavGroup`      |
+| `DocsHeadings`                  | `DocsHeading`       |
+| `DocsEntry.localeId`            | `DocsEntry.path`    |
+| `order` on a group              | removed             |
+| `primaryOrder` on `DocsNavItem` | removed             |
+
+Groups and items arrive in display order, so nothing replaces the two removed
+fields.
 
 ## From 0.9
 

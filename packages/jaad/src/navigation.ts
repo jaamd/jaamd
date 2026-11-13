@@ -1,43 +1,39 @@
 import type { DocsNavItem } from './@types/docs.ts'
 import { docsPageHref, type DocsUrlOptions } from './urls.ts'
-import { docLabel, getCanonicalDocSlug, parseDocCollectionId, routedId, type DocsPageLike } from './utils/docs.ts'
+import { docCanonicalSlug, docLabel, docPath, parseDocCollectionId, type DocsPageLike } from './utils/docs.ts'
 
-export type NavGroup =
-    | { type: 'page'; order: number; item: DocsNavItem }
-    | { type: 'chapter'; order: number; chapter: string; items: DocsNavItem[] }
+export type DocsNavGroup =
+    | { type: 'page'; item: DocsNavItem }
+    | { type: 'chapter'; chapter: string; items: DocsNavItem[] }
 
 export interface DocsNavigation {
     /** Top-level pages and chapters of the current section, or of the whole tree. */
-    groups: NavGroup[]
+    groups: DocsNavGroup[]
     previousPage: DocsNavItem | null
     nextPage: DocsNavItem | null
 }
 
-function groupByChapter(items: DocsNavItem[]): NavGroup[] {
-    const chapters = new Map<string, Extract<NavGroup, { type: 'chapter' }>>()
-    const groups: NavGroup[] = []
+/** Each chapter sits where its first page does. */
+function groupByChapter(items: DocsNavItem[]): DocsNavGroup[] {
+    const chapters = new Map<string, DocsNavItem[]>()
+    const groups: DocsNavGroup[] = []
 
     for (const item of items) {
         if (!item.chapter) {
-            groups.push({ type: 'page', order: item.primaryOrder, item })
+            groups.push({ type: 'page', item })
             continue
         }
 
-        let chapter = chapters.get(item.chapter)
-        if (!chapter) {
-            chapter = {
-                type: 'chapter',
-                order: item.primaryOrder,
-                chapter: item.chapter,
-                items: [],
-            }
-            chapters.set(item.chapter, chapter)
-            groups.push(chapter)
+        let pages = chapters.get(item.chapter)
+        if (!pages) {
+            pages = []
+            chapters.set(item.chapter, pages)
+            groups.push({ type: 'chapter', chapter: item.chapter, items: pages })
         }
-        chapter.items.push(item)
+        pages.push(item)
     }
 
-    return groups.toSorted((a, b) => a.order - b.order)
+    return groups
 }
 
 /** Build every navigation view from one ordered collection traversal. */
@@ -61,17 +57,13 @@ function modelFor(sortedPages: DocsPageLike[], urls: DocsUrlOptions): Model {
     if (cached) return cached
 
     const model: Model = {
-        items: sortedPages.map((page, index): DocsNavItem => {
-            const parsed = parseDocCollectionId(routedId(page))
-            return {
-                title: docLabel(page),
-                section: page.section,
-                chapter: parsed.chapter,
-                primaryOrder: parsed.orderChapter ?? page.data?.order ?? parsed.order,
-                href: docsPageHref(getCanonicalDocSlug(page, index, sortedPages), urls),
-                isActive: false,
-            }
-        }),
+        items: sortedPages.map((page, index): DocsNavItem => ({
+            title: docLabel(page),
+            section: page.section,
+            chapter: parseDocCollectionId(docPath(page)).chapter,
+            href: docsPageHref(docCanonicalSlug(page, index, sortedPages), urls),
+            isActive: false,
+        })),
         positions: new Map(sortedPages.map((page, index) => [page.id, index])),
     }
 

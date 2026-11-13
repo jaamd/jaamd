@@ -4,7 +4,7 @@ import { getSortedDocsPages } from '../collection.ts'
 import DocsPage from '../components/docs/DocsPage.astro'
 import { buildLocales, docsUrls, localePrefix } from '../docs-config.ts'
 import { docsPageHref, withDeploymentBase } from '../urls.ts'
-import { docSlug, docTitle, getCanonicalDocSlug } from '../utils/docs.ts'
+import { docAliases, docCanonicalSlug, docTitle } from '../utils/docs.ts'
 
 interface DocsPath {
     params: { slug: string }
@@ -23,15 +23,12 @@ export async function getStaticPaths() {
             const add = (slug: string, redirect?: string) =>
                 paths.push({ params: { slug }, props: { id: page.id, locale, redirect } })
 
-            const canonical = getCanonicalDocSlug(page, index, sortedPages)
-            const named = docSlug(page)
+            const canonical = docCanonicalSlug(page, index, sortedPages)
 
             // Empty is the index route's; a prefixed locale has none, so /it is this page.
             const own = `${prefix}${canonical}`.replace(/\/$/, '')
             if (own) add(own)
-            if (named !== canonical) add(`${prefix}${named}`, canonical)
-            // The first section has no page of its own: its key opens the docs.
-            if (index === 0 && page.section) add(`${prefix}${page.section}`, canonical)
+            for (const alias of docAliases(page, index, sortedPages)) add(`${prefix}${alias}`, canonical)
         })
     }
 

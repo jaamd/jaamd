@@ -9,7 +9,7 @@ import {
     formatChapterTitle,
     docSlug,
     parseDocCollectionId,
-    routedId,
+    docPath,
 } from './docs.ts'
 
 export async function searchIndexResponse(locale?: string): Promise<Response> {
@@ -44,7 +44,7 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
         const chapters = new Map<string, Row[]>()
 
         for (const page of pages) {
-            const { chapter } = parseDocCollectionId(routedId(page))
+            const { chapter } = parseDocCollectionId(docPath(page))
             const title = docTitle(page)
             const row: Row = {
                 title,

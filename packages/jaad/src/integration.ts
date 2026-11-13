@@ -1,15 +1,15 @@
-import type { JaadResolvedConfig, resolveStylesheets } from './config.ts'
-import type { DocsRoot } from './utils/links.ts'
+import type { DocsRoot, JaadResolvedConfig, resolveStylesheets } from './config.ts'
 import type { AstroIntegration, AstroUserConfig } from 'astro'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { join, relative, resolve } from 'node:path'
+import { join, relative } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { docsRoots } from './config.ts'
 import { fonts } from './fonts.ts'
 import { rehypeDocLinks, satteriDocLinks } from './link-plugins.ts'
 import { prefixedLocales } from './locales.ts'
 import { docsPageHref, normaliseBasePath, type DocsUrlOptions } from './urls.ts'
-import { docSlug, getCanonicalDocSlug, getDocCollectionId, sortDocPages, splitDocLocale } from './utils/docs.ts'
+import { docAliases, getDocCollectionId, sortDocPages, splitDocLocale, type DocsPageLike } from './utils/docs.ts'
 import { jaadVirtualPlugin } from './virtual.ts'
 
 type Stylesheets = ReturnType<typeof resolveStylesheets>
@@ -41,15 +41,15 @@ export function loadTailwindPlugin(root: string, registered: VitePlugins | undef
     return tailwindcss()
 }
 
-/** One per locale: each has its own first page, and its own redirect. */
-export interface OpeningPage {
+/** A named url that redirects to its page's canonical one. */
+export interface DocsAlias {
     locale?: string
     slug: string
 }
 
 export interface IntegrationState {
     deploymentBase: string
-    openingPages: OpeningPage[]
+    aliases: DocsAlias[]
     docsFrame: string
 }
 
@@ -68,8 +68,7 @@ export function shouldInjectNotFound(docsBase: string, srcDir: URL): boolean {
     return docsBase === '' && !NOT_FOUND_PAGE_NAMES.some((name) => existsSync(new URL(`pages/${name}`, srcDir)))
 }
 
-/** The two fields that move the opening page. The content collection is not
- *  available this early, so `order` and `draft` are read from the file. */
+/** The two fields that move the first page of the docs or of a section. */
 function readFrontmatter(source: string): { order?: number; draft?: boolean } {
     const block = /^---\r?\n([\s\S]*?)\r?\n---/.exec(source)
     if (!block) return {}
@@ -82,58 +81,39 @@ function readFrontmatter(source: string): { order?: number; draft?: boolean } {
     }
 }
 
-/** The pages whose named url redirects: the first of the docs and of every
- *  section, per locale. With sections, the first section's key redirects too. */
-export function findOpeningPages(roots: string | DocsRoot[], locales: string[] = []): OpeningPage[] {
-    const pages: {
-        id: string
-        localeId: string
-        locale: string | null
-        section?: string
-        sectionOrder: number
-        data: { order?: number }
-    }[] = []
+/** The aliases of every locale. The content collection is not available this
+ *  early, so the pages are read from disk. */
+export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlias[] {
+    const pages: (DocsPageLike & { locale: string | null })[] = []
 
-    const visit = (root: DocsRoot, sectionOrder: number, current: string) => {
+    const visit = (root: DocsRoot, current: string) => {
         for (const entry of readdirSync(current, { withFileTypes: true }).toSorted((a, b) =>
             a.name.localeCompare(b.name),
         )) {
             const file = join(current, entry.name)
-            if (entry.isDirectory()) visit(root, sectionOrder, file)
+            if (entry.isDirectory()) visit(root, file)
             else if (entry.isFile() && entry.name.endsWith('.md')) {
                 const front = readFrontmatter(readFileSync(file, 'utf8'))
                 if (front.draft) continue
 
-                const id = getDocCollectionId(relative(root.dir, file))
-                const split = splitDocLocale(id, locales)
-                pages.push({
-                    id,
-                    localeId: split.id,
-                    locale: split.locale,
-                    section: root.section,
-                    sectionOrder,
-                    data: { order: front.order },
-                })
+                const { locale, id } = splitDocLocale(getDocCollectionId(relative(root.dir, file)), locales)
+                pages.push({ id, locale, section: root.section, data: { order: front.order } })
             }
         }
     }
+    for (const root of roots) {
+        if (existsSync(root.dir)) visit(root, root.dir)
+    }
 
-    const all = typeof roots === 'string' ? [{ dir: roots }] : roots
-    all.forEach((root, order) => {
-        if (existsSync(root.dir)) visit(root, order, root.dir)
-    })
-
-    const groups = locales.length > 0 ? locales : [null]
-    return groups.flatMap((locale) => {
-        const sorted = sortDocPages(pages.filter((page) => page.locale === locale))
-        const opening = sorted
-            .filter((page, index) => getCanonicalDocSlug(page, index, sorted) !== docSlug(page))
-            .map((page) => docSlug(page))
-        const firstSection = sorted[0]?.section
-        return [...opening, ...(firstSection ? [firstSection] : [])].map((slug) => ({
-            locale: locale ?? undefined,
-            slug,
-        }))
+    const sections = roots.flatMap((root) => root.section ?? [])
+    return (locales.length > 0 ? locales : [null]).flatMap((locale) => {
+        const sorted = sortDocPages(
+            pages.filter((page) => page.locale === locale),
+            sections,
+        )
+        return sorted
+            .flatMap((page, index) => docAliases(page, index, sorted))
+            .map((slug) => ({ locale: locale ?? undefined, slug }))
     })
 }
 
@@ -161,7 +141,7 @@ export function getInjectedRoutes(docsBase: string, locales: string[] = []): [st
 export function createIntegrationState(): IntegrationState {
     return {
         deploymentBase: '',
-        openingPages: [],
+        aliases: [],
         docsFrame: fileURLToPath(new URL('./layouts/DefaultDocsFrame.astro', import.meta.url)),
     }
 }
@@ -170,7 +150,7 @@ export function createCoreIntegration(
     config: JaadResolvedConfig,
     stylesheets: Stylesheets,
     state: IntegrationState,
-    discoverOpeningPage: boolean,
+    discoverAliases: boolean,
 ): AstroIntegration {
     return {
         name: 'jaad',
@@ -223,13 +203,8 @@ export function createCoreIntegration(
                 }
 
                 const root = fileURLToPath(astroConfig.root)
-                const roots: DocsRoot[] =
-                    config.docsSections.length > 0
-                        ? config.docsSections.map((section) => ({
-                              dir: resolve(root, section.dir),
-                              section: section.key,
-                          }))
-                        : [{ dir: resolve(root, config.docsDir) }]
+                const roots = docsRoots(config, root)
+                const locales = config.docsLocales.map((locale) => locale.code)
 
                 const missing = roots.filter(({ dir }) => !existsSync(dir))
                 for (const { dir } of missing) {
@@ -238,17 +213,14 @@ export function createCoreIntegration(
                             'Create it, or point docsDir or the section at your markdown.',
                     )
                 }
-                if (discoverOpeningPage && missing.length < roots.length) {
-                    state.openingPages = findOpeningPages(
-                        roots,
-                        config.docsLocales.map((locale) => locale.code),
-                    )
+                if (discoverAliases && missing.length < roots.length) {
+                    state.aliases = findAliases(roots, locales)
                 }
                 for (const { dir } of roots) addWatchFile(pathToFileURL(dir))
 
                 const links = {
                     roots,
-                    locales: config.docsLocales.map((locale) => locale.code),
+                    locales,
                     urls: (locale?: string): DocsUrlOptions => ({
                         docsBase: config.docsBase,
                         deploymentBase: normaliseBasePath(astroConfig.base),
@@ -304,21 +276,21 @@ const withoutTrailingSlash = (value: string) => (value.length > 1 ? value.replac
 
 export function createSitemapFilter(
     docsBase: string,
-    state: Pick<IntegrationState, 'deploymentBase' | 'openingPages'>,
+    state: Pick<IntegrationState, 'deploymentBase' | 'aliases'>,
     defaultLocale?: string,
 ): (page: string) => boolean {
     return (page) => {
-        if (state.openingPages.length === 0) return true
+        if (state.aliases.length === 0) return true
 
         const pathname = withoutTrailingSlash(new URL(page).pathname)
-        return !state.openingPages.some((opening) => {
+        return !state.aliases.some((alias) => {
             const urls: DocsUrlOptions = {
                 docsBase,
                 deploymentBase: state.deploymentBase,
-                locale: opening.locale,
+                locale: alias.locale,
                 defaultLocale,
             }
-            return pathname === withoutTrailingSlash(docsPageHref(opening.slug, urls))
+            return pathname === withoutTrailingSlash(docsPageHref(alias.slug, urls))
         })
     }
 }

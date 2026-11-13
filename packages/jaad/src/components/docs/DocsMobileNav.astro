@@ -1,14 +1,14 @@
 ---
-import type { DocsHeadings } from '../../@types/docs.ts'
-import type { NavGroup } from '../../navigation.ts'
+import type { DocsHeading } from '../../@types/docs.ts'
+import type { DocsNavGroup } from '../../navigation.ts'
 import { ui } from '../../docs-config.ts'
 import { formatChapterTitle } from '../../utils/docs.ts'
 import ScrollToTop from '../ScrollToTop.astro'
 
 interface Props {
     locale?: string
-    groups: NavGroup[]
-    headings: DocsHeadings[]
+    groups: DocsNavGroup[]
+    headings: DocsHeading[]
 }
 
 const { groups, headings, locale } = Astro.props

@@ -7,7 +7,7 @@ import { test } from 'node:test'
 import { pathToFileURL } from 'node:url'
 import {
     createSitemapFilter,
-    findOpeningPages,
+    findAliases,
     getInjectedRoutes,
     loadTailwindPlugin,
     shouldInjectNotFound,
@@ -20,7 +20,7 @@ test('opening-page discovery follows collection slugging and numeric order', () 
         writeFileSync(join(docsDir, '01-images-&-videos.md'), '# Images')
         writeFileSync(join(docsDir, '02-guides', '01-setup.md'), '# Setup')
 
-        assert.deepEqual(findOpeningPages(docsDir), [{ locale: undefined, slug: 'images--videos' }])
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'images--videos' }])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
@@ -34,7 +34,7 @@ test('a draft never counts as the opening page', () => {
         writeFileSync(join(docsDir, '00-scratch.md'), '---\ndraft: true\n---\n\n# Scratch')
         writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
 
-        assert.deepEqual(findOpeningPages(docsDir), [{ locale: undefined, slug: 'intro' }])
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'intro' }])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
@@ -46,7 +46,7 @@ test('frontmatter order moves the opening page', () => {
         writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
         writeFileSync(join(docsDir, '02-welcome.md'), '---\norder: 0\n---\n\n# Welcome')
 
-        assert.deepEqual(findOpeningPages(docsDir), [{ locale: undefined, slug: 'welcome' }])
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'welcome' }])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
@@ -55,7 +55,7 @@ test('frontmatter order moves the opening page', () => {
 test("the sitemap omits only the opening page's named redirect", () => {
     const filter = createSitemapFilter('/docs', {
         deploymentBase: '/repo',
-        openingPages: [{ slug: 'images--videos' }],
+        aliases: [{ slug: 'images--videos' }],
     })
 
     assert.equal(filter('https://example.dev/repo/docs/images--videos/'), false)
@@ -74,7 +74,7 @@ test('each locale gets its own opening page', () => {
         writeFileSync(join(docsDir, 'en', '02-guide.md'), '# Guide')
         writeFileSync(join(docsDir, 'it', '01-introduzione.md'), '# Introduzione')
 
-        assert.deepEqual(findOpeningPages(docsDir, ['en', 'it']), [
+        assert.deepEqual(findAliases([{ dir: docsDir }], ['en', 'it']), [
             { locale: 'en', slug: 'intro' },
             { locale: 'it', slug: 'introduzione' },
         ])
@@ -88,7 +88,7 @@ test('the sitemap omits the named redirect of every locale', () => {
         '',
         {
             deploymentBase: '',
-            openingPages: [
+            aliases: [
                 { locale: 'en', slug: 'intro' },
                 { locale: 'it', slug: 'introduzione' },
             ],

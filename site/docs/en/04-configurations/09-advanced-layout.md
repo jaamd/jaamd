@@ -94,38 +94,39 @@ conditional placement. JAAD's internal components are not part of this API.
 | `page.id`                 | Content collection ID                        |
 | `page.slug`               | File-derived slug, including the opening one |
 | `page.title`              | Resolved page title                          |
+| `page.section`            | Section key, when the docs have sections     |
 | `page.chapter`            | Chapter slug, when present                   |
 | `headings`                | `{ depth, slug, text }[]` for levels 2 and 3 |
 | `navigation.groups`       | Ordered top-level pages and chapter groups   |
 | `navigation.previousPage` | Previous navigation item or `null`           |
 | `navigation.nextPage`     | Next navigation item or `null`               |
 
-`page.chapter` and `NavGroup.chapter` are directory slugs, such as
+`page.chapter` and `DocsNavGroup.chapter` are directory slugs, such as
 `getting-started`. Title-case them for display.
 
 ### Navigation shapes
 
-`NavGroup` is a union discriminated on `type`.
+`DocsNavGroup` is a union discriminated on `type`.
 
 ```ts
-type NavGroup =
-    | { type: 'page'; order: number; item: DocsNavItem }
-    | { type: 'chapter'; order: number; chapter: string; items: DocsNavItem[] }
+type DocsNavGroup = { type: 'page'; item: DocsNavItem } | { type: 'chapter'; chapter: string; items: DocsNavItem[] }
 
 interface DocsNavItem {
     title: string
+    section?: string
     chapter: string | undefined
-    primaryOrder: number
     href: string
     isActive: boolean
 }
 ```
 
+Groups and their items arrive in display order.
+
 `href` already carries `routeBase` and the deployment `base`. `isActive` marks
 the current page.
 
-`DocsFrameProps`, `DocsNavigation`, `NavGroup`, `DocsHeadings`, `DocsNavItem`
-and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
+`DocsFrameProps`, `DocsNavigation`, `DocsNavGroup`, `DocsHeading`,
+`DocsNavItem` and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
 [`src/jaad.css`](/docs/jaad/configurations/styles) instead.

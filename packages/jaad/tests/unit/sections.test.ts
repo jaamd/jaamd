@@ -4,15 +4,14 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { resolveConfig } from '../../src/config.ts'
-import { findOpeningPages } from '../../src/integration.ts'
+import { findAliases } from '../../src/integration.ts'
 import { rehypeDocLinks } from '../../src/link-plugins.ts'
 import { buildDocsNavigation } from '../../src/navigation.ts'
 import {
     collectionIdFor,
     docSlug,
-    getCanonicalDocSlug,
+    docCanonicalSlug,
     sortDocPages,
-    splitDocSection,
     validateDocsStructure,
 } from '../../src/utils/docs.ts'
 import { resolveDocLink } from '../../src/utils/links.ts'
@@ -23,7 +22,7 @@ const urls = { docsBase: '' }
 const inSections = (...ids: string[]) =>
     ids.map((id) => {
         const [section, ...rest] = id.split('/')
-        return { id, localeId: rest.join('/'), section, sectionOrder: ['guide', 'api'].indexOf(section) }
+        return { id, path: rest.join('/'), section }
     })
 
 function withTree(files: Record<string, string>, run: (root: string) => void) {
@@ -40,15 +39,6 @@ function withTree(files: Record<string, string>, run: (root: string) => void) {
 }
 
 // ── Ids ──────────────────────────────────────────────────────────────────────
-
-test('a section is split off the id only when it is a declared one', () => {
-    assert.deepEqual(splitDocSection('api/01-client', ['guide', 'api']), { section: 'api', id: '01-client' })
-    assert.deepEqual(splitDocSection('02-guides/01-setup', ['guide', 'api']), {
-        section: null,
-        id: '02-guides/01-setup',
-    })
-    assert.deepEqual(splitDocSection('api', ['api']), { section: null, id: 'api' })
-})
 
 test('a file gets the key of the section its directory is', () => {
     assert.equal(collectionIdFor('02-setup/01-install.md', 'guide', []), 'guide/02-setup/01-install')
@@ -68,7 +58,7 @@ test('without sections the id is the path', () => {
 test('sections sort in the declared order, pages by their own inside each', () => {
     const pages = inSections('api/02-server', 'guide/02-setup/01-install', 'api/01-client', 'guide/01-intro')
     assert.deepEqual(
-        sortDocPages(pages).map((page) => page.id),
+        sortDocPages(pages, ['guide', 'api']).map((page) => page.id),
         ['guide/01-intro', 'guide/02-setup/01-install', 'api/01-client', 'api/02-server'],
     )
 })
@@ -81,7 +71,7 @@ test('the slug of a page starts with its section', () => {
 test('the first page opens the docs, the first of a later section opens the section', () => {
     const pages = inSections('guide/01-intro', 'guide/02-next', 'api/01-client', 'api/02-server')
     assert.deepEqual(
-        pages.map((page, index) => getCanonicalDocSlug(page, index, pages)),
+        pages.map((page, index) => docCanonicalSlug(page, index, pages)),
         ['', 'guide/next', 'api', 'api/server'],
     )
 })
@@ -190,8 +180,8 @@ test('every section opener, and the first section key, has a url that redirects'
                 { dir: join(root, 'api'), section: 'api' },
             ]
             assert.deepEqual(
-                findOpeningPages(roots).map((page) => page.slug),
-                ['guide/intro', 'api/client', 'guide'],
+                findAliases(roots).map((page) => page.slug),
+                ['guide/intro', 'guide', 'api/client'],
             )
         },
     )

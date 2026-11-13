@@ -150,6 +150,13 @@ export interface DocsSection {
     editBase: string | null
 }
 
+/** A directory of markdown, and the section it is when the docs have sections. */
+export interface DocsRoot {
+    /** Absolute. */
+    dir: string
+    section?: string
+}
+
 const FAVICONS = ['favicon.svg', 'favicon.ico', 'favicon.png']
 const OG_IMAGES = ['og-image.png', 'og-image.jpg', 'og-image.jpeg', 'og-image.webp']
 
@@ -246,16 +253,18 @@ export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd
 }
 
 /** Where the markdown lives: `docsDir`, or the directory of every section. */
-function docsRoots(config: Pick<JaadConfig, 'docsDir' | 'sections'>): string[] {
-    const sections = Object.values(config.sections ?? {})
-    return sections.length > 0 ? sections.map((section) => section.dir) : [config.docsDir]
+export function docsRoots(config: Pick<JaadConfig, 'docsDir' | 'sections'>, cwd: string): DocsRoot[] {
+    const sections = Object.entries(config.sections ?? {})
+    return sections.length > 0
+        ? sections.map(([section, { dir }]) => ({ dir: resolve(cwd, dir), section }))
+        : [{ dir: resolve(cwd, config.docsDir) }]
 }
 
 /** Directory names win; `locales` only overrides what detection found. */
 function resolveLocales(config: JaadConfig, cwd: string): string[] {
     if (config.locales === false) return []
 
-    const perRoot = docsRoots(config).map((root) => resolveLocalesIn(join(cwd, root), config))
+    const perRoot = docsRoots(config, cwd).map((root) => resolveLocalesIn(root.dir, config))
     const [first, ...rest] = perRoot
     const differing = rest.find((locales) => locales.join() !== first.join())
     if (differing) {
