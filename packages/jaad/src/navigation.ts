@@ -1,42 +1,39 @@
 import type { DocsNavItem } from './@types/docs.ts'
 import { docsPageHref, type DocsUrlOptions } from './urls.ts'
-import { docLabel, getCanonicalDocSlug, parseDocCollectionId, routedId, type DocsPageLike } from './utils/docs.ts'
+import { docCanonicalSlug, docLabel, docPath, parseDocCollectionId, type DocsPageLike } from './utils/docs.ts'
 
-export type NavSection =
-    | { type: 'page'; order: number; item: DocsNavItem }
-    | { type: 'chapter'; order: number; chapter: string; items: DocsNavItem[] }
+export type DocsNavGroup =
+    | { type: 'page'; item: DocsNavItem }
+    | { type: 'chapter'; chapter: string; items: DocsNavItem[] }
 
 export interface DocsNavigation {
-    sections: NavSection[]
+    /** Top-level pages and chapters of the current section, or of the whole tree. */
+    groups: DocsNavGroup[]
     previousPage: DocsNavItem | null
     nextPage: DocsNavItem | null
 }
 
-function groupByChapter(items: DocsNavItem[]): NavSection[] {
-    const chapters = new Map<string, Extract<NavSection, { type: 'chapter' }>>()
-    const sections: NavSection[] = []
+/** Each chapter sits where its first page does. */
+function groupByChapter(items: DocsNavItem[]): DocsNavGroup[] {
+    const chapters = new Map<string, DocsNavItem[]>()
+    const groups: DocsNavGroup[] = []
 
     for (const item of items) {
         if (!item.chapter) {
-            sections.push({ type: 'page', order: item.primaryOrder, item })
+            groups.push({ type: 'page', item })
             continue
         }
 
-        let chapter = chapters.get(item.chapter)
-        if (!chapter) {
-            chapter = {
-                type: 'chapter',
-                order: item.primaryOrder,
-                chapter: item.chapter,
-                items: [],
-            }
-            chapters.set(item.chapter, chapter)
-            sections.push(chapter)
+        let pages = chapters.get(item.chapter)
+        if (!pages) {
+            pages = []
+            chapters.set(item.chapter, pages)
+            groups.push({ type: 'chapter', chapter: item.chapter, items: pages })
         }
-        chapter.items.push(item)
+        pages.push(item)
     }
 
-    return sections.toSorted((a, b) => a.order - b.order)
+    return groups
 }
 
 /** Build every navigation view from one ordered collection traversal. */
@@ -60,16 +57,13 @@ function modelFor(sortedPages: DocsPageLike[], urls: DocsUrlOptions): Model {
     if (cached) return cached
 
     const model: Model = {
-        items: sortedPages.map((page, index): DocsNavItem => {
-            const parsed = parseDocCollectionId(routedId(page))
-            return {
-                title: docLabel(page),
-                chapter: parsed.chapter,
-                primaryOrder: parsed.orderChapter ?? page.data?.order ?? parsed.order,
-                href: docsPageHref(getCanonicalDocSlug(page, index), urls),
-                isActive: false,
-            }
-        }),
+        items: sortedPages.map((page, index): DocsNavItem => ({
+            title: docLabel(page),
+            section: page.section,
+            chapter: parseDocCollectionId(docPath(page)).chapter,
+            href: docsPageHref(docCanonicalSlug(page, index, sortedPages), urls),
+            isActive: false,
+        })),
         positions: new Map(sortedPages.map((page, index) => [page.id, index])),
     }
 
@@ -84,14 +78,16 @@ export function buildDocsNavigation(
 ): DocsNavigation {
     const { items, positions } = modelFor(sortedPages, urls)
     const currentIndex = positions.get(currentId) ?? -1
-    const marked = items.map((item, index) => ({
-        ...item,
-        isActive: index === currentIndex,
-    }))
+    const section = items[currentIndex]?.section
+    // Navigation stays inside the section the page belongs to.
+    const marked = items
+        .map((item, index) => ({ ...item, isActive: index === currentIndex }))
+        .filter((item) => item.section === section)
+    const position = marked.findIndex((item) => item.isActive)
 
     return {
-        sections: groupByChapter(marked),
-        previousPage: currentIndex > 0 ? marked[currentIndex - 1] : null,
-        nextPage: currentIndex >= 0 && currentIndex < marked.length - 1 ? marked[currentIndex + 1] : null,
+        groups: groupByChapter(marked),
+        previousPage: position > 0 ? marked[position - 1] : null,
+        nextPage: position >= 0 && position < marked.length - 1 ? marked[position + 1] : null,
     }
 }

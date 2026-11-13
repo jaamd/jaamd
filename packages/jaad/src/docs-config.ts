@@ -1,3 +1,4 @@
+import type { DocsSection } from './config.ts'
 import type { Locale } from './locales.ts'
 import type { DocsUrlOptions } from './urls.ts'
 import config from 'virtual:jaad/config'
@@ -6,6 +7,7 @@ import { uiString, type UiKey } from './ui.ts'
 
 /** The virtual config, read once. */
 export const LOCALES: Locale[] = config.docsLocales
+export const SECTIONS: DocsSection[] = config.docsSections
 export const DEFAULT_LOCALE: string = config.defaultLocale
 
 /** The four fields every href builder takes, in one place. */

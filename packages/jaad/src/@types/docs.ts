@@ -8,13 +8,14 @@ export interface ParsedDocsCollectionId {
 
 export interface DocsNavItem {
     title: string
+    /** Set when the docs are split into sections. */
+    section?: string
     chapter: string | undefined
-    primaryOrder: number
     href: string
     isActive: boolean
 }
 
-export interface DocsHeadings {
+export interface DocsHeading {
     depth: 2 | 3
     slug: string
     text: string
@@ -38,10 +39,12 @@ export interface DocsPageData {
  *  types in the consumer project, so the package states its own contract. */
 export interface DocsEntry {
     id: string
-    /** Set when the docs are localised; the id without its locale directory. */
-    localeId?: string
+    /** The id without its locale and its section. */
+    path?: string
     /** Set when the docs are localised. */
     locale?: string
+    /** Set when the docs are split into sections. */
+    section?: string
     body?: string
     data: DocsPageData
 }

@@ -1,35 +1,35 @@
 ---
-import type { NavSection } from '../../navigation.ts'
+import type { DocsNavGroup } from '../../navigation.ts'
 import { ui } from '../../docs-config.ts'
 import { formatChapterTitle } from '../../utils/docs.ts'
 
 interface Props {
-    sections: NavSection[]
+    groups: DocsNavGroup[]
     locale?: string
 }
 
-const { sections, locale } = Astro.props
+const { groups, locale } = Astro.props
 const t = ui(locale)
 ---
 
 <aside class="docs-sidebar-left jaad-sidebar">
     <nav aria-label={t('nav.documentation')}>
-        {sections.map((section) =>
-            section.type === 'page' ? (
+        {groups.map((group) =>
+            group.type === 'page' ? (
                 <div class="docs-sidebar-page">
                     <a
-                        href={section.item.href}
+                        href={group.item.href}
                         class="docs-sidebar-link"
-                        aria-current={section.item.isActive ? 'page' : undefined}
+                        aria-current={group.item.isActive ? 'page' : undefined}
                     >
-                        {section.item.title}
+                        {group.item.title}
                     </a>
                 </div>
             ) : (
                 <div class="docs-sidebar-chapter">
-                    <h3 class="docs-sidebar-chapter-title">{formatChapterTitle(section.chapter)}</h3>
+                    <h3 class="docs-sidebar-chapter-title">{formatChapterTitle(group.chapter)}</h3>
                     <ul class="docs-sidebar-chapter-list">
-                        {section.items.map((item) => (
+                        {group.items.map((item) => (
                             <li>
                                 <a
                                     href={item.href}

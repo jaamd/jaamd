@@ -6,7 +6,7 @@ import {
     sortDocPages,
     getCleanSlug,
     getDocCollectionId,
-    getCanonicalDocSlug,
+    docCanonicalSlug,
     slugToTitle,
     formatChapterTitle,
     extractTitleFromMarkdown,
@@ -17,14 +17,14 @@ import {
     docLabel,
     docOrder,
     splitDocLocale,
-    routedId,
+    docPath,
     docTranslationKey,
     buildSearchIndex,
     validateDocsStructure,
 } from '../../src/utils/docs.ts'
 
 const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) =>
-    navigation.sections.flatMap((section) => (section.type === 'page' ? [section.item] : section.items))
+    navigation.groups.flatMap((section) => (section.type === 'page' ? [section.item] : section.items))
 
 // ── Numeric prefixes: the ordering convention the whole product rests on ──────
 
@@ -66,8 +66,8 @@ test('file paths use the same slug rules as the content collection', () => {
 
 test('only the first sorted page has an empty canonical slug', () => {
     const pages = [{ id: '01-intro' }, { id: '02-guide' }]
-    assert.equal(getCanonicalDocSlug(pages[0], 0), '')
-    assert.equal(getCanonicalDocSlug(pages[1], 1), 'guide')
+    assert.equal(docCanonicalSlug(pages[0], 0, pages), '')
+    assert.equal(docCanonicalSlug(pages[1], 1, pages), 'guide')
 })
 
 test('a flat tree or one chapter level has an unambiguous structure', () => {
@@ -260,7 +260,7 @@ test('root pages and chapters interleave by number', () => {
     )
 
     assert.deepEqual(
-        navigation.sections.map((s) => (s.type === 'page' ? s.item.title : `${s.chapter}(${String(s.items.length)})`)),
+        navigation.groups.map((s) => (s.type === 'page' ? s.item.title : `${s.chapter}(${String(s.items.length)})`)),
         ['Intro', 'guides(2)', 'Changelog'],
     )
 })
@@ -269,7 +269,7 @@ test('grouping keeps a chapter together even when its pages are apart', () => {
     const navigation = buildDocsNavigation([{ id: '02-a/01-x' }, { id: '02-a/02-y' }], '02-a/01-x', {
         docsBase: '/docs',
     })
-    const sections = navigation.sections
+    const sections = navigation.groups
     assert.equal(sections.length, 1)
     assert.equal(sections[0].type, 'chapter')
 })
@@ -282,7 +282,7 @@ test('navigation derives active, previous and next pages together', () => {
 
     assert.equal(navigation.previousPage?.title, 'Intro')
     assert.equal(navigation.nextPage?.title, 'Api')
-    assert.equal(navigation.sections.filter((section) => section.type === 'page' && section.item.isActive).length, 1)
+    assert.equal(navigation.groups.filter((section) => section.type === 'page' && section.item.isActive).length, 1)
 })
 
 // ── One title rule, wherever a page is named ─────────────────────────────────
@@ -363,23 +363,23 @@ test('a directory that is not a configured locale is left in place', () => {
 })
 
 test('ordering and chapters read the id without its locale', () => {
-    const page = { id: 'it/02-guides/01-setup', localeId: '02-guides/01-setup' }
-    assert.equal(routedId(page), '02-guides/01-setup')
+    const page = { id: 'it/02-guides/01-setup', path: '02-guides/01-setup' }
+    assert.equal(docPath(page), '02-guides/01-setup')
     assert.deepEqual(docOrder(page), { primary: 2, secondary: 1 })
-    assert.equal(parseDocCollectionId(routedId(page)).chapter, 'guides')
+    assert.equal(parseDocCollectionId(docPath(page)).chapter, 'guides')
 })
 
 // Three segments are only legal because the locale is gone by the time the
 // structure is checked.
 test('a chaptered page inside a locale is a valid structure', () => {
     assert.doesNotThrow(() => {
-        validateDocsStructure([{ id: 'it/02-guides/01-setup', localeId: '02-guides/01-setup' }], 'it')
+        validateDocsStructure([{ id: 'it/02-guides/01-setup', path: '02-guides/01-setup' }], 'it')
     })
 })
 
 test('a structure error names the file on disk, locale included', () => {
     assert.throws(() => {
-        validateDocsStructure([{ id: 'it/a/b/c', localeId: 'a/b/c' }], 'it')
+        validateDocsStructure([{ id: 'it/a/b/c', path: 'a/b/c' }], 'it')
     }, /it\/a\/b\/c: only one chapter directory/)
 })
 

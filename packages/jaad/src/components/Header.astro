@@ -14,10 +14,12 @@ interface Props {
     /** Whether this page is part of the docs. */
     inDocs?: boolean
     locale?: string
+    /** The section the page belongs to, when the docs have sections. */
+    section?: string
     alternates?: LocaleAlternate[]
 }
 
-const { inDocs = false, locale = DEFAULT_LOCALE } = Astro.props
+const { inDocs = false, locale = DEFAULT_LOCALE, section } = Astro.props
 // A page of the reader's own has no translations: offer each locale's opener.
 const alternates = Astro.props.alternates ?? (await getLocaleAlternates(''))
 const t = ui(locale)
@@ -36,11 +38,11 @@ const logoSrc = config.logo ? withDeploymentBase(config.logo, import.meta.env.BA
 
             <div class="jaad-header-actions">
                 <SearchPalette inDocs={inDocs} locale={locale} />
-                <Nav />
+                <Nav {locale} {section} />
                 <SocialLinks />
                 {config.appearance === 'auto' && <ThemeSwitcher {locale} />}
                 {alternates.length > 1 && <LocaleSwitcher {alternates} current={locale} />}
-                <NavMobile {locale} />
+                <NavMobile {locale} {section} />
             </div>
         </div>
     </div>

@@ -2,16 +2,10 @@
 import type { DocsEntry } from '../../@types/docs.ts'
 import MarkdownContent from '@jaamd/astro/components'
 import config from 'virtual:jaad/config'
-import { DEFAULT_LOCALE, LOCALES, docsUrls, ui } from '../../docs-config.ts'
+import { DEFAULT_LOCALE, LOCALES, SECTIONS, docsUrls, ui } from '../../docs-config.ts'
 import DocsLayout from '../../layouts/Docs.astro'
 import { buildDocsNavigation } from '../../navigation.ts'
-import {
-    getCleanSlug,
-    parseDocCollectionId,
-    docTitle,
-    extractHeadingsFromMarkdown,
-    routedId,
-} from '../../utils/docs.ts'
+import { docSlug, docTitle, extractHeadingsFromMarkdown, parseDocCollectionId, docPath } from '../../utils/docs.ts'
 import Breadcrumbs from './Breadcrumbs.astro'
 import DocsMobileNav from './DocsMobileNav.astro'
 import DocsPageNav from './DocsPageNav.astro'
@@ -26,8 +20,12 @@ interface Props {
 
 const { entry, sortedPages, headTitle } = Astro.props
 
-const cleanSlug = getCleanSlug(routedId(entry))
-const { chapter } = parseDocCollectionId(routedId(entry))
+const cleanSlug = docSlug(entry)
+const section = SECTIONS.find((known) => known.key === entry.section)
+// A section's files sit in its own directory.
+const editBase = section ? section.editBase : config.editBase
+const editPath = [entry.locale, docPath(entry)].filter(Boolean).join('/')
+const { chapter } = parseDocCollectionId(docPath(entry))
 const title = docTitle(entry)
 const headings = extractHeadingsFromMarkdown(entry.body || '')
 const urls = docsUrls(entry.locale)
@@ -39,10 +37,10 @@ const contentAttrs = { id: 'content' }
 ---
 
 <DocsLayout title={headTitle} chapter={chapter} entry={entry} headings={headings} {navigation}>
-    <DocsMobileNav slot="mobile-navigation" sections={navigation.sections} headings={headings} locale={entry.locale} />
+    <DocsMobileNav slot="mobile-navigation" groups={navigation.groups} headings={headings} locale={entry.locale} />
 
-    <Breadcrumbs slot="breadcrumbs" chapter={chapter} title={title} locale={entry.locale} />
-    <PageActions slot="page-actions" id={entry.id} cleanSlug={cleanSlug} locale={entry.locale} />
+    <Breadcrumbs slot="breadcrumbs" section={entry.section} chapter={chapter} title={title} locale={entry.locale} />
+    <PageActions slot="page-actions" {editBase} {editPath} cleanSlug={cleanSlug} locale={entry.locale} />
 
     <Fragment slot="content">
         <MarkdownContent {...contentAttrs} class="docs-content">

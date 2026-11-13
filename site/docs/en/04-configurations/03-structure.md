@@ -29,6 +29,44 @@ source files.
 The same structure generates the sidebar, mobile selectors, breadcrumbs and
 previous/next links; no navigation configuration is required.
 
+## Linking between pages
+
+Link to another page by its file, relative to the one you are writing:
+
+```markdown
+See [Deployment](./02-guides/02-deployment.md#hosting).
+```
+
+JAAD turns the link into the page's URL, so it also works on GitHub and in an
+editor. A link to a file that does not exist stops the build.
+
+## Sections
+
+A larger site can split its documentation into sections, each with its own
+directory, chapters and sidebar:
+
+```ts
+defineJaadConfig({
+    title: 'My Project',
+    sections: {
+        guide: { dir: './docs/guide', label: 'Guide' },
+        api: { dir: '../packages/api/docs' },
+    },
+})
+```
+
+- The key is the URL segment: `api/01-client.md` is served at `/api/client`.
+- `label` names the section in the header; it defaults to the key.
+- A directory can sit outside the project, such as the `docs/` of a package.
+  No section's directory can be inside another's.
+- Sections replace `docsDir`, and appear in the order they are declared.
+- The header links to every section. The sidebar and the previous and next
+  links stay inside the current one.
+- The first page of the first section opens at `routeBase`; the first page of
+  every other section opens at the section's own URL.
+- The rules above apply inside each section: one level of chapters, unique
+  paths.
+
 ## Overriding the file tree
 
 Optional [frontmatter](/docs/jaad/configurations/frontmatter) renames a page, moves
@@ -46,5 +84,6 @@ draft: true
 ## More than one language
 
 Directories named after language codes turn the tree into one site per
-language, and the nesting limit then applies inside each of them. See
+language, and the nesting limit then applies inside each of them. With
+sections, every section holds the same language directories. See
 [Languages](/docs/jaad/configurations/i18n).
