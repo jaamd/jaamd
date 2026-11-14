@@ -4,6 +4,7 @@ import {
     satteriAlert,
     satteriCodeTabs,
     satteriDirectiveFallback,
+    satteriSpoiler,
     satteriTableWrapper,
     satteriToc,
 } from '@jaamd/core/satteri'
@@ -13,6 +14,7 @@ import {
     remarkAlert,
     remarkCodeTabs,
     remarkDirective,
+    remarkSpoiler,
     remarkToc,
 } from '@jaamd/core/unified'
 import { isSatteriProcessor } from './src/astro-satteri.js'
@@ -137,14 +139,15 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
 
                 if (isSatteriProcessor(processor)) {
                     const mdast = [
-                        ...(alerts ? [satteriAlert] : []),
-                        ...(codeTabs ? [satteriCodeTabs] : []),
-                        ...(toc ? [satteriToc] : []),
+                        ...(alerts ? [satteriAlert()] : []),
+                        ...(codeTabs ? [satteriCodeTabs()] : []),
+                        ...(toc ? [satteriToc()] : []),
+                        ...(needsDirective ? [satteriSpoiler()] : []),
                     ]
                     const existing = processor.options.mdastPlugins
                     const addedMdast = missing(existing, mdast, satteriNames)
                     // After the user's plugins.
-                    const fallback = needsDirective ? missing(existing, [satteriDirectiveFallback], satteriNames) : []
+                    const fallback = needsDirective ? missing(existing, [satteriDirectiveFallback()], satteriNames) : []
 
                     processor.options.mdastPlugins = [...addedMdast, ...existing, ...fallback]
                     if (needsDirective) {
@@ -152,7 +155,7 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
                     }
 
                     const hast = [
-                        ...(tables ? [satteriTableWrapper] : []),
+                        ...(tables ? [satteriTableWrapper()] : []),
                         ...(headingLinks ? [satteriHeadingLinks] : []),
                     ]
                     const existingHast = processor.options.hastPlugins
@@ -167,6 +170,7 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
                         ...(needsDirective ? [remarkDirective] : []),
                         ...(codeTabs ? [remarkCodeTabs] : []),
                         ...(toc ? [remarkToc] : []),
+                        ...(needsDirective ? [remarkSpoiler] : []),
                     ]
                     const existing = processor.options.remarkPlugins
                     const addedRemark = missing(existing, remark, unifiedNames)
@@ -217,8 +221,9 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
                 injectScript(
                     'page',
                     [
-                        `import { initMarkdownEnhancements } from ${paths.client};`,
-                        `function __jaamdRun() { initMarkdownEnhancements(${JSON.stringify(selector)}); }`,
+                        `import { enhance } from ${paths.client};`,
+                        `let __jaamdDispose;`,
+                        `function __jaamdRun() { __jaamdDispose?.(); __jaamdDispose = enhance(${JSON.stringify(selector)}); }`,
                         `__jaamdRun();`,
                         `document.addEventListener("astro:page-load", __jaamdRun);`,
                     ].join('\n'),
@@ -236,6 +241,7 @@ export {
     satteriCodeTabs,
     satteriDirectiveFallback,
     satteriHeadingLinks,
+    satteriSpoiler,
     satteriTableWrapper,
     satteriToc,
     rehypeHeadingLinks,
@@ -243,6 +249,7 @@ export {
     remarkAlert,
     remarkCodeTabs,
     remarkDirective,
+    remarkSpoiler,
     remarkToc,
 }
 

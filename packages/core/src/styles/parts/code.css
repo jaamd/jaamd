@@ -1,0 +1,81 @@
+.jaamd-content {
+    & pre {
+        /* Beats the inline background Shiki sets on the <pre>. */
+        background-color: var(--jaamd-pre-bg) !important;
+        border: 1px solid var(--jaamd-pre-border);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        line-height: var(--jaamd-line-height);
+    }
+
+    & pre > code {
+        display: block;
+        overflow-x: auto;
+        padding-right: 3rem;
+        mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent 100%);
+    }
+
+    & pre > .jaamd-copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        cursor: pointer;
+        border: 1px solid var(--jaamd-copy-btn-border);
+        background-color: var(--jaamd-copy-btn-bg);
+        color: var(--jaamd-copy-btn-fg);
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        font-size: calc(var(--jaamd-font-size) * 0.67);
+        transition: all 0.2s ease;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.85;
+        pointer-events: auto;
+
+        &:hover {
+            background-color: var(--jaamd-copy-btn-hover-bg);
+            color: var(--jaamd-copy-btn-hover-fg);
+            border-color: var(--jaamd-copy-btn-hover-border);
+        }
+
+        & .jaamd-copied-icon,
+        &[data-copied='true'] .jaamd-copy-icon {
+            display: none;
+        }
+
+        &[data-copied='true'] .jaamd-copied-icon {
+            display: inline;
+        }
+
+        &[data-copied='true'] {
+            color: var(--jaamd-color-success, #22c55e);
+        }
+    }
+
+    & pre:hover > .jaamd-copy-btn {
+        opacity: 1;
+    }
+
+    & pre code {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        color: var(--jaamd-pre-fg);
+        font-size: var(--jaamd-font-size-code-block, calc(var(--jaamd-font-size) * 0.85));
+        white-space: pre;
+        word-break: normal;
+        overflow-wrap: normal;
+        line-height: var(--jaamd-line-height);
+    }
+
+    & :is(pre.shiki, pre.astro-code) code {
+        display: block;
+        font-family: var(--jaamd-font-mono);
+    }
+}

@@ -1,0 +1,31 @@
+.jaamd-content {
+    & .jaamd-spoiler {
+        background-color: var(--jaamd-spoiler-hidden-color);
+        color: var(--jaamd-spoiler-hidden-color);
+        border-radius: 0.2em;
+        padding: 0.1em 0.3em;
+        cursor: pointer;
+        user-select: none;
+        transition:
+            color 0.25s ease,
+            background-color 0.25s ease;
+
+        /* Explicit action only. Hover is not a reveal: it spoils the content on
+       pointer pass-through, and on touch the state sticks after the tap. */
+        /* Nested elements carry colours of their own. */
+        &:not([data-revealed]) * {
+            visibility: hidden;
+        }
+
+        &[data-revealed] {
+            background-color: var(--jaamd-spoiler-revealed-bg);
+            color: var(--jaamd-spoiler-revealed-fg);
+        }
+
+        /* The client script makes spoilers focusable, so they need a focus ring. */
+        &:focus-visible {
+            outline: 2px solid var(--jaamd-color-primary);
+            outline-offset: 2px;
+        }
+    }
+}

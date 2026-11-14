@@ -1,23 +1,24 @@
-import { qsa } from '../utils.js'
+import type { Labels } from '../../markup.ts'
+import { CLASS } from '../../markup.ts'
+import { qsa } from '../dom.ts'
 
-const INITIALIZED = '.spoiler[data-spoiler-init]'
+const INITIALIZED = `.${CLASS.spoiler}[data-spoiler-init]`
 
-/** `.spoiler` is authored as plain markup; this gives it button semantics so it
- *  is reachable without a mouse. */
-export function initSpoilers(selector: string): void {
-    qsa<HTMLElement>(document, `${selector} .spoiler`).forEach((el) => {
+/** Gives a spoiler button semantics, so it is reachable without a mouse. */
+export function initSpoilers(root: ParentNode, labels: Labels): void {
+    qsa<HTMLElement>(root, `.${CLASS.spoiler}`).forEach((el) => {
         if (el.dataset.spoilerInit) return
         el.dataset.spoilerInit = '1'
 
         if (!el.hasAttribute('tabindex')) el.tabIndex = 0
         if (!el.hasAttribute('role')) el.setAttribute('role', 'button')
-        el.setAttribute('aria-expanded', String(el.classList.contains('revealed')))
-        if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', 'Spoiler')
+        el.setAttribute('aria-expanded', String(el.hasAttribute('data-revealed')))
+        if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', labels.spoiler)
     })
 }
 
 function toggle(el: Element): void {
-    const revealed = el.classList.toggle('revealed')
+    const revealed = el.toggleAttribute('data-revealed')
     el.setAttribute('aria-expanded', String(revealed))
 }
 

@@ -1,0 +1,22 @@
+/* Emitted for all markdown: hidden outside the wrapper. */
+.jaamd-heading-link {
+    display: none;
+}
+
+/* Screen-reader announcements from the client script. */
+.jaamd-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.jaamd-content {
+    color: var(--jaamd-color-fg);
+    line-height: var(--jaamd-line-height);
+    max-width: none;
+    font-family: var(--jaamd-font-sans);
+    font-size: var(--jaamd-font-size);
+}

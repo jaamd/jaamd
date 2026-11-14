@@ -1,5 +1,33 @@
 # Upgrading
 
+## To 1.0
+
+### Classes
+
+Every class JAAMD emits now starts with `jaamd-`, and states are attributes.
+Update CSS of your own that selects on the old names:
+
+| Before                                           | After                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------ |
+| `.code-tabs`                                     | `.jaamd-code-tabs`                                                 |
+| `.code-tab-buttons`                              | `.jaamd-code-tab-buttons`                                          |
+| `.code-tab-btn`, `.code-tab-btn.active`          | `.jaamd-code-tab-btn`, `.jaamd-code-tab-btn[aria-selected='true']` |
+| `.code-tab-panel`, `.code-tab-panel.active`      | `.jaamd-code-tab-panel`, `.jaamd-code-tab-panel[data-active]`      |
+| `.spoiler`, `.spoiler.revealed`                  | `.jaamd-spoiler`, `.jaamd-spoiler[data-revealed]`                  |
+| `.jaamd-lightbox__img`, `.jaamd-lightbox__close` | `.jaamd-lightbox-img`, `.jaamd-lightbox-close`                     |
+
+The alert classes (`markdown-alert`, `markdown-alert-title`) are unchanged.
+
+### Spoilers
+
+`<span class="spoiler">` is no longer a spoiler. Write `:spoiler[text]`, or
+change the class to `jaamd-spoiler`.
+
+### Client script
+
+`initMarkdownEnhancements(selector)` is now `enhance(root, options)`, which
+returns a cleanup. See [Client script](./03-usage/02-client.md).
+
 ## From @jaamd/jaamd
 
 The package is now `@jaamd/astro`. Replace the dependency and every import from

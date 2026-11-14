@@ -78,10 +78,14 @@ Available types are `NOTE`, `TIP`, `IMPORTANT`, `WARNING` and `CAUTION`.
 
 ## Spoilers
 
-Add the `spoiler` class to inline or block HTML:
+Hide text inline with `:spoiler[…]`, or a block with `:::spoiler`:
 
-```html
-The answer is <span class="spoiler">42</span>.
+```markdown
+The answer is :spoiler[42].
+
+:::spoiler
+A paragraph hidden until the reader activates it.
+:::
 ```
 
 Spoilers are keyboard accessible and return to their hidden state after a page

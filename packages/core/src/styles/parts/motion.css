@@ -1,0 +1,14 @@
+/* Scoped to jaamd's own elements, so the host page keeps control of the rest. */
+
+@media (prefers-reduced-motion: reduce) {
+    .jaamd-content *,
+    .jaamd-content *::before,
+    .jaamd-content *::after,
+    .jaamd-content details::details-content,
+    .jaamd-lightbox,
+    .jaamd-lightbox * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

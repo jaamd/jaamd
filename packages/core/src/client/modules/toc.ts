@@ -1,4 +1,5 @@
-import { qsa } from '../utils.js'
+import { CLASS } from '../../markup.ts'
+import { qsa } from '../dom.ts'
 
 /** Previous run's observers: re-init must not stack them. */
 const observers = new WeakMap<HTMLElement, IntersectionObserver>()
@@ -18,10 +19,14 @@ function scrollMarginTop(heading: Element): number {
     return Number.isFinite(parsed) ? parsed : 80
 }
 
-/** Marks the entry whose section is in view. The links stay plain anchors. */
-export function initToc(selector: string): void {
-    qsa<HTMLElement>(document, `${selector} .jaamd-toc`).forEach((nav) => {
+/** Marks the entry whose section is in view. The links stay plain anchors.
+ *  Returns what stops the watching. */
+export function initToc(root: ParentNode): () => void {
+    const navs = [...qsa<HTMLElement>(root, `.${CLASS.toc}`)]
+
+    for (const nav of navs) {
         observers.get(nav)?.disconnect()
+        observers.delete(nav)
 
         const links = new Map<Element, HTMLAnchorElement>()
 
@@ -34,7 +39,7 @@ export function initToc(selector: string): void {
             if (target) links.set(target, link)
         })
 
-        if (links.size === 0) return
+        if (links.size === 0) continue
 
         const visible = new Set<Element>()
         const order = [...links.keys()]
@@ -65,5 +70,12 @@ export function initToc(selector: string): void {
 
         links.forEach((_link, target) => observer.observe(target))
         observers.set(nav, observer)
-    })
+    }
+
+    return () => {
+        for (const nav of navs) {
+            observers.get(nav)?.disconnect()
+            observers.delete(nav)
+        }
+    }
 }

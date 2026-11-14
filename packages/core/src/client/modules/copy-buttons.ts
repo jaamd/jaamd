@@ -1,25 +1,26 @@
-import { qs, qsa } from '../utils.js'
+import type { Labels } from '../../markup.ts'
+import { CLASS, ICON, ID } from '../../markup.ts'
+import { qs, qsa } from '../dom.ts'
 
-const BUTTON_CLASS = 'jaamd-copy-btn'
-const LIVE_ID = 'jaamd-live'
 const RESET_MS = 2000
 
-const LABEL = 'Copy code to clipboard'
-
 const resetTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>()
+/** What each button announces, in the language it was added with. */
+const messages = new WeakMap<Element, Pick<Labels, 'copied' | 'copySelected'>>()
 
-export function addCopyButtons(selector: string): void {
-    qsa<HTMLElement>(document, `${selector} pre`).forEach((pre) => {
-        if (qs(pre, `.${BUTTON_CLASS}`)) return
+export function addCopyButtons(root: ParentNode, labels: Labels): void {
+    qsa<HTMLElement>(root, 'pre').forEach((pre) => {
+        if (qs(pre, `.${CLASS.copyButton}`)) return
         if (!qs(pre, 'code')) return
 
         const btn = document.createElement('button')
         btn.type = 'button'
-        btn.className = BUTTON_CLASS
-        btn.title = 'Copy code'
-        btn.setAttribute('aria-label', LABEL)
+        btn.className = CLASS.copyButton
+        btn.title = labels.copy
+        btn.setAttribute('aria-label', labels.copy)
         // Both icons: `data-copied` picks one in CSS.
-        btn.innerHTML = ICON_COPY + ICON_CHECK
+        btn.innerHTML = ICON.copy + ICON.copied
+        messages.set(btn, labels)
 
         pre.appendChild(btn)
     })
@@ -27,9 +28,10 @@ export function addCopyButtons(selector: string): void {
 
 /** The only clipboard write in the package. */
 export async function onCopyClick(target: Element): Promise<void> {
-    const btn = target.closest<HTMLElement>(`.${BUTTON_CLASS}`)
+    const btn = target.closest<HTMLElement>(`.${CLASS.copyButton}`)
     const code = btn?.parentElement && qs<HTMLElement>(btn.parentElement, 'code')
-    if (!btn || !code) return
+    const labels = btn && messages.get(btn)
+    if (!btn || !code || !labels) return
 
     let copied = true
     try {
@@ -45,7 +47,7 @@ export async function onCopyClick(target: Element): Promise<void> {
     }
 
     btn.dataset.copied = copied ? 'true' : 'manual'
-    announce(copied ? 'Code copied to clipboard' : 'Code selected: copy it with your keyboard')
+    announce(copied ? labels.copied : labels.copySelected)
 
     // Restart on every click.
     clearTimeout(resetTimers.get(btn))
@@ -57,11 +59,11 @@ export async function onCopyClick(target: Element): Promise<void> {
 
 /** One polite live region. Looked up each time: View Transitions swap <body>. */
 function announce(message: string): void {
-    let live = document.getElementById(LIVE_ID)
+    let live = document.getElementById(ID.live)
     if (!live) {
         live = document.createElement('div')
-        live.id = LIVE_ID
-        live.className = LIVE_ID
+        live.id = ID.live
+        live.className = CLASS.live
         live.setAttribute('role', 'status')
         live.setAttribute('aria-live', 'polite')
         document.body.appendChild(live)
@@ -70,9 +72,3 @@ function announce(message: string): void {
     live.textContent = ''
     requestAnimationFrame(() => (live.textContent = message))
 }
-
-const SVG_ATTRS = `xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em" aria-hidden="true"`
-
-const ICON_COPY = `<svg class="jaamd-copy-icon" ${SVG_ATTRS}><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`
-
-const ICON_CHECK = `<svg class="jaamd-copied-icon" ${SVG_ATTRS}><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`

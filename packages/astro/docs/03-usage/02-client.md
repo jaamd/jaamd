@@ -17,7 +17,7 @@ only to markup that skipped the processor (`set:html`, HTML from a CMS).
 | Image lightbox    | Wraps each image in a button that opens it in a modal `<dialog>`. Closes on <kbd>Esc</kbd>, the ✕ button or a click outside the image.                    |
 | Responsive tables | Wraps a `table` in a horizontally scrollable container where the build did not.                                                                           |
 | Code tabs         | Drives the `:::code-tabs` tablist.                                                                                                                        |
-| Spoilers          | Reveals `.spoiler` content on click or <kbd>Enter</kbd>/<kbd>Space</kbd>.                                                                                 |
+| Spoilers          | Reveals a spoiler on click or <kbd>Enter</kbd>/<kbd>Space</kbd>.                                                                                          |
 
 ## Keyboard
 

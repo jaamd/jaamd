@@ -181,7 +181,7 @@ And it animates on the way out too.
 Click the blurred text, or focus it with <kbd>Tab</kbd> and press
 <kbd>Enter</kbd>, to reveal it:
 
-<span class="spoiler">The butler did it.</span>
+:spoiler[The butler did it.]
 
 ---
 
@@ -189,16 +189,16 @@ Click the blurred text, or focus it with <kbd>Tab</kbd> and press
 
 Wrapped in a scroll container, so a wide table never pushes the page sideways.
 
-| Component         | Trigger           | Notes                    |
-| ----------------- | ----------------- | ------------------------ |
-| Table of contents | `:::toc`          | Marks the entry in view  |
-| Alerts            | `> [!NOTE]`       | Five variants            |
-| Code tabs         | `:::code-tabs`    | Keyboard navigable       |
-| Copy buttons      | any `pre`         | Resets after 2 s         |
-| Heading links     | `h1`–`h6`         | Copies the section URL   |
-| Image lightbox    | any `img`         | Backdrop + Esc to close  |
-| Details           | `<details>`       | Animated in CSS          |
-| Spoilers          | `class="spoiler"` | Click or Enter to reveal |
+| Component         | Trigger          | Notes                    |
+| ----------------- | ---------------- | ------------------------ |
+| Table of contents | `:::toc`         | Marks the entry in view  |
+| Alerts            | `> [!NOTE]`      | Five variants            |
+| Code tabs         | `:::code-tabs`   | Keyboard navigable       |
+| Copy buttons      | any `pre`        | Resets after 2 s         |
+| Heading links     | `h1`–`h6`        | Copies the section URL   |
+| Image lightbox    | any `img`        | Backdrop + Esc to close  |
+| Details           | `<details>`      | Animated in CSS          |
+| Spoilers          | `:spoiler[text]` | Click or Enter to reveal |
 
 ---
 

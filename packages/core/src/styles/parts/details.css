@@ -1,0 +1,68 @@
+.jaamd-content {
+    & details {
+        background-color: var(--jaamd-details-bg);
+        border: 1px solid var(--jaamd-details-border);
+        border-radius: 0.5rem;
+        box-sizing: border-box;
+        padding: 0 1.25rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        /* Height animates where `interpolate-size` exists, opacity elsewhere. */
+        interpolate-size: allow-keywords;
+
+        &::details-content {
+            block-size: 0;
+            padding: 0 0.25rem;
+            opacity: 0;
+            overflow: clip;
+            transition:
+                block-size 0.28s ease,
+                padding 0.28s ease,
+                opacity 0.28s ease,
+                content-visibility 0.28s allow-discrete;
+        }
+
+        &[open]::details-content {
+            block-size: auto;
+            padding-bottom: 0.75rem;
+            opacity: 1;
+        }
+    }
+
+    & summary {
+        font-weight: 600;
+        color: var(--jaamd-color-fg-bright);
+        cursor: pointer;
+        padding: 0.75rem 0;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--jaamd-font-size-summary, calc(var(--jaamd-font-size) * 0.89));
+        user-select: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::before {
+            content: '▶';
+            font-size: 0.6em;
+            color: var(--jaamd-color-primary);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+    }
+
+    & details[open] > summary::before {
+        transform: rotate(90deg);
+    }
+
+    & details > summary + * {
+        margin-top: 0;
+    }
+
+    & details > *:last-child {
+        margin-bottom: 0;
+    }
+}

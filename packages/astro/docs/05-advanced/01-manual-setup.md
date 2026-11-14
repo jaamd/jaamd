@@ -10,6 +10,7 @@ import {
     satteriAlert,
     satteriCodeTabs,
     satteriToc,
+    satteriSpoiler,
     satteriDirectiveFallback,
     satteriTableWrapper,
     satteriHeadingLinks,
@@ -19,8 +20,14 @@ export default defineConfig({
     markdown: {
         processor: satteri({
             features: { directive: true },
-            mdastPlugins: [satteriAlert, satteriCodeTabs, satteriToc, satteriDirectiveFallback],
-            hastPlugins: [satteriTableWrapper, satteriHeadingLinks],
+            mdastPlugins: [
+                satteriAlert(),
+                satteriCodeTabs(),
+                satteriToc(),
+                satteriSpoiler(),
+                satteriDirectiveFallback(),
+            ],
+            hastPlugins: [satteriTableWrapper(), satteriHeadingLinks],
         }),
     },
 })
@@ -40,6 +47,7 @@ import {
     remarkCodeTabs,
     remarkDirective,
     remarkToc,
+    remarkSpoiler,
     rehypeTableWrapper,
     rehypeHeadingLinks,
 } from '@jaamd/astro'
@@ -47,7 +55,7 @@ import {
 export default defineConfig({
     markdown: {
         processor: unified({
-            remarkPlugins: [remarkAlert, remarkDirective, remarkCodeTabs, remarkToc],
+            remarkPlugins: [remarkAlert, remarkDirective, remarkCodeTabs, remarkToc, remarkSpoiler],
             rehypePlugins: [rehypeTableWrapper, rehypeHeadingIds, rehypeHeadingLinks],
         }),
     },
@@ -66,9 +74,11 @@ import '@jaamd/astro/styles.css'
     <slot />
 </div>
 <script>
-    import { initMarkdownEnhancements } from '@jaamd/astro/client'
+    import { enhance } from '@jaamd/astro/client'
+    let dispose
     function run() {
-        initMarkdownEnhancements('.jaamd-content')
+        dispose?.()
+        dispose = enhance('.jaamd-content')
     }
     run()
     document.addEventListener('astro:page-load', run)

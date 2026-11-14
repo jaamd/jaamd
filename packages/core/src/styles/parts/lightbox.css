@@ -1,0 +1,70 @@
+/* Sized to the image: a click on the backdrop around it closes the dialog. */
+.jaamd-lightbox {
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+
+    &[open] {
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    &::backdrop {
+        background-color: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+    }
+}
+
+@starting-style {
+    .jaamd-lightbox[open] {
+        opacity: 0;
+    }
+}
+
+html:has(.jaamd-lightbox[open]) {
+    overflow: hidden;
+}
+
+.jaamd-lightbox-img {
+    display: block;
+    max-width: 95vw;
+    max-height: 95dvh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.jaamd-lightbox-close {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    z-index: 10;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}

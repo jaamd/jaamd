@@ -1,0 +1,79 @@
+.jaamd-content {
+    & .markdown-alert {
+        border-left: 4px solid var(--jaamd-blockquote-border);
+        background-color: var(--jaamd-blockquote-bg);
+        padding: 0.875rem 1.25rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+        position: relative;
+
+        & p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    & .markdown-alert-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: var(--jaamd-font-size-alert-title, calc(var(--jaamd-font-size) * 0.83));
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.5rem;
+
+        & svg {
+            width: 1em;
+            height: 1em;
+            flex-shrink: 0;
+            fill: currentColor;
+        }
+    }
+
+    & .markdown-alert-note {
+        border-left-color: var(--jaamd-alert-note-color);
+        background-color: var(--jaamd-alert-note-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-note-color);
+        }
+    }
+
+    & .markdown-alert-tip {
+        border-left-color: var(--jaamd-alert-tip-color);
+        background-color: var(--jaamd-alert-tip-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-tip-color);
+        }
+    }
+
+    & .markdown-alert-important {
+        border-left-color: var(--jaamd-alert-important-color);
+        background-color: var(--jaamd-alert-important-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-important-color);
+        }
+    }
+
+    & .markdown-alert-warning {
+        border-left-color: var(--jaamd-alert-warning-color);
+        background-color: var(--jaamd-alert-warning-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-warning-color);
+        }
+    }
+
+    & .markdown-alert-caution {
+        border-left-color: var(--jaamd-alert-caution-color);
+        background-color: var(--jaamd-alert-caution-bg);
+
+        & .markdown-alert-title {
+            color: var(--jaamd-alert-caution-color);
+        }
+    }
+}

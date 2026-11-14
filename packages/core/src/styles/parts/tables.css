@@ -1,0 +1,83 @@
+.jaamd-content {
+    & .jaamd-table-wrapper {
+        max-width: 100%;
+        overflow-x: auto;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+
+        & > table {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    & table {
+        --jaamd-table-radius: 0.5rem;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--jaamd-table-border);
+        border-radius: var(--jaamd-table-radius);
+    }
+
+    & :is(th, td) {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--jaamd-table-border);
+        border-right: 1px solid var(--jaamd-table-border);
+        font-size: var(--jaamd-font-size-table, calc(var(--jaamd-font-size) * 0.78));
+    }
+
+    /* The table border already draws the outer edges. */
+    & tr > *:last-child {
+        border-right: none;
+    }
+
+    & table > tbody:last-child > tr:last-child > *,
+    & tfoot > tr:last-child > * {
+        border-bottom: none;
+    }
+
+    /* Corner cells are rounded by hand: `overflow: hidden` on a table is not
+     reliable, and it would break sticky headers. `tbody:first-child` covers
+     tables without a `thead`. */
+    & thead > tr:first-child > *:first-child,
+    & table > tbody:first-child > tr:first-child > *:first-child {
+        border-top-left-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & thead > tr:first-child > *:last-child,
+    & table > tbody:first-child > tr:first-child > *:last-child {
+        border-top-right-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & table > tbody:last-child > tr:last-child > *:first-child,
+    & tfoot > tr:last-child > *:first-child {
+        border-bottom-left-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & table > tbody:last-child > tr:last-child > *:last-child,
+    & tfoot > tr:last-child > *:last-child {
+        border-bottom-right-radius: calc(var(--jaamd-table-radius) - 1px);
+    }
+
+    & th {
+        background-color: var(--jaamd-table-header-bg);
+        color: var(--jaamd-color-fg-bright);
+        font-weight: 600;
+    }
+
+    & td {
+        color: var(--jaamd-color-fg);
+
+        & code {
+            line-height: 2;
+        }
+    }
+
+    & tbody > tr:hover > td {
+        background-color: var(--jaamd-table-hover-bg);
+    }
+}

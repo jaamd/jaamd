@@ -6,6 +6,9 @@ Install [Node.js 24.12 or newer](https://nodejs.org/) and [pnpm 12](https://pnpm
 pnpm install
 ```
 
+`pnpm install` builds `@jaamd/core`, which the other packages read compiled.
+After changing its sources, build it again with `pnpm --filter @jaamd/core build`.
+
 Before opening a pull request, run the same checks as CI:
 
 ```bash
@@ -29,11 +32,12 @@ link to a file that does not exist.
 ## Themes
 
 A theme is a directory under `packages/core/src/themes/<slug>/` plus one entry in
-`packages/core/src/themes/index.js`. Themes are welcome as pull requests.
+`packages/core/src/themes/index.ts`. Themes are welcome as pull requests.
 
-The CSS is generated. You write a palette; `pnpm build:themes` writes `index.css`
-and, for a single-palette theme, `dark.css`, then the stylesheets under
-`packages/astro/src/` that re-export them. Never edit those by hand.
+The CSS is generated. You write a palette; the build of `@jaamd/core` writes
+`index.css` and, for a single-palette theme, `dark.css` under `dist/`. The
+stylesheets under `packages/astro/src/` that re-export them come from
+`build:bridges`. Never edit those by hand.
 
 ### 1. Write `palette.js`
 
@@ -83,12 +87,13 @@ readable `name`, plus:
 ### 3. Generate and check
 
 ```bash
-pnpm build:themes
+pnpm --filter @jaamd/core build
+pnpm --filter @jaamd/astro build:bridges
 pnpm --filter @jaamd/core --filter @jaamd/astro test
 ```
 
-The test names the missing level, an unknown Shiki theme, a token no other theme
-lacks, or CSS that no longer matches its palette.
+The test names the missing level, an unknown Shiki theme, or a token no other
+theme lacks.
 
 ## Translating the interface
 
