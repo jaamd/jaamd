@@ -44,7 +44,7 @@ import '@jaamd/astro/themes/dracula/dark.css'
 > [!IMPORTANT]
 > A preset declares a palette, not the whole variable set: surfaces, borders and
 > the table-of-contents card are derived from it by `default.css`. Load the
-> defaults alongside it. Do **not** pair a preset with `noDefault: true`: those
+> defaults alongside it. Do **not** pair a preset with `defaultVariables: false`: those
 > derived tokens fall back to the light palette.
 
 Each theme declares itself, so a picker can be built from data:

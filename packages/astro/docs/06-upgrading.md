@@ -28,6 +28,25 @@ change the class to `jaamd-spoiler`.
 `initMarkdownEnhancements(selector)` is now `enhance(root, options)`, which
 returns a cleanup. See [Client script](./03-usage/02-client.md).
 
+### Options
+
+| Before                      | After                         |
+| --------------------------- | ----------------------------- |
+| `noDefault: true`           | `defaultVariables: false`     |
+| `plugins: { … }`            | `features: { … }`             |
+| `plugins: { directive: … }` | `features: { directives: … }` |
+
+`features` also turns off what runs only in the browser: `copyButtons`,
+`lightbox`, and the client part of the others. `labels` is new: see
+[Options](./01-getting-started/02-options.md#labels).
+
+### Manual setup
+
+`@jaamd/astro` no longer exports the plugins one by one. Use its presets,
+`satteriPlugins()` and `unifiedPlugins()`, which also add Astro's heading ids:
+see [Manual setup](./05-advanced/01-manual-setup.md). The single plugins are in
+`@jaamd/core`.
+
 ## From @jaamd/jaamd
 
 The package is now `@jaamd/astro`. Replace the dependency and every import from

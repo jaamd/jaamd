@@ -2,17 +2,11 @@
 
 ```ts
 jaamd({
-    selector: '.jaamd-content', // CSS selector for the JS enhancements
-    theme: 'github-light', // Shiki theme name (or { light, dark }); see below
-    noDefault: false, // skip injecting @jaamd/astro/default.css variable fallbacks
-    plugins: {
-        codeTabs: true, // :::code-tabs directive blocks
-        toc: true, // :::toc directive blocks
-        alerts: true, // > [!NOTE] / [!WARNING] blockquote alerts
-        directive: true, // `:::` syntax (prerequisite for codeTabs and toc)
-        tables: true, // scroll container around tables
-        headingLinks: true, // anchor link on every heading
-    },
+    selector: '.jaamd-content', // elements the client script enhances
+    theme: 'github-light', // Shiki theme name, or { light, dark }; see below
+    defaultVariables: true, // inject @jaamd/astro/default.css on every page
+    features: {}, // features to turn off, such as { lightbox: false }
+    labels: {}, // text JAAMD writes into the page
 })
 ```
 
@@ -32,14 +26,50 @@ It does not affect the CSS file, which always uses `.jaamd-content`.
 - With a custom wrapper (e.g. `<div data-md>`), set `selector` to match it and
   provide your own CSS.
 
-## `noDefault`
+## `defaultVariables`
 
-Set to `true` when you supply a complete `--jaamd-*` variable set of your own.
+Set to `false` when you supply a complete `--jaamd-*` variable set of your own.
 It has no effect on `<MarkdownContent>`, which imports the defaults directly;
 with a custom wrapper, control them by importing `@jaamd/astro/default.css` or
 not.
 
-## `plugins`
+## `features`
 
-Each feature can be turned off on its own. `codeTabs` and `toc` need
-`directive`, the `:::` syntax they are written in.
+Every feature is on. Set one to `false` to turn it off, in the build and in the
+client script:
+
+| Feature        | What                                         | Where         |
+| -------------- | -------------------------------------------- | ------------- |
+| `alerts`       | `> [!NOTE]` blockquotes                      | build         |
+| `codeTabs`     | `:::code-tabs` blocks                        | build, client |
+| `toc`          | `:::toc` blocks                              | build, client |
+| `spoilers`     | `:spoiler[…]` and `:::spoiler`               | build, client |
+| `directives`   | The `:::` syntax, for directives of your own | build         |
+| `tables`       | Scroll container around tables               | build, client |
+| `headingLinks` | Anchor on every heading                      | build, client |
+| `copyButtons`  | Copy button on code blocks                   | client        |
+| `lightbox`     | Images open in a dialog                      | client        |
+
+`directives` stays on while `codeTabs`, `toc` or `spoilers` is, since they are
+written in it.
+
+## `labels`
+
+The text JAAMD writes into the page, in English by default. Set the ones to
+translate:
+
+```ts
+jaamd({ labels: { copy: 'Copia il codice', headingLink: 'Link alla sezione' } })
+```
+
+| Label           | Default                                           |
+| --------------- | ------------------------------------------------- |
+| `headingLink`   | `Link to section`, followed by the heading        |
+| `toc`           | `Table of contents`, for a `:::toc` without title |
+| `copy`          | `Copy code`                                       |
+| `copied`        | `Code copied to clipboard`                        |
+| `copySelected`  | `Code selected: copy it with your keyboard`       |
+| `lightbox`      | `Image preview`                                   |
+| `lightboxOpen`  | `Enlarge image`, followed by the alt text         |
+| `lightboxClose` | `Close image preview`                             |
+| `spoiler`       | `Spoiler`                                         |
