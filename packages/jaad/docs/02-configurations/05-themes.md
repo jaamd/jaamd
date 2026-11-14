@@ -1,3 +1,7 @@
+---
+description: Named themes, a fixed appearance, code themes and custom palettes.
+---
+
 # Themes
 
 Dark mode works without configuration. The default `appearance: "auto"`
@@ -74,7 +78,7 @@ seeds.
 
 ## Sharing the theme with your own pages
 
-[Pages of your own](08-custom-pages.md) use your layout, not
+[Pages of your own](07-custom-pages.md) use your layout, not
 JAAD's. Two values keep both halves of a site in step:
 
 | What                      | Value                         |

@@ -1,4 +1,10 @@
+---
+description: 'Every option of the jaamd() integration: theme, selector, default variables, features and labels.'
+---
+
 # Options
+
+`jaamd()` works with no options. Each one below changes a single behaviour:
 
 ```ts
 jaamd({

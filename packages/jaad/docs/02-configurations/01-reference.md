@@ -1,3 +1,7 @@
+---
+description: Every option of jaad.config.ts, and the values JAAD detects from the project.
+---
+
 # Configuration
 
 All JAAD options live in `jaad.config.ts`. Only `title` is required.
@@ -49,10 +53,10 @@ Astro's `base`.
 | `ui`        | `object`            | `{}`       | Interface string overrides, per locale    |
 
 Locale directories under `docsDir` are detected on their own; `locales` only
-overrides that. See [Languages](10-i18n.md).
+overrides that. See [Languages](03-i18n.md).
 
 With `sections`, `docsDir` is read only when set, for pages outside every
-section. See [Sections](03-structure.md#sections).
+section. See [Sections](../01-getting-started/02-pages.md#sections).
 
 To keep a landing page at `/`, mount documentation below it:
 
@@ -126,7 +130,7 @@ defineJaadConfig({
 The link is omitted when the git remote, branch or repository root cannot be
 resolved safely.
 
-With [sections](03-structure.md#sections), each one links
+With [sections](../01-getting-started/02-pages.md#sections), each one links
 to its own directory. A URL passed here applies to all of them, and `:path` is
 the file's path inside its section's directory.
 
@@ -163,11 +167,11 @@ defineJaadConfig({
 
 A named theme styles the interface, Markdown and code blocks. A `{ light,
 dark }` object changes only the Shiki code themes. See
-[Themes](06-themes.md) for available names and custom themes.
+[Themes](05-themes.md) for available names and custom themes.
 
 `tailwind: true` enables Tailwind utilities with JAAD's tokens on documentation
 pages, `Page` pages and a custom `DocsFrame`; see
-[Styles](05-styles.md#tailwind).
+[Styles](06-styles.md#tailwind).
 
 `appearance: "auto"` follows the reader's preference and shows the switcher.
 `"light"` and `"dark"` pin the appearance and remove it.
@@ -208,4 +212,4 @@ defineJaadConfig({
 
 For full control, use a regular Astro configuration and add `jaad(config)` to
 its integrations, as shown in
-[Existing Astro project](../02-getting-started/01-installation.md#existing-astro-project).
+[Existing Astro project](../01-getting-started/01-installation.md#existing-astro-project).

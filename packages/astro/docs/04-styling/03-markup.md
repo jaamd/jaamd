@@ -1,3 +1,7 @@
+---
+description: The HTML and classes JAAMD emits, for styling them or writing a wrapper of your own.
+---
+
 # Markup and classes
 
 What JAAMD emits, for styling it or writing a custom wrapper. _Build_ markup is

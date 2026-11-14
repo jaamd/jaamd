@@ -1,4 +1,11 @@
+---
+description: Create a JAAD project, or add JAAD to an existing repository or Astro project.
+---
+
 # Installation
+
+`create-jaad` sets up a project in one command. To add JAAD by hand, see
+[Manual installation](#manual-installation).
 
 ## Create a project
 
@@ -104,7 +111,7 @@ bun run dev
 The development server starts at `http://localhost:4321`.
 
 Add pages to `docs/`, following the conventions in
-[Creating pages](03-creating-pages.md).
+[Pages and structure](02-pages.md).
 
 ## Manual installation
 
@@ -160,7 +167,7 @@ export { collections } from '@jaamd/jaad/content'
 ```
 
 Only `title` is required. See the
-[configuration reference](../04-configurations/01-reference.md) for the remaining
+[configuration reference](../02-configurations/01-reference.md) for the remaining
 options.
 
 ## Existing Astro project
@@ -184,7 +191,7 @@ export default defineConfig({
 ```
 
 `jaad()` returns integrations only. `site` and `base` are lifted above, and the
-[`astro`](../04-configurations/01-reference.md#extending-astro) field is ignored here.
+[`astro`](../02-configurations/01-reference.md#extending-astro) field is ignored here.
 Write those options in `defineConfig`.
 
 If the project defines content collections, add JAAD's collection without

@@ -1,14 +1,52 @@
+---
+description: Install the @jaamd/astro integration and wrap your Markdown with it.
+---
+
 # Installation
 
-```bash
+Let Astro add the integration and register it for you:
+
+:::code-tabs
+
+```bash npm
 npx astro add @jaamd/astro
 ```
 
+```bash pnpm
+pnpm astro add @jaamd/astro
+```
+
+```bash yarn
+yarn astro add @jaamd/astro
+```
+
+```bash bun
+bunx astro add @jaamd/astro
+```
+
+:::
+
 Or install it and register it yourself:
 
-```bash
+:::code-tabs
+
+```bash npm
 npm install @jaamd/astro
 ```
+
+```bash pnpm
+pnpm add @jaamd/astro
+```
+
+```bash yarn
+yarn add @jaamd/astro
+```
+
+```bash bun
+bun add @jaamd/astro
+```
+
+:::
 
 ```ts
 // astro.config.mjs
@@ -30,10 +68,10 @@ export default defineConfig({
 | `@astrojs/markdown-remark` | Only with `unified()`: an optional peer, installed by you |
 | Toolchain                  | Must compile TypeScript and `.astro` sources              |
 
-JAAMD is published as source, with no compiled `dist/` and no emitted `.d.ts`.
-It works out of the box in any Astro project, but is not consumable from plain
-Node, a CommonJS build, or a TypeScript project using
-`"moduleResolution": "node16"`.
+`@jaamd/astro` is published as TypeScript and `.astro` source, which any Astro
+project compiles. It is not consumable from plain Node, a CommonJS build, or a
+TypeScript project using `"moduleResolution": "node16"`: outside Astro, use
+the compiled [`@jaamd/core`](../05-advanced/03-other-frameworks.md).
 
 ## Wrapping your content
 

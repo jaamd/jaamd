@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { MOVED } from '../worker.ts'
 
 const DIST = fileURLToPath(new URL('../dist', import.meta.url))
 const PACKAGES = fileURLToPath(new URL('../../packages', import.meta.url))
@@ -36,7 +37,7 @@ test('the docs open on the welcome page, and each section at its own url', () =>
     const home = page('index.html')
     assert.match(home, /data-jaad-default-frame/)
     assert.match(home, /<h1[^>]*>Welcome to JAAMD/)
-    assert.match(page('jaamd/index.html'), /<h1[^>]*>JAAMD/)
+    assert.match(page('jaamd/index.html'), /<h1[^>]*>Overview/)
     assert.match(page('welcome/index.html'), /http-equiv="refresh"[^>]*url=\/"/)
     assert.match(home, /<link rel="canonical" href="https:\/\/docs\.jaamd\.org\/?"/)
 })
@@ -46,6 +47,11 @@ test('every page of both packages has a url, so every old /docs url has a target
     const missing = [...urlsOf('jaamd', 'astro'), ...urlsOf('jaad', 'jaad')].filter(
         (url) => !existsSync(join(DIST, url, 'index.html')),
     )
+    assert.deepEqual(missing, [])
+})
+
+test('every moved page has a built target', () => {
+    const missing = Object.values(MOVED).filter((target) => !existsSync(join(DIST, target, 'index.html')))
     assert.deepEqual(missing, [])
 })
 

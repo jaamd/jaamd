@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import worker, { markdownSource, quality } from '../worker.ts'
+import worker, { markdownSource, MOVED, movedTo, quality } from '../worker.ts'
 
 const FILES: Record<string, string> = {
     '/jaad/getting-started/installation/': '<html>installation</html>',
@@ -62,4 +62,19 @@ test('a missing page answers an agent in Markdown', async () => {
     assert.equal(response.status, 404)
     assert.equal(response.headers.get('Content-Type'), 'text/markdown; charset=utf-8')
     assert.match(await response.text(), /^# Not found[\s\S]*\/llms\.txt/)
+})
+
+test('a moved page redirects to its new url, query kept', async () => {
+    const response = await get('/jaad/configurations/structure/?q=x')
+    assert.equal(response.status, 301)
+    assert.equal(response.headers.get('Location'), 'https://docs.jaamd.org/jaad/getting-started/pages/?q=x')
+})
+
+test('the Markdown of a moved page redirects to the new Markdown', () => {
+    assert.equal(movedTo('/jaad/markdown.md'), '/jaamd/markdown.md')
+    assert.equal(movedTo('/jaad/getting-started/installation'), null)
+})
+
+test('no moved page points at another moved page', () => {
+    for (const target of Object.values(MOVED)) assert.equal(MOVED[target], undefined, target)
 })

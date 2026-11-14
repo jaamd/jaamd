@@ -116,7 +116,7 @@ To contribute another language:
    to `UI_CATALOGS`.
 4. Add the catalogue to the completeness test in `packages/jaad/tests/unit/ui.test.ts` and
    update the supported-language list in
-   `packages/jaad/docs/04-configurations/10-i18n.md`.
+   `packages/jaad/docs/02-configurations/03-i18n.md`.
 5. Run the checks above.
 
 Translate meaning rather than individual words. Keep labels concise, preserve

@@ -1,37 +1,43 @@
+---
+description: The blocks JAAMD adds to CommonMark and GitHub Flavored Markdown, each with its result.
+keywords: [alerts, code tabs, toc, spoilers, directives]
+---
+
 # Markdown syntax
 
-JAAMD extends CommonMark and GitHub Flavored Markdown with the blocks below.
-Every one of them can be turned off in the
-[`plugins` option](./01-getting-started/02-options.md#plugins).
+JAAMD extends [CommonMark](https://commonmark.org/help/) and
+[GitHub Flavored Markdown](https://github.github.com/gfm/) with the blocks
+below. Each one is shown as you write it, then as it renders. Every one of them
+can be turned off with the
+[`features` option](./01-getting-started/02-options.md#features).
 
 ## Alerts
 
-GitHub-style blockquote alerts, in five variants:
+GitHub-style blockquote alerts, in five types: `NOTE`, `TIP`, `IMPORTANT`,
+`WARNING` and `CAUTION`.
 
 ```markdown
 > [!NOTE]
 > Useful information the reader should know.
 
-> [!TIP]
-> Helpful advice.
+> [!WARNING]
+> Urgent information needing immediate attention.
+```
 
-> [!IMPORTANT]
-> Key information required to succeed.
+> [!NOTE]
+> Useful information the reader should know.
 
 > [!WARNING]
 > Urgent information needing immediate attention.
 
-> [!CAUTION]
-> Advises about risks or negative outcomes.
-```
-
 ## Code tabs
 
 Group several code blocks into a tabbed panel. The text after the language is
-used as the tab label; it falls back to the language, then to `Tab N`.
+the tab label; it falls back to the language, then to `Tab N`.
 
 ````markdown
 :::code-tabs
+
 ```bash npm
 npm install
 ```
@@ -39,38 +45,48 @@ npm install
 ```bash pnpm
 pnpm install
 ```
+
 :::
 ````
+
+:::code-tabs
+
+```bash npm
+npm install
+```
+
+```bash pnpm
+pnpm install
+```
+
+:::
 
 ## Table of contents
 
 A `:::toc` block wraps the list you write in a navigation landmark. Nothing is
-generated: entries, order, wording and depth are whatever the markdown says.
+generated: entries, order, wording and depth are whatever the Markdown says.
 The text in brackets is an optional title.
 
 ```markdown
 :::toc[On this page]
-- [Installation](#installation)
-- [Setup](#setup)
-    - [Integration options](#integration-options)
+
+- [Alerts](#alerts)
+- [Code tabs](#code-tabs)
+
 :::
 ```
 
-It renders as:
+:::toc[On this page]
 
-```html
-<nav class="jaamd-toc" aria-label="On this page">
-    <p class="jaamd-toc-title">On this page</p>
-    <ul>
-        …your list…
-    </ul>
-</nav>
-```
+- [Alerts](#alerts)
+- [Code tabs](#code-tabs)
 
-The title is a `<p>`: out of `getHeadings()`, no anchor icon. A `-` list loses
-its bullets, `1.` keeps the numbers. Entries are plain anchors and navigate with
-JavaScript disabled; with it, the entry whose section is on screen is marked
-`aria-current="location"`.
+:::
+
+A `-` list loses its bullets, `1.` keeps the numbers. Entries are plain anchors
+and navigate with JavaScript disabled; with it, the entry whose section is on
+screen is marked `aria-current="location"`. The title is a `<p>`, so it stays
+out of `getHeadings()` and has no anchor.
 
 ### Writing the anchors
 
@@ -85,25 +101,56 @@ Heading ids come from Astro, slugged with
 | `## snake_case`          | `#snake_case` (underscores survive)                                      |
 | a second `## Setup`      | `#setup-1`                                                               |
 
-The client-side fallback follows the same rules, so ids match for markdown that
-never went through Astro's pipeline (`set:html`, HTML from a CMS).
+The client script follows the same rules, so ids match for Markdown that never
+went through Astro's pipeline (`set:html`, HTML from a CMS).
 
 With a sticky header, raise `--jaamd-scroll-margin-top` (default `80px`).
 
 > [!NOTE]
-> `:::toc` needs the directive syntax, on by default. With `features: { toc: false }`
-> the block degrades to a plain `<div>`: list and links intact, unstyled.
+> `:::toc` needs the directive syntax, on by default. With
+> `features: { toc: false }` the block degrades to a plain `<div>`: list and
+> links intact, unstyled.
 
 ## Spoilers
 
-Text hidden until the reader activates it, inline or as a block:
+Text hidden until the reader activates it, inline or as a block. Spoilers are
+reachable from the keyboard and hide again on reload.
 
 ```markdown
-:spoiler[The butler did it.]
+The answer is :spoiler[42].
 
 :::spoiler
 A whole paragraph, hidden.
 :::
 ```
 
+The answer is :spoiler[42].
+
+:::spoiler
+A whole paragraph, hidden.
+:::
+
 In HTML you write yourself, the class is `jaamd-spoiler`.
+
+## Details
+
+`<details>` is plain HTML. JAAMD styles it and animates it open and closed, in
+CSS alone.
+
+```html
+<details>
+    <summary>Why is the sky blue?</summary>
+    Shorter wavelengths scatter more.
+</details>
+```
+
+<details>
+    <summary>Why is the sky blue?</summary>
+    Shorter wavelengths scatter more.
+</details>
+
+## Without writing anything
+
+Some enhancements need no syntax. Every heading gets an anchor link, every code
+block a copy button, every image a lightbox, and every table a scroll container
+on narrow screens. See [Client script](./03-usage/02-client.md).

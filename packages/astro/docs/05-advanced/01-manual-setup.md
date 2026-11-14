@@ -1,3 +1,7 @@
+---
+description: Register the JAAMD plugins on the Markdown processor yourself, without the integration.
+---
+
 # Manual setup
 
 To bypass the integration, register the plugins yourself on the processor you

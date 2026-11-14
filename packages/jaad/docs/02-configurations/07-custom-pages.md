@@ -1,3 +1,7 @@
+---
+description: "Pages of your own beside the documentation, with your layout or with JAAD's."
+---
+
 # Custom pages
 
 Files in `src/pages/` are regular Astro pages. They keep their own layouts,
@@ -92,7 +96,7 @@ icon is what says so. Clicking it opens the same palette.
 This is the site chrome, not the reading layout: there is no sidebar and no
 table of contents, because a page outside the documentation has no place in
 its navigation. To restructure documentation pages themselves, use
-[Advanced layout](09-advanced-layout.md).
+[Advanced layout](08-advanced-layout.md).
 
 ## Matching the documentation's layout
 
@@ -101,7 +105,7 @@ its navigation. To restructure documentation pages themselves, use
 - `.jaad-main`: vertical margin and horizontal padding of the main landmark.
   `bare` swaps it for `.jaad-main-bare`, which has none.
 - Layout tokens (`--jaad-content-width`, `--jaad-page-padding`, …) are listed
-  in [Styles](05-styles.md).
+  in [Styles](06-styles.md).
 
 ```astro
 <Page title="Changelog">
@@ -112,4 +116,4 @@ its navigation. To restructure documentation pages themselves, use
 ## Tailwind
 
 With `tailwind: true`, utilities on `Page` pages use JAAD's tokens. See
-[Styles](05-styles.md#tailwind).
+[Styles](06-styles.md#tailwind).
