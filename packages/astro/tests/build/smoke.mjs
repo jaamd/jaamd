@@ -7,7 +7,6 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { themes } from '@jaamd/core/themes'
 
 const DIST = fileURLToPath(new URL('../fixture/dist', import.meta.url))
 const PAGE = join(DIST, 'index.html')
@@ -177,48 +176,6 @@ check(
     'the copied icon would never show',
 )
 
-// ─── themes ──────────────────────────────────────────────────────────────────
-
-const themeSlugs = [...new Set([...html.matchAll(/html\[data-jaamd-theme="([a-z0-9-]+)"\]/g)].map((m) => m[1]))]
-
-check(
-    `themes: ${themeSlugs.length} scoped in the page`,
-    themeSlugs.length > 0,
-    'the layout did not inject the re-scoped theme CSS',
-)
-
-// Authored on :root, so without re-scoping only the last import would ever win.
-check(
-    'themes: none left on bare :root',
-    !/(^|\})\s*:root\s*\{[^}]*--jaamd-color-primary/.test(html),
-    'a theme reached the page unscoped and will override every other one',
-)
-
-check(
-    'themes: the site bridge is scoped too',
-    /\[data-jaamd-theme=("?)default\1\]/.test(css),
-    'an unscoped bridge outranks the themes, so only secondary colours would change',
-)
-
-// One Shiki variable per key lets code follow the switch. A dual theme needs
-// two; otherwise one mode keeps the previous theme's syntax colours.
-for (const theme of themes) {
-    const keys = theme.mode === 'dual' ? [theme.slug, `${theme.slug}-dark`] : [theme.slug]
-    const absent = keys.filter((key) => !html.includes(`--shiki-${key}:`))
-
-    check(
-        `themes: ${theme.slug} has its Shiki colours baked`,
-        absent.length === 0,
-        `missing --shiki-${absent.join(', --shiki-')} in the rendered code`,
-    )
-}
-
-check(
-    "themes: the picker lists every theme plus the site's own",
-    countOf(/<option value="/g) === themeSlugs.length + 1,
-    'the picker is built from the manifest; an option is missing',
-)
-
 // ─── the rest of the pipeline still ships ────────────────────────────────────
 
 check(
@@ -255,17 +212,6 @@ check(
     'client enhancements bundled',
     /<script[^>]+type="module"/.test(html),
     'the injected page script did not make it into the build',
-)
-
-// ─── llms.txt ────────────────────────────────────────────────────────────────
-
-const LLMS = join(DIST, 'llms.txt')
-const llms = existsSync(LLMS) ? readFileSync(LLMS, 'utf8') : ''
-
-check(
-    'llms.txt: the package documentation, with the markup contract',
-    llms.startsWith('# jaamd\n') && llms.includes('# Markup and classes'),
-    'tests/fixture/src/pages/llms.txt.ts did not emit the docs; check its glob',
 )
 
 // ─── report ──────────────────────────────────────────────────────────────────

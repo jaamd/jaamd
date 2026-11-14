@@ -4,53 +4,49 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import { DIST, allCss, page, walk } from './dist.mjs'
 
-test('the home page is the jaamd showcase, rendered with jaamd', () => {
-    const home = page('index.html')
-    assert.match(home, /<title>JAAMD<\/title>/)
-    assert.match(home, /class="[^"]*jaamd-content/)
-    assert.match(home, /markdown-alert/)
-    assert.match(home, /data-jaamd-theme/)
+const home = () => page('index.html')
+
+test('the home page opens on the wordmark and the tagline', () => {
+    assert.match(home(), /<title>JAAMD<\/title>/)
+    assert.match(home(), /class="hero-wordmark">JAAMD</)
+    assert.match(home(), /Markdown, refined\./)
 })
 
-test('/docs opens the jaamd section, read from the package', () => {
-    const docs = page('docs/index.html')
-    assert.match(docs, /data-jaad-default-frame/)
-    assert.match(docs, /<h1[^>]*>JAAMD/)
-    assert.match(page('docs/jaamd/index.html'), /url=\/docs["']?/)
-    assert.match(page('docs/jaamd/styling/markup/index.html'), /<title>Markup and classes \| JAAMD<\/title>/)
+test('the preview is rendered at build by JAAMD, so it shows without scripts', () => {
+    const preview = home().match(/<article id="preview"[\s\S]*?<\/article>/)?.[0] ?? ''
+    assert.match(preview, /class="jaamd-content landing-preview"/)
+    assert.match(preview, /markdown-alert markdown-alert-tip/)
+    assert.match(preview, /class="jaamd-code-tabs"/)
+    assert.match(preview, /class="jaamd-table-wrapper"/)
+    assert.match(preview, /class="jaamd-spoiler"/)
+    assert.match(preview, /<h2 id="install">Install<a class="jaamd-heading-link" href="#install"/)
 })
 
-test('the jaad section keeps its urls below /docs/jaad', () => {
-    assert.match(page('docs/jaad/index.html'), /data-jaad-default-frame/)
-    assert.match(page('docs/jaad/getting-started/installation/index.html'), /<title>Installation \| JAAMD<\/title>/)
-    assert.match(page('docs/llms.txt'), /## JAAMD[\s\S]*## JAAD/)
+test('every JAAMD theme can dress the preview, and only the preview', () => {
+    const css = allCss()
+    const options = [...home().matchAll(/<option value="([^"]+)"/g)].map((m) => m[1])
+    assert.equal(options[0], 'default')
+    for (const slug of options.slice(1)) {
+        assert.match(css, new RegExp(`\\.landing-preview\\[data-jaamd-theme='${slug}'\\]`), slug)
+    }
+    assert.doesNotMatch(css, /(^|[^-\w])html\.dark\s*\{[^}]*--jaamd-/m, 'a JAAMD rule left on the whole page')
 })
 
-test('a relative link between the packages becomes a page url', () => {
-    assert.match(page('docs/jaad/markdown/index.html'), /href="\/docs\/jaamd\/overview"/)
+test('the related projects link to the documentation', () => {
+    const related = home().match(/<section class="related"[\s\S]*?<\/section>/)?.[0] ?? ''
+    for (const name of ['@jaamd/astro', 'JAAD', 'JAAB', '@jaamd/react']) assert.match(related, new RegExp(`>${name}<`))
+    assert.match(related, /href="https:\/\/docs\.jaamd\.org\/jaamd"/)
+    assert.match(related, /href="https:\/\/docs\.jaamd\.org\/jaad"/)
 })
 
-test('llms.txt serves the jaamd documentation', () => {
-    assert.match(page('llms.txt'), /^# jaamd\n[\s\S]*# Markup and classes/)
+test('the documentation is no longer built here', () => {
+    assert.equal(existsSync(join(DIST, 'docs')), false)
+    assert.equal(existsSync(join(DIST, 'jaad')), false)
+    assert.match(page('llms.txt'), /https:\/\/docs\.jaamd\.org\/llms\.txt/)
 })
 
-// With routeBase set, JAAD injects no 404: the site has to bring its own.
-test('the site answers a wrong url with its own page', () => {
-    const missing = page('404.html')
-    assert.match(missing, /<title>404 \| JAAMD<\/title>/)
-    assert.match(missing, /<body[^>]*data-site-layout/)
-    assert.match(missing, /href="\/docs"/, 'no way back into the documentation')
-})
-
-test('the jaad landing page shares the docs measure without using its frame', () => {
-    const landing = page('jaad/index.html')
-    const css = allCss().replace(/\s+/g, '')
-
-    assert.match(landing, /<body[^>]*data-site-layout/)
-    assert.doesNotMatch(landing, /jaad-chrome|data-jaad-default-frame/)
-    assert.match(css, /\.site-chrome\{[^}]*max-width:var\(--site-content-width\)/)
-    assert.match(css, /\.site-main\{[^}]*max-width:var\(--site-content-width\)/)
-    assert.match(landing, /<site-theme-toggle>/)
+test('a wrong url gets the site page', () => {
+    assert.match(page('404.html'), /<title>404 \| JAAMD<\/title>/)
 })
 
 const resolves = (path) =>
@@ -61,12 +57,11 @@ const resolves = (path) =>
 test('every internal link points at a built page', () => {
     const broken = walk()
         .filter((file) => file.endsWith('.html'))
-        .flatMap((file) => {
-            const html = readFileSync(file, 'utf8')
-            return [...html.matchAll(/href="(\/(?!\/)[^"#?]*)/g)]
+        .flatMap((file) =>
+            [...readFileSync(file, 'utf8').matchAll(/href="(\/(?!\/)[^"#?]*)/g)]
                 .map((m) => decodeURI(m[1]))
                 .filter((href) => !resolves(href))
-                .map((href) => `${file.slice(DIST.length)} → ${href}`)
-        })
+                .map((href) => `${file.slice(DIST.length)} → ${href}`),
+        )
     assert.deepEqual([...new Set(broken)], [])
 })

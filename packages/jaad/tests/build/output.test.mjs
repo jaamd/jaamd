@@ -65,7 +65,7 @@ test('the inferred repository is a single icon, with no menu to repeat it', () =
 test('an unset footer renders the credit, not its placeholder', () => {
     const footer = page('docs/index.html').match(/<footer[\s\S]*?<\/footer>/)?.[0]
     assert.ok(footer, 'no footer in the built page')
-    assert.match(footer, /jaamd\.org\/docs\/jaad/)
+    assert.match(footer, /docs\.jaamd\.org\/jaad/)
     assert.doesNotMatch(footer, /:credit/, ':credit reached the page unexpanded')
 })
 

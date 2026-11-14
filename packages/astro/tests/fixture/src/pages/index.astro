@@ -1,13 +1,17 @@
 ---
 import MarkdownContent from '@jaamd/astro/components'
-import Hero from '../components/Hero.astro'
 import { Content } from '../content/showcase.md'
-import SiteLayout from '../layouts/SiteLayout.astro'
 ---
 
-<SiteLayout>
-    <Hero />
-    <MarkdownContent as="article">
-        <Content />
-    </MarkdownContent>
-</SiteLayout>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>JAAMD fixture</title>
+    </head>
+    <body>
+        <MarkdownContent as="article">
+            <Content />
+        </MarkdownContent>
+    </body>
+</html>

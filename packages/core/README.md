@@ -45,10 +45,10 @@ const dispose = enhance(element)
 ```
 
 Options, labels and the React pattern are in
-[Other frameworks](https://jaamd.org/docs/jaamd/advanced/other-frameworks).
+[Other frameworks](https://docs.jaamd.org/jaamd/advanced/other-frameworks).
 
 ## Markup
 
 The emitted HTML and its classes are the public contract: stylesheets, themes
 and the client script all rely on them. They are listed in
-[Markup and classes](https://jaamd.org/docs/jaamd/styling/markup).
+[Markup and classes](https://docs.jaamd.org/jaamd/styling/markup).

@@ -30,6 +30,10 @@ with `pnpm --filter docs dev`. Link between pages by file, relative to
 the page you are writing, even across the two packages; the build fails on a
 link to a file that does not exist.
 
+The `site/` project is jaamd.org, the landing page with the live editor: preview
+it with `pnpm --filter site dev`. Its Worker sends the old `jaamd.org/docs/...`
+addresses to docs.jaamd.org. Both projects deploy from `main`.
+
 ## Themes
 
 A theme is a directory under `packages/core/src/themes/<slug>/` plus one entry in

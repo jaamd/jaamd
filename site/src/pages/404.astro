@@ -1,19 +1,13 @@
 ---
-import SiteLayout from '@/layouts/SiteLayout.astro'
-import { withBase } from '@/utils/base'
+import Page from '../layouts/Page.astro'
 ---
 
-<SiteLayout pageTitle="404" description="The page you are looking for does not exist.">
-    <section class="mx-auto max-w-2xl py-24 text-center">
-        <p class="font-brand text-primary mb-4 text-7xl">404</p>
-        <h1 class="text-foreground-bright mb-4 text-2xl">Page not found</h1>
-        <p class="text-foreground-secondary mb-8 text-base leading-relaxed">
-            The page you are looking for does not exist, or it moved.
-        </p>
+<Page title="404" description="Nothing is published at this address.">
+    <section class="not-found">
+        <h1>404</h1>
+        <p>Nothing is published at this address.</p>
         <p>
-            <a href={withBase('/')}>Home</a>
-            <span class="text-foreground-muted mx-2">·</span>
-            <a href={withBase('/docs')}>Documentation</a>
+            <a href="/">JAAMD</a> · <a href="https://docs.jaamd.org">Documentation</a>
         </p>
     </section>
-</SiteLayout>
+</Page>

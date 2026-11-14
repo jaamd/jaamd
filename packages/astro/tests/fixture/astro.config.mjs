@@ -1,44 +1,11 @@
 import { unified } from '@astrojs/markdown-remark'
 import jaamd from '@jaamd/astro'
-import { defineConfig, fontProviders } from 'astro/config'
-import { shikiThemes } from './src/themes.ts'
+import { defineConfig } from 'astro/config'
 
-// Shiki takes arbitrary theme keys and emits --shiki-<key> per token, so every
-// theme is baked at build time and switched with CSS. jaamd's own option accepts
-// only light/dark, so the rest are added here, after it.
-
-/** @type {import("astro").AstroIntegration} */
-const shikiMultiTheme = {
-    name: 'www:shiki-themes',
-    hooks: {
-        'astro:config:setup': ({ updateConfig }) => {
-            updateConfig({
-                markdown: { shikiConfig: { themes: shikiThemes, defaultColor: false } },
-            })
-        },
-    },
-}
-
-// `pnpm build:unified` builds on unified. Default: Sätteri.
+// `JAAMD_PROCESSOR=unified` builds on unified. Default: Sätteri.
 const onUnified = process.env.JAAMD_PROCESSOR === 'unified'
 
 export default defineConfig({
-    site: 'https://jaamd.org',
     ...(onUnified ? { markdown: { processor: unified() } } : {}),
-    integrations: [jaamd({ theme: { light: 'github-light', dark: 'one-dark-pro' } }), shikiMultiTheme],
-    fonts: [
-        {
-            provider: fontProviders.google(),
-            name: 'Inter',
-            cssVariable: '--font-inter',
-            weights: ['400 600'],
-        },
-        {
-            provider: fontProviders.google(),
-            name: 'Merriweather',
-            cssVariable: '--font-merriweather',
-            weights: ['300 700'],
-            styles: ['normal', 'italic'],
-        },
-    ],
+    integrations: [jaamd({ theme: { light: 'github-light', dark: 'one-dark-pro' } })],
 })

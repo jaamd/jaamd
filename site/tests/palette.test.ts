@@ -15,9 +15,8 @@ function derivedTokens(file: string): [string, string][] {
     ])
 }
 
-// The official site keeps its own palette and maps it onto both surfaces, so
-// nothing forces the two recipes to agree. If they drift, jaamd.org/docs/jaad
-// stops showing what a default installation looks like.
+// The landing keeps its own palette, so nothing forces it to agree with JAAD's.
+// If they drift, jaamd.org and docs.jaamd.org stop looking like one site.
 test('the site derives its palette the way the package does', () => {
     const shipped = derivedTokens('packages/jaad/src/site/styles/global.css')
     const site = derivedTokens('site/src/styles/identity.css')
