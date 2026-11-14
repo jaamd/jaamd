@@ -39,13 +39,7 @@ const contentAttrs = { id: 'content' }
 <DocsLayout {title} {page} {headings} {navigation}>
     <DocsMobileNav slot="mobile-navigation" groups={navigation.groups} headings={headings} locale={page.locale} />
 
-    <Breadcrumbs
-        slot="breadcrumbs"
-        section={page.section}
-        chapter={page.chapter}
-        title={page.title}
-        locale={page.locale}
-    />
+    <Breadcrumbs slot="breadcrumbs" section={page.section} chapter={page.chapter} locale={page.locale} />
     <PageActions slot="page-actions" {editBase} {editPath} cleanSlug={page.slug} locale={page.locale} />
 
     <Fragment slot="content">

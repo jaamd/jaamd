@@ -94,23 +94,26 @@ fonts are still downloaded during the build even when unused.
 
 ## Layout tokens
 
-| Token                  | Default                         |
-| ---------------------- | ------------------------------- |
-| `--jaad-content-width` | `56rem`                         |
-| `--jaad-chrome-width`  | the content width               |
-| `--jaad-sidebar-width` | `16rem`                         |
-| `--jaad-page-padding`  | `2rem`                          |
-| `--jaad-header-height` | `4.25rem`, where sidebars start |
+| Token                  | Default                                           |
+| ---------------------- | ------------------------------------------------- |
+| `--jaad-chrome-width`  | content, both sidebars and their gaps             |
+| `--jaad-content-width` | `56rem`, the most the page column takes           |
+| `--jaad-sidebar-width` | `16rem`, the navigation and the table of contents |
+| `--jaad-page-padding`  | `2rem`, on each side of the page                  |
+| `--jaad-header-height` | `4.25rem`, the fixed header                       |
+
+`--jaad-chrome-width` is the column the header, the sidebars and the page share.
+The header and the two sidebars are fixed to the window, and only the page
+scrolls; raise `--jaad-header-height` along with a logo taller than the header.
+Set it to fit the documentation to the width of the rest of a site; the page
+column takes what the sidebars leave, up to `--jaad-content-width`:
 
 ```css
 :root {
-    --jaad-content-width: 64rem;
-    --jaad-sidebar-width: 18rem;
+    --jaad-chrome-width: 80rem;
+    --jaad-sidebar-width: 14rem;
 }
 ```
-
-`--jaad-chrome-width` is the width of the header and footer. Raise
-`--jaad-header-height` along with a logo taller than the header.
 
 Use [Advanced layout](08-advanced-layout.md) when token changes are not
 enough.

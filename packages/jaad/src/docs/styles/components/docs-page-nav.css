@@ -1,31 +1,41 @@
 @layer components {
     .docs-page-nav {
-        @apply py-8;
+        margin-top: 3rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--color-border);
     }
 
     .docs-page-nav-row {
-        @apply flex items-center justify-between gap-4;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
     }
 
     .docs-page-nav-link {
-        @apply border-border-dark bg-background-tertiary text-foreground-bright hover:border-primary hover:bg-border-dark hover:text-primary flex max-w-[calc(45%-1rem)] min-w-0 items-center gap-2 rounded-lg border px-4 py-3 no-underline transition-all duration-300;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+        max-width: calc(50% - 0.5rem);
+        min-height: 2.75rem;
+        color: var(--color-foreground-bright);
+        font-size: 0.875rem;
+        text-decoration: none;
+    }
+
+    .docs-page-nav-link:hover {
+        color: var(--color-foreground-muted);
     }
 
     .docs-page-nav-icon {
-        @apply h-4 w-4 shrink-0 transition-transform;
-    }
-
-    @media (hover: hover) {
-        .docs-page-nav-link:hover .docs-page-nav-icon-prev {
-            @apply -translate-x-1;
-        }
-
-        .docs-page-nav-link:hover .docs-page-nav-icon-next {
-            @apply translate-x-1;
-        }
+        flex: none;
+        width: 1rem;
+        height: 1rem;
     }
 
     .docs-page-nav-label {
-        @apply overflow-hidden font-medium text-ellipsis whitespace-nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }

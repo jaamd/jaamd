@@ -1,19 +1,15 @@
 /** The canonical UI catalogue: its keys define every catalogue JAAD accepts. */
 export const ENGLISH_UI = {
     'breadcrumb.label': 'Breadcrumb',
-    'breadcrumb.root': 'Docs',
     home: 'Home',
     'locale.change': 'Change language',
     'nav.documentation': 'Documentation navigation',
-    'nav.jumpToSection': 'Jump to section...',
     'nav.mobile': 'Toggle mobile menu',
     'nav.page': 'Page navigation',
-    'nav.selectPage': 'Select page',
     'page.copied': 'Copied!',
     'page.copy': 'Copy page',
     'page.edit': 'Edit this page',
     'page.lastUpdated': 'Last updated on',
-    scrollTop: 'Scroll to top',
     'search.all': 'All',
     'search.close': 'close',
     'search.empty': 'No results for',
@@ -27,5 +23,5 @@ export const ENGLISH_UI = {
     'search.trigger': 'Search docs...',
     'theme.toggle': 'Toggle color theme',
     'toc.label': 'Table of contents',
-    'toc.title': 'On This Page',
+    'toc.title': 'On this page',
 } as const

@@ -85,6 +85,26 @@ With [sections](01-getting-started/02-pages.md#sections), the browser title of
 a page is `Page · Section | Site`, so pages with the same name in two sections
 no longer share a title. Docs without sections are unchanged.
 
+### A fixed shell
+
+The header and both sidebars are fixed to the window and only the page
+scrolls. They sit in one column, `--jaad-chrome-width`, which now defaults to
+the sidebars, the page and their gaps; to fit the documentation to a site of
+your own, set it. See [Layout tokens](02-configurations/06-styles.md#layout-tokens).
+
+- The sidebar lists every section with all its pages, under the section's name.
+- Above the title, the page shows its section and chapter instead of a full
+  breadcrumb trail.
+- Copy and edit sit under the table of contents, in the right column.
+- Previous and next are a line of text, and the footer closes the page column.
+- On narrow screens, a menu named after the current page opens the navigation,
+  and another opens the table of contents. The scroll-to-top button is gone.
+
+`--jaad-sidebar-offset` and the `.docs-main-gutters` class are gone: set
+`--jaad-chrome-width` and `--jaad-sidebar-width` instead. The `ui` keys
+`breadcrumb.root`, `nav.jumpToSection`, `nav.selectPage` and `scrollTop` are no
+longer used: remove them from your overrides.
+
 ### Custom docs frame: renamed navigation types
 
 "Section" now names a part of the documentation with its own directory. A

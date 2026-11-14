@@ -1,21 +1,38 @@
 @layer components {
     .docs-toc-title {
-        @apply text-primary/60 mb-4 text-xs font-semibold tracking-wider uppercase;
+        margin: 0 0 0.5rem;
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--color-foreground-muted);
     }
 
     .docs-toc-list {
-        @apply space-y-2;
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
 
     .docs-toc-link {
-        @apply text-foreground/60 hover:text-primary block border-l-2 border-transparent py-1 pl-3 text-xs no-underline transition-colors;
+        display: block;
+        padding: 0.1875rem 0 0.1875rem calc(0.625rem - 2px);
+        border-left: 2px solid transparent;
+        color: var(--color-foreground-muted);
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        text-decoration: none;
     }
 
     .docs-toc-link-nested {
-        @apply pl-6;
+        padding-left: calc(1.375rem - 2px);
+    }
+
+    .docs-toc-link:hover {
+        color: var(--color-foreground-bright);
     }
 
     .docs-toc-link[aria-current='location'] {
-        @apply border-primary;
+        border-color: var(--color-foreground-bright);
+        color: var(--color-foreground-bright);
     }
 }

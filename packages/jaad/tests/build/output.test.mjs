@@ -111,39 +111,42 @@ test('the sidebar follows the numeric prefixes', () => {
     )
 })
 
-// The header used to be 50rem over 56rem of content, so its right edge fell
-// inside the text it sat above.
-test('the chrome is measured against the content, not against a second number', () => {
+test('a fixed shell: header and sidebars hold still, only the page scrolls', () => {
     const css = allCss().replace(/\s+/g, '')
 
     assert.match(
         css,
-        /--jaad-chrome-width:var\(--jaad-content-width\)/,
-        'the chrome width is no longer derived from the content width',
+        /--jaad-chrome-width:calc\(var\(--jaad-content-width\)\+2\*var\(--jaad-sidebar-width\)/,
+        'the chrome width is no longer derived from the content and sidebar widths',
     )
-    assert.match(css, /\.jaad-chrome\{[^}]*max-width:var\(--jaad-chrome-width\)/)
+    assert.match(css, /\.jaad-header\{[^}]*position:fixed/, 'the header scrolls with the page')
+    assert.match(css, /\.jaad-header-inner\{[^}]*max-width:var\(--jaad-chrome-width\)/)
+    assert.match(css, /\.jaad-body\{[^}]*padding-top:var\(--jaad-header-height\)/, 'the page starts under the header')
+    assert.match(css, /\.docs-container\{[^}]*max-width:var\(--jaad-chrome-width\)/)
     assert.match(css, /\.docs-main\{[^}]*max-width:var\(--jaad-content-width\)/)
     assert.ok(!css.includes('max-width:50rem'), 'a hardcoded chrome width is back')
 
-    // The gutters used to be lg:ml-64/lg:mr-64, so widening the sidebar token
-    // moved the sidebars without moving the room reserved for them.
     assert.match(
         css,
-        /\.docs-main-gutters\{margin-inline:var\(--jaad-sidebar-width\)\}/,
-        'the content gutters no longer follow the sidebar token',
+        /grid-template-columns:var\(--jaad-sidebar-width\)minmax\(0,1fr\)var\(--jaad-sidebar-width\)/,
+        'the sidebar columns no longer follow the sidebar token',
     )
     assert.match(
         css,
-        /\.docs-sidebar-left\{left:max\(1rem,var\(--jaad-sidebar-offset\)\)\}/,
-        'a widened sidebar can be pushed off screen again',
+        /\[data-jaad-default-frame\]\.docs-sidebar-right\{[^}]*position:fixed/,
+        'the sidebars move with the page',
     )
+    assert.match(
+        css,
+        /\.docs-sidebar-left\{[^}]*left:max\(1rem,calc\(50%-var\(--jaad-chrome-width\)\/2\+1rem\)\)/,
+        'the sidebars are no longer placed at the edges of the header column',
+    )
+    assert.match(css, /\.docs-container>\.jaad-footer\{grid-column:2\}/, 'the footer no longer closes the page column')
 
-    assert.match(
-        page('docs/index.html'),
-        /<header[^>]*class="[^"]*jaad-chrome/,
-        'the header does not use the shared measure',
-    )
-    assert.match(page('docs/index.html'), /data-jaad-default-frame/)
+    const html = page('docs/getting-started/installation/index.html')
+    assert.match(html, /<header[^>]*class="jaad-header"/)
+    assert.match(html, /data-jaad-default-frame/)
+    assert.ok(html.indexOf('class="docs-main"') < html.indexOf('<footer'), 'the footer comes before the page')
 })
 
 test('docs and the page layout share one padding token', () => {

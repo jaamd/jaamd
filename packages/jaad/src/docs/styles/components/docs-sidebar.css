@@ -1,50 +1,59 @@
 @layer components {
-    .docs-sidebar-page {
-        @apply mb-0.5;
+    .docs-sidebar-left nav {
+        font-size: 0.875rem;
+        line-height: 1.5;
     }
 
-    .docs-sidebar-page:not(:first-child) {
-        @apply mt-0.5;
+    .docs-sidebar-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
 
-    .docs-sidebar-link,
-    .docs-sidebar-sublink {
-        @apply text-foreground hover:bg-primary/10 hover:text-primary block px-3 py-1.5 text-sm no-underline transition-colors;
-    }
-
+    /* The bar of the current page sits in the gutter, so every label lines up. */
     .docs-sidebar-link {
-        @apply rounded;
+        display: block;
+        margin-left: -0.75rem;
+        padding: 0.25rem 0 0.25rem calc(0.75rem - 2px);
+        border-left: 2px solid transparent;
+        color: var(--color-foreground);
+        text-decoration: none;
     }
 
-    .docs-sidebar-sublink {
-        @apply rounded-r;
+    .docs-sidebar-link:hover {
+        color: var(--color-foreground-bright);
     }
 
     .docs-sidebar-link[aria-current='page'] {
-        @apply bg-primary/10 text-primary font-semibold;
-    }
-
-    .docs-sidebar-sublink[aria-current='page'] {
-        @apply border-primary bg-primary/10 text-primary -ml-px border-l-2 pl-2.75 font-semibold;
-    }
-
-    .docs-sidebar-section:not(:first-child) {
-        @apply border-border/60 mt-6 border-t pt-6;
-    }
-
-    .docs-sidebar-section-title {
-        @apply text-foreground-bright mb-3 px-3 font-serif text-xl font-light italic;
+        border-color: var(--color-foreground-bright);
+        color: var(--color-foreground-bright);
+        font-weight: 500;
     }
 
     .docs-sidebar-chapter {
-        @apply mt-5 mb-5;
+        margin-top: 1rem;
+    }
+
+    .docs-sidebar-chapter + li:not(.docs-sidebar-chapter) {
+        margin-top: 1rem;
     }
 
     .docs-sidebar-chapter-title {
-        @apply text-primary/50 mb-1 px-3 text-[0.825rem] font-semibold tracking-widest uppercase;
+        margin: 0 0 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--color-foreground-muted);
     }
 
-    .docs-sidebar-chapter-list {
-        @apply border-border/40 ml-3 space-y-0.5 border-l pl-0;
+    .docs-sidebar-section {
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .docs-sidebar-section-title {
+        margin: 0 0 0.25rem;
+        color: var(--color-foreground-bright);
+        font-weight: 600;
     }
 }

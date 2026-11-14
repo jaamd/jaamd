@@ -1,9 +1,9 @@
 ---
 import type { DocsNavGroup } from '../navigation.ts'
-import type { DocsHeading } from '../types.ts'
-import ScrollToTop from '../../site/components/ScrollToTop.astro'
+import type { DocsHeading, DocsNavItem } from '../types.ts'
 import { ui } from '../../site/runtime.ts'
 import { formatChapterTitle } from '../model/ids.ts'
+import DocsNavTree from './DocsNavTree.astro'
 
 interface Props {
     locale?: string
@@ -14,104 +14,77 @@ interface Props {
 const { groups, headings, locale } = Astro.props
 const t = ui(locale)
 
-/** Option groups cannot nest: a chapter inside a section is named after both. */
-const options = groups.flatMap((group) => {
-    const entries = group.type === 'section' ? group.entries : [group]
-    const prefix = group.type === 'section' ? group.label : null
-    const loose = entries.flatMap((entry) => (entry.type === 'page' ? [entry.item] : []))
-    return [
-        ...(loose.length > 0 ? [{ label: prefix, items: loose }] : []),
-        ...entries.flatMap((entry) =>
-            entry.type === 'chapter'
-                ? [
-                      {
-                          label: [prefix, formatChapterTitle(entry.chapter) || entry.chapter]
-                              .filter(Boolean)
-                              .join(' · '),
-                          items: entry.items,
-                      },
-                  ]
-                : [],
-        ),
-    ]
-})
+/** Section, chapter and page of the current page, as the menu's label. */
+function trail(): string[] {
+    for (const group of groups) {
+        const entries = group.type === 'section' ? group.entries : [group]
+        const section = group.type === 'section' ? [group.label] : []
+        for (const entry of entries) {
+            const items: DocsNavItem[] = entry.type === 'page' ? [entry.item] : entry.items
+            const current = items.find((item) => item.isActive)
+            if (!current) continue
+            const chapter = entry.type === 'chapter' ? [formatChapterTitle(entry.chapter) ?? entry.chapter] : []
+            return [...section, ...chapter, current.title]
+        }
+    }
+    return []
+}
+
+const path = trail()
 ---
 
 <div class="docs-mobile-nav">
-    <div class="docs-select">
-        <label for="page-select" class="jaad-sr-only">
-            {t('nav.selectPage')}
-        </label>
-        <select id="page-select" class="docs-select-field">
-            {options.map((option) =>
-                option.label ? (
-                    <optgroup label={option.label}>
-                        {option.items.map((page) => (
-                            <option value={page.href} selected={page.isActive}>
-                                {page.title}
-                            </option>
-                        ))}
-                    </optgroup>
-                ) : (
-                    option.items.map((page) => (
-                        <option value={page.href} selected={page.isActive}>
-                            {page.title}
-                        </option>
-                    ))
-                ),
-            )}
-        </select>
-    </div>
+    <details class="docs-mobile-menu">
+        <summary class="docs-mobile-summary">
+            <svg class="docs-mobile-icon" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z" />
+            </svg>
+            <span class="jaad-sr-only">{t('nav.documentation')}:</span>
+            {path.map((part, index) => (
+                <>
+                    {index > 0 && <span aria-hidden="true">/</span>}
+                    <span class:list={[index === path.length - 1 && 'docs-mobile-current']}>{part}</span>
+                </>
+            ))}
+        </summary>
+        <nav aria-label={t('nav.documentation')} class="docs-mobile-tree">
+            <DocsNavTree {groups} />
+        </nav>
+    </details>
 
     {headings.length > 0 && (
-        <div id="section-select-wrapper" class="docs-select">
-            <label for="section-select" class="jaad-sr-only">
-                Jump to section
-            </label>
-            <select id="section-select" class="docs-select-field">
-                <option value="">{t('nav.jumpToSection')}</option>
-                {headings.map((heading) => {
-                    const prefix = heading.depth === 3 ? '\u00A0\u00A0\u00A0\u00A0' : ''
-                    return (
-                        <option value={`#${heading.slug}`}>
-                            {prefix}
-                            {heading.text}
-                        </option>
-                    )
-                })}
-            </select>
-        </div>
+        <details class="docs-mobile-menu">
+            <summary class="docs-mobile-summary">{t('toc.title')}</summary>
+            <nav aria-label={t('toc.label')} class="docs-mobile-tree">
+                <ul class="docs-toc-list">
+                    {headings.map((heading) => (
+                        <li>
+                            <a
+                                href={`#${heading.slug}`}
+                                class:list={['docs-toc-link', heading.depth === 3 && 'docs-toc-link-nested']}
+                            >
+                                {heading.text}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        </details>
     )}
 </div>
 
-<ScrollToTop {locale} />
-
 <script>
-    import { navigate } from 'astro:transitions/client'
-
-    function initMobileNav(): void {
-        const pageSelect = document.querySelector<HTMLSelectElement>('#page-select')
-        const sectionSelect = document.querySelector<HTMLSelectElement>('#section-select')
-
-        if (pageSelect && !pageSelect.dataset.navInit) {
-            pageSelect.dataset.navInit = '1'
-            pageSelect.addEventListener('change', () => {
-                if (pageSelect.value) navigate(pageSelect.value)
-            })
-        }
-
-        if (sectionSelect && !sectionSelect.dataset.navInit) {
-            sectionSelect.dataset.navInit = '1'
-            sectionSelect.addEventListener('change', () => {
-                const target = sectionSelect.value
-                if (!target) return
-                document.querySelector(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                // Reset so picking the same section twice in a row fires again.
-                setTimeout(() => (sectionSelect.value = ''), 500)
+    // A chosen entry closes its menu, so the page it opens is not covered.
+    function closeOnChoice(): void {
+        for (const menu of document.querySelectorAll<HTMLDetailsElement>('.docs-mobile-menu')) {
+            if (menu.dataset.navInit) continue
+            menu.dataset.navInit = '1'
+            menu.addEventListener('click', (event) => {
+                if ((event.target as Element).closest('a')) menu.open = false
             })
         }
     }
 
-    initMobileNav()
-    document.addEventListener('astro:page-load', initMobileNav)
+    closeOnChoice()
+    document.addEventListener('astro:page-load', closeOnChoice)
 </script>
