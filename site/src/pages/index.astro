@@ -1,13 +1,149 @@
 ---
-import MarkdownContent from '@jaamd/astro/components'
-import Hero from '../components/Hero.astro'
-import { Content } from '../content/showcase.md'
-import ShowcaseLayout from '../layouts/ShowcaseLayout.astro'
+import Page from '../layouts/Page.astro'
+import { render } from '../markdown.ts'
+import { previewCss, previewThemes } from '../preview-styles.ts'
+import { SAMPLE } from '../sample.ts'
+import '@jaamd/core/styles.css'
+
+const INSTALL = 'npx astro add @jaamd/astro'
+
+const projects = [
+    {
+        name: '@jaamd/astro',
+        code: true,
+        status: 'Available',
+        what: 'JAAMD as an Astro integration, with a component to wrap your markdown.',
+        href: 'https://docs.jaamd.org/jaamd',
+    },
+    {
+        name: 'JAAD',
+        status: 'Available',
+        what: 'A documentation site from a folder of markdown, with search and languages.',
+        href: 'https://docs.jaamd.org/jaad',
+    },
+    {
+        name: 'JAAB',
+        status: 'Coming soon',
+        what: 'A blog from a folder of markdown, on the same base as JAAD.',
+    },
+    {
+        name: '@jaamd/react',
+        code: true,
+        status: 'Coming soon',
+        what: 'JAAMD for React: the same markdown, in a component.',
+    },
+]
+
+const COPY_ICON =
+    'M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z'
+const ARROW_ICON =
+    'M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z'
 ---
 
-<ShowcaseLayout>
-    <Hero />
-    <MarkdownContent as="article">
-        <Content />
-    </MarkdownContent>
-</ShowcaseLayout>
+<Page>
+    <style is:inline slot="head" set:html={previewCss()} />
+
+    <section class="hero">
+        <h1 class="hero-wordmark">JAAMD</h1>
+        <div class="hero-rule"></div>
+        <p class="hero-tagline">Markdown, refined.</p>
+        <p class="hero-lead">
+            Alerts, code tabs, a table of contents and spoilers in the markdown you write; heading anchors, copy buttons
+            and a lightbox on the page that shows it; themes to dress both. Nothing to learn beyond markdown.
+        </p>
+        <div class="install">
+            <div class="install-command">
+                <code>{INSTALL}</code>
+                <button type="button" class="icon-button" data-copy={INSTALL} aria-label="Copy the command">
+                    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                        <path d={COPY_ICON}></path>
+                    </svg>
+                </button>
+            </div>
+            <span class="install-note">for Astro, today</span>
+        </div>
+    </section>
+
+    <section class="editor-section" aria-label="Try it">
+        <div class="editor">
+            <div class="editor-pane">
+                <div class="editor-bar">
+                    <label for="source">Markdown</label>
+                </div>
+                <textarea id="source" spellcheck="false" autocomplete="off" set:text={SAMPLE} />
+            </div>
+            <div class="editor-pane">
+                <div class="editor-bar">
+                    <span>Preview</span>
+                    <label class="editor-theme">
+                        <span>Theme</span>
+                        <select id="theme">
+                            {previewThemes.map((theme) => (
+                                <option value={theme.slug} data-mode={theme.mode}>
+                                    {theme.name}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                </div>
+                <article id="preview" class="jaamd-content landing-preview" set:html={render(SAMPLE)} />
+            </div>
+        </div>
+        <p class="editor-note">Rendered in your browser by JAAMD itself.</p>
+    </section>
+
+    <section class="related" aria-labelledby="related">
+        <h2 id="related">Related projects</h2>
+        <ul class="related-list">
+            {projects.map((project) => (
+                <li class="related-item">
+                    <div class="related-head">
+                        <span class:list={['related-name', { 'related-code': project.code }]}>{project.name}</span>
+                        <span class="related-status">{project.status}</span>
+                    </div>
+                    <p>{project.what}</p>
+                    {project.href && (
+                        <a class="related-link" href={project.href}>
+                            Documentation
+                            <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                                <path d={ARROW_ICON} />
+                            </svg>
+                        </a>
+                    )}
+                </li>
+            ))}
+        </ul>
+    </section>
+</Page>
+
+<script>
+    import { enhance } from '@jaamd/core/client'
+    import { render } from '../markdown.ts'
+
+    const source = document.querySelector<HTMLTextAreaElement>('#source')!
+    const preview = document.querySelector<HTMLElement>('#preview')!
+    const theme = document.querySelector<HTMLSelectElement>('#theme')!
+
+    let dispose = enhance(preview)
+    let frame = 0
+
+    source.addEventListener('input', () => {
+        cancelAnimationFrame(frame)
+        frame = requestAnimationFrame(() => {
+            dispose()
+            preview.innerHTML = render(source.value)
+            dispose = enhance(preview)
+        })
+    })
+
+    theme.addEventListener('change', () => {
+        const option = theme.selectedOptions[0]
+        preview.dataset.jaamdTheme = theme.value
+        if (option.dataset.mode === 'dark') preview.dataset.mode = 'dark'
+        else delete preview.dataset.mode
+    })
+
+    for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+        button.addEventListener('click', () => navigator.clipboard?.writeText(button.dataset.copy ?? ''))
+    }
+</script>

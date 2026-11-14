@@ -337,31 +337,34 @@ importers:
 
   site:
     dependencies:
-      '@jaamd/astro':
-        specifier: workspace:^
-        version: link:../packages/astro
       '@jaamd/core':
         specifier: workspace:^
         version: link:../packages/core
-      '@jaamd/jaad':
-        specifier: workspace:^
-        version: link:../packages/jaad
       astro:
         specifier: ^7.4.2
         version: 7.4.4(@astrojs/markdown-remark@7.3.5(supports-color@10.2.2))(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)
-      sharp:
-        specifier: ^0.35.5
-        version: 0.35.5(@types/node@24.13.3)
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
+      rehype-stringify:
+        specifier: ^10.0.1
+        version: 10.0.1
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1(supports-color@10.2.2)
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0(supports-color@10.2.2)
+      remark-rehype:
+        specifier: ^11.1.2
+        version: 11.1.2
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.12
         version: 0.9.12(prettier@3.9.6)(typescript@6.0.3)
-      '@tailwindcss/vite':
-        specifier: ^4.3.3
-        version: 4.3.5(vite@8.3.5(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
-      tailwindcss:
-        specifier: ^4.3.3
-        version: 4.3.5
       typescript:
         specifier: ^6
         version: 6.0.3

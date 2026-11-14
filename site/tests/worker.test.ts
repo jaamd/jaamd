@@ -1,64 +1,42 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import worker, { markdownSource, quality } from '../worker.ts'
-
-const FILES: Record<string, string> = {
-    '/docs/jaad/getting-started/installation/': '<html>installation</html>',
-    '/docs/jaad/getting-started/installation.md': '# Installation',
-    '/docs/jaad/overview.md': '# JAAD',
-    '/docs/jaamd/overview.md': '# JAAMD',
-    '/docs/search-index.json': '{}',
-}
+import worker, { movedTo } from '../worker.ts'
 
 const env = {
     ASSETS: {
-        async fetch(input: Request | URL | string) {
-            const { pathname } = new URL(input instanceof Request ? input.url : input)
-            const body = FILES[pathname] ?? FILES[`${pathname}/`]
-            return body === undefined
-                ? new Response('<html>404</html>', { status: 404, headers: { 'Content-Type': 'text/html' } })
-                : new Response(body, { headers: { 'Content-Type': 'text/html' } })
+        async fetch() {
+            return new Response('<html>home</html>', { headers: { 'Content-Type': 'text/html' } })
         },
     },
 }
 
-const get = (path: string, accept = 'text/html') =>
-    worker.fetch(new Request(`https://jaamd.org${path}`, { headers: { Accept: accept } }), env)
+const get = (path: string) => worker.fetch(new Request(`https://jaamd.org${path}`), env)
 
-test('quality reads q values and defaults to 1', () => {
-    assert.equal(quality('text/markdown, text/html;q=0.9', 'text/markdown'), 1)
-    assert.equal(quality('text/markdown, text/html;q=0.9', 'text/html'), 0.9)
-    assert.equal(quality('text/html', 'text/markdown'), 0)
+test('the old documentation urls move to docs.jaamd.org', () => {
+    assert.equal(movedTo('/docs'), 'https://docs.jaamd.org/jaamd')
+    assert.equal(movedTo('/docs/'), 'https://docs.jaamd.org/jaamd')
+    assert.equal(movedTo('/docs/jaamd/styling/markup'), 'https://docs.jaamd.org/jaamd/styling/markup')
+    assert.equal(
+        movedTo('/docs/jaad/getting-started/installation/'),
+        'https://docs.jaamd.org/jaad/getting-started/installation/',
+    )
+    assert.equal(movedTo('/docs/llms.txt'), 'https://docs.jaamd.org/llms.txt')
+    assert.equal(movedTo('/jaad'), 'https://docs.jaamd.org/jaad')
 })
 
-test('a browser gets the HTML page', async () => {
-    const response = await get('/docs/jaad/getting-started/installation/', 'text/html,application/xhtml+xml,*/*;q=0.8')
-    assert.equal(await response.text(), '<html>installation</html>')
-    assert.equal(response.headers.get('Vary'), 'Accept')
+test('the landing stays here', () => {
+    assert.equal(movedTo('/'), null)
+    assert.equal(movedTo('/llms.txt'), null)
+    assert.equal(movedTo('/docsearch'), null)
+    assert.equal(movedTo('/jaadx'), null)
 })
 
-test('an agent asking for Markdown gets the page source', async () => {
-    const response = await get('/docs/jaad/getting-started/installation', 'text/markdown, text/html;q=0.5')
-    assert.equal(response.status, 200)
-    assert.equal(response.headers.get('Content-Type'), 'text/markdown; charset=utf-8')
-    assert.equal(await response.text(), '# Installation')
+test('a moved url answers with a permanent redirect, query kept', async () => {
+    const response = await get('/docs/jaad/search?q=x')
+    assert.equal(response.status, 301)
+    assert.equal(response.headers.get('Location'), 'https://docs.jaamd.org/jaad/search?q=x')
 })
 
-test('the section openers map to their own Markdown', async () => {
-    assert.equal(await (await get('/docs', 'text/markdown')).text(), '# JAAMD')
-    assert.equal(await (await get('/docs/jaamd/', 'text/markdown')).text(), '# JAAMD')
-    assert.equal(await (await get('/docs/jaad', 'text/markdown')).text(), '# JAAD')
-})
-
-test('files keep their own type when Markdown is preferred', async () => {
-    assert.equal(markdownSource('/docs/search-index.json'), null)
-    const response = await get('/docs/search-index.json', 'text/markdown')
-    assert.equal(await response.text(), '{}')
-})
-
-test('a missing page answers an agent in Markdown', async () => {
-    const response = await get('/docs/jaad/missing', 'text/markdown')
-    assert.equal(response.status, 404)
-    assert.equal(response.headers.get('Content-Type'), 'text/markdown; charset=utf-8')
-    assert.match(await response.text(), /^# Not found/)
+test('everything else is served from the build', async () => {
+    assert.equal(await (await get('/')).text(), '<html>home</html>')
 })
