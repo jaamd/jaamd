@@ -1,18 +1,14 @@
 name: Publish to npm
 
-# A `<package>@<version>` tag publishes packages/<package>.
+# A `v<version>` tag publishes every package at that version.
 on:
     push:
-        tags: ['*@*']
+        tags: ['v*']
+    # Publishes what is missing at the version of the chosen ref, e.g. after a failed run.
     workflow_dispatch:
-        inputs:
-            package:
-                description: Directory under packages/
-                required: true
-                type: string
 
 concurrency:
-    group: publish-${{ inputs.package || github.ref }}
+    group: publish
     cancel-in-progress: false
 
 permissions:
@@ -22,6 +18,8 @@ permissions:
 env:
     # Only until every package has a trusted publisher on npm.
     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    # Dependencies first: each tarball names the version of the one before.
+    PACKAGES: core astro jaad create-jaad
 
 jobs:
     publish:
@@ -39,43 +37,40 @@ jobs:
 
             - run: pnpm install --frozen-lockfile
 
-            - name: Resolve the package and check the tag against its version
-              id: target
-              env:
-                  PACKAGE: ${{ inputs.package }}
+            - name: Check the version against the tag and every package
+              id: release
               run: |
-                  if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
-                    dir="$PACKAGE"
-                  else
-                    dir="${GITHUB_REF_NAME%@*}"
-                    tag="${GITHUB_REF_NAME##*@}"
-                  fi
+                  for manifest in packages/*/package.json; do
+                    dir="$(basename "$(dirname "$manifest")")"
+                    case " $PACKAGES " in
+                      *" $dir "*) ;;
+                      *) echo "packages/$dir is missing from PACKAGES" >&2; exit 1 ;;
+                    esac
+                  done
 
-                  manifest="packages/$dir/package.json"
-                  if [ ! -f "$manifest" ]; then
-                    echo "no package at packages/$dir" >&2
+                  version="$(node -p "require('./packages/core/package.json').version")"
+                  for dir in $PACKAGES; do
+                    own="$(node -p "require('./packages/$dir/package.json').version")"
+                    if [ "$own" != "$version" ]; then
+                      echo "packages/$dir is $own, not $version" >&2
+                      exit 1
+                    fi
+                  done
+                  if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+                    echo "tag $GITHUB_REF_NAME does not match version $version" >&2
                     exit 1
                   fi
 
-                  name="$(node -p "require('./$manifest').name")"
-                  version="$(node -p "require('./$manifest').version")"
-                  if [ -n "${tag:-}" ] && [ "$tag" != "$version" ]; then
-                    echo "tag $GITHUB_REF_NAME does not match $name@$version" >&2
-                    exit 1
-                  fi
-
-                  echo "dir=packages/$dir" >> "$GITHUB_OUTPUT"
-                  if npm view "$name@$version" version >/dev/null 2>&1; then
-                    echo "published=true" >> "$GITHUB_OUTPUT"
-                    echo "$name@$version is already on npm, nothing to do"
-                  else
-                    echo "releasing $name@$version"
-                  fi
+                  # A prerelease must not become what `npm install` picks.
+                  case "$version" in
+                    *-*) echo "dist-tag=next" >> "$GITHUB_OUTPUT" ;;
+                    *) echo "dist-tag=latest" >> "$GITHUB_OUTPUT" ;;
+                  esac
+                  echo "version=$version" >> "$GITHUB_OUTPUT"
 
             # The whole suite: create-jaad is tested through jaad, jaad through
             # the site, and every package through its packed tarball.
             - name: Check and test
-              if: steps.target.outputs.published != 'true'
               run: |
                   pnpm check
                   pnpm test
@@ -83,11 +78,23 @@ jobs:
                   pnpm test:consumer
 
             - name: Authenticate with a token
-              if: steps.target.outputs.published != 'true' && env.NPM_TOKEN != ''
+              if: env.NPM_TOKEN != ''
               run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
 
             # pnpm writes the versions behind `workspace:` ranges into the tarball.
+            # A package already on npm at this version is skipped, so a rerun
+            # finishes what a failed one left.
             - name: Publish
-              if: steps.target.outputs.published != 'true'
-              working-directory: ${{ steps.target.outputs.dir }}
-              run: pnpm publish --provenance --access public --no-git-checks
+              env:
+                  VERSION: ${{ steps.release.outputs.version }}
+                  DIST_TAG: ${{ steps.release.outputs.dist-tag }}
+              run: |
+                  for dir in $PACKAGES; do
+                    name="$(node -p "require('./packages/$dir/package.json').name")"
+                    if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+                      echo "$name@$VERSION is already on npm"
+                      continue
+                    fi
+                    echo "publishing $name@$VERSION as $DIST_TAG"
+                    (cd "packages/$dir" && pnpm publish --provenance --access public --no-git-checks --tag "$DIST_TAG")
+                  done

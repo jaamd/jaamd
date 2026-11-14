@@ -127,15 +127,18 @@ override either locale through their JAAD configuration.
 
 ## Releasing
 
-Each package is released on its own, from a clean `main`:
+Every package is released together, at one version, from a clean `main`:
 
 ```bash
-node scripts/release.mjs jaamd 0.12.0
-git push origin HEAD jaamd@0.12.0
+node scripts/release.mjs 1.0.0
+git push origin HEAD v1.0.0
 ```
 
-The script sets the version, commits, and creates the `<package>@<version>` tag; the
-tag runs [`publish.yml`](/.github/workflows/publish.yml), which tests the whole
-workspace and publishes with provenance. Releasing `jaad` also updates the version
-`create-jaad` installs, so release `create-jaad` after it. When jaad needs a new
-jaamd, release jaamd first.
+The script sets the version of every package, commits, and creates the
+`v<version>` tag. The tag runs [`publish.yml`](/.github/workflows/publish.yml),
+which tests the whole workspace and publishes with provenance, in dependency
+order: core, astro, jaad, create-jaad. A package already on npm at that version
+is skipped, so running the workflow again from the tag finishes a release that
+failed halfway. A version with a suffix, such as `1.0.0-rc.1`, is published under
+the `next` dist-tag, the others under `latest`. `create-jaad` installs JAAD at its
+own version.

@@ -261,11 +261,23 @@ test('no template depends on tailwind', () => {
     }
 })
 
-test('the version the scaffolder installs is the one being published', () => {
-    const pinned = /const JAAD = ['"]\^([\d.]+)['"]/.exec(readFileSync(join(CREATE_PKG, 'index.mjs'), 'utf8'))?.[1]
-    const published = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version
+const versionOf = (dir) => JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version
 
-    assert.equal(pinned, published, 'create-jaad pins a stale @jaamd/jaad')
+test('every package is released at one version', () => {
+    const packages = join(ROOT, '..')
+    const versions = Object.fromEntries(
+        readdirSync(packages)
+            .filter((dir) => existsSync(join(packages, dir, 'package.json')))
+            .map((dir) => [dir, versionOf(join(packages, dir))]),
+    )
+    assert.equal(new Set(Object.values(versions)).size, 1, JSON.stringify(versions))
+})
+
+test('the scaffolder installs JAAD at its own version', () => {
+    const dir = join(temporaryDirectory('jaad-version-'), 'site')
+    run('node', [CLI, dir, '--template', 'docs', '--title', 'T', '--no-install'], dirname(dir))
+    const { dependencies } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
+    assert.equal(dependencies['@jaamd/jaad'], `^${versionOf(CREATE_PKG)}`)
 })
 
 test('every guide the agent files cite is a page of the docs', () => {
