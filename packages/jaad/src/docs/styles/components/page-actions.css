@@ -1,13 +1,51 @@
 @layer components {
     .docs-page-actions {
-        @apply mb-4 flex items-center gap-2 text-xs;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1.25rem;
+        margin-top: 2rem;
+        font-size: 0.8125rem;
     }
 
     .docs-page-action {
-        @apply border-border bg-surface hover:bg-surface-hover text-foreground-secondary hover:text-foreground-bright flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 no-underline transition-colors;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 2.75rem;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--color-foreground-muted);
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .docs-page-action:hover {
+        color: var(--color-foreground-bright);
     }
 
     .docs-page-action-icon {
-        @apply h-3.5 w-3.5 shrink-0;
+        flex: none;
+        width: 0.875rem;
+        height: 0.875rem;
+    }
+
+    /* Under the table of contents: a column of quiet links. */
+    @media (min-width: 64rem) {
+        .docs-page-actions {
+            flex-direction: column;
+            margin-top: 0;
+        }
+
+        .docs-page-action {
+            min-height: 1.75rem;
+        }
+
+        .docs-toc ~ .docs-page-actions {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
     }
 }

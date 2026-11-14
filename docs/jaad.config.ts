@@ -16,6 +16,7 @@ export default defineJaadConfig({
         jaamd: { dir: '../packages/astro/docs', label: 'JAAMD' },
         jaad: { dir: '../packages/jaad/docs', label: 'JAAD' },
     },
+    footer: 'MIT License · <a href="https://github.com/jaamd/jaamd">GitHub</a> · <a href="https://www.npmjs.com/org/jaamd">npm</a>',
     social: {
         github: { href: 'https://github.com/jaamd/jaamd', label: 'GitHub', svg: GITHUB_ICON },
     },

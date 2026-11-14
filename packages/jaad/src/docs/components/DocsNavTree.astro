@@ -1,0 +1,57 @@
+---
+import type { DocsNavEntry, DocsNavGroup } from '../navigation.ts'
+import { formatChapterTitle } from '../model/ids.ts'
+
+interface Props {
+    groups: DocsNavGroup[]
+}
+
+const { groups } = Astro.props
+
+/** The pages outside every section, then each section with all its pages. */
+const loose = groups.filter((group): group is DocsNavEntry => group.type !== 'section')
+const blocks = [
+    ...(loose.length > 0 ? [{ entries: loose, label: null }] : []),
+    ...groups.flatMap((group) => (group.type === 'section' ? [{ entries: group.entries, label: group.label }] : [])),
+]
+---
+
+{blocks.map(({ entries, label }) => (
+    <div class:list={[label && 'docs-sidebar-section']}>
+        {label && <p class="docs-sidebar-section-title">{label}</p>}
+        {entries.length > 0 && (
+            <ul class="docs-sidebar-list">
+                {entries.map((entry) =>
+                    entry.type === 'page' ? (
+                        <li>
+                            <a
+                                href={entry.item.href}
+                                class="docs-sidebar-link"
+                                aria-current={entry.item.isActive ? 'page' : undefined}
+                            >
+                                {entry.item.title}
+                            </a>
+                        </li>
+                    ) : (
+                        <li class="docs-sidebar-chapter">
+                            <p class="docs-sidebar-chapter-title">{formatChapterTitle(entry.chapter)}</p>
+                            <ul class="docs-sidebar-list">
+                                {entry.items.map((item) => (
+                                    <li>
+                                        <a
+                                            href={item.href}
+                                            class="docs-sidebar-link"
+                                            aria-current={item.isActive ? 'page' : undefined}
+                                        >
+                                            {item.title}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </li>
+                    ),
+                )}
+            </ul>
+        )}
+    </div>
+))}

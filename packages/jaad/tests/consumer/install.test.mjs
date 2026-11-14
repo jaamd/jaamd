@@ -395,7 +395,7 @@ export default defineJaadConfig({
         assert.match(page, /<title>Changelog \| Consumer Test<\/title>/)
         assert.match(page, /data-page-layout/)
         assert.match(page, /<main class="jaad-main-bare">/)
-        assert.match(page, /<header[^>]*class="jaad-chrome"/, 'no header chrome')
+        assert.match(page, /<header[^>]*class="jaad-header"/, 'no header chrome')
         assert.match(page, /aria-label="GitHub"/, 'no configured social links')
         assert.doesNotMatch(page, /<body data-docs/, 'the docs body leaked in')
     })
@@ -405,8 +405,8 @@ export default defineJaadConfig({
         assert.match(home, /data-custom-docs-frame[^>]*data-page-id="01-getting-started"/)
         assert.match(home, /data-page-title="Frontmatter Wins"/)
         assert.ok(
-            home.indexOf('data-copy-page') < home.indexOf('aria-label="Breadcrumb"'),
-            'the custom frame did not move page actions before breadcrumbs',
+            home.indexOf('data-copy-page') < home.indexOf('<h1'),
+            'the custom frame did not move page actions before the content',
         )
         assert.doesNotMatch(home, /<footer/, 'the omitted footer was rendered')
         assert.match(

@@ -4,110 +4,78 @@
         display: contents;
     }
 
+    /* The header's column. Wide, it holds the page between two sidebars fixed
+     to the window: only the page scrolls. */
     .docs-container {
-        position: relative;
         width: 100%;
-        min-height: calc(100vh - 6.5rem);
-        display: flex;
-        justify-content: center;
-    }
-
-    /* The inline margin is deliberate and survives every breakpoint: it sits
-     outside the page padding, which only starts at 48rem. */
-    .docs-page-main {
-        flex: 1;
-        margin-block: 2rem;
-        margin-inline: 1rem;
-    }
-
-    @media (min-width: 48rem) {
-        .docs-page-main {
-            margin-block: 4rem;
-            padding-inline: var(--jaad-page-padding);
-        }
-    }
-
-    @media (min-width: 64rem) {
-        .docs-page-main {
-            margin-bottom: 8rem;
-            padding-inline: calc(var(--jaad-page-padding) * 2);
-        }
+        max-width: var(--jaad-chrome-width);
+        margin-inline: auto;
+        padding-inline: 1rem;
     }
 
     .docs-main {
         width: 100%;
         min-width: 0;
         max-width: var(--jaad-content-width);
-        position: relative;
+        margin-inline: auto;
     }
 
-    /* The room the sidebars need, so widening them widens the gutters too. */
-    @media (min-width: 64rem) {
-        .docs-main-gutters {
-            margin-inline: var(--jaad-sidebar-width);
+    .docs-page-main {
+        padding-top: 2rem;
+    }
+
+    [data-jaad-default-frame] .docs-container > .jaad-footer {
+        width: 100%;
+        max-width: var(--jaad-content-width);
+        margin-inline: auto;
+    }
+
+    @media (48rem <= width < 64rem) {
+        .docs-page-main {
+            padding-inline: var(--jaad-page-padding);
         }
     }
 
     @media (min-width: 64rem) {
+        .docs-page-main {
+            padding-top: 2.5rem;
+        }
+
+        [data-jaad-default-frame] .docs-container {
+            display: grid;
+            grid-template-columns: var(--jaad-sidebar-width) minmax(0, 1fr) var(--jaad-sidebar-width);
+            column-gap: 3rem;
+        }
+
+        [data-jaad-default-frame] .docs-main,
+        [data-jaad-default-frame] .docs-container > .jaad-footer {
+            grid-column: 2;
+        }
+
         [data-jaad-default-frame] .docs-sidebar-left,
         [data-jaad-default-frame] .docs-sidebar-right {
             position: fixed;
             top: var(--jaad-header-height);
-            height: calc(100vh - var(--jaad-header-height));
-            padding: calc(6rem - var(--jaad-header-height)) 1.5rem 2rem;
+            bottom: 0;
+            padding-block: 2rem;
         }
 
-        /* max() keeps the sidebar on screen when the centred offset would be
-       negative, whatever the content and sidebar tokens are set to. */
+        /* Widened into the gutter, where the bar of the current page sits. */
         [data-jaad-default-frame] .docs-sidebar-left {
-            left: max(1rem, var(--jaad-sidebar-offset));
+            left: max(1rem, calc(50% - var(--jaad-chrome-width) / 2 + 1rem));
+            margin-left: -0.75rem;
+            padding-left: 0.75rem;
         }
 
         [data-jaad-default-frame] .docs-sidebar-right {
-            right: max(1rem, var(--jaad-sidebar-offset));
+            right: max(1rem, calc(50% - var(--jaad-chrome-width) / 2 + 1rem));
         }
     }
 
     @media (width < 64rem) {
         [data-jaad-default-frame] .docs-sidebar-left,
-        [data-jaad-default-frame] .docs-sidebar-right {
+        [data-jaad-default-frame] .docs-sidebar-right .docs-toc {
             display: none;
         }
-    }
-
-    /* A mask, so the colour comes from the token and follows the theme.
-     Override --jaad-select-arrow for a different shape. */
-    .docs-select {
-        position: relative;
-    }
-
-    .docs-select::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 0.75rem;
-        width: 1.25rem;
-        height: 1.25rem;
-        transform: translateY(-50%);
-        pointer-events: none;
-        background-color: var(--color-foreground);
-        mask: var(
-                --jaad-select-arrow,
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' viewBox='0 0 20 20'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E")
-            )
-            center / contain no-repeat;
-    }
-
-    .docs-mobile-nav optgroup {
-        font-weight: 600;
-        color: var(--color-primary);
-        background: var(--color-surface);
-    }
-
-    .docs-mobile-nav option {
-        font-weight: 400;
-        color: var(--color-foreground);
-        background: var(--color-surface);
-        padding: 0.5rem;
     }
 }

@@ -8,7 +8,7 @@ description: JAAD turns a folder of Markdown files into a documentation site.
 of Markdown files into a documentation site. The folder is the configuration:
 there is no sidebar to declare and no route to write.
 
-- **Navigation** from the file tree: sidebar, chapters, breadcrumbs, previous
+- **Navigation** from the file tree: sidebar, chapters, previous
   and next links. See [Pages and structure](01-getting-started/02-pages.md).
 - **Search** across every page, built at compile time, with no external
   service. See [Search](02-configurations/04-search.md).

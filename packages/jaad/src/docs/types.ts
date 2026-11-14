@@ -4,7 +4,7 @@ export interface DocsNavItem {
     title: string
     /** Set when the docs are split into sections. */
     section?: string
-    chapter: string | undefined
+    chapter?: string
     href: string
     isActive: boolean
 }

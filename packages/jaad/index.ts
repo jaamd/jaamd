@@ -1,7 +1,6 @@
 import type { AstroIntegration } from 'astro'
 import sitemap from '@astrojs/sitemap'
 import jaamd from '@jaamd/astro'
-import { defineConfig } from 'astro/config'
 import { resolveConfig, type JaadUserConfig } from './src/config.ts'
 import { createIntegrationState, createSitemapFilter } from './src/docs/integration.ts'
 import { createJaadIntegration } from './src/integration.ts'
@@ -28,20 +27,5 @@ export default function jaad(options: JaadUserConfig): AstroIntegration[] {
     ]
 }
 
-/** The whole Astro config for a JAAD site. `astro` is merged in, with its
- *  integrations appended rather than replacing ours. */
-export function defineJaadSite(options: JaadUserConfig) {
-    const { site, base, astro } = options
-    const extra = astro ?? {}
-    const extraIntegrations = Array.isArray(extra.integrations) ? (extra.integrations as AstroIntegration[]) : []
-
-    return defineConfig({
-        ...(site ? { site } : {}),
-        ...(base ? { base } : {}),
-        ...extra,
-        integrations: [...jaad(options), ...extraIntegrations],
-    })
-}
-
 export { defineJaadConfig } from './src/config.ts'
-export type { JaadUserConfig, JaadConfig, JaadResolvedConfig } from './src/config.ts'
+export type { JaadUserConfig } from './src/config.ts'

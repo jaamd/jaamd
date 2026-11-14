@@ -16,14 +16,14 @@ docs/
   03-reference.md        → /reference
 ```
 
-The same tree builds the sidebar, the mobile selectors, the breadcrumbs and the
+The same tree builds the sidebar, the mobile menu, the line above each title and the
 previous and next links.
 
 ## Rules
 
 - A numeric prefix sets the order and is removed from the URL. Files without
   one sort after the numbered files.
-- A folder becomes a collapsible chapter. Only one folder level is supported.
+- A folder becomes a chapter. Only one folder level is supported.
 - The first `# Heading` is the page title.
 - The `##` and `###` headings make the page's table of contents. Wrap headings
   in `<div data-toc-ignore>` to leave them out.

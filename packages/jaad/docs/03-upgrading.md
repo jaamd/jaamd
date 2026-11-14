@@ -85,6 +85,26 @@ With [sections](01-getting-started/02-pages.md#sections), the browser title of
 a page is `Page · Section | Site`, so pages with the same name in two sections
 no longer share a title. Docs without sections are unchanged.
 
+### A fixed shell
+
+The header and both sidebars are fixed to the window and only the page
+scrolls. They sit in one column, `--jaad-chrome-width`, which now defaults to
+the sidebars, the page and their gaps; to fit the documentation to a site of
+your own, set it. See [Layout tokens](02-configurations/06-styles.md#layout-tokens).
+
+- The sidebar lists every section with all its pages, under the section's name.
+- Above the title, the page shows its section and chapter instead of a full
+  breadcrumb trail.
+- Copy and edit sit under the table of contents, in the right column.
+- Previous and next are a line of text, and the footer closes the page column.
+- On narrow screens, a menu named after the current page opens the navigation,
+  and another opens the table of contents. The scroll-to-top button is gone.
+
+`--jaad-sidebar-offset` and the `.docs-main-gutters` class are gone: set
+`--jaad-chrome-width` and `--jaad-sidebar-width` instead. The `ui` keys
+`breadcrumb.root`, `nav.jumpToSection`, `nav.selectPage` and `scrollTop` are no
+longer used: remove them from your overrides.
+
 ### Custom docs frame: renamed navigation types
 
 "Section" now names a part of the documentation with its own directory. A
@@ -104,23 +124,19 @@ fields.
 `DocsEntry` is no longer exported: no prop of the frame carried it. The page a
 frame renders is `DocsFrameProps['page']`.
 
-### Resolved configuration: docs fields under `docs`
+### Search index
 
-`jaad.config.ts` is unchanged. Code that reads the resolved configuration, the
-`JaadResolvedConfig` type or `virtual:jaad/config`, finds the docs fields
-grouped:
+`search-index.json` now holds one entry per heading, for
+[search by heading](02-configurations/04-search.md). Its format is internal to
+JAAD's search and can change in any release: do not read it from code of your
+own.
 
-| Before         | After           |
-| -------------- | --------------- |
-| `docsBase`     | `docs.base`     |
-| `docsDir`      | `docs.dir`      |
-| `docsDirInUse` | `docs.dirInUse` |
-| `docsSections` | `docs.sections` |
-| `editBase`     | `docs.editBase` |
-| `docsLocales`  | `locales`       |
+### Fewer exports
 
-`routeBase`, `sections`, `editLink` and the `locales` option are no longer
-copied into it: their resolved form is the field on the right.
+`@jaamd/jaad` exports `jaad()`, `defineJaadConfig()` and the `JaadUserConfig`
+type. `defineJaadSite`, `JaadConfig` and `JaadResolvedConfig` are gone:
+`@jaamd/jaad/site` builds the Astro configuration, and the resolved
+configuration, `virtual:jaad/config` included, is internal.
 
 ## From 0.9
 

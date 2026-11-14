@@ -19,17 +19,17 @@ metadata, theme, fonts, view transitions and keyboard navigation.
 
 ## Frame contract
 
-| Slot                | Contents                          |
-| ------------------- | --------------------------------- |
-| `header`            | Header, navigation and search     |
-| `sidebar`           | Desktop page navigation           |
-| `mobile-navigation` | Mobile page and heading selectors |
-| `breadcrumbs`       | Current documentation path        |
-| `page-actions`      | Copy and edit actions             |
-| `content`           | Rendered Markdown article         |
-| `page-navigation`   | Previous and next links           |
-| `table-of-contents` | Desktop heading navigation        |
-| `footer`            | Documentation footer              |
+| Slot                | Contents                                      |
+| ------------------- | --------------------------------------------- |
+| `header`            | Header, navigation and search                 |
+| `sidebar`           | Desktop page navigation, every section open   |
+| `mobile-navigation` | Mobile navigation and table of contents menus |
+| `breadcrumbs`       | Section and chapter of the page               |
+| `page-actions`      | Copy and edit actions                         |
+| `content`           | Rendered Markdown article                     |
+| `page-navigation`   | Previous and next links                       |
+| `table-of-contents` | Desktop heading navigation                    |
+| `footer`            | Documentation footer                          |
 
 Omitting a slot removes that element from every documentation page.
 
@@ -121,7 +121,7 @@ type DocsNavGroup = DocsNavEntry | { type: 'section'; section: string; label: st
 interface DocsNavItem {
     title: string
     section?: string
-    chapter: string | undefined
+    chapter?: string
     href: string
     isActive: boolean
 }

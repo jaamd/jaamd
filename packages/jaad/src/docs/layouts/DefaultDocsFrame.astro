@@ -10,13 +10,12 @@ type Props = DocsFrameProps
     <div class="docs-container">
         <slot name="sidebar" />
 
-        <div class="docs-main docs-main-gutters">
+        <div class="docs-main">
             <main class="docs-page-main">
                 <slot name="mobile-navigation" />
 
                 <article>
                     <slot name="breadcrumbs" />
-                    <slot name="page-actions" />
                     <slot name="content" />
                 </article>
 
@@ -24,8 +23,11 @@ type Props = DocsFrameProps
             </main>
         </div>
 
-        <slot name="table-of-contents" />
-    </div>
+        <aside class="docs-sidebar-right jaad-sidebar">
+            <slot name="table-of-contents" />
+            <slot name="page-actions" />
+        </aside>
 
-    <slot name="footer" />
+        <slot name="footer" />
+    </div>
 </div>
