@@ -28,18 +28,10 @@ html.dark {
     --jaad-page-padding: var(--identity-page-padding);
 }
 
-/* Header and footer span the sidebars. */
-@media (min-width: 64rem) {
-    :root {
-        --jaad-chrome-width: min(
-            calc(var(--jaad-content-width) + 2 * var(--jaad-sidebar-width) + 4rem),
-            calc(100% - 2rem)
-        );
-    }
-
-    .jaad-header-inner {
-        padding-inline: 1.5rem;
-    }
+/* The column of jaamd.org. */
+:root {
+    --jaad-chrome-width: 80rem;
+    --jaad-sidebar-width: 14rem;
 }
 
 .jaad-logo {

@@ -1,12 +1,16 @@
 :root {
-    --site-width: 70rem;
-    --site-gutter: 1.5rem;
+    --site-width: 80rem;
+    --site-gutter: 1rem;
 }
 
 *,
 *::before,
 *::after {
     box-sizing: border-box;
+}
+
+html {
+    scrollbar-gutter: stable;
 }
 
 body {
