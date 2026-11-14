@@ -50,14 +50,21 @@ test('every page of both packages has a url, so every old /docs url has a target
     assert.deepEqual(missing, [])
 })
 
+test('a page title names its section, the opening page the site alone', () => {
+    const title = (relative) => page(relative).match(/<title>([^<]*)<\/title>/)[1]
+    assert.equal(title('index.html'), 'JAAMD Docs')
+    assert.equal(title('jaamd/index.html'), 'Overview · JAAMD | JAAMD Docs')
+    assert.equal(title('jaad/getting-started/installation/index.html'), 'Installation · JAAD | JAAMD Docs')
+})
+
 test('every moved page has a built target', () => {
     const missing = Object.values(MOVED).filter((target) => !existsSync(join(DIST, target, 'index.html')))
     assert.deepEqual(missing, [])
 })
 
-test('the header holds the site name, leading to jaamd.org, and no text links', () => {
+test('the header holds the J mark, leading to jaamd.org, and no text links', () => {
     const header = page('index.html').match(/<header[\s\S]*?<\/header>/)[0]
-    assert.match(header, /<a href="https:\/\/jaamd\.org"[^>]*class="jaad-brand-link"/)
+    assert.match(header, /<a href="https:\/\/jaamd\.org"[^>]*class="jaad-brand-link">\s*<img src="\/mark\.svg"/)
     assert.doesNotMatch(header, /jaad-nav-link/)
 })
 

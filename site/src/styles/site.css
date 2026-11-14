@@ -53,6 +53,10 @@ svg {
     padding-block: 1.25rem;
 }
 
+header.site-bar {
+    padding-block: 1rem;
+}
+
 .site-mark,
 .icon-button,
 .site-icon-link {
@@ -61,6 +65,13 @@ svg {
     justify-content: center;
     width: 2.75rem;
     height: 2.75rem;
+}
+
+.site-mark,
+.site-icon-link {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 8px;
 }
 
 .site-mark {
