@@ -17,8 +17,8 @@ import {
     titleFrom,
 } from './lib.mjs'
 
-// Bumped together with the package they install.
-const JAAD = '^0.11.0'
+// Every package is released at one version: this one's is JAAD's.
+const JAAD = `^${JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version}`
 const ASTRO = '^7.4.2'
 const ASTRO_CONFIG_NAMES = ['astro.config.ts', 'astro.config.mjs', 'astro.config.js']
 const CONTENT_CONFIG_NAMES = ['src/content.config.ts', 'src/content.config.mjs', 'src/content.config.js']
