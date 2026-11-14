@@ -31,16 +31,16 @@
     "type": "module",
     "exports": {
         ".": "./index.ts",
-        "./advanced": "./src/advanced.ts",
-        "./content": "./src/content.ts",
-        "./layouts/Page.astro": "./src/layouts/Page.astro",
+        "./advanced": "./src/docs/advanced.ts",
+        "./content": "./src/docs/content.ts",
+        "./layouts/Page.astro": "./src/docs/layouts/Page.astro",
         "./site": "./site.ts"
     },
     "publishConfig": {
         "access": "public"
     },
     "scripts": {
-        "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tailwindcss -i ./src/styles/global.css -o ./dist/jaad.css",
+        "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tailwindcss -i ./src/styles.css -o ./dist/jaad.css",
         "prepare": "pnpm build",
         "prepack": "pnpm build",
         "check": "astro check && tsc --noEmit -p tests",

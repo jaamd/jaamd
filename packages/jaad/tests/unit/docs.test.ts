@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { buildDocsNavigation } from '../../src/navigation.ts'
+import { buildDocsNavigation } from '../../src/docs/navigation.ts'
 import {
     parseDocCollectionId,
     sortDocPages,
@@ -20,7 +20,7 @@ import {
     docPath,
     docTranslationKey,
     validateDocsStructure,
-} from '../../src/utils/docs.ts'
+} from '../../src/docs/pages.ts'
 
 const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) =>
     navigation.groups.flatMap((group) =>

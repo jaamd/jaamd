@@ -1,0 +1,5 @@
+/* The package stylesheet: Tailwind, the site's components, the docs', then the tokens. */
+@import 'tailwindcss' source(none);
+@import './site/styles/components.css';
+@import './docs/styles/components.css';
+@import './site/styles/global.css';

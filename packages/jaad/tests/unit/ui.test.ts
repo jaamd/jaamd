@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { resolveConfig } from '../../src/config.ts'
-import { UI_DEFAULTS, UI_KEYS, UI_SUPPORTED_LOCALES, uiString } from '../../src/ui.ts'
-import { ITALIAN_UI } from '../../src/ui/it.ts'
+import { UI_DEFAULTS, UI_KEYS, UI_SUPPORTED_LOCALES, uiString } from '../../src/site/ui.ts'
+import { ITALIAN_UI } from '../../src/site/ui/it.ts'
 
 test("a locale's override wins over its bundled catalogue", () => {
     const overrides = { it: { 'page.copy': 'Copia la pagina' } }
@@ -49,7 +49,7 @@ test('unlocalised docs use the lang override as their default locale', () => {
         '/',
     )
 
-    assert.deepEqual(config.docsLocales, [])
+    assert.deepEqual(config.locales, [])
     assert.equal(config.defaultLocale, 'it')
     assert.equal(uiString(config.ui, config.defaultLocale, 'page.copy'), ITALIAN_UI['page.copy'])
 })

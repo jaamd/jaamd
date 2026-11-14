@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { normaliseRemote, editBaseFrom, inferRepo, inferDescription } from '../../src/infer.ts'
+import { normaliseRemote, editBaseFrom, inferRepo, inferDescription } from '../../src/site/infer.ts'
 
 test('ssh and https remotes normalise to the same browsable url', () => {
     const expected = 'https://github.com/owner/repo'

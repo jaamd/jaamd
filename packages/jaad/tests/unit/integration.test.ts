@@ -9,9 +9,9 @@ import {
     createSitemapFilter,
     findAliases,
     getInjectedRoutes,
-    loadTailwindPlugin,
     shouldInjectNotFound,
-} from '../../src/integration.ts'
+} from '../../src/docs/integration.ts'
+import { loadTailwindPlugin } from '../../src/site/integration.ts'
 
 test('opening-page discovery follows collection slugging and numeric order', () => {
     const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-'))

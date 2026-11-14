@@ -1,0 +1,50 @@
+---
+import type { LocaleAlternate } from '../locales.ts'
+import config from 'virtual:jaad/config'
+import { DEFAULT_LOCALE, ui } from '../runtime.ts'
+import { withDeploymentBase } from '../urls.ts'
+import LocaleSwitcher from './LocaleSwitcher.astro'
+import Nav from './Nav.astro'
+import NavMobile from './NavMobile.astro'
+import SearchPalette from './SearchPalette.astro'
+import SocialLinks from './SocialLinks.astro'
+import ThemeSwitcher from './ThemeSwitcher.astro'
+
+interface Props {
+    locale?: string
+    /** The page in every locale, for the switcher. */
+    alternates: LocaleAlternate[]
+    search: {
+        /** `search-index.json` of the reader's locale. */
+        indexUrl: string
+        /** The full search field on wide screens, not just its icon. */
+        prominent?: boolean
+    }
+}
+
+const { locale = DEFAULT_LOCALE, alternates, search } = Astro.props
+const t = ui(locale)
+const homeHref = withDeploymentBase(config.homeLink, import.meta.env.BASE_URL)
+const logoSrc = config.logo ? withDeploymentBase(config.logo, import.meta.env.BASE_URL) : null
+---
+
+<header class="jaad-chrome" transition:persist>
+    <div class="jaad-header-inner">
+        <div class="jaad-header-row">
+            <span class="jaad-brand font-brand">
+                <a href={homeHref} title={t('home')} class="jaad-brand-link">
+                    {logoSrc ? <img src={logoSrc} alt={config.title} class="jaad-logo" /> : config.title}
+                </a>
+            </span>
+
+            <div class="jaad-header-actions">
+                <SearchPalette indexUrl={search.indexUrl} prominent={search.prominent} {locale} />
+                <Nav />
+                <SocialLinks />
+                {config.appearance === 'auto' && <ThemeSwitcher {locale} />}
+                {alternates.length > 1 && <LocaleSwitcher {alternates} current={locale} />}
+                <NavMobile {locale} />
+            </div>
+        </div>
+    </div>
+</header>

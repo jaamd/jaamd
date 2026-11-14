@@ -1,0 +1,11 @@
+@import './components/shell.css';
+@import './components/header.css';
+@import './components/footer.css';
+@import './components/nav.css';
+@import './components/nav-mobile.css';
+@import './components/social-links.css';
+@import './components/theme-switcher.css';
+@import './components/locale-switcher.css';
+@import './components/scroll-to-top.css';
+@import './components/not-found.css';
+@import './components/search.css';
