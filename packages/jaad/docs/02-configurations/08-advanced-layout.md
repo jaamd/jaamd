@@ -121,7 +121,7 @@ type DocsNavGroup = DocsNavEntry | { type: 'section'; section: string; label: st
 interface DocsNavItem {
     title: string
     section?: string
-    chapter: string | undefined
+    chapter?: string
     href: string
     isActive: boolean
 }
