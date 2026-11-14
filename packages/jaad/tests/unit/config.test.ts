@@ -11,9 +11,8 @@ const bare = (over = {}) => resolveConfig({ title: 'T', ...over }, '/')
 test('title is the only thing you must supply', () => {
     const config = bare()
     assert.equal(config.title, 'T')
-    assert.equal(config.docsDir, './docs')
-    assert.equal(config.routeBase, '/')
-    assert.equal(config.docsBase, '')
+    assert.equal(config.docs.dir, './docs')
+    assert.equal(config.docs.base, '')
     assert.equal(config.lang, 'en')
     assert.deepEqual(config.nav, [])
     assert.deepEqual(config.social, {})
@@ -87,19 +86,19 @@ test('every problem is reported at once, one per line', () => {
 
 test('an explicit edit link is used verbatim', () => {
     assert.equal(
-        bare({ editLink: 'https://git.example.dev/r/edit/main/docs/:path' }).editBase,
+        bare({ editLink: 'https://git.example.dev/r/edit/main/docs/:path' }).docs.editBase,
         'https://git.example.dev/r/edit/main/docs/:path',
     )
 })
 
 test('edit link and repository degrade to null outside a repository', () => {
     const config = bare()
-    assert.equal(config.editBase, null)
+    assert.equal(config.docs.editBase, null)
     assert.equal(config.repoUrl, null)
 })
 
 test('editLink false disables it even inside a repository', () => {
-    assert.equal(resolveConfig({ title: 'T', editLink: false }).editBase, null)
+    assert.equal(resolveConfig({ title: 'T', editLink: false }).docs.editBase, null)
 })
 
 test('the shorthand and full theme forms both parse', () => {
@@ -175,7 +174,7 @@ test("astro's own options never reach the resolved config", () => {
 // ── The mount point, which every internal link is built from ─────────────────
 
 test('the mount point gets one leading slash and no trailing one', () => {
-    const at = (routeBase: string) => bare({ routeBase }).docsBase
+    const at = (routeBase: string) => bare({ routeBase }).docs.base
     assert.equal(at('/docs'), '/docs')
     assert.equal(at('docs'), '/docs', 'a missing slash made every link relative')
     assert.equal(at('/docs/'), '/docs')
@@ -183,7 +182,7 @@ test('the mount point gets one leading slash and no trailing one', () => {
 })
 
 test('the root mount point is empty, so links stay single-slashed', () => {
-    assert.equal(bare({ routeBase: '/' }).docsBase, '')
+    assert.equal(bare({ routeBase: '/' }).docs.base, '')
 })
 
 test('a logo has to be a public url, not a source path', () => {
@@ -236,7 +235,7 @@ test('locale directories reach the resolved config', (t) => {
     const config = resolveConfig({ title: 'T' }, cwd)
 
     assert.deepEqual(
-        config.docsLocales.map((locale) => locale.code),
+        config.locales.map((locale) => locale.code),
         ['en', 'it'],
     )
     assert.equal(config.defaultLocale, 'en')
@@ -246,7 +245,7 @@ test('locales: false leaves the directories as chapters', (t) => {
     const cwd = docsTree(t, ['en/01-a.md', 'it/01-a.md'])
     const config = resolveConfig({ title: 'T', locales: false }, cwd)
 
-    assert.deepEqual(config.docsLocales, [])
+    assert.deepEqual(config.locales, [])
     assert.equal(config.defaultLocale, 'en')
 })
 
@@ -255,7 +254,7 @@ test('an explicit list is taken over what detection would find', (t) => {
     const config = resolveConfig({ title: 'T', locales: ['en', 'it'] }, cwd)
 
     assert.deepEqual(
-        config.docsLocales.map((locale) => locale.code),
+        config.locales.map((locale) => locale.code),
         ['en', 'it'],
     )
 })
@@ -268,13 +267,13 @@ test('two empty locale directories leave the docs unlocalised', (t) => {
     mkdirSync(join(cwd, 'docs', 'en'), { recursive: true })
     mkdirSync(join(cwd, 'docs', 'it'), { recursive: true })
 
-    assert.deepEqual(resolveConfig({ title: 'T' }, cwd).docsLocales, [])
+    assert.deepEqual(resolveConfig({ title: 'T' }, cwd).locales, [])
 })
 
 // A pinned list skips detection, which is what guards against a missing docsDir.
 test('a pinned list does not crash when there is no docs directory', () => {
     assert.doesNotThrow(() => bare({ locales: ['en'] }))
-    assert.deepEqual(bare({ locales: ['en'] }).docsLocales, [])
+    assert.deepEqual(bare({ locales: ['en'] }).locales, [])
 })
 
 test('a locale code the config pins has to be a real one', () => {

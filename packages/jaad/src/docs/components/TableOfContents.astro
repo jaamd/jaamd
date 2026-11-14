@@ -1,0 +1,73 @@
+---
+import type { DocsHeading } from '../types.ts'
+import { ui } from '../../site/runtime.ts'
+
+interface Props {
+    headings: DocsHeading[]
+    locale?: string
+}
+
+const { headings, locale } = Astro.props
+const t = ui(locale)
+---
+
+{headings.length > 0 && (
+    <aside id="toc-sidebar" class="docs-sidebar-right jaad-sidebar">
+        <nav aria-label={t('toc.label')}>
+            <h2 class="docs-toc-title">{t('toc.title')}</h2>
+            <ul class="docs-toc-list">
+                {headings.map((heading) => (
+                    <li>
+                        <a
+                            href={`#${heading.slug}`}
+                            data-toc-link
+                            class:list={['docs-toc-link', heading.depth === 3 && 'docs-toc-link-nested']}
+                        >
+                            {heading.text}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    </aside>
+)}
+
+<script>
+    function initToc(): void {
+        const sidebar = document.getElementById('toc-sidebar')
+        // astro:page-load also fires on the first load, which would observe twice.
+        if (!sidebar || sidebar.dataset.tocInit) return
+        sidebar.dataset.tocInit = '1'
+
+        const links = Array.from(sidebar.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'))
+        const headingEls = links
+            .map((link) => document.getElementById(link.getAttribute('href')!.slice(1)))
+            .filter(Boolean) as HTMLElement[]
+
+        if (!headingEls.length) return
+
+        const setActive = (id: string): void => {
+            links.forEach((link) => {
+                const isActive = link.getAttribute('href') === `#${id}`
+                if (isActive) link.setAttribute('aria-current', 'location')
+                else link.removeAttribute('aria-current')
+            })
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) setActive(entry.target.id)
+                })
+            },
+            { rootMargin: '-100px 0px -66%', threshold: 0 },
+        )
+
+        headingEls.forEach((el) => observer.observe(el))
+
+        document.addEventListener('astro:before-preparation', () => observer.disconnect(), { once: true })
+    }
+
+    initToc()
+    document.addEventListener('astro:page-load', initToc)
+</script>

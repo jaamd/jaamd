@@ -4,9 +4,10 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { resolveConfig } from '../../src/config.ts'
-import { findAliases } from '../../src/integration.ts'
-import { rehypeDocLinks } from '../../src/link-plugins.ts'
-import { buildDocsNavigation } from '../../src/navigation.ts'
+import { findAliases } from '../../src/docs/integration.ts'
+import { rehypeDocLinks } from '../../src/docs/link-plugins.ts'
+import { resolveDocLink } from '../../src/docs/links.ts'
+import { buildDocsNavigation } from '../../src/docs/navigation.ts'
 import {
     collectionIdFor,
     docAliases,
@@ -14,8 +15,7 @@ import {
     docCanonicalSlug,
     sortDocPages,
     validateDocsStructure,
-} from '../../src/utils/docs.ts'
-import { resolveDocLink } from '../../src/utils/links.ts'
+} from '../../src/docs/pages.ts'
 
 const urls = { docsBase: '' }
 
@@ -180,7 +180,7 @@ test('a section keeps its directory, and takes its label from the key', () => {
         tmpdir(),
     )
     assert.deepEqual(
-        config.docsSections.map(({ key, label, dir }) => ({ key, label, dir })),
+        config.docs.sections.map(({ key, label, dir }) => ({ key, label, dir })),
         [
             { key: 'guide', label: 'The Guide', dir: './guide' },
             { key: 'api', label: 'Api', dir: '../shared/api' },
@@ -198,9 +198,9 @@ test('a section inside another is refused', () => {
 
 test('docsDir is read alongside sections only when set, and cannot hold one', () => {
     const sections = { guide: { dir: './guide' } }
-    assert.equal(resolveConfig({ title: 'T', sections }, tmpdir()).docsDirInUse, false)
-    assert.equal(resolveConfig({ title: 'T', sections, docsDir: './intro' }, tmpdir()).docsDirInUse, true)
-    assert.equal(resolveConfig({ title: 'T' }, tmpdir()).docsDirInUse, true)
+    assert.equal(resolveConfig({ title: 'T', sections }, tmpdir()).docs.dirInUse, false)
+    assert.equal(resolveConfig({ title: 'T', sections, docsDir: './intro' }, tmpdir()).docs.dirInUse, true)
+    assert.equal(resolveConfig({ title: 'T' }, tmpdir()).docs.dirInUse, true)
     assert.throws(
         () => resolveConfig({ title: 'T', docsDir: './docs', sections: { api: { dir: './docs/api' } } }, tmpdir()),
         /api: docs\/api is, or is inside, another/,

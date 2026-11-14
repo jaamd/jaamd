@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { detectLocales, validateLocaleTree } from '../../src/locale-tree.ts'
+import { detectLocales, validateLocaleTree } from '../../src/docs/locale-tree.ts'
 import {
     describeLocale,
     isLocale,
@@ -12,7 +12,7 @@ import {
     localePrefix,
     prefixedLocales,
     routedLocales,
-} from '../../src/locales.ts'
+} from '../../src/site/locales.ts'
 
 function docsTree(entries: string[]): string {
     const dir = mkdtempSync(join(tmpdir(), 'jaad-locales-'))

@@ -20,7 +20,7 @@ const source = (name) => readFileSync(join(SRC, name), 'utf8')
 test('every @theme token ships in the package stylesheet', () => {
     const dist = source('../dist/jaad.css')
     assert.deepEqual(
-        themeTokens(source('styles/global.css')).filter((t) => !dist.includes(`${t}:`)),
+        themeTokens(source('site/styles/global.css')).filter((t) => !dist.includes(`${t}:`)),
         [],
     )
 })
@@ -28,8 +28,8 @@ test('every @theme token ships in the package stylesheet', () => {
 // `tailwind: true` exposes exactly JAAD's colour and font tokens.
 test('tailwind.css names every colour and font token', () => {
     const pick = (tokens) => tokens.filter((t) => /^--(color|font)-/.test(t)).toSorted()
-    const declared = pick(themeTokens(source('styles/global.css')))
-    const bridged = pick(themeTokens(source('styles/tailwind.css')))
+    const declared = pick(themeTokens(source('site/styles/global.css')))
+    const bridged = pick(themeTokens(source('site/styles/tailwind.css')))
     assert.deepEqual(bridged, declared)
 })
 
@@ -74,7 +74,7 @@ test('the package styles no bare element outside a cascade layer', () => {
 // indistinguishable from a utility. docs.css went unlayered for a whole release
 // because of that, outranking every utility a consumer writes on a .docs-* box.
 test('the documentation stylesheet is layered as a whole', () => {
-    const source = readFileSync(join(SRC, 'styles/docs.css'), 'utf8')
+    const source = readFileSync(join(SRC, 'docs/styles/docs.css'), 'utf8')
 
     const outside = source
         .replace(/\/\*[\s\S]*?\*\//g, '')

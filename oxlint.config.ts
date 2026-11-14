@@ -45,6 +45,22 @@ export default defineConfig({
             },
         },
         {
+            files: ['packages/jaad/src/site/**'],
+            rules: {
+                'no-restricted-imports': [
+                    'error',
+                    {
+                        patterns: [
+                            {
+                                group: ['**/docs/*', '**/docs/**/*'],
+                                message: 'the site layer sits below the docs: it may not import them.',
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        {
             files: ['**/tests/**'],
             rules: { 'unicorn/consistent-function-scoping': 'off' },
         },

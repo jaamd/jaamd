@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { extractHeadingsFromMarkdown, splitMarkdownByHeadings } from '../../src/utils/docs.ts'
-import { buildSearchIndex } from '../../src/utils/search-index.ts'
+import { extractHeadingsFromMarkdown, splitMarkdownByHeadings } from '../../src/docs/pages.ts'
+import { buildSearchIndex } from '../../src/docs/search-index.ts'
 import {
     getSnippet,
     markWords,
@@ -10,7 +10,7 @@ import {
     search,
     type SearchIndex,
     type SearchPage,
-} from '../../src/utils/search.ts'
+} from '../../src/site/search.ts'
 
 /** An index of pages, each `[title, ...[heading, text]]`, the first pair
  *  with no heading being the text before the first one. */

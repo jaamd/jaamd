@@ -1,7 +1,7 @@
 import type { JaadResolvedConfig } from '../../src/config.ts'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { buildSocialLinks } from '../../src/social.ts'
+import { buildSocialLinks } from '../../src/site/social.ts'
 
 const config = (over: Partial<JaadResolvedConfig>) => ({ social: {}, repoUrl: null, ...over }) as JaadResolvedConfig
 

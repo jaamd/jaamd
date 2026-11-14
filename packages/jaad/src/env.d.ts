@@ -8,6 +8,6 @@ declare module 'virtual:jaad/config' {
 
 declare module 'virtual:jaad/docs-frame' {
     // oxlint-disable-next-line typescript/consistent-type-imports
-    const DocsFrame: typeof import('./layouts/DefaultDocsFrame.astro').default
+    const DocsFrame: typeof import('./docs/layouts/DefaultDocsFrame.astro').default
     export default DocsFrame
 }

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { normaliseBasePath, withDeploymentBase, docsPageHref, docsMarkdownHref } from '../../src/urls.ts'
+import { docsMarkdownHref, docsPageHref } from '../../src/docs/urls.ts'
+import { normaliseBasePath, withDeploymentBase } from '../../src/site/urls.ts'
 
 test('base paths are normalised without a trailing slash', () => {
     assert.equal(normaliseBasePath('/'), '')

@@ -3,10 +3,11 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { resolveConfig, resolveStylesheets } from '../../src/config.ts'
-import { PRESETS } from '../../src/themes/index.ts'
+import { resolveConfig } from '../../src/config.ts'
+import { resolveStylesheets } from '../../src/site/config.ts'
+import { PRESETS } from '../../src/site/themes.ts'
 
-const THEMES = join(dirname(fileURLToPath(import.meta.url)), '../../src/themes')
+const SITE = join(dirname(fileURLToPath(import.meta.url)), '../../src/site')
 
 test('every preset resolves to a stylesheet JAAMD actually ships', () => {
     for (const name of Object.keys(PRESETS)) {
@@ -35,9 +36,7 @@ test('a preset flips the bridge, so the palette travels from JAAMD', () => {
 test('the two bridges never declare the same custom property', () => {
     const declared = (name: string) =>
         new Set(
-            [...readFileSync(join(THEMES, '../styles', name), 'utf8').matchAll(/^\s*(--[a-z0-9-]+):/gm)].map(
-                (m) => m[1],
-            ),
+            [...readFileSync(join(SITE, 'styles', name), 'utf8').matchAll(/^\s*(--[a-z0-9-]+):/gm)].map((m) => m[1]),
         )
 
     const forward = declared('jaamd-forward.css')
@@ -49,7 +48,7 @@ test('the two bridges never declare the same custom property', () => {
 
 // global.css derives everything else from these with color-mix().
 test('the reverse bridge covers every seed global.css expects', () => {
-    const css = readFileSync(join(THEMES, '../styles/jaamd-reverse.css'), 'utf8')
+    const css = readFileSync(join(SITE, 'styles/jaamd-reverse.css'), 'utf8')
 
     for (const seed of [
         '--color-background',
@@ -91,7 +90,7 @@ test('an unknown theme is a build error, not a silent fallback', () => {
 test('every preset names shiki themes that shiki actually bundles', () => {
     // shiki is a transitive dependency of astro, so it is not resolvable from
     // here; read the bundled theme files instead.
-    const pnpm = join(THEMES, '../../../../node_modules/.pnpm')
+    const pnpm = join(SITE, '../../../../node_modules/.pnpm')
     const dir = readdirSync(pnpm)
         .filter((d) => d.startsWith('@shikijs+themes@'))
         .map((d) => join(pnpm, d, 'node_modules/@shikijs/themes/dist'))

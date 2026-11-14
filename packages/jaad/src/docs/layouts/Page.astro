@@ -1,0 +1,18 @@
+---
+import type { ComponentProps } from 'astro/types'
+import Shell from '../../site/layouts/Shell.astro'
+import { DEFAULT_LOCALE } from '../../site/runtime.ts'
+import { getLocaleAlternates } from '../collection.ts'
+import { docsUrls } from '../runtime.ts'
+import { docsPageHref } from '../urls.ts'
+
+type Props = Omit<ComponentProps<typeof Shell>, 'header'>
+
+// A page of the project's own has no translations: offer each locale's opener.
+const alternates = await getLocaleAlternates('')
+const indexUrl = docsPageHref('search-index.json', docsUrls(DEFAULT_LOCALE))
+---
+
+<Shell {...Astro.props} header={{ alternates, search: { indexUrl } }}>
+    <slot />
+</Shell>

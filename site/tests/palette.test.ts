@@ -19,7 +19,7 @@ function derivedTokens(file: string): [string, string][] {
 // nothing forces the two recipes to agree. If they drift, jaamd.org/docs/jaad
 // stops showing what a default installation looks like.
 test('the site derives its palette the way the package does', () => {
-    const shipped = derivedTokens('packages/jaad/src/styles/global.css')
+    const shipped = derivedTokens('packages/jaad/src/site/styles/global.css')
     const site = derivedTokens('site/src/styles/identity.css')
 
     assert.ok(shipped.length > 0, 'no derived tokens found in the package')
