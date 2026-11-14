@@ -68,6 +68,24 @@ The extensionless paths are gone. Add `.css`:
 Groups and items arrive in display order, so nothing replaces the two removed
 fields.
 
+### Resolved configuration: docs fields under `docs`
+
+`jaad.config.ts` is unchanged. Code that reads the resolved configuration, the
+`JaadResolvedConfig` type or `virtual:jaad/config`, finds the docs fields
+grouped:
+
+| Before         | After           |
+| -------------- | --------------- |
+| `docsBase`     | `docs.base`     |
+| `docsDir`      | `docs.dir`      |
+| `docsDirInUse` | `docs.dirInUse` |
+| `docsSections` | `docs.sections` |
+| `editBase`     | `docs.editBase` |
+| `docsLocales`  | `locales`       |
+
+`routeBase`, `sections`, `editLink` and the `locales` option are no longer
+copied into it: their resolved form is the field on the right.
+
 ## From 0.9
 
 ### Tailwind on your own pages
