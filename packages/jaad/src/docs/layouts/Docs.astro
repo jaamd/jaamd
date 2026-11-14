@@ -1,7 +1,9 @@
 ---
 import type { DocsFrameProps } from '../advanced.ts'
+import type { DocsSourceEntry } from '../collection.ts'
+import type { DocsPage } from '../model/tree.ts'
 import type { DocsNavigation } from '../navigation.ts'
-import type { DocsEntry, DocsHeading } from '../types.ts'
+import type { DocsHeading } from '../types.ts'
 import { ClientRouter } from 'astro:transitions'
 import config from 'virtual:jaad/config'
 import DocsFrame from 'virtual:jaad/docs-frame'
@@ -13,7 +15,7 @@ import { getLocaleAlternates } from '../collection.ts'
 import DocsSidebarLeft from '../components/DocsSidebarLeft.astro'
 import StructuredData from '../components/StructuredData.astro'
 import TableOfContents from '../components/TableOfContents.astro'
-import { docSlug, docTitle, docTranslationKey, extractDescription } from '../pages.ts'
+import { pageDescription } from '../model/rendered.ts'
 import { docsUrls } from '../runtime.ts'
 import { docsPageHref } from '../urls.ts'
 import '../../../dist/jaad.css'
@@ -26,32 +28,26 @@ import 'virtual:jaad/user.css'
 import 'virtual:jaad/tailwind.css'
 
 interface Props {
+    /** The `<title>` before the site name. Left out on the opening page. */
     title?: string
-    chapter?: string
-    entry?: DocsEntry
+    page: DocsPage<DocsSourceEntry>
     headings?: DocsHeading[]
     navigation: DocsNavigation
 }
 
-const { title, chapter, entry, headings = [], navigation } = Astro.props
+const { title, page, headings = [], navigation } = Astro.props
 
 const pageTitle = title ? `${title} | ${config.title}` : config.title
 
-// The opening page gets no `title`; resolve it from the entry.
-const entryTitle = entry ? docTitle(entry) : (title ?? '')
+const description =
+    page.data.description ?? pageDescription(page.source.rendered, page.title) ?? config.description ?? config.title
 
-const pageDescription =
-    entry?.data.description ??
-    (entry ? extractDescription(entry.body || '', entryTitle) : null) ??
-    config.description ??
-    config.title
-
-const locale = entry?.locale ?? DEFAULT_LOCALE
+const locale = page.locale ?? DEFAULT_LOCALE
 const language = LOCALES.find((known) => known.code === locale)?.tag ?? config.lang
 
 const indexUrl = docsPageHref('search-index.json', docsUrls(locale))
 
-const switcherAlternates = await getLocaleAlternates(entry ? docTranslationKey(entry) : '')
+const switcherAlternates = await getLocaleAlternates(page.translationKey)
 
 // x-default is a landing place, so it takes the fallback when this page has no
 // translation into the default locale.
@@ -68,12 +64,12 @@ const alternates = switcherAlternates
 
 const frameProps: DocsFrameProps = {
     page: {
-        id: entry?.id ?? '',
-        slug: entry ? docSlug(entry) : '',
-        title: entryTitle,
-        section: entry?.section,
-        chapter,
-        data: entry?.data ?? { draft: false, keywords: [] },
+        id: page.id,
+        slug: page.slug,
+        title: page.title,
+        section: page.section,
+        chapter: page.chapter,
+        data: page.data,
     },
     headings,
     navigation,
@@ -85,22 +81,22 @@ const frameProps: DocsFrameProps = {
     <head>
         <Head
             title={pageTitle}
-            description={pageDescription}
-            keywords={entry?.data.keywords}
-            author={entry?.data.author}
-            image={entry?.data.ogImage}
-            modified={entry?.data.lastUpdated}
+            description={description}
+            keywords={page.data.keywords}
+            author={page.data.author}
+            image={page.data.ogImage}
+            modified={page.data.lastUpdated}
             language={language}
             {alternates}
             {xDefault}
         />
         <StructuredData
-            title={entryTitle || config.title}
-            description={pageDescription}
-            chapter={chapter}
-            keywords={entry?.data.keywords}
-            author={entry?.data.author}
-            modified={entry?.data.lastUpdated}
+            title={page.title || config.title}
+            description={description}
+            chapter={page.chapter}
+            keywords={page.data.keywords}
+            author={page.data.author}
+            modified={page.data.lastUpdated}
             {language}
             {locale}
         />

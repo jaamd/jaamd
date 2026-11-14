@@ -1,6 +1,8 @@
+import type { DocsSource } from '../../src/docs/model/tree.ts'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { extractHeadingsFromMarkdown, splitMarkdownByHeadings } from '../../src/docs/pages.ts'
+import { pageChunks } from '../../src/docs/model/rendered.ts'
+import { buildDocsTree } from '../../src/docs/model/tree.ts'
 import { buildSearchIndex } from '../../src/docs/search-index.ts'
 import {
     getSnippet,
@@ -30,55 +32,65 @@ const titles = (index: SearchIndex, query: string, section?: string) =>
 
 // ── Splitting a page at its headings ─────────────────────────────────────────
 
-test('a page is cut at its h2 and h3, the title line left out', () => {
-    const chunks = splitMarkdownByHeadings(
-        '# Title\n\nIntro.\n\n## One\n\nFirst.\n\n### Two\n\nSecond.\n#### Deep\nStill second.',
-    )
+test('a page is cut at its h2 and h3, the title left out', () => {
+    const chunks = pageChunks({
+        html: '<h1 id="title">Title</h1><p>Intro.</p><h2 id="one">One</h2><p>First.</p><h3 id="two">Two</h3><p>Second.</p><h4 id="deep">Deep</h4><p>Still second.</p>',
+    })
     assert.deepEqual(
-        chunks.map((chunk) => [chunk.heading?.slug ?? null, chunk.markdown.trim()]),
+        chunks.map((chunk) => [chunk.heading?.slug ?? null, chunk.text]),
         [
             [null, 'Intro.'],
             ['one', 'First.'],
-            ['two', 'Second.\n#### Deep\nStill second.'],
+            ['two', 'Second. Deep Still second.'],
         ],
     )
 })
 
-test('a heading in a code sample stays in the text of its chunk', () => {
-    const chunks = splitMarkdownByHeadings('## Real\n\n```md\n## Example\n```\n')
+test('code samples are left out of the text', () => {
+    const chunks = pageChunks({ html: '<h2 id="real">Real</h2><p>Use it.</p><pre><code>## Example</code></pre>' })
     assert.equal(chunks.length, 2)
-    assert.match(chunks[1].markdown, /## Example/)
+    assert.equal(chunks[1].text, 'Use it.')
 })
 
-// The renderer numbers ids across every level, so an h1 or h4 shifts the suffix.
-test('anchors count headings of every level, like the renderer', () => {
-    assert.deepEqual(
-        extractHeadingsFromMarkdown('# Setup\n## Setup\n#### Setup\n### Setup').map((h) => h.slug),
-        ['setup-1', 'setup-3'],
-    )
-})
-
-test('a closing sequence of hashes is not part of the heading', () => {
-    assert.deepEqual(
-        extractHeadingsFromMarkdown('## Setup ##').map((h) => [h.text, h.slug]),
-        [['Setup', 'setup']],
-    )
+test('a heading takes the text and the id the renderer gave it', () => {
+    const [, chunk] = pageChunks({
+        html: '<h2 id="install-it">Install <code>it</code><a class="jaamd-heading-link" href="#install-it"><svg></svg></a></h2>',
+        metadata: { headings: [{ depth: 2, slug: 'install-it', text: 'Install it' }] },
+    })
+    assert.deepEqual(chunk.heading, { depth: 2, slug: 'install-it', text: 'Install it' })
 })
 
 // ── Building the index ───────────────────────────────────────────────────────
 
+const page = (id: string, html: string, more: Partial<DocsSource> = {}): DocsSource => ({
+    id,
+    path: id,
+    data: {},
+    rendered: {
+        html,
+        metadata: {
+            headings: [...html.matchAll(/<h([1-6]) id="([^"]*)">([^<]*)/g)].map(([, depth, slug, text]) => ({
+                depth: Number(depth),
+                slug,
+                text,
+            })),
+        },
+    },
+    ...more,
+})
+
 test('the index has one entry per heading, each with its anchor and text', () => {
-    const index = buildSearchIndex(
+    const tree = buildDocsTree(
         [
-            {
-                id: '02-guides/01-setup',
-                body: '# Setup\n\nRead **this** first.\n\n## Install `it`\n\n| a | b |\n| --- | --- |\n| c | d |\n',
-                data: { keywords: ['start'] },
-            },
+            page(
+                '02-guides/01-setup',
+                '<h1 id="setup">Setup</h1><p>Read <strong>this</strong> first.</p><h2 id="install-it">Install it</h2><table><tr><th>a</th><th>b</th></tr><tr><td>c</td><td>d</td></tr></table>',
+                { data: { keywords: ['start'] } },
+            ),
         ],
-        [],
-        { docsBase: '/docs' },
+        { urls: { docsBase: '/docs' } },
     )
+    const index = buildSearchIndex(tree, [])
     assert.deepEqual(index.pages, [{ title: 'Setup', href: '/docs', chapter: 'Guides', keywords: ['start'] }])
     assert.deepEqual(index.entries, [
         { page: 0, text: 'Read this first.' },
@@ -87,17 +99,17 @@ test('the index has one entry per heading, each with its anchor and text', () =>
 })
 
 test('the index lists only the sections with pages, at the pages own urls', () => {
-    const index = buildSearchIndex(
+    const tree = buildDocsTree(
         [
-            { id: 'guide/01-intro', path: '01-intro', section: 'guide', body: '# Intro' },
-            { id: 'guide/02-next', path: '02-next', section: 'guide', body: '# Next' },
+            page('guide/01-intro', '<h1 id="intro">Intro</h1>', { path: '01-intro', section: 'guide' }),
+            page('guide/02-next', '<h1 id="next">Next</h1>', { path: '02-next', section: 'guide' }),
         ],
-        [
-            { key: 'guide', label: 'Guide' },
-            { key: 'api', label: 'API' },
-        ],
-        { docsBase: '' },
+        { sections: ['guide', 'api'], urls: { docsBase: '' } },
     )
+    const index = buildSearchIndex(tree, [
+        { key: 'guide', label: 'Guide' },
+        { key: 'api', label: 'API' },
+    ])
     assert.deepEqual(index.sections, [{ key: 'guide', label: 'Guide' }])
     assert.deepEqual(
         index.pages.map((page) => [page.href, page.section]),

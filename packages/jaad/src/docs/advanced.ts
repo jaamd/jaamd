@@ -19,5 +19,5 @@ export interface DocsFrameProps {
     navigation: DocsNavigation
 }
 
-export type { DocsHeading, DocsNavItem, DocsEntry, DocsPageData } from './types.ts'
+export type { DocsHeading, DocsNavItem, DocsPageData } from './types.ts'
 export type { DocsNavEntry, DocsNavGroup, DocsNavigation } from './navigation.ts'

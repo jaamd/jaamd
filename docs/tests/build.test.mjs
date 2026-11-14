@@ -86,3 +86,23 @@ test('every internal link points at a built page', () => {
         )
     assert.deepEqual([...new Set(broken)], [])
 })
+
+const pageFile = (href) => join(DIST, href, 'index.html')
+
+test('every search anchor and every table-of-contents link is an id of its page', () => {
+    const index = JSON.parse(page('search-index.json'))
+    const searchTargets = index.entries
+        .filter((entry) => entry.anchor)
+        .map((entry) => [pageFile(index.pages[entry.page].href), entry.anchor])
+    const tocTargets = walk(DIST)
+        .filter((file) => file.endsWith('.html'))
+        .flatMap((file) =>
+            [...readFileSync(file, 'utf8').matchAll(/<a href="#([^"]+)" data-toc-link/g)].map((m) => [file, m[1]]),
+        )
+
+    assert.ok(searchTargets.length > 0 && tocTargets.length > 0)
+    const missing = [...searchTargets, ...tocTargets]
+        .filter(([file, id]) => !readFileSync(file, 'utf8').includes(`id="${id}"`))
+        .map(([file, id]) => `${file.slice(DIST.length)}#${id}`)
+    assert.deepEqual([...new Set(missing)], [])
+})

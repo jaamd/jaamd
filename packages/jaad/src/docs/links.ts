@@ -2,7 +2,7 @@ import type { DocsRoot } from './config.ts'
 import type { DocsUrlOptions } from './urls.ts'
 import { existsSync } from 'node:fs'
 import { dirname, relative, resolve, sep } from 'node:path'
-import { getCleanSlug, getDocCollectionId, splitDocLocale } from './pages.ts'
+import { getDocCollectionId, namedSlug, splitDocLocale } from './model/ids.ts'
 import { docsPageHref } from './urls.ts'
 
 export interface DocLinkContext {
@@ -37,6 +37,6 @@ export function resolveDocLink(href: string, fromFile: string, context: DocLinkC
     }
 
     const { locale, id } = splitDocLocale(getDocCollectionId(relative(root.dir, target)), context.locales)
-    const slug = [root.section, getCleanSlug(id)].filter(Boolean).join('/')
+    const slug = namedSlug(id, root.section)
     return docsPageHref(slug, context.urls(locale ?? undefined)) + (hash ? `#${hash}` : '')
 }

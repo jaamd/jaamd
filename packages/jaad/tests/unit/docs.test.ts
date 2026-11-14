@@ -1,56 +1,70 @@
+import type { DocsSource } from '../../src/docs/model/tree.ts'
+import type { DocsUrlOptions } from '../../src/docs/urls.ts'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { buildDocsNavigation } from '../../src/docs/navigation.ts'
 import {
-    parseDocCollectionId,
-    sortDocPages,
+    formatChapterTitle,
     getCleanSlug,
     getDocCollectionId,
-    docCanonicalSlug,
+    parseDocPath,
     slugToTitle,
-    formatChapterTitle,
-    extractTitleFromMarkdown,
-    extractHeadingsFromMarkdown,
-    stripMarkdown,
-    extractDescription,
-    docTitle,
-    docLabel,
-    docOrder,
     splitDocLocale,
-    docPath,
-    docTranslationKey,
-    validateDocsStructure,
-} from '../../src/docs/pages.ts'
+} from '../../src/docs/model/ids.ts'
+import { htmlText, pageDescription, pageHeadings } from '../../src/docs/model/rendered.ts'
+import { buildDocsTree } from '../../src/docs/model/tree.ts'
+import { validateDocsStructure } from '../../src/docs/model/validate.ts'
+import { buildDocsNavigation } from '../../src/docs/navigation.ts'
+
+/** A file of one locale; its path is its id unless given. */
+const source = (id: string, more: Partial<DocsSource> = {}): DocsSource => ({ id, path: id, data: {}, ...more })
+
+const treeOf = (sources: DocsSource[], urls: DocsUrlOptions = { docsBase: '/docs' }) => buildDocsTree(sources, { urls })
+
+const ids = (sources: DocsSource[]) => treeOf(sources).pages.map((page) => page.id)
 
 const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) =>
     navigation.groups.flatMap((group) =>
         group.type === 'page' ? [group.item] : group.type === 'chapter' ? group.items : [],
     )
 
+/** Rendered markdown from HTML, with Astro's headings read off it. */
+const rendered = (html: string) => ({
+    html,
+    metadata: {
+        headings: [...html.matchAll(/<h([1-6]) id="([^"]*)">(.*?)<\/h\1>/g)].map(([, depth, slug, text]) => ({
+            depth: Number(depth),
+            slug,
+            text: htmlText(text),
+        })),
+    },
+})
+
 // ── Numeric prefixes: the ordering convention the whole product rests on ──────
 
 test('a numeric prefix sets the order and is stripped from the slug', () => {
-    const parsed = parseDocCollectionId('01-introduction')
-    assert.equal(parsed.order, 1)
-    assert.equal(parsed.slug, 'introduction')
-    assert.equal(parsed.title, 'Introduction')
-    assert.equal(parsed.chapter, undefined)
+    assert.deepEqual(parseDocPath('01-introduction'), {
+        slug: 'introduction',
+        order: 1,
+        chapter: undefined,
+        orderChapter: undefined,
+    })
 })
 
 test("a nested page carries both its chapter's order and its own", () => {
-    const parsed = parseDocCollectionId('02-guides/03-advanced')
-    assert.equal(parsed.orderChapter, 2)
-    assert.equal(parsed.chapter, 'guides')
-    assert.equal(parsed.order, 3)
-    assert.equal(parsed.slug, 'advanced')
+    assert.deepEqual(parseDocPath('02-guides/03-advanced'), {
+        slug: 'advanced',
+        order: 3,
+        chapter: 'guides',
+        orderChapter: 2,
+    })
 })
 
 test('an unnumbered page sorts last', () => {
-    assert.equal(parseDocCollectionId('about').order, 999)
+    assert.equal(parseDocPath('about').order, 999)
 })
 
 test('an unnumbered directory still names the chapter', () => {
-    const parsed = parseDocCollectionId('guides/01-intro')
+    const parsed = parseDocPath('guides/01-intro')
     assert.equal(parsed.chapter, 'guides')
     assert.equal(parsed.orderChapter, undefined)
 })
@@ -65,69 +79,83 @@ test('file paths use the same slug rules as the content collection', () => {
     assert.equal(getDocCollectionId('03-markdown\\10-detail-&-summary.md'), '03-markdown/10-detail--summary')
 })
 
-test('only the first sorted page has an empty canonical slug', () => {
-    const pages = [{ id: '01-intro' }, { id: '02-guide' }]
-    assert.equal(docCanonicalSlug(pages[0], 0, pages), '')
-    assert.equal(docCanonicalSlug(pages[1], 1, pages), 'guide')
+// ── The tree: one resolution per page ────────────────────────────────────────
+
+test('only the first page has an empty canonical slug', () => {
+    const [first, second] = treeOf([source('01-intro'), source('02-guide')]).pages
+    assert.equal(first.canonical, '')
+    assert.deepEqual(first.aliases, ['intro'])
+    assert.equal(second.canonical, 'guide')
+    assert.deepEqual(second.aliases, [])
 })
 
-test('a flat tree or one chapter level has an unambiguous structure', () => {
-    assert.doesNotThrow(() => {
-        validateDocsStructure([{ id: '01-intro' }, { id: '02-guides/01-setup' }, { id: '02-guides/02-deploy' }])
-    })
+test('every page has its href, from the url options', () => {
+    const sources = [source('01-intro'), source('02-guides/01-setup')]
+    const hrefs = (urls: DocsUrlOptions) => treeOf(sources, urls).pages.map((page) => page.href)
+
+    assert.deepEqual(hrefs({ docsBase: '/docs' }), ['/docs', '/docs/guides/setup'])
+    // routeBase "/" is normalised to "" by the caller, so links stay single-slashed.
+    assert.deepEqual(hrefs({ docsBase: '' }), ['/', '/guides/setup'])
+    assert.deepEqual(hrefs({ docsBase: '/docs', deploymentBase: '/repo/' }), ['/repo/docs', '/repo/docs/guides/setup'])
 })
 
-test('duplicate clean slugs stop the build with both source ids', () => {
-    assert.throws(
-        () => {
-            validateDocsStructure([{ id: '01-guide' }, { id: '02-guide' }])
-        },
-        (error: Error) => {
-            assert.match(error.message, /^jaad: invalid documentation structure\n/)
-            assert.match(error.message, /01-guide, 02-guide all resolve to \/guide/)
-            return true
-        },
-    )
-})
-
-test('ambiguous chapters and unsupported depth are reported together', () => {
-    assert.throws(
-        () => {
-            validateDocsStructure([
-                { id: '01-guides/01-start' },
-                { id: 'guides/02-next' },
-                { id: '03-api/01-client/01-create' },
-            ])
-        },
-        (error: Error) => {
-            assert.match(error.message, /01-guides, guides all resolve to chapter \/guides/)
-            assert.match(error.message, /03-api\/01-client\/01-create: only one chapter directory is supported/)
-            return true
-        },
-    )
+test('pages are found by id and by translation key', () => {
+    const tree = treeOf([source('01-a'), source('02-b', { data: { translationKey: 'setup' } })])
+    assert.equal(tree.byId.get('02-b')?.index, 1)
+    assert.equal(tree.byKey.get('setup')?.id, '02-b')
+    assert.equal(tree.byKey.get('a')?.id, '01-a')
 })
 
 // ── Sorting ──────────────────────────────────────────────────────────────────
 
 test('chapters sort by directory prefix, pages by their own within a chapter', () => {
-    const pages = [
-        { id: '02-guides/02-second' },
-        { id: '01-intro' },
-        { id: '02-guides/01-first' },
-        { id: '03-reference/01-api' },
-    ]
     assert.deepEqual(
-        sortDocPages([...pages]).map((p) => p.id),
+        ids([
+            source('02-guides/02-second'),
+            source('01-intro'),
+            source('02-guides/01-first'),
+            source('03-reference/01-api'),
+        ]),
         ['01-intro', '02-guides/01-first', '02-guides/02-second', '03-reference/01-api'],
     )
 })
 
 test('a root page interleaves with chapters by its own number', () => {
-    const pages = [{ id: '03-later' }, { id: '02-guides/01-first' }, { id: '01-first' }]
-    assert.deepEqual(
-        sortDocPages([...pages]).map((p) => p.id),
-        ['01-first', '02-guides/01-first', '03-later'],
-    )
+    assert.deepEqual(ids([source('03-later'), source('02-guides/01-first'), source('01-first')]), [
+        '01-first',
+        '02-guides/01-first',
+        '03-later',
+    ])
+})
+
+test('frontmatter order re-sorts pages against their filenames', () => {
+    assert.deepEqual(ids([source('01-first'), source('02-second', { data: { order: 99 } }), source('03-third')]), [
+        '01-first',
+        '03-third',
+        '02-second',
+    ])
+})
+
+test('inside a chapter, frontmatter order moves the page, not the chapter', () => {
+    assert.deepEqual(ids([source('01-intro'), source('02-guides/05-a', { data: { order: 1 } }), source('03-end')]), [
+        '01-intro',
+        '02-guides/05-a',
+        '03-end',
+    ])
+    assert.deepEqual(ids([source('02-guides/01-b'), source('02-guides/05-a', { data: { order: 0 } })]), [
+        '02-guides/05-a',
+        '02-guides/01-b',
+    ])
+})
+
+test('an ordered page can take the opening route from the first file', () => {
+    assert.equal(ids([source('01-intro'), source('02-welcome', { data: { order: 0 } })])[0], '02-welcome')
+})
+
+test('ordering and chapters read the path, without the locale', () => {
+    const [page] = treeOf([source('it/02-guides/01-setup', { path: '02-guides/01-setup', locale: 'it' })]).pages
+    assert.equal(page.chapter, 'guides')
+    assert.equal(page.slug, 'guides/setup')
 })
 
 // ── Titles ───────────────────────────────────────────────────────────────────
@@ -143,125 +171,95 @@ test('a chapter title is null when there is no chapter', () => {
     assert.equal(formatChapterTitle('getting-started'), 'Getting Started')
 })
 
-test('the first h1 wins as the page title', () => {
-    assert.equal(extractTitleFromMarkdown('# Real Title\n\n# Later'), 'Real Title')
-    assert.equal(extractTitleFromMarkdown('## Not an h1\n\ntext'), null)
-    assert.equal(extractTitleFromMarkdown(''), null)
+test('frontmatter wins over the h1, which wins over the slug', () => {
+    const h1 = rendered('<h1 id="from-the-body">From the <code>body</code></h1>')
+    const [explicit, fromBody, fromSlug] = treeOf([
+        source('01-a', { data: { title: 'Explicit' }, rendered: h1 }),
+        source('02-b', { rendered: h1 }),
+        source('03-getting-started'),
+    ]).pages
+    assert.equal(explicit.title, 'Explicit')
+    assert.equal(fromBody.title, 'From the body')
+    assert.equal(fromSlug.title, 'Getting Started')
 })
 
-// ── Table of contents ────────────────────────────────────────────────────────
+test('a short label replaces the title in navigation only', () => {
+    const [page] = treeOf([source('01-a', { data: { title: 'A Very Long Page Title', label: 'Short' } })]).pages
+    assert.equal(page.title, 'A Very Long Page Title')
+    assert.equal(page.label, 'Short')
+})
 
-test('only h2 and h3 reach the table of contents', () => {
-    const headings = extractHeadingsFromMarkdown('# One\n## Two\n### Three\n#### Four')
-    assert.deepEqual(
-        headings.map((h) => [h.depth, h.text]),
-        [
-            [2, 'Two'],
-            [3, 'Three'],
-        ],
+// ── Structure ────────────────────────────────────────────────────────────────
+
+test('a flat tree or one chapter level has an unambiguous structure', () => {
+    assert.doesNotThrow(() => {
+        validateDocsStructure([source('01-intro'), source('02-guides/01-setup'), source('02-guides/02-deploy')])
+    })
+})
+
+test('duplicate clean slugs stop the build with both source ids', () => {
+    assert.throws(
+        () => {
+            validateDocsStructure([source('01-guide'), source('02-guide')])
+        },
+        (error: Error) => {
+            assert.match(error.message, /^jaad: invalid documentation structure\n/)
+            assert.match(error.message, /01-guide, 02-guide all resolve to \/guide/)
+            return true
+        },
     )
 })
 
-// The renderer numbers repeated ids; a stateless slug pointed every duplicate
-// entry at the first heading.
-test('repeated headings get the same suffixes the renderer gives them', () => {
-    const headings = extractHeadingsFromMarkdown('## Setup\n## Setup\n### Setup')
-    assert.deepEqual(
-        headings.map((h) => h.slug),
-        ['setup', 'setup-1', 'setup-2'],
+test('ambiguous chapters and unsupported depth are reported together', () => {
+    assert.throws(
+        () => {
+            validateDocsStructure([
+                source('01-guides/01-start'),
+                source('guides/02-next'),
+                source('03-api/01-client/01-create'),
+            ])
+        },
+        (error: Error) => {
+            assert.match(error.message, /01-guides, guides all resolve to chapter \/guides/)
+            assert.match(error.message, /03-api\/01-client\/01-create: only one chapter directory is supported/)
+            return true
+        },
     )
 })
 
-test('headings written inside a code sample are not table-of-contents entries', () => {
-    const headings = extractHeadingsFromMarkdown(['## Real', '```md', '## Example', '```', '## Also real'].join('\n'))
-    assert.deepEqual(
-        headings.map((h) => h.text),
-        ['Real', 'Also real'],
-    )
+// Three segments are only legal because the locale is gone by the time the
+// structure is checked.
+test('a chaptered page inside a locale is a valid structure', () => {
+    assert.doesNotThrow(() => {
+        validateDocsStructure([source('it/02-guides/01-setup', { path: '02-guides/01-setup' })], 'it')
+    })
 })
 
-// ── Text extraction, which also feeds search and the update manifest ─────────
-
-test('markdown syntax is stripped down to prose', () => {
-    const stripped = stripMarkdown(
-        '# Title\n\n**bold** and *italic* and `code`\n\n[link](https://x.dev)\n\n![alt](img.png)',
-    )
-    assert.ok(stripped.includes('bold and italic and code'))
-    assert.ok(stripped.includes('link'))
-    assert.ok(!stripped.includes('https://x.dev'))
-    assert.ok(!stripped.includes('img.png'))
+test('a structure error names the file on disk, locale included', () => {
+    assert.throws(() => {
+        validateDocsStructure([source('it/a/b/c', { path: 'a/b/c' })], 'it')
+    }, /it\/a\/b\/c: only one chapter directory/)
 })
 
-test('an image leaves neither its alt text nor a stray bang', () => {
-    assert.equal(stripMarkdown('Look ![a diagram](/x.png) here.'), 'Look  here.')
-    assert.equal(stripMarkdown('Empty ![](/x.png) alt.'), 'Empty  alt.')
-})
-
-test('fenced code blocks are removed entirely', () => {
-    const stripped = stripMarkdown('before\n\n```js\nconst secret = 1;\n```\n\nafter')
-    assert.ok(!stripped.includes('secret'))
-    assert.ok(stripped.includes('before') && stripped.includes('after'))
-})
-
-test('the description skips a first paragraph that only repeats the title', () => {
-    const body = '# Tables\n\nTables\n\nThe real summary sentence.'
-    assert.equal(extractDescription(body, 'Tables'), 'The real summary sentence.')
-})
-
-test('a long description is cut at a word boundary', () => {
-    const body = '# T\n\n' + 'word '.repeat(60)
-    const description = extractDescription(body, 'T', 40) ?? ''
-    assert.ok(description.length <= 41, description)
-    assert.ok(description.endsWith('…'))
-    assert.ok(!description.includes('wor…'))
-})
-
-test('no description when there is nothing but the title', () => {
-    assert.equal(extractDescription('# Only', 'Only'), null)
-})
+// ── Navigation ───────────────────────────────────────────────────────────────
 
 test('the first nav item owns the docs root and later links use their slugs', () => {
-    const pages = [{ id: '01-intro' }, { id: '02-guides/01-setup' }]
-
+    const tree = treeOf([source('01-intro'), source('02-guides/01-setup')])
     assert.deepEqual(
-        navigationItems(buildDocsNavigation(pages, pages[0].id, { docsBase: '/docs' })).map((item) => item.href),
+        navigationItems(buildDocsNavigation(tree, '01-intro')).map((item) => item.href),
         ['/docs', '/docs/guides/setup'],
-    )
-
-    // routeBase "/" is normalised to "" by the caller, so links stay single-slashed.
-    assert.deepEqual(
-        navigationItems(buildDocsNavigation(pages, pages[0].id, { docsBase: '' })).map((item) => item.href),
-        ['/', '/guides/setup'],
-    )
-
-    assert.deepEqual(
-        navigationItems(buildDocsNavigation(pages, pages[0].id, { docsBase: '/manual' })).map((item) => item.href),
-        ['/manual', '/manual/guides/setup'],
-    )
-})
-
-test("nav links include Astro's deployment base", () => {
-    const pages = [{ id: '01-intro' }, { id: '02-guide' }]
-    assert.deepEqual(
-        navigationItems(
-            buildDocsNavigation(pages, pages[0].id, {
-                docsBase: '/docs',
-                deploymentBase: '/repo/',
-            }),
-        ).map((item) => item.href),
-        ['/repo/docs', '/repo/docs/guide'],
     )
 })
 
 test('root pages and chapters interleave by number', () => {
-    const navigation = buildDocsNavigation(
-        [{ id: '01-intro' }, { id: '02-guides/01-setup' }, { id: '02-guides/02-deep' }, { id: '03-changelog' }],
-        '01-intro',
-        { docsBase: '/docs' },
-    )
-
+    const tree = treeOf([
+        source('01-intro'),
+        source('02-guides/01-setup'),
+        source('02-guides/02-deep'),
+        source('03-changelog'),
+    ])
     assert.deepEqual(
-        navigation.groups.map((group) =>
+        buildDocsNavigation(tree, '01-intro').groups.map((group) =>
             group.type === 'page'
                 ? group.item.title
                 : group.type === 'chapter'
@@ -272,70 +270,20 @@ test('root pages and chapters interleave by number', () => {
     )
 })
 
-test('grouping keeps a chapter together even when its pages are apart', () => {
-    const navigation = buildDocsNavigation([{ id: '02-a/01-x' }, { id: '02-a/02-y' }], '02-a/01-x', {
-        docsBase: '/docs',
-    })
-    const sections = navigation.groups
-    assert.equal(sections.length, 1)
-    assert.equal(sections[0].type, 'chapter')
+test('grouping keeps a chapter together', () => {
+    const { groups } = buildDocsNavigation(treeOf([source('02-a/01-x'), source('02-a/02-y')]), '02-a/01-x')
+    assert.equal(groups.length, 1)
+    assert.equal(groups[0].type, 'chapter')
 })
 
 test('navigation derives active, previous and next pages together', () => {
-    const pages = [{ id: '01-intro' }, { id: '02-guide' }, { id: '03-api' }]
-    const navigation = buildDocsNavigation(pages, '02-guide', {
-        docsBase: '/docs',
-    })
-
+    const navigation = buildDocsNavigation(
+        treeOf([source('01-intro'), source('02-guide'), source('03-api')]),
+        '02-guide',
+    )
     assert.equal(navigation.previousPage?.title, 'Intro')
     assert.equal(navigation.nextPage?.title, 'Api')
-    assert.equal(navigation.groups.filter((section) => section.type === 'page' && section.item.isActive).length, 1)
-})
-
-// ── One title rule, wherever a page is named ─────────────────────────────────
-
-test('frontmatter wins over the h1, which wins over the slug', () => {
-    const body = '# From the body\n'
-    assert.equal(docTitle({ id: '01-a', body, data: { title: 'Explicit' } }), 'Explicit')
-    assert.equal(docTitle({ id: '01-a', body }), 'From the body')
-    assert.equal(docTitle({ id: '01-getting-started' }), 'Getting Started')
-})
-
-test('a short label replaces the title in navigation only', () => {
-    const page = { id: '01-a', data: { title: 'A Very Long Page Title' } }
-    assert.equal(docLabel(page), 'A Very Long Page Title')
-    assert.equal(docLabel({ ...page, data: { ...page.data, label: 'Short' } }), 'Short')
-    assert.equal(docTitle({ ...page, data: { ...page.data, label: 'Short' } }), 'A Very Long Page Title')
-})
-
-// ── Frontmatter order ───────────────────────────────────────────────────────
-
-test('frontmatter order replaces the number the filename supplies', () => {
-    assert.deepEqual(docOrder({ id: '05-a' }), { primary: 5, secondary: 5 })
-    assert.deepEqual(docOrder({ id: '05-a', data: { order: 1 } }), {
-        primary: 1,
-        secondary: 1,
-    })
-})
-
-test('inside a chapter, frontmatter order moves the page, not the chapter', () => {
-    assert.deepEqual(docOrder({ id: '02-guides/05-a', data: { order: 1 } }), {
-        primary: 2,
-        secondary: 1,
-    })
-})
-
-test('frontmatter order re-sorts pages against their filenames', () => {
-    const pages = [{ id: '01-first' }, { id: '02-second', data: { order: 99 } }, { id: '03-third' }]
-    assert.deepEqual(
-        sortDocPages(pages).map((page) => page.id),
-        ['01-first', '03-third', '02-second'],
-    )
-})
-
-test('an ordered page can take the opening route from the first file', () => {
-    const pages = [{ id: '01-intro' }, { id: '02-welcome', data: { order: 0 } }]
-    assert.equal(sortDocPages(pages)[0].id, '02-welcome')
+    assert.equal(navigation.groups.filter((group) => group.type === 'page' && group.item.isActive).length, 1)
 })
 
 // ── The locale directory is split off before anything else reads the id ──────
@@ -348,35 +296,8 @@ test('a locale directory is split off the collection id', () => {
 })
 
 test('a directory that is not a configured locale is left in place', () => {
-    assert.deepEqual(splitDocLocale('guides/01-setup', ['en', 'it']), {
-        locale: null,
-        id: 'guides/01-setup',
-    })
-    assert.deepEqual(splitDocLocale('it', ['en', 'it']), {
-        locale: null,
-        id: 'it',
-    })
-})
-
-test('ordering and chapters read the id without its locale', () => {
-    const page = { id: 'it/02-guides/01-setup', path: '02-guides/01-setup' }
-    assert.equal(docPath(page), '02-guides/01-setup')
-    assert.deepEqual(docOrder(page), { primary: 2, secondary: 1 })
-    assert.equal(parseDocCollectionId(docPath(page)).chapter, 'guides')
-})
-
-// Three segments are only legal because the locale is gone by the time the
-// structure is checked.
-test('a chaptered page inside a locale is a valid structure', () => {
-    assert.doesNotThrow(() => {
-        validateDocsStructure([{ id: 'it/02-guides/01-setup', path: '02-guides/01-setup' }], 'it')
-    })
-})
-
-test('a structure error names the file on disk, locale included', () => {
-    assert.throws(() => {
-        validateDocsStructure([{ id: 'it/a/b/c', path: 'a/b/c' }], 'it')
-    }, /it\/a\/b\/c: only one chapter directory/)
+    assert.deepEqual(splitDocLocale('guides/01-setup', ['en', 'it']), { locale: null, id: 'guides/01-setup' })
+    assert.deepEqual(splitDocLocale('it', ['en', 'it']), { locale: null, id: 'it' })
 })
 
 // ── Pairing translations ─────────────────────────────────────────────────────
@@ -384,22 +305,20 @@ test('a structure error names the file on disk, locale included', () => {
 // Without a key the slug decides, which is why two languages that translate
 // their file names stop being linked.
 test('the clean slug pairs translations until a key says otherwise', () => {
-    assert.equal(docTranslationKey({ id: '02-guides/01-setup' }), 'guides/setup')
-    assert.equal(
-        docTranslationKey({
-            id: '02-guida/01-installazione',
-            data: { translationKey: 'setup' },
-        }),
-        'setup',
-    )
+    const [plain, keyed] = treeOf([
+        source('02-guides/01-setup'),
+        source('02-guida/01-installazione', { data: { translationKey: 'setup' } }),
+    ]).pages
+    assert.equal(plain.translationKey, 'guides/setup')
+    assert.equal(keyed.translationKey, 'setup')
 })
 
 test('two pages of one locale cannot claim the same translation', () => {
     assert.throws(() => {
         validateDocsStructure(
             [
-                { id: '01-a', data: { translationKey: 'setup' } },
-                { id: '02-b', data: { translationKey: 'setup' } },
+                source('01-a', { data: { translationKey: 'setup' } }),
+                source('02-b', { data: { translationKey: 'setup' } }),
             ],
             'it',
         )
@@ -408,27 +327,95 @@ test('two pages of one locale cannot claim the same translation', () => {
 
 test('the same key in different locales is the point, not a clash', () => {
     assert.doesNotThrow(() => {
-        validateDocsStructure([{ id: '01-a', data: { translationKey: 'setup' } }], 'it')
+        validateDocsStructure([source('01-a', { data: { translationKey: 'setup' } })], 'it')
     })
 })
 
-test('headings inside a data-toc-ignore element stay out of the toc', () => {
-    const headings = extractHeadingsFromMarkdown(
+// ── What the renderer produced ───────────────────────────────────────────────
+
+test('only h2 and h3 reach the table of contents, with the renderer’s ids and text', () => {
+    const headings = pageHeadings(
+        rendered(
+            '<h1 id="one">One</h1><h2 id="two">Two <code>it</code></h2><h3 id="three">Three</h3><h4 id="four">Four</h4>',
+        ),
+    )
+    assert.deepEqual(
+        headings.map((h) => [h.depth, h.slug, h.text]),
         [
-            '## Setup',
-            '<div data-toc-ignore class="demo">',
-            '',
-            '## Setup',
-            '<div>',
-            '### Nested',
-            '</div>',
-            '',
-            '</div>',
-            '## Setup',
-        ].join('\n'),
+            [2, 'two', 'Two it'],
+            [3, 'three', 'Three'],
+        ],
+    )
+})
+
+test('headings inside a data-toc-ignore element stay out of the toc', () => {
+    const headings = pageHeadings(
+        rendered(
+            [
+                '<h2 id="setup">Setup</h2>',
+                '<div data-toc-ignore class="demo">',
+                '<h2 id="setup-1">Setup</h2>',
+                '<div><h3 id="nested">Nested</h3></div>',
+                '<img src="x.png">',
+                '</div>',
+                '<h2 id="setup-2">Setup</h2>',
+            ].join('\n'),
+        ),
     )
     assert.deepEqual(
         headings.map((h) => h.slug),
         ['setup', 'setup-2'],
     )
+})
+
+// Writing about the attribute is not using it.
+test('data-toc-ignore in inline code ignores nothing', () => {
+    const headings = pageHeadings(
+        rendered('<p>Wrap headings in <code>&#x3C;div data-toc-ignore></code>.</p><h2 id="after">After</h2>'),
+    )
+    assert.deepEqual(
+        headings.map((h) => h.slug),
+        ['after'],
+    )
+})
+
+test('text keeps prose and drops code, controls and icons', () => {
+    assert.equal(
+        htmlText(
+            '<p><strong>bold</strong> and <em>it</em> &#x26; <code>code</code></p><pre><code>const secret = 1</code></pre>' +
+                '<button>Copy</button><p>Look <img src="/x.png" alt="a diagram"> here.<svg><title>x</title></svg></p>',
+        ),
+        'bold and it & code Look here.',
+    )
+})
+
+test('the description skips a first paragraph that only repeats the title', () => {
+    assert.equal(
+        pageDescription(rendered('<h1 id="t">Tables</h1><p>Tables</p><p>The real summary sentence.</p>'), 'Tables'),
+        'The real summary sentence.',
+    )
+})
+
+test('an alert title is not a description', () => {
+    assert.equal(
+        pageDescription(
+            rendered(
+                '<blockquote class="markdown-alert"><p class="markdown-alert-title">Note</p><p>Read this.</p></blockquote>',
+            ),
+            'T',
+        ),
+        'Read this.',
+    )
+})
+
+test('a long description is cut at a word boundary', () => {
+    const description = pageDescription(rendered(`<p>${'word '.repeat(60)}</p>`), 'T', 40) ?? ''
+    assert.ok(description.length <= 41, description)
+    assert.ok(description.endsWith('…'))
+    assert.ok(!description.includes('wor…'))
+})
+
+test('no description when there is nothing but the title', () => {
+    assert.equal(pageDescription(rendered('<h1 id="only">Only</h1>'), 'Only'), null)
+    assert.equal(pageDescription(undefined, 'Only'), null)
 })
