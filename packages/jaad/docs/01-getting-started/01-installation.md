@@ -115,7 +115,7 @@ Add pages to `docs/`, following the conventions in
 
 ## Manual installation
 
-Install JAAD in an Astro 7 project running Node.js 22.12 or later:
+Install JAAD in a project on Astro 7.3 or a later 7.x, with Node.js 22.12 or later:
 
 :::code-tabs
 
