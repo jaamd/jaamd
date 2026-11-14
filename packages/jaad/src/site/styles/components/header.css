@@ -1,6 +1,6 @@
 @layer components {
     .jaad-header-inner {
-        @apply container mx-auto p-4;
+        @apply p-4;
     }
     .jaad-header-row {
         @apply flex items-center gap-4;

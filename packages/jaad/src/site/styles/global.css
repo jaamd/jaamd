@@ -37,6 +37,7 @@
     --jaad-content-width: 56rem;
     --jaad-chrome-width: var(--jaad-content-width);
     --jaad-sidebar-width: 16rem;
+    --jaad-header-height: 4.25rem;
     --jaad-page-padding: 2rem;
 
     /* Where a sidebar sits beside centred content. Derived, so moving the
