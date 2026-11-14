@@ -1,7 +1,7 @@
 # Repository guide
 
 A website with its own documentation. The documentation is built with
-[JAAD](https://jaamd.org/docs/jaad), an Astro integration that turns the `docs/`
+[JAAD](https://docs.jaamd.org/jaad), an Astro integration that turns the `docs/`
 folder into pages mounted at `/docs`; the landing page at `/` is an ordinary
 Astro page. No component is needed for a documentation page: a markdown file
 in `docs/` is a page.
@@ -103,4 +103,4 @@ guide for a task before working on it:
 - Advanced layout: `node_modules/@jaamd/jaad/docs/04-configurations/09-advanced-layout.md`
 - Deployment: `node_modules/@jaamd/jaad/docs/02-getting-started/99-deployment.md`
 
-The same pages are published at https://jaamd.org/docs/jaad.
+The same pages are published at https://docs.jaamd.org/jaad.

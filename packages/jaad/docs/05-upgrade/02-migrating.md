@@ -20,7 +20,7 @@ Then replace `@lancher-dev/jaad` with `@jaamd/jaad` in every import:
 `@jaamd/jaad/layouts/Page.astro` or `@jaamd/jaad/advanced`. A project that
 imports `@lancher-dev/jaamd` directly needs `@jaamd/astro` instead.
 
-The documentation moved from `jaad.lancher.dev` to `jaamd.org/docs/jaad`: update
+The documentation moved from `jaad.lancher.dev` to `docs.jaamd.org/jaad`: update
 the links in `AGENTS.md` if `create-jaad` generated one.
 
 ## From 0.12

@@ -46,7 +46,7 @@ Requires Astro `^7.3.0` and Node `>=22.12.0`.
 The documentation ships with the package, in
 [`docs/`](https://github.com/jaamd/jaamd/tree/main/packages/astro/docs): once
 installed, at `node_modules/@jaamd/astro/docs/`. Point an agent's `AGENTS.md`
-there. It is also published at [jaamd.org/docs](https://jaamd.org/docs).
+there. It is also published at [docs.jaamd.org](https://docs.jaamd.org).
 
 | Page                                                          | What                                                          |
 | ------------------------------------------------------------- | ------------------------------------------------------------- |

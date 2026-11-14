@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://jaamd.org/docs/jaad">
+  <a href="https://docs.jaamd.org/jaad">
     <img src="./assets/readme-header.png" alt="JAAD — Just Another Astro Docs. Documentation, simplified." width="1200" />
   </a>
 </p>
@@ -47,7 +47,7 @@ The documentation ships with the package, in
 [`docs/`](https://github.com/jaamd/jaamd/tree/main/packages/jaad/docs): once
 installed, at `node_modules/@jaamd/jaad/docs/`. Point an agent's `AGENTS.md`
 there; projects made with `create-jaad` already do. It is also published at
-[jaamd.org/docs/jaad](https://jaamd.org/docs/jaad).
+[docs.jaamd.org/jaad](https://docs.jaamd.org/jaad).
 
 ## Contributing
 

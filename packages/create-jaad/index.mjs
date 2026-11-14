@@ -25,7 +25,7 @@ const CONTENT_CONFIG_NAMES = ['src/content.config.ts', 'src/content.config.mjs',
 const JAAD_CONFIG_NAMES = ['jaad.config.ts', 'jaad.config.mjs', 'jaad.config.js']
 const ASTRO_CONFIG = 'export { default } from "@jaamd/jaad/site";\n'
 const CONTENT_CONFIG = 'export { collections } from "@jaamd/jaad/content";\n'
-const MANUAL_SETUP_URL = 'https://jaamd.org/docs/jaad/getting-started/installation#existing-astro-project'
+const MANUAL_SETUP_URL = 'https://docs.jaamd.org/jaad/getting-started/installation#existing-astro-project'
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
 const FAVICON_NAMES = ['favicon.svg', 'favicon.ico', 'favicon.png']
 

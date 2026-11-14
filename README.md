@@ -30,7 +30,7 @@ import MarkdownContent from '@jaamd/astro/components'
 </MarkdownContent>
 ```
 
-Documentation and showcase: [jaamd.org](https://jaamd.org)
+Site: [jaamd.org](https://jaamd.org). Documentation: [docs.jaamd.org](https://docs.jaamd.org).
 
 ## Packages
 
