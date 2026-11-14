@@ -36,6 +36,7 @@
 
     .docs-main {
         width: 100%;
+        min-width: 0;
         max-width: var(--jaad-content-width);
         position: relative;
     }
