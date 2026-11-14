@@ -5,7 +5,7 @@ import { editBaseFrom, type RepoInfo } from '../site/infer.ts'
 import { isLocale } from '../site/locales.ts'
 import { normaliseBasePath } from '../site/urls.ts'
 import { detectLocales, validateLocaleTree } from './locale-tree.ts'
-import { slugToTitle } from './pages.ts'
+import { slugToTitle } from './model/ids.ts'
 
 /** The options of the documentation: where the markdown is and where it is served. */
 export const docsConfigShape = {

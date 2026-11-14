@@ -129,7 +129,7 @@ Groups and their items arrive in display order.
 the current page.
 
 `DocsFrameProps`, `DocsNavigation`, `DocsNavGroup`, `DocsNavEntry`,
-`DocsHeading`, `DocsNavItem` and `DocsEntry` are exported from `@jaamd/jaad/advanced`.
+`DocsHeading`, `DocsNavItem` and `DocsPageData` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
 [`src/jaad.css`](05-styles.md) instead.

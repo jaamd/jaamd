@@ -1,10 +1,4 @@
-export interface ParsedDocsCollectionId {
-    slug: string
-    orderChapter?: number
-    chapter?: string
-    order: number
-    title: string
-}
+import type { RenderedMarkdown } from './model/rendered.ts'
 
 export interface DocsNavItem {
     title: string
@@ -35,16 +29,11 @@ export interface DocsPageData {
     lastUpdated?: Date
 }
 
-/** The shape jaad requires of the docs collection. Astro generates collection
- *  types in the consumer project, so the package states its own contract. */
+/** The shape jaad requires of a docs collection entry. Astro generates
+ *  collection types in the consumer project, so the package states its own contract. */
 export interface DocsEntry {
     id: string
-    /** The id without its locale and its section. */
-    path?: string
-    /** Set when the docs are localised. */
-    locale?: string
-    /** Set when the docs are split into sections. */
-    section?: string
     body?: string
     data: DocsPageData
+    rendered?: RenderedMarkdown
 }

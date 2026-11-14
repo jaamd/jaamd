@@ -61,12 +61,14 @@ The extensionless paths are gone. Add `.css`:
 | `navigation.sections`           | `navigation.groups` |
 | `NavSection`                    | `DocsNavGroup`      |
 | `DocsHeadings`                  | `DocsHeading`       |
-| `DocsEntry.localeId`            | `DocsEntry.path`    |
 | `order` on a group              | removed             |
 | `primaryOrder` on `DocsNavItem` | removed             |
 
 Groups and items arrive in display order, so nothing replaces the two removed
 fields.
+
+`DocsEntry` is no longer exported: no prop of the frame carried it. The page a
+frame renders is `DocsFrameProps['page']`.
 
 ### Resolved configuration: docs fields under `docs`
 

@@ -1,47 +1,50 @@
 ---
-import type { DocsEntry } from '../types.ts'
+import type { DocsSourceEntry } from '../collection.ts'
+import type { DocsPage, DocsTree } from '../model/tree.ts'
 import MarkdownContent from '@jaamd/astro/components'
 import config from 'virtual:jaad/config'
 import { DEFAULT_LOCALE, LOCALES, ui } from '../../site/runtime.ts'
 import DocsLayout from '../layouts/Docs.astro'
+import { pageHeadings } from '../model/rendered.ts'
 import { buildDocsNavigation } from '../navigation.ts'
-import { docSlug, docTitle, extractHeadingsFromMarkdown, parseDocCollectionId, docPath } from '../pages.ts'
-import { SECTIONS, docsUrls } from '../runtime.ts'
+import { SECTIONS } from '../runtime.ts'
 import Breadcrumbs from './Breadcrumbs.astro'
 import DocsMobileNav from './DocsMobileNav.astro'
 import DocsPageNav from './DocsPageNav.astro'
 import PageActions from './PageActions.astro'
 
 interface Props {
-    entry: DocsEntry
-    sortedPages: DocsEntry[]
+    page: DocsPage<DocsSourceEntry>
+    tree: DocsTree<DocsSourceEntry>
     /** Left out on the opening page, whose title is the site name alone. */
     headTitle?: string
 }
 
-const { entry, sortedPages, headTitle } = Astro.props
+const { page, tree, headTitle } = Astro.props
 
-const cleanSlug = docSlug(entry)
-const section = SECTIONS.find((known) => known.key === entry.section)
+const section = SECTIONS.find((known) => known.key === page.section)
 // A section's files sit in its own directory.
 const editBase = section ? section.editBase : config.docs.editBase
-const editPath = [entry.locale, docPath(entry)].filter(Boolean).join('/')
-const { chapter } = parseDocCollectionId(docPath(entry))
-const title = docTitle(entry)
-const headings = extractHeadingsFromMarkdown(entry.body || '')
-const urls = docsUrls(entry.locale)
-const t = ui(entry.locale)
-const language = LOCALES.find((known) => known.code === (entry.locale ?? DEFAULT_LOCALE))?.tag ?? config.lang
-const updated = entry.data.lastUpdated
-const navigation = buildDocsNavigation(sortedPages, entry.id, urls, SECTIONS)
+const editPath = [page.locale, page.path].filter(Boolean).join('/')
+const headings = pageHeadings(page.source.rendered)
+const t = ui(page.locale)
+const language = LOCALES.find((known) => known.code === (page.locale ?? DEFAULT_LOCALE))?.tag ?? config.lang
+const updated = page.data.lastUpdated
+const navigation = buildDocsNavigation(tree, page.id, SECTIONS)
 const contentAttrs = { id: 'content' }
 ---
 
-<DocsLayout title={headTitle} chapter={chapter} entry={entry} headings={headings} {navigation}>
-    <DocsMobileNav slot="mobile-navigation" groups={navigation.groups} headings={headings} locale={entry.locale} />
+<DocsLayout title={headTitle} {page} {headings} {navigation}>
+    <DocsMobileNav slot="mobile-navigation" groups={navigation.groups} headings={headings} locale={page.locale} />
 
-    <Breadcrumbs slot="breadcrumbs" section={entry.section} chapter={chapter} title={title} locale={entry.locale} />
-    <PageActions slot="page-actions" {editBase} {editPath} cleanSlug={cleanSlug} locale={entry.locale} />
+    <Breadcrumbs
+        slot="breadcrumbs"
+        section={page.section}
+        chapter={page.chapter}
+        title={page.title}
+        locale={page.locale}
+    />
+    <PageActions slot="page-actions" {editBase} {editPath} cleanSlug={page.slug} locale={page.locale} />
 
     <Fragment slot="content">
         <MarkdownContent {...contentAttrs} class="docs-content">
@@ -62,6 +65,6 @@ const contentAttrs = { id: 'content' }
         slot="page-navigation"
         previousPage={navigation.previousPage}
         nextPage={navigation.nextPage}
-        locale={entry.locale}
+        locale={page.locale}
     />
 </DocsLayout>

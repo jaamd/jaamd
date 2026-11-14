@@ -1,3 +1,4 @@
+import type { DocsSource } from '../../src/docs/model/tree.ts'
 import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -7,24 +8,20 @@ import { resolveConfig } from '../../src/config.ts'
 import { findAliases } from '../../src/docs/integration.ts'
 import { rehypeDocLinks } from '../../src/docs/link-plugins.ts'
 import { resolveDocLink } from '../../src/docs/links.ts'
+import { collectionIdFor } from '../../src/docs/model/ids.ts'
+import { buildDocsTree } from '../../src/docs/model/tree.ts'
+import { validateDocsStructure } from '../../src/docs/model/validate.ts'
 import { buildDocsNavigation } from '../../src/docs/navigation.ts'
-import {
-    collectionIdFor,
-    docAliases,
-    docSlug,
-    docCanonicalSlug,
-    sortDocPages,
-    validateDocsStructure,
-} from '../../src/docs/pages.ts'
-
-const urls = { docsBase: '' }
 
 /** Pages as the collection hands them over, section attached. */
-const inSections = (...ids: string[]) =>
+const inSections = (...ids: string[]): DocsSource[] =>
     ids.map((id) => {
         const [section, ...rest] = id.split('/')
-        return { id, path: rest.join('/'), section }
+        return { id, path: rest.join('/'), section, data: {} }
     })
+
+const treeOf = (pages: DocsSource[], sections = ['guide', 'api']) =>
+    buildDocsTree(pages, { sections, urls: { docsBase: '' } })
 
 function withTree(files: Record<string, string>, run: (root: string) => void) {
     const root = mkdtempSync(join(tmpdir(), 'jaad-sections-'))
@@ -59,20 +56,20 @@ test('without sections the id is the path', () => {
 test('sections sort in the declared order, pages by their own inside each', () => {
     const pages = inSections('api/02-server', 'guide/02-setup/01-install', 'api/01-client', 'guide/01-intro')
     assert.deepEqual(
-        sortDocPages(pages, ['guide', 'api']).map((page) => page.id),
+        treeOf(pages).pages.map((page) => page.id),
         ['guide/01-intro', 'guide/02-setup/01-install', 'api/01-client', 'api/02-server'],
     )
 })
 
 test('the slug of a page starts with its section', () => {
-    const [install] = inSections('guide/02-setup/01-install')
-    assert.equal(docSlug(install), 'guide/setup/install')
+    const [install] = treeOf(inSections('guide/02-setup/01-install')).pages
+    assert.equal(install.slug, 'guide/setup/install')
 })
 
 test('the first page opens the docs, the first of a later section opens the section', () => {
     const pages = inSections('guide/01-intro', 'guide/02-next', 'api/01-client', 'api/02-server')
     assert.deepEqual(
-        pages.map((page, index) => docCanonicalSlug(page, index, pages)),
+        treeOf(pages).pages.map((page) => page.canonical),
         ['', 'guide/next', 'api', 'api/server'],
     )
 })
@@ -97,19 +94,16 @@ test('one chapter level is the limit inside a section too', () => {
 
 // ── Pages outside the sections ───────────────────────────────────────────────
 
-const loose = (id: string) => ({ id, path: id })
+const loose = (id: string): DocsSource => ({ id, path: id, data: {} })
 
 test('a page outside the sections opens the docs, and every section keeps its url', () => {
-    const pages = sortDocPages(
-        [...inSections('guide/01-intro', 'api/01-client'), loose('01-welcome')],
-        ['guide', 'api'],
-    )
+    const { pages } = treeOf([...inSections('guide/01-intro', 'api/01-client'), loose('01-welcome')])
     assert.deepEqual(
-        pages.map((page, index) => docCanonicalSlug(page, index, pages)),
+        pages.map((page) => page.canonical),
         ['', 'guide', 'api'],
     )
     assert.deepEqual(
-        pages.flatMap((page, index) => docAliases(page, index, pages)),
+        pages.flatMap((page) => page.aliases),
         ['welcome', 'guide/intro', 'api/client'],
     )
 })
@@ -123,7 +117,9 @@ test('a page outside the sections cannot take a section url', () => {
 
 test('the navigation lists the pages outside the sections first', () => {
     const pages = [loose('01-welcome'), ...inSections('guide/01-intro')]
-    const { groups, nextPage } = buildDocsNavigation(pages, '01-welcome', urls, [{ key: 'guide', label: 'Guide' }])
+    const { groups, nextPage } = buildDocsNavigation(treeOf(pages, ['guide']), '01-welcome', [
+        { key: 'guide', label: 'Guide' },
+    ])
     assert.deepEqual(
         groups.map((group) => group.type),
         ['page', 'section'],
@@ -140,7 +136,7 @@ const SECTIONS = [
 
 test('navigation puts every section at the top, with its pages and chapters below', () => {
     const pages = inSections('guide/01-intro', 'guide/02-setup/01-install', 'api/01-client', 'api/02-server')
-    const { groups } = buildDocsNavigation(pages, 'guide/01-intro', urls, SECTIONS)
+    const { groups } = buildDocsNavigation(treeOf(pages), 'guide/01-intro', SECTIONS)
 
     assert.deepEqual(
         groups.map((group) =>
@@ -157,18 +153,18 @@ test('navigation puts every section at the top, with its pages and chapters belo
 
 test('a section with no pages has no entry', () => {
     const pages = inSections('guide/01-intro')
-    const { groups } = buildDocsNavigation(pages, 'guide/01-intro', urls, SECTIONS)
+    const { groups } = buildDocsNavigation(treeOf(pages), 'guide/01-intro', SECTIONS)
     assert.equal(groups.length, 1)
 })
 
 test('previous and next run across the sections', () => {
     const pages = inSections('guide/01-intro', 'guide/02-next', 'api/01-client', 'api/02-server')
 
-    const last = buildDocsNavigation(pages, 'guide/02-next', urls, SECTIONS)
+    const last = buildDocsNavigation(treeOf(pages), 'guide/02-next', SECTIONS)
     assert.equal(last.previousPage?.href, '/')
     assert.equal(last.nextPage?.href, '/api')
 
-    const opener = buildDocsNavigation(pages, 'api/01-client', urls, SECTIONS)
+    const opener = buildDocsNavigation(treeOf(pages), 'api/01-client', SECTIONS)
     assert.equal(opener.previousPage?.href, '/guide/next')
 })
 

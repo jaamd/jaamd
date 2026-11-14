@@ -8,7 +8,8 @@ import { prefixedLocales } from '../site/locales.ts'
 import { normaliseBasePath } from '../site/urls.ts'
 import { docsRoots } from './config.ts'
 import { rehypeDocLinks, satteriDocLinks } from './link-plugins.ts'
-import { docAliases, getDocCollectionId, sortDocPages, splitDocLocale, type DocsPageLike } from './pages.ts'
+import { getDocCollectionId, splitDocLocale } from './model/ids.ts'
+import { buildDocsTree, type DocsSource } from './model/tree.ts'
 import { docsPageHref, type DocsUrlOptions } from './urls.ts'
 
 type SetupParams = Parameters<NonNullable<AstroIntegration['hooks']['astro:config:setup']>>[0]
@@ -69,7 +70,7 @@ function readFrontmatter(source: string): { order?: number; draft?: boolean } {
 /** The aliases of every locale. The content collection is not available this
  *  early, so the pages are read from disk. */
 export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlias[] {
-    const pages: (DocsPageLike & { locale: string | null })[] = []
+    const sources: DocsSource[] = []
 
     const visit = (root: DocsRoot, current: string) => {
         for (const entry of readdirSync(current, { withFileTypes: true }).toSorted((a, b) =>
@@ -82,7 +83,13 @@ export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlia
                 if (front.draft) continue
 
                 const { locale, id } = splitDocLocale(getDocCollectionId(relative(root.dir, file)), locales)
-                pages.push({ id, locale, section: root.section, data: { order: front.order } })
+                sources.push({
+                    id,
+                    path: id,
+                    locale: locale ?? undefined,
+                    section: root.section,
+                    data: { order: front.order },
+                })
             }
         }
     }
@@ -91,14 +98,13 @@ export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlia
     }
 
     const sections = roots.flatMap((root) => root.section ?? [])
-    return (locales.length > 0 ? locales : [null]).flatMap((locale) => {
-        const sorted = sortDocPages(
-            pages.filter((page) => page.locale === locale),
-            sections,
+    return (locales.length > 0 ? locales : [undefined]).flatMap((locale) => {
+        // The slugs are all that is read: the urls need no mount.
+        const tree = buildDocsTree(
+            sources.filter((source) => source.locale === locale),
+            { sections, urls: { docsBase: '' } },
         )
-        return sorted
-            .flatMap((page, index) => docAliases(page, index, sorted))
-            .map((slug) => ({ locale: locale ?? undefined, slug }))
+        return tree.pages.flatMap((page) => page.aliases.map((slug) => ({ locale, slug })))
     })
 }
 

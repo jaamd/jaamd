@@ -2,9 +2,8 @@
 import { render } from 'astro:content'
 import { buildLocales, localePrefix } from '../../site/runtime.ts'
 import { withDeploymentBase } from '../../site/urls.ts'
-import { getSortedDocsPages } from '../collection.ts'
+import { getDocsTree } from '../collection.ts'
 import DocsPage from '../components/DocsPage.astro'
-import { docAliases, docCanonicalSlug, docTitle } from '../pages.ts'
 import { docsUrls } from '../runtime.ts'
 import { docsPageHref } from '../urls.ts'
 
@@ -18,20 +17,18 @@ export async function getStaticPaths() {
     const paths: DocsPath[] = []
 
     for (const locale of buildLocales()) {
-        const sortedPages = await getSortedDocsPages(locale)
+        const { pages } = await getDocsTree(locale)
         const prefix = localePrefix(locale)
 
-        sortedPages.forEach((page, index) => {
+        for (const page of pages) {
             const add = (slug: string, redirect?: string) =>
                 paths.push({ params: { slug }, props: { id: page.id, locale, redirect } })
 
-            const canonical = docCanonicalSlug(page, index, sortedPages)
-
             // Empty is the index route's; a prefixed locale has none, so /it is this page.
-            const own = `${prefix}${canonical}`.replace(/\/$/, '')
+            const own = `${prefix}${page.canonical}`.replace(/\/$/, '')
             if (own) add(own)
-            for (const alias of docAliases(page, index, sortedPages)) add(`${prefix}${alias}`, canonical)
-        })
+            for (const alias of page.aliases) add(`${prefix}${alias}`, page.canonical)
+        }
     }
 
     return paths
@@ -43,15 +40,15 @@ if (redirect !== undefined) {
     return Astro.redirect(docsPageHref(redirect, docsUrls(locale)), 301)
 }
 
-const sortedPages = await getSortedDocsPages(locale)
-const docPage = sortedPages.find((page) => page.id === id)
-if (!docPage) {
+const tree = await getDocsTree(locale)
+const page = tree.byId.get(id)
+if (!page) {
     return Astro.redirect(withDeploymentBase('/404', import.meta.env.BASE_URL))
 }
 
-const { Content } = await render(docPage)
+const { Content } = await render(page.source)
 ---
 
-<DocsPage entry={docPage} {sortedPages} headTitle={docTitle(docPage)}>
+<DocsPage {page} {tree} headTitle={page.title}>
     <Content />
 </DocsPage>

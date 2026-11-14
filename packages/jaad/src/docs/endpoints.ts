@@ -1,12 +1,14 @@
+import type { DocsPage } from './model/tree.ts'
 import config from 'virtual:jaad/config'
-import { getSortedDocsPages } from './collection.ts'
-import { docTitle, extractDescription, formatChapterTitle, docSlug, parseDocCollectionId, docPath } from './pages.ts'
+import { getDocsTree } from './collection.ts'
+import { formatChapterTitle } from './model/ids.ts'
+import { pageDescription } from './model/rendered.ts'
 import { SECTIONS, docsUrls } from './runtime.ts'
 import { buildSearchIndex } from './search-index.ts'
 import { docsMarkdownHref } from './urls.ts'
 
 export async function searchIndexResponse(locale?: string): Promise<Response> {
-    const index = buildSearchIndex(await getSortedDocsPages(locale), SECTIONS, docsUrls(locale))
+    const index = buildSearchIndex(await getDocsTree(locale), SECTIONS)
 
     return new Response(JSON.stringify(index), {
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
@@ -21,7 +23,7 @@ interface Row {
 
 /** Plain-text index of every page, per the llms.txt convention. */
 export async function llmsResponse(site: URL | undefined, locale?: string): Promise<Response> {
-    const sortedPages = await getSortedDocsPages(locale)
+    const { pages: sortedPages } = await getDocsTree(locale)
 
     const markdownHref = (slug: string): string => {
         const href = docsMarkdownHref(slug, docsUrls(locale))
@@ -32,17 +34,16 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
         `- [${row.title}](${markdownHref(row.slug)})${row.description ? `: ${row.description}` : ''}`
 
     /** Standalone pages first, then one heading per chapter. */
-    const outline = (pages: typeof sortedPages, heading: string): string[] => {
+    const outline = (pages: DocsPage[], heading: string): string[] => {
         const standalone: Row[] = []
         const chapters = new Map<string, Row[]>()
 
         for (const page of pages) {
-            const { chapter } = parseDocCollectionId(docPath(page))
-            const title = docTitle(page)
+            const { chapter, title } = page
             const row: Row = {
                 title,
-                slug: docSlug(page),
-                description: page.data.description ?? extractDescription(page.body || '', title),
+                slug: page.slug,
+                description: page.data.description ?? pageDescription(page.source.rendered, title),
             }
 
             if (!chapter) {

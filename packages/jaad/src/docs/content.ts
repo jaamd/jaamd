@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 import { defineCollection } from 'astro:content'
 import config from 'virtual:jaad/config'
-import { collectionIdFor, collectionName } from './pages.ts'
+import { collectionIdFor, collectionName } from './model/ids.ts'
 
 const LOCALES = config.locales.map((locale) => locale.code)
 

@@ -1,6 +1,5 @@
+import type { DocsTree } from './model/tree.ts'
 import type { DocsNavItem } from './types.ts'
-import { docCanonicalSlug, docLabel, docPath, parseDocCollectionId, type DocsPageLike } from './pages.ts'
-import { docsPageHref, type DocsUrlOptions } from './urls.ts'
 
 /** A page, or a chapter and its pages. */
 export type DocsNavEntry =
@@ -41,41 +40,6 @@ function groupByChapter(items: DocsNavItem[]): DocsNavEntry[] {
     return groups
 }
 
-/** Build every navigation view from one ordered collection traversal. */
-interface Model {
-    items: DocsNavItem[]
-    positions: Map<string, number>
-}
-
-// Only isActive and the neighbours vary between the pages of one locale. The
-// hrefs do not, as long as the url options are the same ones.
-const models = new WeakMap<object, Map<string, Model>>()
-
-function modelFor(sortedPages: DocsPageLike[], urls: DocsUrlOptions): Model {
-    const key = `${urls.docsBase}\u0000${urls.deploymentBase ?? ''}\u0000${urls.locale ?? ''}\u0000${urls.defaultLocale ?? ''}`
-    let byUrls = models.get(sortedPages)
-    if (!byUrls) {
-        byUrls = new Map()
-        models.set(sortedPages, byUrls)
-    }
-    const cached = byUrls.get(key)
-    if (cached) return cached
-
-    const model: Model = {
-        items: sortedPages.map((page, index): DocsNavItem => ({
-            title: docLabel(page),
-            section: page.section,
-            chapter: parseDocCollectionId(docPath(page)).chapter,
-            href: docsPageHref(docCanonicalSlug(page, index, sortedPages), urls),
-            isActive: false,
-        })),
-        positions: new Map(sortedPages.map((page, index) => [page.id, index])),
-    }
-
-    byUrls.set(key, model)
-    return model
-}
-
 /** Each section with pages, under its label, in the order of `sections`. */
 function groupBySection(items: DocsNavItem[], sections: { key: string; label: string }[]): DocsNavGroup[] {
     return sections.flatMap(({ key, label }) => {
@@ -84,22 +48,28 @@ function groupBySection(items: DocsNavItem[], sections: { key: string; label: st
     })
 }
 
+/** The navigation seen from one page of `tree`: every group, the page marked
+ *  active, and its neighbours. */
 export function buildDocsNavigation(
-    sortedPages: DocsPageLike[],
+    tree: DocsTree,
     currentId: string,
-    urls: DocsUrlOptions,
     sections: { key: string; label: string }[] = [],
 ): DocsNavigation {
-    const { items, positions } = modelFor(sortedPages, urls)
-    const position = positions.get(currentId) ?? -1
-    const marked = items.map((item, index) => ({ ...item, isActive: index === position }))
+    const position = tree.byId.get(currentId)?.index ?? -1
+    const items = tree.pages.map((page): DocsNavItem => ({
+        title: page.label,
+        section: page.section,
+        chapter: page.chapter,
+        href: page.href,
+        isActive: page.index === position,
+    }))
 
     return {
         groups:
             sections.length > 0
-                ? [...groupByChapter(marked.filter((item) => !item.section)), ...groupBySection(marked, sections)]
-                : groupByChapter(marked),
-        previousPage: position > 0 ? marked[position - 1] : null,
-        nextPage: position >= 0 && position < marked.length - 1 ? marked[position + 1] : null,
+                ? [...groupByChapter(items.filter((item) => !item.section)), ...groupBySection(items, sections)]
+                : groupByChapter(items),
+        previousPage: position > 0 ? items[position - 1] : null,
+        nextPage: position >= 0 && position < items.length - 1 ? items[position + 1] : null,
     }
 }
