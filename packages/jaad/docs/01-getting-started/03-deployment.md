@@ -1,3 +1,7 @@
+---
+description: Build JAAD as a static site and publish it on GitHub Pages or any static host.
+---
+
 # Deployment
 
 JAAD builds a static site in `dist/`:

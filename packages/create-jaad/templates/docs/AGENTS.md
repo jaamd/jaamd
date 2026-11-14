@@ -82,18 +82,16 @@ structure itself has to change.
 The JAAD documentation is installed with it, in `node_modules/@jaamd/jaad/docs/`. Read the
 guide for a task before working on it:
 
-- Creating pages: `node_modules/@jaamd/jaad/docs/02-getting-started/03-creating-pages.md`
-- Structure, links and sections: `node_modules/@jaamd/jaad/docs/04-configurations/03-structure.md`
-- Frontmatter: `node_modules/@jaamd/jaad/docs/04-configurations/02-frontmatter.md`
-- Markdown features: `node_modules/@jaamd/jaad/docs/03-markdown.md`
-- Languages: `node_modules/@jaamd/jaad/docs/04-configurations/10-i18n.md`
-- Search: `node_modules/@jaamd/jaad/docs/04-configurations/07-search.md`
-- Fonts: `node_modules/@jaamd/jaad/docs/04-configurations/04-fonts.md`
-- Configuration reference: `node_modules/@jaamd/jaad/docs/04-configurations/01-reference.md`
-- Styles: `node_modules/@jaamd/jaad/docs/04-configurations/05-styles.md`
-- Themes: `node_modules/@jaamd/jaad/docs/04-configurations/06-themes.md`
-- Pages of your own: `node_modules/@jaamd/jaad/docs/04-configurations/08-custom-pages.md`
-- Advanced layout: `node_modules/@jaamd/jaad/docs/04-configurations/09-advanced-layout.md`
-- Deployment: `node_modules/@jaamd/jaad/docs/02-getting-started/99-deployment.md`
+- Pages, links and sections: `node_modules/@jaamd/jaad/docs/01-getting-started/02-pages.md`
+- Frontmatter: `node_modules/@jaamd/jaad/docs/02-configurations/02-frontmatter.md`
+- Markdown syntax: https://docs.jaamd.org/jaamd/markdown.md
+- Languages: `node_modules/@jaamd/jaad/docs/02-configurations/03-i18n.md`
+- Search: `node_modules/@jaamd/jaad/docs/02-configurations/04-search.md`
+- Configuration reference: `node_modules/@jaamd/jaad/docs/02-configurations/01-reference.md`
+- Styles and fonts: `node_modules/@jaamd/jaad/docs/02-configurations/06-styles.md`
+- Themes: `node_modules/@jaamd/jaad/docs/02-configurations/05-themes.md`
+- Pages of your own: `node_modules/@jaamd/jaad/docs/02-configurations/07-custom-pages.md`
+- Advanced layout: `node_modules/@jaamd/jaad/docs/02-configurations/08-advanced-layout.md`
+- Deployment: `node_modules/@jaamd/jaad/docs/01-getting-started/03-deployment.md`
 
 The same pages are published at https://docs.jaamd.org/jaad.

@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { MOVED } from '../worker.ts'
 
 const DIST = fileURLToPath(new URL('../dist', import.meta.url))
 const PACKAGES = fileURLToPath(new URL('../../packages', import.meta.url))
@@ -36,7 +37,7 @@ test('the docs open on the welcome page, and each section at its own url', () =>
     const home = page('index.html')
     assert.match(home, /data-jaad-default-frame/)
     assert.match(home, /<h1[^>]*>Welcome to JAAMD/)
-    assert.match(page('jaamd/index.html'), /<h1[^>]*>JAAMD/)
+    assert.match(page('jaamd/index.html'), /<h1[^>]*>Overview/)
     assert.match(page('welcome/index.html'), /http-equiv="refresh"[^>]*url=\/"/)
     assert.match(home, /<link rel="canonical" href="https:\/\/docs\.jaamd\.org\/?"/)
 })
@@ -49,9 +50,21 @@ test('every page of both packages has a url, so every old /docs url has a target
     assert.deepEqual(missing, [])
 })
 
-test('the header holds the site name, leading to jaamd.org, and no text links', () => {
+test('a page title names its section, the opening page the site alone', () => {
+    const title = (relative) => page(relative).match(/<title>([^<]*)<\/title>/)[1]
+    assert.equal(title('index.html'), 'JAAMD Docs')
+    assert.equal(title('jaamd/index.html'), 'Overview · JAAMD | JAAMD Docs')
+    assert.equal(title('jaad/getting-started/installation/index.html'), 'Installation · JAAD | JAAMD Docs')
+})
+
+test('every moved page has a built target', () => {
+    const missing = Object.values(MOVED).filter((target) => !existsSync(join(DIST, target, 'index.html')))
+    assert.deepEqual(missing, [])
+})
+
+test('the header holds the J mark, leading to jaamd.org, and no text links', () => {
     const header = page('index.html').match(/<header[\s\S]*?<\/header>/)[0]
-    assert.match(header, /<a href="https:\/\/jaamd\.org"[^>]*class="jaad-brand-link"/)
+    assert.match(header, /<a href="https:\/\/jaamd\.org"[^>]*class="jaad-brand-link">\s*<img src="\/mark\.svg"/)
     assert.doesNotMatch(header, /jaad-nav-link/)
 })
 

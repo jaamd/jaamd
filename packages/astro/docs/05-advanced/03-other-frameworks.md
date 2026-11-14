@@ -1,12 +1,32 @@
+---
+description: Use @jaamd/core, the compiled framework-free part of JAAMD, with any framework.
+---
+
 # Other frameworks
 
 `@jaamd/core` is the part of JAAMD with no framework around it: the markdown
 plugins, the client script, the stylesheets and the themes. `@jaamd/astro`
 registers all of it; install core directly to bring JAAMD to another framework.
 
-```bash
+:::code-tabs
+
+```bash npm
 npm install @jaamd/core
 ```
+
+```bash pnpm
+pnpm add @jaamd/core
+```
+
+```bash yarn
+yarn add @jaamd/core
+```
+
+```bash bun
+bun add @jaamd/core
+```
+
+:::
 
 The package ships compiled JavaScript with its types: it loads in Node and in any bundler.
 
@@ -62,25 +82,11 @@ points also export each plugin on its own.
 
 ### Options
 
-Both functions, and `enhance()` below, take the same two options.
-
-`features` turns a feature off; unset is on:
-
-| Feature        | What                                         | Where         |
-| -------------- | -------------------------------------------- | ------------- |
-| `alerts`       | `> [!NOTE]` blockquotes                      | build         |
-| `codeTabs`     | `:::code-tabs` blocks                        | build, client |
-| `toc`          | `:::toc` blocks                              | build, client |
-| `spoilers`     | `:spoiler[…]` and `:::spoiler`               | build, client |
-| `directives`   | The `:::` syntax, for directives of your own | build         |
-| `tables`       | Scroll container around tables               | build, client |
-| `headingLinks` | Anchor on every heading                      | build, client |
-| `copyButtons`  | Copy button on code blocks                   | client        |
-| `lightbox`     | Images open in a dialog                      | client        |
-
-`labels` replaces the English strings JAAMD writes: `headingLink`, `toc`,
-`copy`, `copied`, `copySelected`, `lightbox`, `lightboxOpen`, `lightboxClose`
-and `spoiler`.
+Both functions, and `enhance()` below, take the
+[`features`](../01-getting-started/02-options.md#features) and
+[`labels`](../01-getting-started/02-options.md#labels) options of the Astro
+integration: `features` turns a feature off, `labels` replaces the English
+strings JAAMD writes. Pass the same values to the build and to `enhance()`.
 
 ## Client and styles
 

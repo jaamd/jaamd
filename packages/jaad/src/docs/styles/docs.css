@@ -36,6 +36,7 @@
 
     .docs-main {
         width: 100%;
+        min-width: 0;
         max-width: var(--jaad-content-width);
         position: relative;
     }
@@ -51,9 +52,9 @@
         [data-jaad-default-frame] .docs-sidebar-left,
         [data-jaad-default-frame] .docs-sidebar-right {
             position: fixed;
-            top: 0;
-            height: 100vh;
-            padding: 6rem 1.5rem 2rem;
+            top: var(--jaad-header-height);
+            height: calc(100vh - var(--jaad-header-height));
+            padding: calc(6rem - var(--jaad-header-height)) 1.5rem 2rem;
         }
 
         /* max() keeps the sidebar on screen when the centred offset would be

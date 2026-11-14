@@ -1,4 +1,11 @@
+---
+description: Eight theme presets for JAAMD, and dual light and dark code themes.
+---
+
 # Themes
+
+A theme is a palette for the `--jaamd-*` variables, paired with a Shiki theme
+for the code blocks.
 
 ## Theme presets
 

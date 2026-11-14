@@ -23,6 +23,8 @@ interface Props {
 const { page, tree, headTitle } = Astro.props
 
 const section = SECTIONS.find((known) => known.key === page.section)
+// With sections, the title names the section after the page.
+const title = headTitle && section ? `${headTitle} · ${section.label}` : headTitle
 // A section's files sit in its own directory.
 const editBase = section ? section.editBase : config.docs.editBase
 const editPath = [page.locale, page.path].filter(Boolean).join('/')
@@ -34,7 +36,7 @@ const navigation = buildDocsNavigation(tree, page.id, SECTIONS)
 const contentAttrs = { id: 'content' }
 ---
 
-<DocsLayout title={headTitle} {page} {headings} {navigation}>
+<DocsLayout {title} {page} {headings} {navigation}>
     <DocsMobileNav slot="mobile-navigation" groups={navigation.groups} headings={headings} locale={page.locale} />
 
     <Breadcrumbs

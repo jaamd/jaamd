@@ -1,7 +1,55 @@
-# Migrating
+---
+description: How to upgrade JAAD, and the changes that need action, by the version you upgrade from.
+---
 
-Changes that need action, by the version you upgrade from. To upgrade, see
-[Upgrading](01-upgrading.md).
+# Upgrading
+
+JAAD is usually upgraded together with Astro: each JAAD release targets one Astro
+major, and most releases follow an Astro release. Upgrade both at once:
+
+:::code-tabs
+
+```bash npm
+npx @astrojs/upgrade
+```
+
+```bash pnpm
+pnpm dlx @astrojs/upgrade
+```
+
+```bash yarn
+yarn dlx @astrojs/upgrade
+```
+
+```bash bun
+bunx @astrojs/upgrade
+```
+
+:::
+
+To upgrade JAAD alone:
+
+:::code-tabs
+
+```bash npm
+npm install @jaamd/jaad@latest
+```
+
+```bash pnpm
+pnpm add @jaamd/jaad@latest
+```
+
+```bash yarn
+yarn add @jaamd/jaad@latest
+```
+
+```bash bun
+bun add @jaamd/jaad@latest
+```
+
+:::
+
+Then run a build and read below the changes since the version you upgrade from.
 
 ## From @lancher-dev/jaad
 
@@ -23,33 +71,19 @@ imports `@lancher-dev/jaamd` directly needs `@jaamd/astro` instead.
 The documentation moved from `jaad.lancher.dev` to `docs.jaamd.org/jaad`: update
 the links in `AGENTS.md` if `create-jaad` generated one.
 
-## From 0.12
+## From 0.11
 
 ### @jaamd/jaamd is now @jaamd/astro
 
 JAAD installs it for you: a site that only uses `@jaamd/jaad` has nothing to do.
-A project that depends on `@jaamd/jaamd` directly replaces it:
+A project that imports `@jaamd/jaamd` directly follows
+[JAAMD's upgrade guide](../../astro/docs/06-upgrading.md#from-012).
 
-```bash
-npm uninstall @jaamd/jaamd
-npm install @jaamd/astro
-```
+### Page titles name their section
 
-Then replace `@jaamd/jaamd` with `@jaamd/astro` in every import, stylesheets
-included. The API is unchanged. `@jaamd/jaamd` is deprecated and receives no
-further releases.
-
-### Stylesheets are imported with their extension
-
-The extensionless paths are gone. Add `.css`:
-
-| Before                            | After                                 |
-| --------------------------------- | ------------------------------------- |
-| `@jaamd/jaamd/default`            | `@jaamd/astro/default.css`            |
-| `@jaamd/jaamd/styles`             | `@jaamd/astro/styles.css`             |
-| `@jaamd/jaamd/shiki-dual`         | `@jaamd/astro/shiki-dual.css`         |
-| `@jaamd/jaamd/themes/<slug>`      | `@jaamd/astro/themes/<slug>.css`      |
-| `@jaamd/jaamd/themes/<slug>/dark` | `@jaamd/astro/themes/<slug>/dark.css` |
+With [sections](01-getting-started/02-pages.md#sections), the browser title of
+a page is `Page · Section | Site`, so pages with the same name in two sections
+no longer share a title. Docs without sections are unchanged.
 
 ### Custom docs frame: renamed navigation types
 
@@ -108,7 +142,7 @@ defineJaadConfig({ title: 'My Project', tailwind: true })
 - Pages on a local layout keep their own `@import "tailwindcss";`.
 - `tailwindcss` and `@tailwindcss/vite` stay in your devDependencies.
 
-See [Styles](../04-configurations/05-styles.md#tailwind).
+See [Styles](02-configurations/06-styles.md#tailwind).
 
 ### Component classes
 

@@ -1,6 +1,73 @@
+---
+description: The changes that need action, by the JAAMD version you upgrade from.
+---
+
 # Upgrading
 
-## To 1.0
+Upgrade the integration, then read below the changes since the version you
+upgrade from:
+
+:::code-tabs
+
+```bash npm
+npm install @jaamd/astro@latest
+```
+
+```bash pnpm
+pnpm add @jaamd/astro@latest
+```
+
+```bash yarn
+yarn add @jaamd/astro@latest
+```
+
+```bash bun
+bun add @jaamd/astro@latest
+```
+
+:::
+
+## From 0.12
+
+### The package is now @jaamd/astro
+
+Replace the dependency, then every import from `@jaamd/jaamd`; the API of the
+integration is unchanged. Coming from `@lancher-dev/jaamd`, do the same with
+that name. `@jaamd/jaamd` is deprecated and receives no further releases.
+
+:::code-tabs
+
+```bash npm
+npm uninstall @jaamd/jaamd
+npm install @jaamd/astro
+```
+
+```bash pnpm
+pnpm remove @jaamd/jaamd
+pnpm add @jaamd/astro
+```
+
+```bash yarn
+yarn remove @jaamd/jaamd
+yarn add @jaamd/astro
+```
+
+```bash bun
+bun remove @jaamd/jaamd
+bun add @jaamd/astro
+```
+
+:::
+
+### Stylesheets are imported with their extension
+
+| Before                            | After                                 |
+| --------------------------------- | ------------------------------------- |
+| `@jaamd/jaamd/default`            | `@jaamd/astro/default.css`            |
+| `@jaamd/jaamd/styles`             | `@jaamd/astro/styles.css`             |
+| `@jaamd/jaamd/shiki-dual`         | `@jaamd/astro/shiki-dual.css`         |
+| `@jaamd/jaamd/themes/<slug>`      | `@jaamd/astro/themes/<slug>.css`      |
+| `@jaamd/jaamd/themes/<slug>/dark` | `@jaamd/astro/themes/<slug>/dark.css` |
 
 ### Classes
 
@@ -46,15 +113,6 @@ returns a cleanup. See [Client script](./03-usage/02-client.md).
 `satteriPlugins()` and `unifiedPlugins()`, which also add Astro's heading ids:
 see [Manual setup](./05-advanced/01-manual-setup.md). The single plugins are in
 `@jaamd/core`.
-
-## From @jaamd/jaamd
-
-The package is now `@jaamd/astro`. Replace the dependency and every import from
-`@jaamd/jaamd`; the API is unchanged. Coming from `@lancher-dev/jaamd`, do the
-same with that name.
-
-Stylesheets are imported with their extension: `@jaamd/astro/styles.css`, not
-`@jaamd/astro/styles`. The same goes for `default`, `shiki-dual` and the themes.
 
 ## From 0.10
 

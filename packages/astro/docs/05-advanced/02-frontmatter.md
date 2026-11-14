@@ -1,3 +1,7 @@
+---
+description: frontmatterFields(), the frontmatter schema JAAMD sites share.
+---
+
 # Frontmatter fields
 
 `frontmatterFields(z)` returns the fields JAAMD sites share, as a plain object

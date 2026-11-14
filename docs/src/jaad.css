@@ -27,3 +27,25 @@ html.dark {
     --jaad-chrome-width: var(--jaad-content-width);
     --jaad-page-padding: var(--identity-page-padding);
 }
+
+/* Header and footer span the sidebars. */
+@media (min-width: 64rem) {
+    :root {
+        --jaad-chrome-width: min(
+            calc(var(--jaad-content-width) + 2 * var(--jaad-sidebar-width) + 4rem),
+            calc(100% - 2rem)
+        );
+    }
+
+    .jaad-header-inner {
+        padding-inline: 1.5rem;
+    }
+}
+
+.jaad-logo {
+    height: 2.1rem;
+}
+
+html.dark .jaad-logo {
+    filter: invert(1);
+}

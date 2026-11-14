@@ -1,3 +1,7 @@
+---
+description: The MarkdownContent component, which wraps rendered Markdown and loads the styles.
+---
+
 # MarkdownContent
 
 `MarkdownContent` is a polymorphic component. It renders as `<div>` by default

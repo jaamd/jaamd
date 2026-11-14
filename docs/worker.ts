@@ -11,6 +11,25 @@ const MARKDOWN_SOURCES: Record<string, string> = {
     '/jaad': '/jaad/overview.md',
 }
 
+/** Pages that moved, by their old path. */
+export const MOVED: Record<string, string> = {
+    '/jaad/getting-started/creating-pages': '/jaad/getting-started/pages',
+    '/jaad/configurations/structure': '/jaad/getting-started/pages',
+    '/jaad/getting-started/keyboard-shortcuts': '/jaad/configurations/search',
+    '/jaad/configurations/fonts': '/jaad/configurations/styles',
+    '/jaad/markdown': '/jaamd/markdown',
+    '/jaad/upgrade/upgrading': '/jaad/upgrading',
+    '/jaad/upgrade/migrating': '/jaad/upgrading',
+}
+
+/** The new path of a moved page or of its Markdown, or null. */
+export function movedTo(path: string): string | null {
+    const markdown = path.endsWith('.md')
+    const target = MOVED[markdown ? path.slice(0, -'.md'.length) : path]
+    if (!target) return null
+    return markdown ? `${target}.md` : `${target}/`
+}
+
 /** Quality of `type` in an Accept header, 0 when absent. */
 export function quality(accept: string, type: string): number {
     for (const part of accept.split(',')) {
@@ -48,6 +67,9 @@ export default {
     async fetch(request: Request, env: Env): Promise<Response> {
         const url = new URL(request.url)
         const path = url.pathname.replace(/\/+$/, '') || '/'
+
+        const moved = movedTo(path)
+        if (moved) return Response.redirect(new URL(`${moved}${url.search}`, url).href, 301)
 
         if (prefersMarkdown(request)) {
             const source = markdownSource(path)

@@ -1,20 +1,33 @@
+---
+description: The --jaamd-* CSS custom properties that drive every JAAMD style.
+---
+
 # Variables
 
-All styles are driven by CSS custom properties prefixed with `--jaamd-*`. The
-default set (`@jaamd/astro/default.css`) is injected automatically.
+All styles are driven by CSS custom properties prefixed with `--jaamd-`. The
+default set, `@jaamd/astro/default.css`, is injected automatically.
 
-## Customizing variables
+## Colours
 
-Override any variable on `:root` in your own stylesheet:
+Four seeds set most of the palette:
 
 ```css
 :root {
-    --jaamd-color-fg: #334155;
-    --jaamd-color-fg-bright: #0f172a;
-    --jaamd-color-primary: #6366f1;
+    --jaamd-bg: #ffffff;
+    --jaamd-color-fg: #3a3a3a;
+    --jaamd-color-fg-bright: #1a1a1a;
+    --jaamd-color-primary: #3b5bdb;
+}
+```
+
+Surfaces, borders and the table-of-contents card are derived from them with
+`color-mix()`, supported in Chrome and Edge 111+, Safari 16.2+ and Firefox
+113+. Override any variable on `:root` in your own stylesheet; for example:
+
+```css
+:root {
     --jaamd-color-primary-light: #818cf8;
     --jaamd-font-mono: ui-monospace, monospace;
-    --jaamd-font-size: 1rem;
 }
 ```
 

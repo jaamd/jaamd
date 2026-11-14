@@ -1,3 +1,7 @@
+---
+description: Replace the documentation page layout with a DocsFrame of your own.
+---
+
 # Advanced layout
 
 Use the default layout unless the documentation needs a different structure.
@@ -132,4 +136,4 @@ the current page.
 `DocsHeading`, `DocsNavItem` and `DocsPageData` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
-[`src/jaad.css`](05-styles.md) instead.
+[`src/jaad.css`](06-styles.md) instead.

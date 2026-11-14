@@ -1,3 +1,7 @@
+---
+description: What the client script adds in the browser, and how it behaves from the keyboard.
+---
+
 # Client script
 
 A dependency-free ES module enhances the rendered markdown. The integration
