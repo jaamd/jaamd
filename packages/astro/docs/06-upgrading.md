@@ -107,6 +107,9 @@ returns a cleanup. See [Client script](./03-usage/02-client.md).
 `lightbox`, and the client part of the others. `labels` is new: see
 [Options](./01-getting-started/02-options.md#labels).
 
+The options type is exported as `JaamdOptions` only: the `Options` alias is
+gone.
+
 ### Manual setup
 
 `@jaamd/astro` no longer exports the plugins one by one. Use its presets,

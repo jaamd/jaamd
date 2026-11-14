@@ -104,23 +104,12 @@ fields.
 `DocsEntry` is no longer exported: no prop of the frame carried it. The page a
 frame renders is `DocsFrameProps['page']`.
 
-### Resolved configuration: docs fields under `docs`
+### Fewer exports
 
-`jaad.config.ts` is unchanged. Code that reads the resolved configuration, the
-`JaadResolvedConfig` type or `virtual:jaad/config`, finds the docs fields
-grouped:
-
-| Before         | After           |
-| -------------- | --------------- |
-| `docsBase`     | `docs.base`     |
-| `docsDir`      | `docs.dir`      |
-| `docsDirInUse` | `docs.dirInUse` |
-| `docsSections` | `docs.sections` |
-| `editBase`     | `docs.editBase` |
-| `docsLocales`  | `locales`       |
-
-`routeBase`, `sections`, `editLink` and the `locales` option are no longer
-copied into it: their resolved form is the field on the right.
+`@jaamd/jaad` exports `jaad()`, `defineJaadConfig()` and the `JaadUserConfig`
+type. `defineJaadSite`, `JaadConfig` and `JaadResolvedConfig` are gone:
+`@jaamd/jaad/site` builds the Astro configuration, and the resolved
+configuration, `virtual:jaad/config` included, is internal.
 
 ## From 0.9
 

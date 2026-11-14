@@ -1,5 +1,5 @@
 export { default } from './src/integration.ts'
-export type { JaamdOptions, JaamdOptions as Options } from './src/integration.ts'
+export type { JaamdOptions } from './src/integration.ts'
 export { satteriPlugins, unifiedPlugins } from './src/processors.ts'
 export type { PluginOptions } from './src/processors.ts'
 export type { ShikiTheme } from './src/shiki.ts'
