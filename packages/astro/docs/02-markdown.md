@@ -91,7 +91,7 @@ never went through Astro's pipeline (`set:html`, HTML from a CMS).
 With a sticky header, raise `--jaamd-scroll-margin-top` (default `80px`).
 
 > [!NOTE]
-> `:::toc` needs the directive syntax, on by default. With `plugins: { toc: false }`
+> `:::toc` needs the directive syntax, on by default. With `features: { toc: false }`
 > the block degrades to a plain `<div>`: list and links intact, unstyled.
 
 ## Spoilers

@@ -7,7 +7,7 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { themes } from '../../src/themes/index.js'
+import { themes } from '@jaamd/core/themes'
 
 const DIST = fileURLToPath(new URL('../fixture/dist', import.meta.url))
 const PAGE = join(DIST, 'index.html')

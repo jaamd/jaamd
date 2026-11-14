@@ -6,8 +6,9 @@ Install [Node.js 24.12 or newer](https://nodejs.org/) and [pnpm 12](https://pnpm
 pnpm install
 ```
 
-`pnpm install` builds `@jaamd/core`, which the other packages read compiled.
-After changing its sources, build it again with `pnpm --filter @jaamd/core build`.
+`pnpm install` builds `@jaamd/core`, which the other packages read compiled,
+and the stylesheets `@jaamd/astro` serves from it. After changing core's
+sources, build again with `pnpm build`.
 
 Before opening a pull request, run the same checks as CI:
 
@@ -36,8 +37,8 @@ A theme is a directory under `packages/core/src/themes/<slug>/` plus one entry i
 
 The CSS is generated. You write a palette; the build of `@jaamd/core` writes
 `index.css` and, for a single-palette theme, `dark.css` under `dist/`. The
-stylesheets under `packages/astro/src/` that re-export them come from
-`build:bridges`. Never edit those by hand.
+build of `@jaamd/astro` writes a stylesheet importing each of them into its own
+`dist/`. Nothing under `dist/` is committed.
 
 ### 1. Write `palette.js`
 
@@ -76,7 +77,7 @@ Where a palette wants a token off the recipe, add it under `overrides`:
 
 ### 2. Declare it
 
-Add an entry to `src/themes/index.js` with the directory name as `slug` and a
+Add an entry to `packages/core/src/themes/index.ts` with the directory name as `slug` and a
 readable `name`, plus:
 
 | `mode`               | The palette is                        | `shiki`           |
@@ -87,8 +88,7 @@ readable `name`, plus:
 ### 3. Generate and check
 
 ```bash
-pnpm --filter @jaamd/core build
-pnpm --filter @jaamd/astro build:bridges
+pnpm build
 pnpm --filter @jaamd/core --filter @jaamd/astro test
 ```
 

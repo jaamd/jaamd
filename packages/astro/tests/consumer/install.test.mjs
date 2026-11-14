@@ -55,6 +55,14 @@ describe('a pnpm project that installed the packed tarballs', () => {
         assert.match(html, /<h2 id="setup">Setup<a class="jaamd-heading-link" href="#setup"/)
     })
 
+    test('the labels reach the build and the client', () => {
+        assert.match(html, /aria-label="Lien vers la section: Setup"/)
+        const scripts = readdirSync(join(project, 'dist', '_astro'))
+            .filter((file) => file.endsWith('.js'))
+            .map((file) => readFileSync(join(project, 'dist', '_astro', file), 'utf8'))
+        assert.ok(scripts.some((script) => script.includes('Lien vers la section')))
+    })
+
     test('the only copy of @astrojs/markdown-satteri is the one Astro installs', () => {
         const copies = readdirSync(join(project, 'node_modules', '.pnpm')).filter((dir) =>
             dir.startsWith('@astrojs+markdown-satteri@'),

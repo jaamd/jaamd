@@ -1,68 +1,43 @@
 # Manual setup
 
 To bypass the integration, register the plugins yourself on the processor you
-use. On Sätteri, Astro's default:
+use. `@jaamd/astro` exports them as presets, in the order they have to run and
+with Astro's own heading ids. On Sätteri, Astro's default:
 
 ```ts
 // astro.config.mjs
 import { satteri } from '@astrojs/markdown-satteri'
-import {
-    satteriAlert,
-    satteriCodeTabs,
-    satteriToc,
-    satteriSpoiler,
-    satteriDirectiveFallback,
-    satteriTableWrapper,
-    satteriHeadingLinks,
-} from '@jaamd/astro'
+import { satteriPlugins } from '@jaamd/astro'
 
 export default defineConfig({
     markdown: {
-        processor: satteri({
-            features: { directive: true },
-            mdastPlugins: [
-                satteriAlert(),
-                satteriCodeTabs(),
-                satteriToc(),
-                satteriSpoiler(),
-                satteriDirectiveFallback(),
-            ],
-            hastPlugins: [satteriTableWrapper(), satteriHeadingLinks],
-        }),
+        processor: satteri(satteriPlugins()),
     },
 })
 ```
 
-`satteriDirectiveFallback` keeps directives no plugin handles, which Sätteri
-drops: blocks as a plain `<div>`, an inline `:name` as typed. Put it last.
-
-On unified, Astro's `rehypeHeadingIds` goes before `rehypeHeadingLinks`, which
-links the ids it finds:
+On unified:
 
 ```ts
 // astro.config.mjs
-import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark'
-import {
-    remarkAlert,
-    remarkCodeTabs,
-    remarkDirective,
-    remarkToc,
-    remarkSpoiler,
-    rehypeTableWrapper,
-    rehypeHeadingLinks,
-} from '@jaamd/astro'
+import { unified } from '@astrojs/markdown-remark'
+import { unifiedPlugins } from '@jaamd/astro'
 
 export default defineConfig({
     markdown: {
-        processor: unified({
-            remarkPlugins: [remarkAlert, remarkDirective, remarkCodeTabs, remarkToc, remarkSpoiler],
-            rehypePlugins: [rehypeTableWrapper, rehypeHeadingIds, rehypeHeadingLinks],
-        }),
+        processor: unified(unifiedPlugins()),
     },
 })
 ```
 
-Then load the styles and run the client script yourself:
+Both take the integration's [`features` and `labels`](../01-getting-started/02-options.md#features).
+To add plugins of your own, spread the preset's lists: on Sätteri, keep
+`jaamd-directive-fallback`, the last mdast plugin, after yours, since it keeps
+directives no plugin claimed. The plugins one by one are in `@jaamd/core`, see
+[Other frameworks](./03-other-frameworks.md).
+
+Then load the styles and run the client script yourself, with the same
+`features` and `labels` if you set them:
 
 ```astro
 ---
