@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { cleanupTemporaryDirectories, jaamdOverride, run, temporaryDirectory } from './helpers.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
-const CORE_STYLES = join(HERE, '..', '..', '..', 'core', 'src', 'styles')
+const CORE_STYLES = join(HERE, '..', '..', '..', 'core', 'dist')
 const DOCS = join(HERE, '..', '..', 'docs')
 
 // pnpm: strict layout, so `@jaamd/core` is reachable only through `@jaamd/astro`.
@@ -77,8 +77,8 @@ describe('a pnpm project that installed the packed tarballs', () => {
     // Injected by the integration, imported by <MarkdownContent> and by the page.
     test('each stylesheet reaches the page once', () => {
         for (const [file, marker] of [
-            ['markdown.css', /\.jaamd-heading-link \{/g],
-            ['variables.css', /--jaamd-bg:/g],
+            ['styles.css', /\.jaamd-heading-link \{/g],
+            ['default.css', /--jaamd-bg:/g],
         ]) {
             const source = readFileSync(join(CORE_STYLES, file), 'utf8')
             assert.equal((css.match(marker) ?? []).length, (source.match(marker) ?? []).length, file)

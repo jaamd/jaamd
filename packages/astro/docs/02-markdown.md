@@ -96,8 +96,14 @@ With a sticky header, raise `--jaamd-scroll-margin-top` (default `80px`).
 
 ## Spoilers
 
-Any element with the `spoiler` class is hidden until activated:
+Text hidden until the reader activates it, inline or as a block:
 
-```html
-<span class="spoiler">The butler did it.</span>
+```markdown
+:spoiler[The butler did it.]
+
+:::spoiler
+A whole paragraph, hidden.
+:::
 ```
+
+In HTML you write yourself, the class is `jaamd-spoiler`.

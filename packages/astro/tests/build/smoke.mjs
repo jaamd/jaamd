@@ -45,13 +45,13 @@ for (const type of ['note', 'tip', 'important', 'warning', 'caution']) {
 
 check(
     'code-tabs: container rendered',
-    html.includes('class="code-tabs"'),
+    html.includes('class="jaamd-code-tabs"'),
     'remarkCodeTabs did not run; remark-directive may not be registered before it',
 )
 
 check(
     'code-tabs: one panel per code block',
-    countOf(/class="code-tab-panel/g) === 3,
+    countOf(/class="jaamd-code-tab-panel/g) === 3,
     'expected the 3 tabs authored in tests/fixture/src/content/showcase.md',
 )
 
@@ -79,6 +79,12 @@ check(
     'code-tabs: roving tabindex in the markup',
     countOf(/tabindex="-1"/g) === 2,
     'unselected tabs must be removed from the tab order',
+)
+
+check(
+    'spoiler: the directive renders the class the client selects on',
+    html.includes('<span class="jaamd-spoiler">'),
+    ':spoiler[…] must become a span with the jaamd-spoiler class',
 )
 
 // ─── declared table of contents ──────────────────────────────────────────────

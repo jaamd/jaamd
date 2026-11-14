@@ -41,7 +41,9 @@ for (const [relative, specifier] of bridges) {
 }
 
 if (stale.length > 0) {
-    console.error(`✗ stale: ${stale.join(', ')}\n  Run \`pnpm build:themes\` and commit the result.`)
+    console.error(
+        `✗ stale: ${stale.join(', ')}\n  Run \`pnpm --filter @jaamd/astro build:bridges\` and commit the result.`,
+    )
     process.exit(1)
 }
 
