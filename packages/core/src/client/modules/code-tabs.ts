@@ -1,40 +1,41 @@
-import { qsa } from '../utils.js'
+import { CLASS } from '../../markup.ts'
+import { qsa } from '../dom.ts'
 
-const GROUP = '.code-tabs[data-tabs-init]'
-const BUTTON = '.code-tab-btn'
+const GROUP = `.${CLASS.codeTabs}[data-tabs-init]`
+const BUTTON = `.${CLASS.codeTabButton}`
+const PANEL = `.${CLASS.codeTabPanel}`
 
 const buttonsOf = (group: Element): HTMLButtonElement[] => Array.from(qsa<HTMLButtonElement>(group, BUTTON))
 
-/** Class, `aria-selected` and the roving `tabindex` always change together
- *  (WAI-ARIA tabs pattern). */
+/** `aria-selected`, the roving `tabindex` and the panel's `data-active` always
+ *  change together (WAI-ARIA tabs pattern). */
 function select(group: Element, index: number, moveFocus: boolean): void {
     const buttons = buttonsOf(group)
 
     buttons.forEach((btn, i) => {
-        const isActive = i === index
-        btn.classList.toggle('active', isActive)
-        btn.setAttribute('aria-selected', String(isActive))
-        btn.tabIndex = isActive ? 0 : -1
+        const selected = i === index
+        btn.setAttribute('aria-selected', String(selected))
+        btn.tabIndex = selected ? 0 : -1
     })
 
-    qsa<HTMLElement>(group, '.code-tab-panel').forEach((panel) => {
-        panel.classList.toggle('active', panel.dataset.tabIndex === String(index))
+    qsa<HTMLElement>(group, PANEL).forEach((panel) => {
+        panel.toggleAttribute('data-active', panel.dataset.tabIndex === String(index))
     })
 
     if (moveFocus) buttons[index]?.focus()
 }
 
 /** Marks the tablists emitted by the `:::code-tabs` plugin as live. */
-export function initCodeTabs(selector: string): void {
-    qsa<HTMLElement>(document, `${selector} .code-tabs`).forEach((group) => {
+export function initCodeTabs(root: ParentNode): void {
+    qsa<HTMLElement>(root, `.${CLASS.codeTabs}`).forEach((group) => {
         if (group.dataset.tabsInit) return
         group.dataset.tabsInit = '1'
 
         const buttons = buttonsOf(group)
         if (buttons.length === 0) return
 
-        // Re-assert so class, aria-selected and tabindex start out in agreement.
-        const initial = buttons.findIndex((b) => b.classList.contains('active'))
+        // Re-assert so the three attributes start out in agreement.
+        const initial = buttons.findIndex((b) => b.getAttribute('aria-selected') === 'true')
         select(group, initial === -1 ? 0 : initial, false)
     })
 }

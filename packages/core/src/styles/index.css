@@ -1,0 +1,18 @@
+/* The stylesheet, one part per feature. The build inlines them, in this order. */
+
+@import './parts/base.css';
+@import './parts/headings.css';
+@import './parts/text.css';
+@import './parts/code.css';
+@import './parts/blockquotes.css';
+@import './parts/lists.css';
+@import './parts/tables.css';
+@import './parts/media.css';
+@import './parts/code-tabs.css';
+@import './parts/details.css';
+@import './parts/alerts.css';
+@import './parts/spoilers.css';
+@import './parts/footnotes.css';
+@import './parts/toc.css';
+@import './parts/lightbox.css';
+@import './parts/motion.css';

@@ -1,0 +1,28 @@
+.jaamd-content {
+    & p {
+        font-size: var(--jaamd-font-size-p, inherit);
+        margin-bottom: 1rem;
+    }
+
+    & a {
+        color: var(--jaamd-color-primary);
+        text-decoration: underline;
+        font-weight: 600;
+        transition: color 300ms ease-in-out;
+
+        &:hover {
+            color: var(--jaamd-color-primary-light);
+        }
+    }
+
+    & code {
+        background-color: var(--jaamd-code-bg);
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--jaamd-code-border);
+        border-radius: 0.25rem;
+        color: var(--jaamd-code-fg);
+        font-size: var(--jaamd-font-size-code, calc(var(--jaamd-font-size) * 0.78));
+        font-family: var(--jaamd-font-mono);
+        white-space: nowrap;
+    }
+}

@@ -1,0 +1,81 @@
+.jaamd-content {
+    & :is(h1, h2, h3, h4, h5, h6) {
+        color: var(--jaamd-color-fg-bright);
+        font-weight: 600;
+        line-height: 1.4;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        position: relative;
+        text-wrap: balance;
+        /* Every level: a TOC links h3+ too. */
+        scroll-margin-top: var(--jaamd-scroll-margin-top, 80px);
+
+        &:hover .jaamd-heading-link {
+            opacity: 0.6;
+        }
+
+        & .jaamd-heading-link:hover {
+            opacity: 1;
+        }
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    & .jaamd-heading-link {
+        display: inline-flex;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        text-decoration: none;
+        cursor: pointer;
+        vertical-align: middle;
+        margin-left: 0.5rem;
+
+        & svg {
+            width: calc(var(--jaamd-font-size) * 0.95);
+            height: calc(var(--jaamd-font-size) * 0.95);
+            color: var(--jaamd-color-primary);
+            fill: none;
+            stroke: currentColor;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 600px) {
+            opacity: 1;
+
+            & svg {
+                width: calc(var(--jaamd-font-size) * 1.1);
+                height: calc(var(--jaamd-font-size) * 1.1);
+            }
+        }
+    }
+
+    & h1 {
+        font-size: var(--jaamd-font-size-h1, calc(var(--jaamd-font-size) * 2.22));
+        margin-top: 0;
+    }
+
+    & h2 {
+        font-size: var(--jaamd-font-size-h2, calc(var(--jaamd-font-size) * 1.67));
+        border-bottom: 2px solid var(--jaamd-heading-border-color);
+        padding-bottom: 0.5rem;
+    }
+
+    & h3 {
+        font-size: var(--jaamd-font-size-h3, calc(var(--jaamd-font-size) * 1.33));
+    }
+
+    & h4 {
+        font-size: var(--jaamd-font-size-h4, calc(var(--jaamd-font-size) * 1.11));
+    }
+
+    & h5 {
+        font-size: var(--jaamd-font-size-h5, inherit);
+    }
+
+    & h6 {
+        font-size: var(--jaamd-font-size-h6, inherit);
+    }
+}

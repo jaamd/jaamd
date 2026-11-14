@@ -1,30 +1,35 @@
-import { qs, qsa } from '../utils.js'
-
-const DIALOG_ID = 'jaamd-lightbox'
-const TRIGGER = 'jaamd-lightbox-trigger'
-
-const CLOSE_ICON =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em" aria-hidden="true">` +
-    `<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`
+import type { Labels } from '../../markup.ts'
+import { CLASS, ICON, ID, labelled } from '../../markup.ts'
+import { qsa } from '../dom.ts'
 
 /**
  * Modal `<dialog>` driven by invoker commands: the triggers open it, the close
  * button and a click outside (`closedby="any"`) close it. Escape, focus trap and
  * focus return are the browser's.
  */
-function lightbox(): HTMLDialogElement {
+function lightbox(labels: Labels): HTMLDialogElement {
     // Looked up each time: View Transitions swap <body>.
-    const existing = document.getElementById(DIALOG_ID)
+    const existing = document.getElementById(ID.lightbox)
     if (existing instanceof HTMLDialogElement) return existing
 
     const dialog = document.createElement('dialog')
-    dialog.id = DIALOG_ID
-    dialog.className = 'jaamd-lightbox'
+    dialog.id = ID.lightbox
+    dialog.className = CLASS.lightbox
     dialog.setAttribute('closedby', 'any')
-    dialog.setAttribute('aria-label', 'Image preview')
-    dialog.innerHTML =
-        `<button type="button" class="jaamd-lightbox__close" commandfor="${DIALOG_ID}" command="close" aria-label="Close image preview">${CLOSE_ICON}</button>` +
-        `<img class="jaamd-lightbox__img" src="" alt="" />`
+    dialog.setAttribute('aria-label', labels.lightbox)
+
+    const close = document.createElement('button')
+    close.type = 'button'
+    close.className = CLASS.lightboxClose
+    close.setAttribute('commandfor', ID.lightbox)
+    close.setAttribute('command', 'close')
+    close.setAttribute('aria-label', labels.lightboxClose)
+    close.innerHTML = ICON.close
+
+    const preview = document.createElement('img')
+    preview.className = CLASS.lightboxImage
+    preview.alt = ''
+    dialog.append(close, preview)
 
     // Fires before the dialog opens: show the image of the trigger that invoked it.
     dialog.addEventListener('command', (e) => {
@@ -32,7 +37,6 @@ function lightbox(): HTMLDialogElement {
         const img = source?.querySelector('img')
         if (command !== 'show-modal' || !img) return
 
-        const preview = qs<HTMLImageElement>(dialog, '.jaamd-lightbox__img')!
         preview.src = img.currentSrc || img.src
         preview.alt = img.alt
     })
@@ -44,22 +48,22 @@ function lightbox(): HTMLDialogElement {
 /** Wraps each image in a button that opens the lightbox. Opt out with
  *  `data-no-lightbox`. Linked images are skipped: a click on
  *  `[![alt](src)](href)` must follow the link. */
-export function addImageLightbox(selector: string): void {
-    const images = [...qsa<HTMLImageElement>(document, `${selector} img`)].filter(
-        (img) => !img.hasAttribute('data-no-lightbox') && !img.closest(`a, .${TRIGGER}`),
+export function addImageLightbox(root: ParentNode, labels: Labels): void {
+    const images = [...qsa<HTMLImageElement>(root, 'img')].filter(
+        (img) => !img.hasAttribute('data-no-lightbox') && !img.closest(`a, .${CLASS.lightboxTrigger}`),
     )
     if (images.length === 0) return
 
-    lightbox()
+    lightbox(labels)
 
     for (const img of images) {
         const trigger = document.createElement('button')
         trigger.type = 'button'
-        trigger.className = TRIGGER
-        trigger.setAttribute('commandfor', DIALOG_ID)
+        trigger.className = CLASS.lightboxTrigger
+        trigger.setAttribute('commandfor', ID.lightbox)
         trigger.setAttribute('command', 'show-modal')
-        trigger.setAttribute('aria-label', img.alt ? `Enlarge image: ${img.alt}` : 'Enlarge image')
-        if (!img.title) img.title = img.alt || 'Click to enlarge'
+        trigger.setAttribute('aria-label', labelled(labels.lightboxOpen, img.alt))
+        if (!img.title) img.title = img.alt || labels.lightboxOpen
 
         img.replaceWith(trigger)
         trigger.appendChild(img)

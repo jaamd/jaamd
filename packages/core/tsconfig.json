@@ -1,14 +1,17 @@
 {
     "compilerOptions": {
-        "target": "ES2020",
+        "target": "ES2022",
         "module": "ESNext",
         "moduleResolution": "bundler",
-        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "lib": ["ES2023", "DOM", "DOM.Iterable"],
         "strict": true,
-        "noEmit": true,
         "skipLibCheck": true,
-        "types": []
+        "types": [],
+        "verbatimModuleSyntax": true,
+        "erasableSyntaxOnly": true,
+        "allowImportingTsExtensions": true,
+        "rewriteRelativeImportExtensions": true,
+        "noEmit": true
     },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules"]
+    "include": ["src/**/*"]
 }

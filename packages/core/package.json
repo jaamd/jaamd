@@ -21,48 +21,68 @@
         "directory": "packages/core"
     },
     "files": [
-        "src",
+        "dist",
         "README.md"
     ],
     "type": "module",
     "exports": {
-        "./unified": "./src/unified/index.ts",
-        "./satteri": "./src/satteri.ts",
-        "./client": "./src/client/enhancements.ts",
-        "./default.css": "./src/styles/variables.css",
-        "./styles.css": "./src/styles/markdown.css",
-        "./shiki-dual.css": "./src/styles/shiki-dual.css",
-        "./themes": {
-            "types": "./src/themes/index.d.ts",
-            "default": "./src/themes/index.js"
+        "./unified": {
+            "types": "./dist/unified/index.d.ts",
+            "default": "./dist/unified/index.js"
         },
-        "./themes/*/dark.css": "./src/themes/*/dark.css",
-        "./themes/*.css": "./src/themes/*/index.css"
+        "./satteri": {
+            "types": "./dist/satteri/index.d.ts",
+            "default": "./dist/satteri/index.js"
+        },
+        "./client": {
+            "types": "./dist/client/index.d.ts",
+            "default": "./dist/client/index.js"
+        },
+        "./themes": {
+            "types": "./dist/themes/index.d.ts",
+            "default": "./dist/themes/index.js"
+        },
+        "./styles.css": "./dist/styles.css",
+        "./default.css": "./dist/default.css",
+        "./shiki-dual.css": "./dist/shiki-dual.css",
+        "./themes/*/dark.css": "./dist/themes/*/dark.css",
+        "./themes/*.css": "./dist/themes/*/index.css"
     },
     "publishConfig": {
         "access": "public"
     },
     "scripts": {
-        "check": "tsc --noEmit",
-        "build:themes": "node scripts/build-themes.mjs",
-        "test": "node tests/slug-parity.mjs && node tests/themes.mjs && node --import ./tests/ts-resolve.mjs --test \"tests/**/*.test.mjs\""
+        "build": "node scripts/build.mjs",
+        "prepare": "pnpm build",
+        "check": "tsc --noEmit && tsc --noEmit -p tests",
+        "test": "node --test \"tests/**/*.test.ts\"",
+        "test:consumer": "pnpm build && node --test \"tests/consumer/**/*.test.mjs\""
     },
     "dependencies": {
+        "@types/hast": "^3.0.5",
+        "@types/mdast": "^4.0.4",
         "remark-directive": "^4.0.0",
+        "unified": "^11.0.0",
         "unist-util-visit": "^5.0.0"
     },
     "devDependencies": {
-        "@types/hast": "^3.0.5",
-        "@types/mdast": "^4.0.4",
         "github-slugger": "^2.0.0",
+        "happy-dom": "^21.0.4",
         "rehype-stringify": "^10.0.1",
         "remark-gfm": "^4.0.1",
         "remark-parse": "^11.0.0",
         "remark-rehype": "^11.1.2",
         "satteri": "^0.10.5",
         "shiki": "4.4.3",
-        "typescript": "^6.0.0",
-        "unified": "^11.0.0"
+        "typescript": "^6.0.0"
+    },
+    "peerDependencies": {
+        "satteri": ">=0.10.0 <1"
+    },
+    "peerDependenciesMeta": {
+        "satteri": {
+            "optional": true
+        }
     },
     "engines": {
         "node": ">=22.12.0"

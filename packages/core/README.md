@@ -8,7 +8,7 @@ Astro projects install [`@jaamd/astro`](https://www.npmjs.com/package/@jaamd/ast
 which registers all of it. Use this package directly to bring JAAMD to another
 framework.
 
-The package ships TypeScript sources, compiled by the consumer's bundler.
+The package ships compiled JavaScript with its types.
 
 ## Entry points
 
@@ -16,64 +16,36 @@ The package ships TypeScript sources, compiled by the consumer's bundler.
 | --------------------------------------------------------------------- | -------------------------------------------------------------- |
 | `@jaamd/core/unified`                                                 | remark and rehype plugins                                      |
 | `@jaamd/core/satteri`                                                 | Sätteri mdast and hast plugins                                 |
-| `@jaamd/core/client`                                                  | `initMarkdownEnhancements(selector)` and `DEFAULT_SELECTOR`    |
+| `@jaamd/core/client`                                                  | `enhance(root, options)` and `DEFAULT_SELECTOR`                |
 | `@jaamd/core/styles.css`                                              | The stylesheet                                                 |
 | `@jaamd/core/default.css`                                             | Fallback values of the CSS variables                           |
 | `@jaamd/core/shiki-dual.css`                                          | Light and dark code colours for a dual Shiki theme             |
 | `@jaamd/core/themes`                                                  | The list of themes: slug, name, mode and matching Shiki theme  |
 | `@jaamd/core/themes/<slug>.css`, `@jaamd/core/themes/<slug>/dark.css` | A theme, and its `html.dark` variant for single-palette themes |
 
-## Plugins
-
-On unified, `remarkDirective` runs before `remarkCodeTabs` and `remarkToc`:
+## Usage
 
 ```ts
-import {
-    rehypeHeadingLinks,
-    rehypeTableWrapper,
-    remarkAlert,
-    remarkCodeTabs,
-    remarkDirective,
-    remarkToc,
-} from '@jaamd/core/unified'
-import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
-import { unified } from 'unified'
+import { unifiedPlugins } from '@jaamd/core/unified'
 
-unified()
-    .use(remarkParse)
-    .use(remarkAlert)
-    .use(remarkDirective)
-    .use(remarkCodeTabs)
-    .use(remarkToc)
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeTableWrapper)
-    .use(rehypeHeadingLinks)
+const { remarkPlugins, rehypePlugins } = unifiedPlugins()
 ```
 
-On Sätteri, `:::` blocks need `features.directive`:
-
 ```ts
-import {
-    satteriAlert,
-    satteriCodeTabs,
-    satteriDirectiveFallback,
-    satteriHeadingLinks,
-    satteriTableWrapper,
-    satteriToc,
-} from '@jaamd/core/satteri'
+import { satteriPlugins } from '@jaamd/core/satteri'
 import { markdownToHtml } from 'satteri'
 
-markdownToHtml(source, {
-    features: { directive: true },
-    mdastPlugins: [satteriAlert, satteriCodeTabs, satteriToc, satteriDirectiveFallback],
-    hastPlugins: [satteriTableWrapper, satteriHeadingLinks(headingIds, (node, ctx) => ctx.textContent(node))],
-})
+const html = await markdownToHtml(source, satteriPlugins())
 ```
 
-Heading links are added to headings that already have an `id`. Core assigns
-none: on unified, run a plugin that does before `rehypeHeadingLinks`; on
-Sätteri, pass one to `satteriHeadingLinks` as its first argument.
+```ts
+import { enhance } from '@jaamd/core/client'
+
+const dispose = enhance(element)
+```
+
+Options, labels and the React pattern are in
+[Other frameworks](https://jaamd.org/docs/jaamd/advanced/other-frameworks).
 
 ## Markup
 

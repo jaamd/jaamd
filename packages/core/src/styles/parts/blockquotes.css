@@ -1,0 +1,22 @@
+.jaamd-content {
+    & blockquote {
+        font-size: var(--jaamd-font-size-blockquote, inherit);
+        border-left: 4px solid var(--jaamd-blockquote-border);
+        background-color: var(--jaamd-blockquote-bg);
+        padding: 1rem 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+        position: relative;
+    }
+
+    /* Outranks `.jaamd-content p`, so the blockquote's own size wins inside it even
+     when --jaamd-font-size-p is set. */
+    & blockquote p {
+        font-size: inherit;
+        margin: 0;
+        font-style: italic;
+        color: var(--jaamd-blockquote-fg);
+    }
+}

@@ -1,22 +1,20 @@
 /** Markup shared by the remark and Sätteri plugins. */
 
 import type { Data, Emphasis, Paragraph } from 'mdast'
-import { HEADING_LINK_CLASS, HEADING_LINK_ICON, headingLinkLabel } from './client/utils.js'
-import { escapeHtml } from './utils.js'
+import { escapeHtml } from './html.ts'
+import { CLASS, ICON, ID, labelled } from './markup.ts'
 
 export const ALERT_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i
 export const ALERT_LEGACY_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)(\/.*)?]/i
 
-export const DEFAULT_TOC_LABEL = 'Table of contents'
-
-/** Blockquote `data` for the alert wrapper. */
-export function alertData(alertType: string, tagName = 'div'): Data {
-    return asHast({ className: ['markdown-alert', `markdown-alert-${alertType}`], dir: 'auto' }, tagName)
-}
-
 /** mdast `data` that renders the node as another hast element. */
 function asHast(hProperties: Record<string, unknown>, hName?: string): Data {
     return (hName ? { hName, hProperties } : { hProperties }) as Data
+}
+
+/** Blockquote `data` for the alert wrapper. */
+export function alertData(alertType: string, tagName = 'div'): Data {
+    return asHast({ className: [CLASS.alert, `${CLASS.alert}-${alertType}`], dir: 'auto' }, tagName)
 }
 
 /** Title paragraph: icon plus label. */
@@ -24,7 +22,7 @@ export function alertTitle(alertType: string, title: string): Paragraph {
     return {
         type: 'paragraph',
         children: [alertIcon(alertType), { type: 'text', value: title }],
-        data: asHast({ className: 'markdown-alert-title', dir: 'auto' }),
+        data: asHast({ className: CLASS.alertTitle, dir: 'auto' }),
     }
 }
 
@@ -33,7 +31,7 @@ function alertIcon(type: string): Emphasis {
         type: 'emphasis',
         data: asHast(
             {
-                className: ['octicon'],
+                className: [CLASS.alertIcon],
                 viewBox: '0 0 16 16',
                 width: '16',
                 height: '16',
@@ -49,6 +47,11 @@ function alertIcon(type: string): Emphasis {
             },
         ],
     }
+}
+
+/** Directive `data` for a spoiler: a span inline, a div as a block. */
+export function spoilerData(tagName: 'span' | 'div'): Data {
+    return asHast({ className: [CLASS.spoiler] }, tagName)
 }
 
 /** Tab label: meta, then language, then "Tab N". */
@@ -67,7 +70,7 @@ export function codeTabsGroupId(index: number, codes: string[]): string {
         hash ^= char.codePointAt(0)!
         hash = Math.imul(hash, 0x01000193)
     }
-    return `jaamd-tabs-${(hash >>> 0).toString(36)}`
+    return `${ID.codeTabs}${(hash >>> 0).toString(36)}`
 }
 
 /** HTML around the code blocks of one `:::code-tabs` group. */
@@ -79,8 +82,7 @@ export function codeTabsHtml(group: string, labels: string[]) {
         .map((label, i) => {
             const selected = i === 0
             return (
-                `<button class="code-tab-btn${selected ? ' active' : ''}" ` +
-                `id="${tabId(i)}" data-tab-index="${i}" role="tab" ` +
+                `<button class="${CLASS.codeTabButton}" id="${tabId(i)}" data-tab-index="${i}" role="tab" ` +
                 `aria-selected="${selected}" aria-controls="${panelId(i)}" ` +
                 // Roving tabindex: only the selected tab is in the tab order.
                 `tabindex="${selected ? 0 : -1}">${escapeHtml(label)}</button>`
@@ -89,9 +91,9 @@ export function codeTabsHtml(group: string, labels: string[]) {
         .join('')
 
     return {
-        open: `<div class="code-tabs" id="${group}"><div class="code-tab-buttons" role="tablist">${buttons}</div>`,
+        open: `<div class="${CLASS.codeTabs}" id="${group}"><div class="${CLASS.codeTabButtons}" role="tablist">${buttons}</div>`,
         panelOpen: (i: number) =>
-            `<div class="code-tab-panel${i === 0 ? ' active' : ''}" ` +
+            `<div class="${CLASS.codeTabPanel}"${i === 0 ? ' data-active' : ''} ` +
             `id="${panelId(i)}" data-tab-index="${i}" role="tabpanel" ` +
             // Focusable so wide samples can be scrolled by keyboard.
             `aria-labelledby="${tabId(i)}" tabindex="0">`,
@@ -100,19 +102,20 @@ export function codeTabsHtml(group: string, labels: string[]) {
     }
 }
 
-/** Opening of the TOC landmark. The title is a <p>: out of getHeadings(). */
-export function tocOpenHtml(label: string): string {
-    const titleHtml = label ? `<p class="jaamd-toc-title">${escapeHtml(label)}</p>` : ''
-    return `<nav class="jaamd-toc" aria-label="${escapeHtml(label || DEFAULT_TOC_LABEL)}">` + titleHtml
+/** Opening of the TOC landmark, named after its title or `fallback`. The
+ *  title is a <p>: out of getHeadings(). */
+export function tocOpenHtml(title: string, fallback: string): string {
+    const titleHtml = title ? `<p class="${CLASS.tocTitle}">${escapeHtml(title)}</p>` : ''
+    return `<nav class="${CLASS.toc}" aria-label="${escapeHtml(title || fallback)}">` + titleHtml
 }
 
 export const TOC_CLOSE_HTML = `</nav>`
 
 /** Anchor appended to a heading. */
-export function headingLinkHtml(id: string, text: string): string {
+export function headingLinkHtml(id: string, text: string, label: string): string {
     return (
-        `<a class="${HEADING_LINK_CLASS}" href="#${escapeHtml(id)}" ` +
-        `aria-label="${escapeHtml(headingLinkLabel(text))}">${HEADING_LINK_ICON}</a>`
+        `<a class="${CLASS.headingLink}" href="#${escapeHtml(id)}" ` +
+        `aria-label="${escapeHtml(labelled(label, text))}">${ICON.headingLink}</a>`
     )
 }
 

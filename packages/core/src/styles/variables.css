@@ -119,7 +119,7 @@
         --jaamd-table-header-bg: var(--jaamd-surface-1);
         --jaamd-table-hover-bg: var(--jaamd-surface-3);
 
-        /* ── Code tabs (.code-tabs) ─────────────────────────────── */
+        /* ── Code tabs ──────────────────────────────────────────── */
 
         --jaamd-tabs-border: var(--jaamd-border);
         --jaamd-tabs-header-bg: var(--jaamd-surface-3);

@@ -1,19 +1,19 @@
-import { HEADING_LINK_CLASS, HEADING_LINK_ICON, headingLinkLabel, qs, qsa, slugify, uniqueElementId } from '../utils.js'
+import type { Labels } from '../../markup.ts'
+import { CLASS, ICON, labelled } from '../../markup.ts'
+import { qs, qsa, slugify, uniqueElementId } from '../dom.ts'
 
 /** Fallback for markup that skipped the build-time plugin. */
-export function addHeadingLinks(selector: string): void {
+export function addHeadingLinks(root: ParentNode, labels: Labels): void {
     // All six levels: a TOC can link an h5.
-    const levels = [1, 2, 3, 4, 5, 6].map((n) => `${selector} h${n}`).join(', ')
-
-    qsa<HTMLElement>(document, levels).forEach((header) => {
+    qsa<HTMLElement>(root, 'h1, h2, h3, h4, h5, h6').forEach((header) => {
         if (!header.id) header.id = uniqueElementId(slugify(header.textContent ?? ''))
-        if (qs(header, `.${HEADING_LINK_CLASS}`)) return
+        if (qs(header, `.${CLASS.headingLink}`)) return
 
         const a = document.createElement('a')
-        a.className = HEADING_LINK_CLASS
-        a.setAttribute('aria-label', headingLinkLabel(header.textContent ?? ''))
+        a.className = CLASS.headingLink
+        a.setAttribute('aria-label', labelled(labels.headingLink, header.textContent ?? ''))
         a.setAttribute('href', `#${header.id}`)
-        a.innerHTML = HEADING_LINK_ICON
+        a.innerHTML = ICON.headingLink
 
         header.appendChild(a)
     })
