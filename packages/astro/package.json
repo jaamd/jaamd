@@ -49,7 +49,7 @@
         "prepare": "node scripts/build.mjs",
         "check": "tsc --noEmit && tsc --noEmit -p tests",
         "test": "node --test \"tests/*.test.ts\"",
-        "test:consumer": "node --test \"tests/consumer/**/*.test.mjs\"",
+        "test:consumer": "pnpm --filter \"@jaamd/astro...\" run build && node --test \"tests/consumer/**/*.test.mjs\"",
         "test:build": "pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs && JAAMD_PROCESSOR=unified pnpm --filter jaamd-fixture build && node tests/build/smoke.mjs"
     },
     "dependencies": {

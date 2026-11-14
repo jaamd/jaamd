@@ -31,9 +31,17 @@ export function run(command, args, cwd) {
     }
 }
 
-/** Packs into an isolated directory, with pnpm so `workspace:` ranges become versions. */
+/**
+ * Packs into an isolated directory, with pnpm so `workspace:` ranges become versions.
+ * Without lifecycle scripts: test files pack in parallel, and one's `prepare` would
+ * delete a `dist` another is reading. `test:consumer` builds first.
+ */
 export function packPackage(packageDir) {
     const destination = temporaryDirectory('jaamd-pack-')
-    const output = run('pnpm', ['pack', '--pack-destination', destination, '--json'], packageDir)
+    const output = run(
+        'pnpm',
+        ['pack', '--pack-destination', destination, '--json', '--config.ignore-scripts=true'],
+        packageDir,
+    )
     return JSON.parse(output).filename
 }

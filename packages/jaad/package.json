@@ -45,7 +45,7 @@
         "prepack": "pnpm build",
         "check": "astro check && tsc --noEmit -p tests",
         "test": "node --test \"tests/unit/**/*.test.ts\" \"tests/unit/**/*.test.mjs\"",
-        "test:consumer": "node --test \"tests/consumer/**/*.test.mjs\"",
+        "test:consumer": "pnpm --filter \"@jaamd/jaad...\" run build && node --test \"tests/consumer/**/*.test.mjs\"",
         "test:build": "pnpm --filter jaad-fixture build && node --test \"tests/build/**/*.test.mjs\""
     },
     "dependencies": {
