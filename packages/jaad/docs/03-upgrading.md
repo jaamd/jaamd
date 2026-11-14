@@ -104,6 +104,13 @@ fields.
 `DocsEntry` is no longer exported: no prop of the frame carried it. The page a
 frame renders is `DocsFrameProps['page']`.
 
+### Search index
+
+`search-index.json` now holds one entry per heading, for
+[search by heading](02-configurations/04-search.md). Its format is internal to
+JAAD's search and can change in any release: do not read it from code of your
+own.
+
 ### Fewer exports
 
 `@jaamd/jaad` exports `jaad()`, `defineJaadConfig()` and the `JaadUserConfig`
