@@ -51,33 +51,51 @@ bun add @jaamd/jaad@latest
 
 Then run a build and read below the changes since the version you upgrade from.
 
-## From @lancher-dev/jaad
+## From 0.10 and 0.11
 
-JAAD and JAAMD moved to the `@jaamd` scope. The old packages are deprecated and
-receive no further releases.
+### The package is now @jaamd/jaad
 
-Replace the dependency:
+`@lancher-dev/jaad` is now `@jaamd/jaad`, and `@lancher-dev/create-jaad` is
+`@jaamd/create-jaad`. The old packages are deprecated and receive no further
+releases. `@jaamd/jaad` 0.11 was 0.10 under the new scope: from it, skip to
+the next heading.
 
-```bash
+:::code-tabs
+
+```bash npm
 npm uninstall @lancher-dev/jaad
 npm install @jaamd/jaad
 ```
 
+```bash pnpm
+pnpm remove @lancher-dev/jaad
+pnpm add @jaamd/jaad
+```
+
+```bash yarn
+yarn remove @lancher-dev/jaad
+yarn add @jaamd/jaad
+```
+
+```bash bun
+bun remove @lancher-dev/jaad
+bun add @jaamd/jaad
+```
+
+:::
+
 Then replace `@lancher-dev/jaad` with `@jaamd/jaad` in every import:
 `astro.config.*`, `src/content.config.*`, `jaad.config.ts`, and any page using
-`@jaamd/jaad/layouts/Page.astro` or `@jaamd/jaad/advanced`. A project that
-imports `@lancher-dev/jaamd` directly needs `@jaamd/astro` instead.
+`@jaamd/jaad/layouts/Page.astro` or `@jaamd/jaad/advanced`.
 
 The documentation moved from `jaad.lancher.dev` to `docs.jaamd.org/jaad`: update
 the links in `AGENTS.md` if `create-jaad` generated one.
 
-## From 0.11
-
-### @jaamd/jaamd is now @jaamd/astro
+### JAAMD is now @jaamd/astro
 
 JAAD installs it for you: a site that only uses `@jaamd/jaad` has nothing to do.
-A project that imports `@jaamd/jaamd` directly follows
-[JAAMD's upgrade guide](../../astro/docs/06-upgrading.md#from-012).
+A project that imports `@lancher-dev/jaamd` or `@jaamd/jaamd` directly follows
+[JAAMD's upgrade guide](../../astro/docs/06-upgrading.md#from-011).
 
 ### Page titles name their section
 

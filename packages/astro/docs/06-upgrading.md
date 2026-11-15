@@ -27,47 +27,50 @@ bun add @jaamd/astro@latest
 
 :::
 
-## From 0.12
+## From 0.11
 
 ### The package is now @jaamd/astro
 
-Replace the dependency, then every import from `@jaamd/jaamd`; the API of the
-integration is unchanged. Coming from `@lancher-dev/jaamd`, do the same with
-that name. `@jaamd/jaamd` is deprecated and receives no further releases.
+`@lancher-dev/jaamd` is now `@jaamd/astro`. Replace the dependency, then the
+package name in every import. `@lancher-dev/jaamd` is deprecated and receives
+no further releases.
 
 :::code-tabs
 
 ```bash npm
-npm uninstall @jaamd/jaamd
+npm uninstall @lancher-dev/jaamd
 npm install @jaamd/astro
 ```
 
 ```bash pnpm
-pnpm remove @jaamd/jaamd
+pnpm remove @lancher-dev/jaamd
 pnpm add @jaamd/astro
 ```
 
 ```bash yarn
-yarn remove @jaamd/jaamd
+yarn remove @lancher-dev/jaamd
 yarn add @jaamd/astro
 ```
 
 ```bash bun
-bun remove @jaamd/jaamd
+bun remove @lancher-dev/jaamd
 bun add @jaamd/astro
 ```
 
 :::
 
+`@jaamd/jaamd` 0.12 was 0.11 under the new scope, and is deprecated too: from
+it, replace `@jaamd/jaamd` the same way and follow the rest of this section.
+
 ### Stylesheets are imported with their extension
 
-| Before                            | After                                 |
-| --------------------------------- | ------------------------------------- |
-| `@jaamd/jaamd/default`            | `@jaamd/astro/default.css`            |
-| `@jaamd/jaamd/styles`             | `@jaamd/astro/styles.css`             |
-| `@jaamd/jaamd/shiki-dual`         | `@jaamd/astro/shiki-dual.css`         |
-| `@jaamd/jaamd/themes/<slug>`      | `@jaamd/astro/themes/<slug>.css`      |
-| `@jaamd/jaamd/themes/<slug>/dark` | `@jaamd/astro/themes/<slug>/dark.css` |
+| Before                 | After                                 |
+| ---------------------- | ------------------------------------- |
+| `…/default`            | `@jaamd/astro/default.css`            |
+| `…/styles`             | `@jaamd/astro/styles.css`             |
+| `…/shiki-dual`         | `@jaamd/astro/shiki-dual.css`         |
+| `…/themes/<slug>`      | `@jaamd/astro/themes/<slug>.css`      |
+| `…/themes/<slug>/dark` | `@jaamd/astro/themes/<slug>/dark.css` |
 
 ### Classes
 
