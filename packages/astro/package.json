@@ -1,6 +1,6 @@
 {
     "name": "@jaamd/astro",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Markdown, refined: plugins, client-side enhancements and styles as a single Astro integration.",
     "keywords": [
         "astro",
