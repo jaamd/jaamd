@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://docs.jaamd.org/jaad">
-    <img src="./assets/readme-header.png" alt="JAAD — Just Another Astro Docs. Documentation, simplified." width="1200" />
+    <img src="./assets/readme-header.png" alt="JAAD — Just Another Astro Docs. Documentation, refined." width="1200" />
   </a>
 </p>
 

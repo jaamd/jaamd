@@ -10,7 +10,7 @@ export default defineJaadConfig({
     logo: '/mark.svg',
     homeLink: 'https://jaamd.org',
     lang: 'en',
-    description: 'Markdown plugins, enhancements and styles for Astro, and a documentation site built on them.',
+    description: 'Markdown, refined: the documentation of JAAMD and JAAD.',
     docsDir: './content',
     sections: {
         jaamd: { dir: '../packages/astro/docs', label: 'JAAMD' },

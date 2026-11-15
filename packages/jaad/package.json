@@ -1,7 +1,7 @@
 {
     "name": "@jaamd/jaad",
     "version": "1.0.1",
-    "description": "Turn a folder of markdown into a documentation site. An Astro integration.",
+    "description": "Documentation, refined: a documentation site from a folder of markdown, as an Astro integration.",
     "keywords": [
         "astro",
         "astro-integration",

@@ -34,6 +34,10 @@ The `site/` project is jaamd.org, the landing page with the live editor: preview
 it with `pnpm --filter site dev`. Its Worker sends the old `jaamd.org/docs/...`
 addresses to docs.jaamd.org. Both projects deploy from `main`.
 
+Every product is written the same way: "Just Another Astro …", the name in
+italic serif, and "<Subject>, refined." (`Markdown, refined.`,
+`Documentation, refined.`), in the README headers and the social images alike.
+
 ## Themes
 
 A theme is a directory under `packages/core/src/themes/<slug>/` plus one entry in
