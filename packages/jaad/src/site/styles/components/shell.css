@@ -1,9 +1,9 @@
 /* Shared shell classes; first in the layer so component files override them. */
 @layer components {
-    /* Header, footer and docs content share one measure. */
+    /* The header's content box: the chrome width less the 1rem gutters. */
     .jaad-chrome {
-        width: 100%;
-        max-width: var(--jaad-chrome-width);
+        width: calc(100% - 2rem);
+        max-width: calc(var(--jaad-chrome-width) - 2rem);
         margin-inline: auto;
     }
 

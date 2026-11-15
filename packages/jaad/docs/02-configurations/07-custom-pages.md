@@ -100,8 +100,8 @@ its navigation. To restructure documentation pages themselves, use
 
 ## Matching the documentation's layout
 
-- `.jaad-chrome`: the column shared by header, footer and documentation
-  content, as wide as `--jaad-chrome-width`.
+- `.jaad-chrome`: the column of the header's content, shared by the footer:
+  `--jaad-chrome-width` less the side gutters.
 - `.jaad-main`: vertical margin and horizontal padding of the main landmark.
   `bare` swaps it for `.jaad-main-bare`, which has none.
 - Layout tokens (`--jaad-content-width`, `--jaad-page-padding`, …) are listed
