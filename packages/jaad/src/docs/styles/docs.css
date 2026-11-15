@@ -30,9 +30,10 @@
         margin-inline: auto;
     }
 
+    /* Page, page actions and footer share the inset. */
     @media (48rem <= width < 64rem) {
-        .docs-page-main {
-            padding-inline: var(--jaad-page-padding);
+        .docs-container {
+            padding-inline: calc(1rem + var(--jaad-page-padding));
         }
     }
 
@@ -76,6 +77,14 @@
         [data-jaad-default-frame] .docs-sidebar-left,
         [data-jaad-default-frame] .docs-sidebar-right .docs-toc {
             display: none;
+        }
+
+        /* Only the page actions are left: they follow the page column. */
+        [data-jaad-default-frame] .docs-sidebar-right {
+            width: 100%;
+            max-width: var(--jaad-content-width);
+            margin-inline: auto;
+            overflow: visible;
         }
     }
 }

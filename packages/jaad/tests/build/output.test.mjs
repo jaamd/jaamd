@@ -142,6 +142,16 @@ test('a fixed shell: header and sidebars hold still, only the page scrolls', () 
         'the sidebars are no longer placed at the edges of the header column',
     )
     assert.match(css, /\.docs-container>\.jaad-footer\{grid-column:2\}/, 'the footer no longer closes the page column')
+    assert.match(
+        css,
+        /\.jaad-chrome\{[^}]*max-width:calc\(var\(--jaad-chrome-width\)-2rem\)/,
+        "the footer is wider than the header's content",
+    )
+    assert.match(
+        css,
+        /\[data-jaad-default-frame\]\.docs-sidebar-right\{[^}]*width:100%[^}]*max-width:var\(--jaad-content-width\)/,
+        'on narrow screens the page actions no longer follow the page column',
+    )
 
     const html = page('docs/getting-started/installation/index.html')
     assert.match(html, /<header[^>]*class="jaad-header"/)
@@ -152,13 +162,16 @@ test('a fixed shell: header and sidebars hold still, only the page scrolls', () 
 test('docs and the page layout share one padding token', () => {
     const css = allCss().replace(/\s+/g, '')
 
-    for (const rule of ['.jaad-main', '.docs-page-main']) {
-        assert.match(
-            css,
-            new RegExp(`\\${rule}\\{[^}]*padding-inline:var\\(--jaad-page-padding\\)`),
-            `${rule} does not read the padding token`,
-        )
-    }
+    assert.match(
+        css,
+        /\.jaad-main\{[^}]*padding-inline:var\(--jaad-page-padding\)/,
+        '.jaad-main does not read the padding token',
+    )
+    assert.match(
+        css,
+        /\.docs-container\{[^}]*padding-inline:calc\(1rem\+var\(--jaad-page-padding\)\)/,
+        '.docs-container does not read the padding token',
+    )
 
     // The page nav takes its width from the main it sits in, not its own number.
     const nav = page('docs/getting-started/installation/index.html')
