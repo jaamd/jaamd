@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://jaamd.org">
-    <img src="./.github/readme-header.png" alt="JAAMD — Just Another Astro Markdown. Markdown, finished." width="1200" />
+    <img src="./packages/astro/assets/readme-header.png" alt="JAAMD — Just Another Astro Markdown. Markdown, refined." width="1200" />
   </a>
 </p>
 
