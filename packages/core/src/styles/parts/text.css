@@ -23,6 +23,9 @@
         color: var(--jaamd-code-fg);
         font-size: var(--jaamd-font-size-code, calc(var(--jaamd-font-size) * 0.78));
         font-family: var(--jaamd-font-mono);
-        white-space: nowrap;
+        /* A name longer than the line breaks instead of widening the page. */
+        overflow-wrap: break-word;
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
     }
 }
