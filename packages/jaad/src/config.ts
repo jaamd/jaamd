@@ -72,6 +72,7 @@ export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd
         ...resolveSiteConfig(siteOptions, repo, cwd),
         locales: locales.map(describeLocale),
         defaultLocale: locales.length > 0 ? config.lang.toLowerCase() : config.lang,
+        fonts: (options.astro?.fonts ?? []).map((font) => font.cssVariable),
         docs,
     }
 }

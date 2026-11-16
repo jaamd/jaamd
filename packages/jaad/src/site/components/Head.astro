@@ -1,5 +1,5 @@
 ---
-import { Font } from 'astro:assets'
+import { Font, type CssVariable } from 'astro:assets'
 import config from 'virtual:jaad/config'
 import { openGraphLocale } from '../locales.ts'
 import { withDeploymentBase } from '../urls.ts'
@@ -87,6 +87,9 @@ const themeScript = `(function () {
 
 <Font cssVariable="--font-inter" preload />
 <Font cssVariable="--font-merriweather" preload />
+{config.fonts.map((cssVariable) => (
+    <Font cssVariable={cssVariable as CssVariable} />
+))}
 
 {canonical && <meta property="og:url" content={canonical} />}
 <meta property="og:type" content="website" />

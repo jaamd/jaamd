@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test, type TestContext } from 'node:test'
+import { fontProviders } from 'astro/config'
 import { defineJaadConfig, resolveConfig } from '../../src/config.ts'
 
 // Resolved outside a repository, so nothing is inferred and the defaults show.
@@ -169,6 +170,23 @@ test("astro's own options never reach the resolved config", () => {
         [],
     )
     assert.doesNotThrow(() => JSON.stringify(config))
+})
+
+test('fonts set in astro.fonts reach the resolved config by css variable', () => {
+    const config = bare({
+        astro: {
+            fonts: [
+                {
+                    provider: fontProviders.local(),
+                    name: 'Mono',
+                    cssVariable: '--font-mono-x',
+                    options: { variants: [] },
+                },
+            ],
+        },
+    })
+    assert.deepEqual(config.fonts, ['--font-mono-x'])
+    assert.deepEqual(bare().fonts, [])
 })
 
 // ── The mount point, which every internal link is built from ─────────────────
