@@ -1,6 +1,6 @@
 {
     "name": "@jaamd/core",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "The framework-agnostic core of JAAMD: markdown plugins, markup, client-side enhancements, styles and themes.",
     "keywords": [
         "markdown",

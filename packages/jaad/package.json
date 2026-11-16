@@ -1,6 +1,6 @@
 {
     "name": "@jaamd/jaad",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Documentation, refined: a documentation site from a folder of markdown, as an Astro integration.",
     "keywords": [
         "astro",
