@@ -13,6 +13,12 @@ test('astro redirects set in the jaad config are emitted', () => {
     assert.match(page('docs/retired/index.html'), /url=\/docs\/markdown["']?/)
 })
 
+test('fonts set in astro.fonts are loaded on every page', () => {
+    for (const name of ['docs/index.html', 'docs/markdown/index.html']) {
+        assert.match(page(name), /@font-face\{[^}]*font-family:"?Fixture Mono/, name)
+    }
+})
+
 test('dual-theme code colours reach the built CSS', () => {
     const css = allCss()
     assert.ok(

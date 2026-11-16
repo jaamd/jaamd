@@ -1,4 +1,5 @@
 import { defineJaadConfig } from '@jaamd/jaad'
+import { fontProviders } from 'astro/config'
 
 export default defineJaadConfig({
     site: 'https://docs.example.com',
@@ -11,5 +12,21 @@ export default defineJaadConfig({
         redirects: {
             '/docs/retired': '/docs/markdown',
         },
+        fonts: [
+            {
+                provider: fontProviders.local(),
+                name: 'Fixture Mono',
+                cssVariable: '--font-fixture-mono',
+                options: {
+                    variants: [
+                        {
+                            weight: '400',
+                            style: 'normal',
+                            src: [new URL('../../src/site/fonts/inter.woff2', import.meta.url)],
+                        },
+                    ],
+                },
+            },
+        ],
     },
 })

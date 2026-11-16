@@ -94,6 +94,8 @@ export interface SiteResolvedConfig extends SiteConfig {
     locales: Locale[]
     /** `lang` when the site is not localised. */
     defaultLocale: string
+    /** CSS variables of the fonts set in `astro.fonts`. */
+    fonts: string[]
 }
 
 const FAVICONS = ['favicon.svg', 'favicon.ico', 'favicon.png']
