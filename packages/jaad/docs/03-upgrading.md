@@ -51,6 +51,44 @@ bun add @jaamd/jaad@latest
 
 Then run a build and read below the changes since the version you upgrade from.
 
+## From 1.0
+
+### Node 22.23.4
+
+JAAD requires Node 22.23.4 or later, the minimum of Astro 7.4.
+
+### Page URLs follow Astro's
+
+Links between pages, the canonical URL, the alternates and the sitemap now
+agree with Astro's `trailingSlash` and `build.format`. With Astro's defaults,
+every page URL ends with `/`; with `trailingSlash: "never"` or
+`build.format: "file"`, none does. Links written by file need no change. A URL
+written by hand to a page, as in `nav`, is served either way, and with the
+matching slash saves a redirect on most hosts.
+
+### Stricter options
+
+- An unknown key inside an option, such as `head[].attributes`, is an error,
+  as an unknown top-level option already was.
+- `ui` takes locale codes, and only the interface strings JAAD has.
+- `lang` must be a language tag: `en-US`, not `en_US`.
+- `homeLink`, `nav` and `social` links must be paths or `http(s)`, `mailto` or
+  `tel` URLs. `logo` and `ogImage` must be root-relative paths or `http(s)`
+  URLs; `//host/...` is neither.
+
+### Edit links
+
+"Edit this page" opens the forge's own editor, the GitLab, Gitea, Forgejo and
+Bitbucket ones included, on the page's real file name. On a detached checkout
+where no CI names the branch, the link is left out instead of pointing at
+`HEAD`.
+
+### Paths and site from Astro
+
+`public/` and `src/` are read where Astro's `publicDir` and `srcDir` point. A
+`site` set in Astro's config, and not in `jaad.config.ts`, now also produces the
+sitemap.
+
 ## From 0.10 and 0.11
 
 ### The package is now @jaamd/jaad
