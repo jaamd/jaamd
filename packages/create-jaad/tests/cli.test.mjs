@@ -342,3 +342,41 @@ test('non-interactive requests are complete before files are written', () => {
         assert.equal(existsSync(join(parent, scenario.target)), false, `${scenario.name} wrote files`)
     }
 })
+
+test('--here leaves a package.json that already has everything as it was', () => {
+    const project = temporaryDirectory('jaad-here-manifest-kept-')
+    const source = JSON.stringify(
+        {
+            name: 'ready',
+            scripts: { dev: 'astro dev', build: 'astro build', preview: 'astro preview' },
+            dependencies: { astro: '^7.4.2', '@jaamd/jaad': '^1.0.0' },
+        },
+        null,
+        4,
+    )
+    writeFileSync(join(project, 'package.json'), source)
+
+    const result = runScaffolderHere(project, 'docs')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 0, output)
+    assert.match(output, /kept\s+package\.json/)
+    assert.doesNotMatch(output, /updated\s+package\.json/)
+    assert.equal(readFileSync(join(project, 'package.json'), 'utf8'), source)
+})
+
+test('--here adds to a package.json in its own indentation and script order', () => {
+    const project = temporaryDirectory('jaad-here-manifest-updated-')
+    writeFileSync(
+        join(project, 'package.json'),
+        JSON.stringify({ name: 'lib', scripts: { test: 'node --test', build: 'tsc' } }, null, 4) + '\n',
+    )
+
+    const result = runScaffolderHere(project, 'docs')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 0, output)
+    assert.match(output, /updated\s+package\.json/)
+
+    const source = readFileSync(join(project, 'package.json'), 'utf8')
+    assert.match(source, /^ {4}"name": "lib",$/m, 'the indentation changed')
+    assert.deepEqual(Object.keys(JSON.parse(source).scripts), ['test', 'build', 'dev', 'preview'])
+})

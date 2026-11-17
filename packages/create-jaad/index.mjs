@@ -7,7 +7,9 @@ import * as p from '@clack/prompts'
 import {
     DEFAULT_TEMPLATE,
     HELP,
+    completeManifest,
     fail,
+    formatManifest,
     missingAnswers,
     normaliseDir,
     packageManager,
@@ -77,9 +79,10 @@ function readManifest(target) {
     const file = manifestPath(target)
     if (!existsSync(file)) return { manifest: null, issue: null }
 
+    const source = readFileSync(file, 'utf8').replace(/^\uFEFF/, '')
     let manifest
     try {
-        manifest = JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, ''))
+        manifest = JSON.parse(source)
     } catch {
         return {
             manifest: null,
@@ -103,7 +106,7 @@ function readManifest(target) {
         }
     }
 
-    return { manifest, issue: null }
+    return { manifest, source, issue: null }
 }
 
 const isRecord = (value) => typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -142,7 +145,7 @@ function failSetup(issues) {
 /** Inspect everything before writing: a failed --here setup is a no-op. */
 function inspectExistingProject(target) {
     const issues = []
-    const { manifest, issue: manifestIssue } = readManifest(target)
+    const { manifest, source, issue: manifestIssue } = readManifest(target)
     if (manifestIssue) issues.push(manifestIssue)
 
     const astroConfig = inspectConfig(target, ASTRO_CONFIG_NAMES, ASTRO_CONFIG, 'Astro configuration', issues)
@@ -151,34 +154,19 @@ function inspectExistingProject(target) {
 
     if (issues.length > 0) failSetup(issues)
 
-    return { manifest, astroConfig, contentConfig, jaadConfig }
+    return { manifest, manifestSource: source ?? null, astroConfig, contentConfig, jaadConfig }
 }
 
-/**
- * Adds what is missing rather than replacing. `type` is set only on a manifest
- * we create: adding it to someone's library would change how Node reads every
- * file in it, and `astro.config.mjs` is ESM either way.
- */
-function writeManifest(target, existing, name) {
-    const manifest = existing ?? { name, private: true, type: 'module' }
+/** Writes package.json only when it gains something: "created", "updated" or null. */
+function writeManifest(target, existing, source, name) {
+    const manifest = completeManifest(existing, {
+        name,
+        dependencies: { astro: ASTRO, '@jaamd/jaad': JAAD },
+    })
+    if (existing && JSON.stringify(manifest) === JSON.stringify(existing)) return null
 
-    manifest.scripts = {
-        dev: 'astro dev',
-        build: 'astro build',
-        preview: 'astro preview',
-        ...manifest.scripts,
-    }
-    const dependencies = { ...manifest.dependencies }
-    if (!('astro' in dependencies) && !('astro' in (manifest.devDependencies ?? {}))) {
-        dependencies.astro = ASTRO
-    }
-    if (!('@jaamd/jaad' in dependencies) && !('@jaamd/jaad' in (manifest.devDependencies ?? {}))) {
-        dependencies['@jaamd/jaad'] = JAAD
-    }
-
-    if (Object.keys(dependencies).length > 0) manifest.dependencies = dependencies
-
-    writeFileSync(manifestPath(target), JSON.stringify(manifest, null, 2) + '\n')
+    writeFileSync(manifestPath(target), formatManifest(manifest, source))
+    return existing ? 'updated' : 'created'
 }
 
 function answer(value) {
@@ -262,6 +250,7 @@ async function collectAnswers(args) {
         ? inspectExistingProject(target)
         : {
               manifest: null,
+              manifestSource: null,
               astroConfig: null,
               contentConfig: null,
               jaadConfig: null,
@@ -370,8 +359,8 @@ function scaffold(request) {
         write(target, destination, withTitle(source, title), written, skipped)
     }
 
-    writeManifest(target, manifest, basename(target))
-    return { written, skipped, found }
+    const manifestChange = writeManifest(target, manifest, existing.manifestSource, basename(target))
+    return { written, skipped, found, manifestChange }
 }
 
 async function main() {
@@ -407,12 +396,16 @@ async function main() {
         return
     }
 
-    const { written, skipped, found } = result
+    const { written, skipped, found, manifestChange } = result
     p.log.success(request.title)
-    p.log.step([...written.map((file) => `created  ${file}`), 'updated  package.json'].join('\n'))
+
+    const changed = written.map((file) => `created  ${file}`)
+    if (manifestChange) changed.push(`${manifestChange}  package.json`)
+    if (changed.length > 0) p.log.step(changed.join('\n'))
 
     const kept = [
         ...skipped.map((file) => `kept     ${file}`),
+        ...(manifestChange ? [] : ['kept     package.json']),
         ...(found > 0 ? [`found    ${found} markdown file(s) in docs/`] : []),
     ]
     if (kept.length > 0) p.log.info(kept.join('\n'))

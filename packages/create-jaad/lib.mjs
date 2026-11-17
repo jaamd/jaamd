@@ -107,6 +107,44 @@ export function packageManager() {
     return 'npm'
 }
 
+const SCRIPTS = {
+    dev: 'astro dev',
+    build: 'astro build',
+    preview: 'astro preview',
+}
+
+/**
+ * The manifest with what JAAD needs added: the missing scripts, after the
+ * existing ones, and the missing dependencies. `type` is set only on a manifest
+ * we create: adding it to someone's library would change how Node reads every
+ * file in it, and `astro.config.mjs` is ESM either way.
+ */
+export function completeManifest(existing, { name, dependencies }) {
+    const manifest = existing ? structuredClone(existing) : { name, private: true, type: 'module' }
+
+    const scripts = { ...manifest.scripts }
+    for (const [script, command] of Object.entries(SCRIPTS)) {
+        if (!(script in scripts)) scripts[script] = command
+    }
+    manifest.scripts = scripts
+
+    const declared = { ...manifest.devDependencies, ...manifest.dependencies }
+    const missing = Object.entries(dependencies).filter(([dependency]) => {
+        return !(dependency in declared)
+    })
+    if (missing.length > 0) {
+        manifest.dependencies = { ...manifest.dependencies, ...Object.fromEntries(missing) }
+    }
+
+    return manifest
+}
+
+/** The manifest as text, indented as the file it replaces. */
+export function formatManifest(manifest, source = null) {
+    const indent = source?.match(/^[ \t]+(?=")/m)?.[0] ?? 2
+    return JSON.stringify(manifest, null, indent) + '\n'
+}
+
 export function missingAnswers(args) {
     const missing = []
     if (!args.here && !args.dir) missing.push('directory ([directory] or --here)')
