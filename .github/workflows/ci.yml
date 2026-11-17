@@ -8,9 +8,10 @@ on:
         - cron: '0 6 * * 1'
     workflow_dispatch:
 
+# A newer push to a pull request replaces its run; every commit on main keeps its own.
 concurrency:
     group: ci-${{ github.ref }}
-    cancel-in-progress: true
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
     contents: read
