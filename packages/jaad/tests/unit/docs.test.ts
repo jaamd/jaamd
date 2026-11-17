@@ -3,6 +3,7 @@ import type { DocsUrlOptions } from '../../src/docs/urls.ts'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
+    editPathFor,
     formatChapterTitle,
     getCleanSlug,
     getDocCollectionId,
@@ -172,6 +173,21 @@ test('ordering and chapters read the path, without the locale', () => {
     const [page] = treeOf([source('it/02-guides/01-setup', { path: '02-guides/01-setup', locale: 'it' })]).pages
     assert.equal(page.chapter, 'guides')
     assert.equal(page.slug, 'guides/setup')
+})
+
+test('the edit path is the file on disk, capitals and all', () => {
+    assert.equal(editPathFor('docs/FAQ.md', 'docs', 'faq'), 'FAQ.md')
+    assert.equal(
+        editPathFor('docs/pt-BR/01-Images & Videos.md', './docs', 'pt-br/01-images--videos'),
+        'pt-BR/01-Images & Videos.md',
+    )
+    assert.equal(editPathFor('../packages/x/docs/01-a.md', '../packages/x/docs', '01-a'), '01-a.md')
+    assert.equal(editPathFor('FAQ.md', '.', 'faq'), 'FAQ.md')
+})
+
+test('without a file on record, the edit path falls back to the id', () => {
+    assert.equal(editPathFor(undefined, 'docs', 'it/guide'), 'it/guide.md')
+    assert.equal(editPathFor('elsewhere/a.md', 'docs', 'a'), 'a.md')
 })
 
 // ── Titles ───────────────────────────────────────────────────────────────────

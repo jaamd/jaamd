@@ -1,3 +1,4 @@
+import { posix } from 'node:path'
 import { slug as githubSlug } from 'github-slugger'
 import { ucfirst } from '../../site/helpers.ts'
 
@@ -84,4 +85,24 @@ export function slugToTitle(slug: string): string {
 export function formatChapterTitle(chapter: string | undefined): string | null {
     if (!chapter) return null
     return slugToTitle(chapter)
+}
+
+/**
+ * A page's file below its docs directory, for the edit link. `filePath` is what
+ * Astro's glob loader records, relative to the project; ids are slugged, so
+ * `FAQ.md` would come back as `faq`. `fallback`, the id path, serves when the
+ * loader records no file or the file sits outside `dir`.
+ */
+export function editPathFor(filePath: string | undefined, dir: string, fallback: string): string {
+    const guess = `${fallback}.md`
+    if (!filePath) {
+        return guess
+    }
+
+    const file = posix.normalize(filePath.replaceAll('\\', '/'))
+    const root = posix.normalize(dir.replaceAll('\\', '/')).replace(/\/+$/, '')
+    if (root === '.') {
+        return file
+    }
+    return file.startsWith(`${root}/`) ? file.slice(root.length + 1) : guess
 }
