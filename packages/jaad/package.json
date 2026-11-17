@@ -40,9 +40,8 @@
         "access": "public"
     },
     "scripts": {
-        "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tailwindcss -i ./src/styles.css -o ./dist/jaad.css",
+        "build": "tailwindcss -i ./src/styles.css -o ./dist/jaad.css",
         "prepare": "pnpm build",
-        "prepack": "pnpm build",
         "check": "astro check && tsc --noEmit -p tests",
         "test": "node --test \"tests/unit/**/*.test.ts\" \"tests/unit/**/*.test.mjs\"",
         "test:consumer": "pnpm --filter \"@jaamd/jaad...\" run build && node --test \"tests/consumer/**/*.test.mjs\"",
@@ -55,6 +54,7 @@
         "yaml": "^2.9.1"
     },
     "devDependencies": {
+        "@astrojs/check": "^0.9.12",
         "@tailwindcss/cli": "^4.3.3",
         "tailwindcss": "^4.3.3"
     },
