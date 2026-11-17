@@ -74,5 +74,6 @@ export function enhance(root: ParentNode | string = DEFAULT_SELECTOR, options: E
 }
 
 export { DEFAULT_SELECTOR }
+export { initToc, type TocOptions } from './modules/toc.ts'
 export type { Feature, Features } from '../features.ts'
 export type { Labels } from '../markup.ts'

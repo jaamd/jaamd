@@ -348,3 +348,38 @@ test("the cleanup of an earlier TOC run leaves a later run's observer alone", as
         })
     }
 })
+
+test('a selector points the TOC watching at navs of another markup', async () => {
+    const { initToc } = await import('../src/client/index.ts')
+
+    const observed: Element[] = []
+    class FakeObserver {
+        observe(target: Element) {
+            observed.push(target)
+        }
+        disconnect() {}
+    }
+    Object.defineProperty(globalThis, 'IntersectionObserver', { value: FakeObserver, configurable: true })
+
+    const root = document.createElement('div')
+    root.innerHTML = '<h2 id="setup">Setup</h2><nav id="side"><a href="#setup">Setup</a></nav>'
+    document.body.append(root)
+
+    try {
+        initToc(root as unknown as ParentNode)()
+        assert.equal(observed.length, 0, 'a nav without the JAAMD class was watched by default')
+
+        const stop = initToc(root as unknown as ParentNode, { selector: '#side' })
+        assert.deepEqual(
+            observed.map((target) => target.id),
+            ['setup'],
+        )
+        stop()
+    } finally {
+        root.remove()
+        Object.defineProperty(globalThis, 'IntersectionObserver', {
+            value: window.IntersectionObserver,
+            configurable: true,
+        })
+    }
+})

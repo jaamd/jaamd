@@ -68,3 +68,34 @@ Opt a standalone image out with `data-no-lightbox`:
 ```html
 <img src="/diagram.svg" alt="Architecture diagram" data-no-lightbox />
 ```
+
+## A table of contents of your own
+
+`initToc()` gives a navigation you render yourself, such as a sidebar outline,
+the marking `:::toc` gets: the link of the section in view carries
+`aria-current="location"`. Pass a selector for your navs; each link to a
+`#heading` on the page is watched. It returns the function that stops the
+watching:
+
+```astro
+<nav id="outline">
+    <a href="#install">Install</a>
+    <a href="#usage">Usage</a>
+</nav>
+
+<script>
+    import { initToc } from '@jaamd/astro/client'
+
+    let stop
+    function watch() {
+        stop?.()
+        stop = initToc(document, { selector: '#outline' })
+    }
+    watch()
+    document.addEventListener('astro:page-load', watch)
+</script>
+```
+
+The section in view is the topmost heading in a band of the window: from where
+an anchored heading comes to rest, its `scroll-margin-top`, down to 30% of the
+height.
