@@ -2,18 +2,42 @@
  *  shows up on screen. */
 
 import assert from 'node:assert/strict'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, test } from 'node:test'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { bundledThemes } from 'shiki'
-import { render, TOKENS } from '../scripts/themes.mjs'
+import { render } from '../scripts/themes.mjs'
 import { REQUIRED_TOKENS, themes } from '../src/themes/index.ts'
 
 const LEVELS = ['recessed', 'base', 'surface', 'overlay', 'text', 'bright', 'primary', 'primaryLight', 'accent']
 const ALERTS = ['note', 'tip', 'important', 'warning', 'caution']
 
 const THEMES = fileURLToPath(new URL('../src/themes', import.meta.url))
+
+/** The light defaults: every variable JAAMD reads, and how it gets its value. */
+const DEFAULTS = (() => {
+    const css = readFileSync(fileURLToPath(new URL('../src/styles/variables.css', import.meta.url)), 'utf8')
+    const light = css.slice(0, css.indexOf('html.dark'))
+    const declarations = [...light.matchAll(/^\s*(--jaamd-[a-z0-9-]+)\s*:\s*([^;]+);/gm)].map((match) => {
+        return [match[1], match[2].trim()] as const
+    })
+    return new Map(declarations)
+})()
+
+/** The custom properties a block declares. */
+const declared = (block: string) =>
+    [...block.matchAll(/^\s*(--[a-z0-9-]+)\s*:/gm)].map((match) => {
+        return match[1]
+    })
+
+test('the tokens a theme must declare are the seeds the defaults derive from', () => {
+    const notSeeds = REQUIRED_TOKENS.filter((token) => {
+        const value = DEFAULTS.get(token)
+        return value === undefined || /var\(|color-mix\(/.test(value)
+    })
+    assert.deepEqual(notSeeds, [])
+})
 
 const directories = readdirSync(THEMES, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -59,12 +83,16 @@ for (const theme of themes) {
             const blocks = dual ? index.split(/^html\.dark \{$/m) : [index]
             assert.equal(blocks.length, dual ? 2 : 1)
 
-            const declares = (block: string, token: string) => new RegExp(`^\\s*${token}\\s*:`, 'm').test(block)
-            const missing = blocks.flatMap((block) => [
-                ...REQUIRED_TOKENS.filter((token) => !declares(block, token)),
-                ...TOKENS.map((token: string) => `--jaamd-${token}`).filter((token: string) => !declares(block, token)),
-            ])
+            const missing = blocks.flatMap((block) => {
+                return REQUIRED_TOKENS.filter((token) => !declared(block).includes(token))
+            })
             assert.deepEqual([...new Set(missing)], [])
+
+            // A misspelt or retired name would build, and change nothing on screen.
+            const unknown = blocks.flatMap((block) => {
+                return declared(block).filter((token) => !DEFAULTS.has(token))
+            })
+            assert.deepEqual([...new Set(unknown)], [])
 
             // A dual theme already covers dark mode: it has no /dark variant.
             assert.equal(dark === null, dual)
