@@ -6,14 +6,17 @@ import '../styles/site.css'
 interface Props {
     title?: string
     description?: string
+    /** A page served at any missing address, so it has no url of its own to give. */
+    notFound?: boolean
 }
 
 const {
     title,
     description = 'Markdown, refined: alerts, code tabs, a table of contents, spoilers, heading anchors, copy buttons, a lightbox and themes.',
+    notFound = false,
 } = Astro.props
 const pageTitle = title ? `${title} | JAAMD` : 'JAAMD'
-const canonical = new URL(Astro.url.pathname, Astro.site).href
+const canonical = notFound ? null : new URL(Astro.url.pathname, Astro.site).href
 const ogImage = new URL('/og-image.png', Astro.site).href
 
 // Before paint: the page follows the system's colour scheme.
@@ -32,14 +35,14 @@ const darkScript = `(function () {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{pageTitle}</title>
         <meta name="description" content={description} />
-        <link rel="canonical" href={canonical} />
+        {canonical ? <link rel="canonical" href={canonical} /> : <meta name="robots" content="noindex" />}
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <Font cssVariable="--font-inter" preload />
         <Font cssVariable="--font-merriweather" preload />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={description} />
-        <meta property="og:url" content={canonical} />
+        {canonical && <meta property="og:url" content={canonical} />}
         <meta property="og:image" content={ogImage} />
         <meta name="twitter:card" content="summary_large_image" />
         <script is:inline set:html={darkScript} />

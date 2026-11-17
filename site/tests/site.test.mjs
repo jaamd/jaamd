@@ -45,8 +45,18 @@ test('the documentation is no longer built here', () => {
     assert.match(page('llms.txt'), /https:\/\/docs\.jaamd\.org\/llms\.txt/)
 })
 
-test('a wrong url gets the site page', () => {
-    assert.match(page('404.html'), /<title>404 \| JAAMD<\/title>/)
+test('a wrong url gets the site page, which names no url of its own', () => {
+    const notFound = page('404.html')
+    assert.match(notFound, /<title>404 \| JAAMD<\/title>/)
+    assert.doesNotMatch(notFound, /rel="canonical"|property="og:url"/)
+    assert.match(notFound, /<meta name="robots" content="noindex">/)
+    assert.match(home(), /<link rel="canonical" href="https:\/\/jaamd\.org\/">/)
+})
+
+test('robots.txt names no sitemap the build does not write', () => {
+    for (const [, url] of page('robots.txt').matchAll(/^Sitemap:\s*(\S+)/gm)) {
+        assert.ok(existsSync(join(DIST, new URL(url).pathname)), url)
+    }
 })
 
 const resolves = (path) =>
