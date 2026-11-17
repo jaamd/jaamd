@@ -12,13 +12,16 @@ concurrency:
     group: ci-${{ github.ref }}
     cancel-in-progress: true
 
+permissions:
+    contents: read
+
 jobs:
     static:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v7
-            - uses: pnpm/action-setup@v6
-            - uses: actions/setup-node@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: '24'
                   cache: pnpm
@@ -31,11 +34,11 @@ jobs:
     packages:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   fetch-depth: 0
-            - uses: pnpm/action-setup@v6
-            - uses: actions/setup-node@v7
+            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: '24'
                   cache: pnpm
@@ -49,18 +52,25 @@ jobs:
                     echo "filter=--filter=...[origin/$GITHUB_BASE_REF]" >> "$GITHUB_OUTPUT"
                   fi
 
-            - run: pnpm -r ${{ steps.scope.outputs.filter }} --if-present run check
-            - run: pnpm -r ${{ steps.scope.outputs.filter }} --if-present run test
+            # The filter goes through the environment: a step output never becomes shell source.
+            - run: pnpm -r $FILTER --if-present run check
+              env:
+                  FILTER: ${{ steps.scope.outputs.filter }}
+            - run: pnpm -r $FILTER --if-present run test
+              env:
+                  FILTER: ${{ steps.scope.outputs.filter }}
             # Builds each fixture, jaamd's on Sätteri and unified, and the site.
-            - run: pnpm -r ${{ steps.scope.outputs.filter }} --if-present run test:build
+            - run: pnpm -r $FILTER --if-present run test:build
+              env:
+                  FILTER: ${{ steps.scope.outputs.filter }}
 
     # Packs the tarballs and installs them into throwaway projects.
     consumer:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v7
-            - uses: pnpm/action-setup@v6
-            - uses: actions/setup-node@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: '24'
                   cache: pnpm
@@ -74,9 +84,9 @@ jobs:
         runs-on: ubuntu-latest
         continue-on-error: true
         steps:
-            - uses: actions/checkout@v7
-            - uses: pnpm/action-setup@v6
-            - uses: actions/setup-node@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: '24'
                   cache: pnpm
