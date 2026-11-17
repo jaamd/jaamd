@@ -27,13 +27,13 @@ their own layout, styles and metadata.
 
 ## Identity
 
-| Option        | Type     | Default        | Description                                       |
-| ------------- | -------- | -------------- | ------------------------------------------------- |
-| `title`       | `string` | none           | **Required.** Site name and metadata              |
-| `description` | `string` | `package.json` | Site description                                  |
-| `lang`        | `string` | `"en"`         | Site language, and the default when localised     |
-| `logo`        | `string` | none           | Public path or URL shown instead of the site name |
-| `homeLink`    | `string` | `"/"`          | Where the site name in the header leads           |
+| Option        | Type     | Default        | Description                                          |
+| ------------- | -------- | -------------- | ---------------------------------------------------- |
+| `title`       | `string` | none           | **Required.** Site name and metadata                 |
+| `description` | `string` | `package.json` | Site description                                     |
+| `lang`        | `string` | `"en"`         | Language tag, as `pt-BR`; the default when localised |
+| `logo`        | `string` | none           | Public path or URL shown instead of the site name    |
+| `homeLink`    | `string` | `"/"`          | Where the site name in the header leads              |
 
 A source file path passed to `logo` produces a build error. Use a public path
 such as `/logo.svg`.

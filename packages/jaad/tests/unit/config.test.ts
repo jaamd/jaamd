@@ -19,6 +19,16 @@ test('title is the only thing you must supply', () => {
     assert.deepEqual(config.social, {})
 })
 
+test('lang has to be a language tag', () => {
+    assert.equal(bare({ lang: 'pt-BR' }).lang, 'pt-BR')
+    assert.throws(() => bare({ lang: 'en_US' }), /lang must be a language tag/)
+})
+
+test('a public url is root-relative or http(s), never protocol-relative', () => {
+    assert.equal(bare({ logo: '/logo.svg' }).logo, '/logo.svg')
+    assert.throws(() => bare({ logo: '//evil.example/logo.svg' }), /logo must be a public url/)
+})
+
 test("astro passthrough keeps Astro's option types", () => {
     const config = defineJaadConfig({
         title: 'T',
