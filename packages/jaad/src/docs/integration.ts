@@ -1,5 +1,6 @@
 import type { JaadResolvedConfig } from '../config.ts'
 import type { DocsRoot } from './config.ts'
+import type { DocLinkContext } from './links.ts'
 import type { AstroIntegration } from 'astro'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
@@ -175,9 +176,16 @@ export function setupDocs(
     }
     for (const { dir } of roots) addWatchFile(pathToFileURL(dir))
 
-    const links = {
+    const warnedDrafts = new Set<string>()
+    const links: DocLinkContext = {
         roots,
         locales,
+        onDraftLink(from, href) {
+            const key = `${from}\0${href}`
+            if (warnedDrafts.has(key)) return
+            warnedDrafts.add(key)
+            logger.warn(`${relative(root, from)} links to ${href}, a draft: a production build leaves it out.`)
+        },
         urls: (locale?: string): DocsUrlOptions => ({
             docsBase: config.docs.base,
             deploymentBase: normaliseBasePath(astroConfig.base),
