@@ -423,12 +423,13 @@ async function main() {
 
     const pm = packageManager()
     if (request.install) {
-        const installed = spawnSync(pm, ['install'], {
-            cwd: request.target,
-            stdio: 'inherit',
-            // npm and pnpm are .cmd shims on Windows.
-            shell: process.platform === 'win32',
-        })
+        const options = { cwd: request.target, stdio: 'inherit' }
+        // npm and pnpm are .cmd shims on Windows, run through a shell, which
+        // takes one command line rather than an argument list.
+        const installed =
+            process.platform === 'win32'
+                ? spawnSync(`${pm} install`, { ...options, shell: true })
+                : spawnSync(pm, ['install'], options)
         if (installed.status !== 0) {
             p.log.error(installed.error ? `could not run ${pm}: ${installed.error.message}` : `${pm} install failed.`)
             process.exitCode = 1

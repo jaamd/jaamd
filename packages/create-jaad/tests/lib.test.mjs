@@ -43,6 +43,12 @@ test('--here and a directory are mutually exclusive', () => {
     assert.throws(() => parseArgs(['a', 'b']), /only one directory/)
 })
 
+test('the -- npm leaves in place is no directory', () => {
+    const args = parseArgs(['my-docs', '--', '--template', 'site'])
+    assert.equal(args.dir, 'my-docs')
+    assert.equal(args.template, 'site')
+})
+
 // ── The current directory, however it is spelled ─────────────────────────────
 
 test('every spelling of the current directory becomes --here', () => {

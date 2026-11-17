@@ -4,7 +4,9 @@ import { join, resolve } from 'node:path'
 export const TEMPLATES = ['docs', 'site']
 export const DEFAULT_TEMPLATE = 'docs'
 
-export const HELP = `Usage: npm create @jaamd/jaad@latest [directory] [options]
+export const HELP = `Usage: npm create @jaamd/jaad@latest [directory] -- [options]
+
+npm hands options on only after --; pnpm, yarn and bun need no --.
 
   --here                    Set up JAAD in the current directory.
   --template <docs|site>    Docs at / (default), or a landing page with
@@ -57,6 +59,8 @@ export function parseArgs(argv) {
 
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
+        // What npm leaves behind when it hands the options on.
+        if (arg === '--') continue
         if (arg === '--here') args.here = true
         else if (arg === '--template') args.template = takeValue(argv, i++, arg)
         else if (arg === '--title') args.title = takeValue(argv, i++, arg)
