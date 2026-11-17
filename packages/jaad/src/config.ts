@@ -1,6 +1,7 @@
 import type { AstroUserConfig, FontProvider, Locales, SessionDriverConfig } from 'astro'
 import { z } from 'astro/zod'
 import { docsConfigShape, resolveDocsConfig, type DocsResolvedConfig } from './docs/config.ts'
+import { toProjectPaths, type ProjectPaths } from './paths.ts'
 import { resolveSiteConfig, siteConfigShape, type SiteResolvedConfig } from './site/config.ts'
 import { inferRepo } from './site/infer.ts'
 import { describeLocale } from './site/locales.ts'
@@ -30,7 +31,7 @@ const FORWARDED = ['site', 'base', 'astro']
 
 /** Unknown keys are rejected here: zod would strip a misspelt option in
  *  silence. Both messages are read in a terminal, not parsed. */
-function parseConfig(options: JaadUserConfig): JaadConfig {
+export function parseConfig(options: JaadUserConfig): JaadConfig {
     const known = new Set([...OPTIONS, ...FORWARDED])
     const unknown = Object.keys(options).filter((key) => !known.has(key))
 
@@ -54,10 +55,16 @@ function parseConfig(options: JaadUserConfig): JaadConfig {
     )
 }
 
-export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd()): JaadResolvedConfig {
+/** The config with what the project tells: repository, locales, public assets.
+ *  `project` is a root, or the directories Astro resolved. */
+export function resolveConfig(
+    options: JaadUserConfig,
+    project: ProjectPaths | string = process.cwd(),
+): JaadResolvedConfig {
+    const paths = toProjectPaths(project)
     const config = parseConfig(options)
-    const repo = inferRepo(cwd)
-    const { docs, locales } = resolveDocsConfig(config, config.lang, options.docsDir !== undefined, repo, cwd)
+    const repo = inferRepo(paths.root)
+    const { docs, locales } = resolveDocsConfig(config, config.lang, options.docsDir !== undefined, repo, paths.root)
     const {
         docsDir: _docsDir,
         routeBase: _routeBase,
@@ -69,7 +76,7 @@ export function resolveConfig(options: JaadUserConfig, cwd: string = process.cwd
 
     return {
         ...siteOptions,
-        ...resolveSiteConfig(siteOptions, repo, cwd),
+        ...resolveSiteConfig(siteOptions, repo, paths),
         locales: locales.map(describeLocale),
         defaultLocale: locales.length > 0 ? config.lang.toLowerCase() : config.lang,
         fonts: (options.astro?.fonts ?? []).map((font) => font.cssVariable),

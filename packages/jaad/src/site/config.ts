@@ -4,6 +4,7 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { z } from 'astro/zod'
+import { toProjectPaths, type ProjectPaths } from '../paths.ts'
 import { inferDescription, type RepoInfo } from './infer.ts'
 import { PRESETS, PRESET_NAMES, isPreset } from './themes.ts'
 
@@ -115,25 +116,30 @@ export interface SiteResolvedConfig extends SiteConfig {
 const FAVICONS = ['favicon.svg', 'favicon.ico', 'favicon.png']
 const OG_IMAGES = ['og-image.png', 'og-image.jpg', 'og-image.jpeg', 'og-image.webp']
 
-function findPublicAsset(cwd: string, candidates: string[]): string | null {
+function findPublicAsset(publicDir: string, candidates: string[]): string | null {
     for (const name of candidates) {
-        if (existsSync(join(cwd, 'public', name))) return `/${name}`
+        if (existsSync(join(publicDir, name))) return `/${name}`
     }
     return null
+}
+
+/** What jaamd gets for code blocks: a preset's Shiki theme, or the pair given. */
+export function shikiTheme(config: Pick<SiteConfig, 'theme'>): SiteResolvedConfig['shiki'] {
+    return typeof config.theme === 'string' ? PRESETS[config.theme].shiki : config.theme
 }
 
 /** The fields the site derives from its options and the project. */
 export function resolveSiteConfig(
     config: SiteConfig,
     repo: RepoInfo | null,
-    cwd: string,
+    paths: ProjectPaths,
 ): Pick<SiteResolvedConfig, 'description' | 'repoUrl' | 'favicon' | 'ogImage' | 'shiki'> {
     return {
-        description: config.description ?? inferDescription(cwd) ?? undefined,
+        description: config.description ?? inferDescription(paths.root) ?? undefined,
         repoUrl: repo?.url ?? null,
-        favicon: findPublicAsset(cwd, FAVICONS),
-        ogImage: config.ogImage ?? findPublicAsset(cwd, OG_IMAGES) ?? false,
-        shiki: typeof config.theme === 'string' ? PRESETS[config.theme].shiki : config.theme,
+        favicon: findPublicAsset(paths.publicDir, FAVICONS),
+        ogImage: config.ogImage ?? findPublicAsset(paths.publicDir, OG_IMAGES) ?? false,
+        shiki: shikiTheme(config),
     }
 }
 
@@ -144,14 +150,14 @@ const styleInPackage = (name: string) => fileURLToPath(new URL(`./styles/${name}
 /** Absolute paths, kept off the resolved config, which gets serialised. */
 export function resolveStylesheets(
     config: SiteConfig,
-    cwd: string = process.cwd(),
+    project: ProjectPaths | string = process.cwd(),
 ): {
     user: string | null
     theme: string | null
     bridge: string
     tailwind: string | null
 } {
-    const userCss = join(cwd, 'src', 'jaad.css')
+    const userCss = join(toProjectPaths(project).srcDir, 'jaad.css')
     const slug = typeof config.theme === 'string' ? PRESETS[config.theme].theme : null
 
     return {

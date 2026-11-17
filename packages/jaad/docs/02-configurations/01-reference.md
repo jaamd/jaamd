@@ -195,6 +195,11 @@ pages, `Page` pages and a custom `DocsFrame`; see
 | Sitemap                                   | Generated when `site` is set                      |
 | Search index, `llms.txt` and raw Markdown | Generated below `routeBase`                       |
 
+`public/` and `src/` are Astro's `publicDir` and `srcDir`, and every path is
+read from the project's `root`, so `astro build --root` and custom directories
+are followed. `site` counts wherever it is set, in the JAAD config or in
+Astro's.
+
 ## Extending Astro
 
 | Option  | Type              | Default |

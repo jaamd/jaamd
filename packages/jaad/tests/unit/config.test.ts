@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { test, type TestContext } from 'node:test'
 import { fontProviders } from 'astro/config'
 import { defineJaadConfig, resolveConfig } from '../../src/config.ts'
+import { resolveStylesheets } from '../../src/site/config.ts'
 
 // Resolved outside a repository, so nothing is inferred and the defaults show.
 const bare = (over = {}) => resolveConfig({ title: 'T', ...over }, '/')
@@ -236,6 +237,22 @@ test('a social image is inferred only when the public asset exists', (t) => {
     writeFileSync(join(cwd, 'public', 'og-image.webp'), 'image')
     assert.equal(resolveConfig({ title: 'T' }, cwd).ogImage, '/og-image.webp')
     assert.equal(resolveConfig({ title: 'T', ogImage: false }, cwd).ogImage, false)
+})
+
+test("public assets and jaad.css are found in Astro's directories, not below the working one", (t) => {
+    const root = mkdtempSync(join(tmpdir(), 'jaad-paths-'))
+    t.after(() => {
+        rmSync(root, { recursive: true })
+    })
+    mkdirSync(join(root, 'static'))
+    mkdirSync(join(root, 'source'))
+    writeFileSync(join(root, 'static', 'favicon.svg'), '<svg/>')
+    writeFileSync(join(root, 'source', 'jaad.css'), '')
+
+    const paths = { root, publicDir: join(root, 'static'), srcDir: join(root, 'source') }
+    const config = resolveConfig({ title: 'T' }, paths)
+    assert.equal(config.favicon, '/favicon.svg')
+    assert.equal(resolveStylesheets(config, paths).user, join(root, 'source', 'jaad.css'))
 })
 
 test('an explicit social image has to be a public url', () => {

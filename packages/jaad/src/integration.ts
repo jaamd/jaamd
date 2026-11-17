@@ -1,24 +1,38 @@
-import type { JaadResolvedConfig } from './config.ts'
+import type { JaadUserConfig } from './config.ts'
 import type { IntegrationState } from './docs/integration.ts'
-import type { SiteStylesheets } from './site/virtual.ts'
 import type { AstroIntegration } from 'astro'
-import { setupDocs } from './docs/integration.ts'
+import { fileURLToPath } from 'node:url'
+import sitemap from '@astrojs/sitemap'
+import { resolveConfig } from './config.ts'
+import { createSitemapFilter, setupDocs } from './docs/integration.ts'
+import { resolveStylesheets } from './site/config.ts'
 import { setupSite } from './site/integration.ts'
 import { normaliseBasePath } from './site/urls.ts'
 
-/** The site, then the docs on it. */
-export function createJaadIntegration(
-    config: JaadResolvedConfig,
-    stylesheets: SiteStylesheets,
-    state: IntegrationState,
-    discoverAliases: boolean,
-): AstroIntegration {
+/** The site, then the docs on it, resolved against the project Astro loaded. */
+export function createJaadIntegration(options: JaadUserConfig, state: IntegrationState): AstroIntegration {
     return {
         name: 'jaad',
         hooks: {
             'astro:config:setup': (params) => {
-                setupSite(params, config, stylesheets)
-                setupDocs(params, config, state, discoverAliases)
+                const { config: astroConfig, updateConfig } = params
+                const paths = {
+                    root: fileURLToPath(astroConfig.root),
+                    publicDir: fileURLToPath(astroConfig.publicDir),
+                    srcDir: fileURLToPath(astroConfig.srcDir),
+                }
+
+                const config = resolveConfig(options, paths)
+                const hasSite = Boolean(astroConfig.site)
+
+                setupSite(params, config, resolveStylesheets(config, paths))
+                setupDocs(params, config, state, hasSite)
+
+                // `site` may come from Astro's own config: read once it is merged.
+                if (hasSite) {
+                    const filter = createSitemapFilter(config.docs.base, state, config.defaultLocale)
+                    updateConfig({ integrations: [sitemap({ filter })] })
+                }
             },
 
             'astro:config:done': ({ config: astroConfig, injectTypes }) => {
