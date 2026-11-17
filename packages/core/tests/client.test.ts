@@ -130,7 +130,27 @@ test('a click selects a tab and reveals a spoiler', () => {
     const spoiler = root.querySelector('.jaamd-spoiler')
     click(spoiler)
     assert.ok(spoiler?.hasAttribute('data-revealed'))
-    assert.equal(spoiler?.getAttribute('aria-expanded'), 'true')
+
+    dispose()
+})
+
+test('a revealed spoiler is plain content again, and a click inside keeps it so', () => {
+    const root = mount()
+    root.insertAdjacentHTML('beforeend', '<div class="jaamd-spoiler"><p>See <a href="#x">this</a>.</p></div>')
+    const dispose = enhance(root)
+
+    const spoiler = root.querySelector('div.jaamd-spoiler')!
+    assert.equal(spoiler.getAttribute('role'), 'button')
+    assert.equal(spoiler.getAttribute('aria-expanded'), 'false')
+
+    click(spoiler)
+    assert.ok(spoiler.hasAttribute('data-revealed'))
+    assert.equal(spoiler.getAttribute('role'), null, 'the content is still read as a button label')
+    assert.equal(spoiler.getAttribute('aria-label'), null)
+    assert.equal(spoiler.getAttribute('tabindex'), '-1')
+
+    click(spoiler.querySelector('a'))
+    assert.ok(spoiler.hasAttribute('data-revealed'), 'a click on a link hid the spoiler again')
 
     dispose()
 })

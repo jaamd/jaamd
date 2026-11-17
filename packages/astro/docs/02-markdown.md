@@ -122,7 +122,9 @@ With a sticky header, raise `--jaamd-scroll-margin-top` (default `80px`).
 ## Spoilers
 
 Text hidden until the reader activates it, inline or as a block. Spoilers are
-reachable from the keyboard and hide again on reload.
+reachable from the keyboard. Once revealed, a spoiler stays open, and its
+links and text work as anywhere else; it hides again on reload. Without
+JavaScript, spoilers are shown.
 
 ```markdown
 The answer is :spoiler[42].
