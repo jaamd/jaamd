@@ -7,6 +7,8 @@
         "binding": "ASSETS",
         "not_found_handling": "404-page",
         "html_handling": "auto-trailing-slash",
-        "run_worker_first": ["/*"],
+        // Pages go through the Worker for redirects and Markdown; the hashed
+        // build assets need neither, and are served without it.
+        "run_worker_first": ["/*", "!/_astro/*"],
     },
 }
