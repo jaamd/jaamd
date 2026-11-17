@@ -1,22 +1,15 @@
 import assert from 'node:assert/strict'
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { brokenLinks, readBuilt, walk } from '../../tests/dist.mjs'
 import { MARKDOWN_SOURCES, MOVED } from '../worker.ts'
 
 const DIST = fileURLToPath(new URL('../dist', import.meta.url))
 const PACKAGES = fileURLToPath(new URL('../../packages', import.meta.url))
 
-function walk(dir) {
-    if (!existsSync(dir)) throw new Error(`no build at ${dir}: run the build first`)
-    return readdirSync(dir).flatMap((entry) => {
-        const path = join(dir, entry)
-        return statSync(path).isDirectory() ? walk(path) : [path]
-    })
-}
-
-const page = (relative) => readFileSync(join(DIST, relative), 'utf8')
+const page = (relative) => readBuilt(DIST, relative)
 
 /** The url of every markdown file of a package: its section, then its clean path. */
 const urlsOf = (section, pkg) => {
@@ -88,21 +81,8 @@ test('llms.txt indexes both sections at the root', () => {
     assert.match(llms, /https:\/\/docs\.jaamd\.org\/jaad\/getting-started\/installation\.md/)
 })
 
-const resolves = (path) =>
-    [join(DIST, path), join(DIST, path, 'index.html'), join(DIST, `${path}.html`)].some(
-        (file) => existsSync(file) && !file.endsWith('/'),
-    )
-
 test('every internal link points at a built page', () => {
-    const broken = walk(DIST)
-        .filter((file) => file.endsWith('.html'))
-        .flatMap((file) =>
-            [...readFileSync(file, 'utf8').matchAll(/href="(\/(?!\/)[^"#?]*)/g)]
-                .map((m) => decodeURI(m[1]))
-                .filter((href) => !resolves(href))
-                .map((href) => `${file.slice(DIST.length)} → ${href}`),
-        )
-    assert.deepEqual([...new Set(broken)], [])
+    assert.deepEqual(brokenLinks(DIST), [])
 })
 
 const pageFile = (href) => join(DIST, href, 'index.html')
