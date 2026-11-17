@@ -106,23 +106,88 @@ export function spoilerData(tagName: 'span' | 'div'): Data {
     return asHast({ className: [CLASS.spoiler] }, tagName)
 }
 
-/** Tab label: meta, then language, then "Tab N". */
+/** Where the annotations of a code meta start: `{1,3}`, `/word/` or `key=value`. */
+const META_ANNOTATION = /(?:^|\s)(?=\{|\/|[\w-]+=)/
+
+/**
+ * A code tab's meta, split into the label written first and the annotations
+ * after it, which stay on the code block for the highlighter:
+ * `npm {1}` is the label "npm" with `{1}` left on the block.
+ */
+export function splitCodeTabMeta(meta: string | null | undefined): { label: string; annotations: string | null } {
+    if (!meta) {
+        return { label: '', annotations: null }
+    }
+
+    const at = meta.search(META_ANNOTATION)
+    if (at === -1) {
+        return { label: meta.trim(), annotations: null }
+    }
+
+    const annotations = meta.slice(at).trim()
+    return { label: meta.slice(0, at).trim(), annotations: annotations || null }
+}
+
+/** Tab label: the meta's label, then language, then "Tab N". */
 export function codeTabLabel(code: { meta?: string | null; lang?: string | null }, i: number): string {
-    return code.meta || code.lang || `Tab ${i + 1}`
+    return splitCodeTabMeta(code.meta).label || code.lang || `Tab ${i + 1}`
+}
+
+/** FNV-1a, 32-bit, in base 36. */
+function hash(text: string): string {
+    let value = 0x811c9dc5
+    for (const char of text) {
+        value ^= char.codePointAt(0)!
+        value = Math.imul(value, 0x01000193)
+    }
+    return (value >>> 0).toString(36)
 }
 
 /**
- * Id of one `:::code-tabs` group: a hash of its position and code, so groups
- * from different documents on one page do not collide.
+ * Id of one `:::code-tabs` group: a hash of the document's source and the
+ * group's position in it. Groups of two documents on one page differ unless
+ * the two documents are the same.
  */
-export function codeTabsGroupId(index: number, codes: string[]): string {
-    // FNV-1a, 32-bit.
-    let hash = 0x811c9dc5
-    for (const char of `${index}\0${codes.join('\0')}`) {
-        hash ^= char.codePointAt(0)!
-        hash = Math.imul(hash, 0x01000193)
+export function codeTabsGroupId(source: string, index: number): string {
+    return `${ID.codeTabs}${hash(`${index}\0${source}`)}`
+}
+
+/** The `[label]` remark-directive and Sätteri put in a flagged paragraph. */
+function isDirectiveLabel(node: { type: string; data?: unknown }): boolean {
+    const data = node.data as { directiveLabel?: boolean } | undefined
+    return node.type === 'paragraph' && data?.directiveLabel === true
+}
+
+/**
+ * The children of a `:::code-tabs` block, sorted into tabs: each code block
+ * opens one, and what follows it up to the next goes in its panel. What comes
+ * before the first code block stays ahead of the tabs; a `[label]` is dropped.
+ */
+export function groupCodeTabs<N extends { type: string; data?: unknown }, C extends N>(
+    children: readonly N[],
+    isCode: (node: N) => node is C,
+): { leading: N[]; tabs: { code: C; after: N[] }[] } {
+    const leading: N[] = []
+    const tabs: { code: C; after: N[] }[] = []
+
+    for (const child of children) {
+        if (isCode(child)) {
+            tabs.push({ code: child, after: [] })
+            continue
+        }
+        if (isDirectiveLabel(child)) {
+            continue
+        }
+
+        const current = tabs.at(-1)
+        if (current) {
+            current.after.push(child)
+        } else {
+            leading.push(child)
+        }
     }
-    return `${ID.codeTabs}${(hash >>> 0).toString(36)}`
+
+    return { leading, tabs }
 }
 
 /** HTML around the code blocks of one `:::code-tabs` group. */
