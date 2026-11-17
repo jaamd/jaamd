@@ -88,6 +88,3 @@ export function resolveConfig(
 export function defineJaadConfig(config: JaadUserConfig): JaadUserConfig {
     return config
 }
-
-export type { DocsResolvedConfig, DocsRoot, DocsSection } from './docs/config.ts'
-export type { SiteResolvedConfig } from './site/config.ts'

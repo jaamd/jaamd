@@ -1,6 +1,6 @@
 ---
 import config from 'virtual:jaad/config'
-import { formatChapterTitle } from '../model/ids.ts'
+import { slugToTitle } from '../model/ids.ts'
 import { docsUrls } from '../runtime.ts'
 import { docsPageHref } from '../urls.ts'
 
@@ -25,7 +25,7 @@ const base = site ? docsPageHref('', docsUrls(locale)) : null
 const crumbs = base
     ? [
           { name: config.title, url: new URL(base, Astro.url.origin).href },
-          ...(chapter ? [{ name: formatChapterTitle(chapter)!, url: null }] : []),
+          ...(chapter ? [{ name: slugToTitle(chapter), url: null }] : []),
           { name: title, url: Astro.url.href },
       ]
     : []

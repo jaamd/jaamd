@@ -1,6 +1,6 @@
 ---
 import type { DocsNavEntry, DocsNavGroup } from '../navigation.ts'
-import { formatChapterTitle } from '../model/ids.ts'
+import { slugToTitle } from '../model/ids.ts'
 
 interface Props {
     groups: DocsNavGroup[]
@@ -34,7 +34,7 @@ const blocks = [
                         </li>
                     ) : (
                         <li class="docs-sidebar-chapter">
-                            <p class="docs-sidebar-chapter-title">{formatChapterTitle(entry.chapter)}</p>
+                            <p class="docs-sidebar-chapter-title">{slugToTitle(entry.chapter)}</p>
                             <ul class="docs-sidebar-list">
                                 {entry.items.map((item) => (
                                     <li>

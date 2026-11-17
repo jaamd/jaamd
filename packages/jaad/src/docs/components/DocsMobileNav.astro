@@ -2,7 +2,7 @@
 import type { DocsNavGroup } from '../navigation.ts'
 import type { DocsHeading, DocsNavItem } from '../types.ts'
 import { ui } from '../../site/runtime.ts'
-import { formatChapterTitle } from '../model/ids.ts'
+import { slugToTitle } from '../model/ids.ts'
 import DocsNavTree from './DocsNavTree.astro'
 
 interface Props {
@@ -23,7 +23,7 @@ function trail(): string[] {
             const items: DocsNavItem[] = entry.type === 'page' ? [entry.item] : entry.items
             const current = items.find((item) => item.isActive)
             if (!current) continue
-            const chapter = entry.type === 'chapter' ? [formatChapterTitle(entry.chapter) ?? entry.chapter] : []
+            const chapter = entry.type === 'chapter' ? [slugToTitle(entry.chapter)] : []
             return [...section, ...chapter, current.title]
         }
     }

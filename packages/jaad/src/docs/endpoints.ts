@@ -1,7 +1,7 @@
 import type { DocsPage } from './model/tree.ts'
 import config from 'virtual:jaad/config'
 import { getDocsTree } from './collection.ts'
-import { formatChapterTitle } from './model/ids.ts'
+import { slugToTitle } from './model/ids.ts'
 import { pageDescription } from './model/rendered.ts'
 import { SECTIONS, docsUrls } from './runtime.ts'
 import { buildSearchIndex } from './search-index.ts'
@@ -59,8 +59,7 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
         return [
             ...(standalone.length > 0 ? [standalone.map(toLine).join('\n')] : []),
             ...[...chapters].map(
-                ([chapter, rows]) =>
-                    `${heading} ${formatChapterTitle(chapter) ?? chapter}\n\n${rows.map(toLine).join('\n')}`,
+                ([chapter, rows]) => `${heading} ${slugToTitle(chapter)}\n\n${rows.map(toLine).join('\n')}`,
             ),
         ]
     }
