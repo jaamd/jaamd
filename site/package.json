@@ -8,8 +8,8 @@
         "build": "astro build",
         "preview": "astro preview",
         "check": "astro check",
-        "test:build": "astro build && node --test tests/site.test.mjs tests/palette.test.ts",
-        "test": "node --test tests/worker.test.ts"
+        "test:build": "astro build && node --test tests/site.test.mjs",
+        "test": "node --test tests/worker.test.ts tests/palette.test.ts"
     },
     "dependencies": {
         "@jaamd/core": "workspace:^",
