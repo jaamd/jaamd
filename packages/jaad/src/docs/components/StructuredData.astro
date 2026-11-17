@@ -1,5 +1,6 @@
 ---
 import config from 'virtual:jaad/config'
+import { scriptJson } from '../../site/helpers.ts'
 import { slugToTitle } from '../model/ids.ts'
 import { docsUrls } from '../runtime.ts'
 import { docsPageHref } from '../urls.ts'
@@ -52,7 +53,7 @@ const data = base && {
 }
 
 // `<` escaped: a `</script>` in a title or description would close the element.
-const json = data ? JSON.stringify(data).replaceAll('<', '\\u003c') : ''
+const json = data ? scriptJson(data) : ''
 ---
 
 {data && <script type="application/ld+json" set:html={json} is:inline />}
