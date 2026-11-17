@@ -16,7 +16,8 @@ export function frontmatterFields(z: typeof Zod) {
         /** Public path or URL; false drops the site's. */
         ogImage: z
             .union([
-                z.string().refine((v) => v.startsWith('/') || /^https?:\/\//.test(v), {
+                // A root-relative path or an http(s) URL; `//host/...` is neither.
+                z.string().refine((v) => /^\/(?!\/)/.test(v) || /^https?:\/\//.test(v), {
                     message: 'ogImage must be a public url, such as "/og/page.png"',
                 }),
                 z.literal(false),
