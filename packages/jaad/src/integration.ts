@@ -40,15 +40,8 @@ export function createJaadIntegration(options: JaadUserConfig, state: Integratio
                 }
             },
 
-            'astro:config:done': ({ config: astroConfig, injectTypes }) => {
+            'astro:config:done': ({ config: astroConfig }) => {
                 state.deploymentBase = normaliseBasePath(astroConfig.base)
-                injectTypes({
-                    filename: 'jaad.d.ts',
-                    content: `declare module "virtual:jaad/config" {
-  const config: import("@jaamd/jaad").JaadResolvedConfig;
-  export default config;
-}`,
-                })
             },
         },
     }

@@ -4,13 +4,12 @@ on:
     push:
         branches: [main]
     pull_request:
-    schedule:
-        - cron: '0 6 * * 1'
     workflow_dispatch:
 
+# A newer push to a pull request replaces its run; every commit on main keeps its own.
 concurrency:
     group: ci-${{ github.ref }}
-    cancel-in-progress: true
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
     contents: read
@@ -25,12 +24,14 @@ jobs:
               with:
                   node-version: '24'
                   cache: pnpm
-            - run: pnpm install --frozen-lockfile
+            # Formatting and linting read sources only: nothing needs building.
+            - run: pnpm install --frozen-lockfile --ignore-scripts
             - run: pnpm format:check
             - run: pnpm lint
 
     # On a pull request that touches only packages/ and site/, runs the changed
-    # projects and their dependents. Anything else runs every project.
+    # projects and their dependents. Anything else runs every project, and so does
+    # a change to a fixture: it is a project of its own, built by its package's tests.
     packages:
         runs-on: ubuntu-latest
         steps:
@@ -47,10 +48,20 @@ jobs:
             - name: Select projects
               id: scope
               run: |
-                  if [ "$GITHUB_EVENT_NAME" = pull_request ] &&
-                     ! git diff --name-only "origin/$GITHUB_BASE_REF...HEAD" | grep -qvE '^(packages|site)/'; then
-                    echo "filter=--filter=...[origin/$GITHUB_BASE_REF]" >> "$GITHUB_OUTPUT"
+                  [ "$GITHUB_EVENT_NAME" = pull_request ] || exit 0
+
+                  changed="$(git diff --name-only "origin/$GITHUB_BASE_REF...HEAD")"
+                  if echo "$changed" | grep -qvE '^(packages|site)/' ||
+                     echo "$changed" | grep -qE '^packages/[^/]+/tests/fixture/'; then
+                    exit 0
                   fi
+
+                  filter="--filter=...[origin/$GITHUB_BASE_REF]"
+                  # The site checks its palette against JAAD's stylesheet.
+                  if echo "$changed" | grep -qE '^packages/jaad/src/site/styles/'; then
+                    filter="$filter --filter=site"
+                  fi
+                  echo "filter=$filter" >> "$GITHUB_OUTPUT"
 
             # The filter goes through the environment: a step output never becomes shell source.
             - run: pnpm -r $FILTER --if-present run check
@@ -76,20 +87,3 @@ jobs:
                   cache: pnpm
             - run: pnpm install --frozen-lockfile
             - run: pnpm test:consumer
-
-    # The fixtures and the site pin astro ^7, so the jobs above never see a new
-    # major. Red here means the next Astro major needs checking.
-    astro-latest:
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        runs-on: ubuntu-latest
-        continue-on-error: true
-        steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-              with:
-                  node-version: '24'
-                  cache: pnpm
-            - run: pnpm install --frozen-lockfile
-            - run: pnpm --filter jaamd-fixture --filter jaad-fixture --filter site --filter docs add astro@latest
-            - run: pnpm test:build

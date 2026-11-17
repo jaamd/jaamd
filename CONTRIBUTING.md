@@ -32,7 +32,9 @@ link to a file that does not exist.
 
 The `site/` project is jaamd.org, the landing page with the live editor: preview
 it with `pnpm --filter site dev`. Its Worker sends the old `jaamd.org/docs/...`
-addresses to docs.jaamd.org. Both projects deploy from `main`.
+addresses to docs.jaamd.org. jaamd.org deploys from `main`; docs.jaamd.org
+documents what is on npm, so it deploys from the release tags. To ship a fix to
+the documentation alone, run the `Deploy docs` workflow by hand on `main`.
 
 Every product is written the same way: "Just Another Astro …", the name in
 italic serif, and "<Subject>, refined." (`Markdown, refined.`,
@@ -142,8 +144,10 @@ node scripts/release.mjs 1.0.0
 git push origin HEAD v1.0.0
 ```
 
-The script sets the version of every package, commits, and creates the
-`v<version>` tag. The tag runs [`publish.yml`](/.github/workflows/publish.yml),
+The script stops unless `main` is checked out, clean and level with
+`origin/main`, and the tag exists neither locally nor on `origin`. It sets the
+version of every package, commits, and creates the `v<version>` tag. The tag
+deploys docs.jaamd.org and runs [`publish.yml`](/.github/workflows/publish.yml),
 which tests the whole workspace and publishes with provenance, in dependency
 order: core, astro, jaad, create-jaad. A package already on npm at that version
 is skipped, so running the workflow again from the tag finishes a release that

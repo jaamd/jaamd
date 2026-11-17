@@ -1,35 +1,33 @@
 name: Deploy
 
+# The steps of a deploy, shared by deploy-site.yml and deploy-docs.yml: each
+# project is a Worker of its own.
 on:
-    push:
-        branches: [main]
-        paths: ['site/**', 'docs/**', 'packages/**', 'pnpm-lock.yaml', '.github/workflows/deploy.yml']
-    workflow_dispatch:
+    workflow_call:
+        inputs:
+            project:
+                description: The workspace project to deploy, site or docs.
+                type: string
+                required: true
+            url:
+                description: Where it is served.
+                type: string
+                required: true
 
 permissions:
     contents: read
 
 jobs:
-    # Each project is a Worker of its own: `site` is jaamd.org, `docs` is docs.jaamd.org.
     deploy:
-        # Shown as "Deploy / site" and "Deploy / docs" instead of the whole matrix entry.
-        name: ${{ matrix.project }}
-        strategy:
-            fail-fast: false
-            matrix:
-                include:
-                    - project: site
-                      url: https://jaamd.org
-                    - project: docs
-                      url: https://docs.jaamd.org
+        name: ${{ inputs.project }}
         runs-on: ubuntu-latest
         concurrency:
-            group: deploy-${{ matrix.project }}
+            group: deploy-${{ inputs.project }}
             cancel-in-progress: false
         # One environment for both: it holds the Cloudflare secrets.
         environment:
             name: production
-            url: ${{ matrix.url }}
+            url: ${{ inputs.url }}
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
@@ -45,13 +43,17 @@ jobs:
 
             - run: pnpm install --frozen-lockfile
 
-            - run: pnpm --filter ${{ matrix.project }} test
-            - run: pnpm --filter ${{ matrix.project }} test:build
+            - run: pnpm --filter "$PROJECT" test
+              env:
+                  PROJECT: ${{ inputs.project }}
+            - run: pnpm --filter "$PROJECT" test:build
+              env:
+                  PROJECT: ${{ inputs.project }}
 
             - uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  workingDirectory: ${{ matrix.project }}
+                  workingDirectory: ${{ inputs.project }}
                   packageManager: pnpm
                   command: deploy

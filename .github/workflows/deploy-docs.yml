@@ -1,0 +1,19 @@
+name: Deploy docs
+
+# docs.jaamd.org documents what is on npm, so it follows the release tags, as
+# publish.yml does. A fix to the docs alone ships by running this by hand on main.
+on:
+    push:
+        tags: ['v*']
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    deploy:
+        uses: ./.github/workflows/deploy.yml
+        with:
+            project: docs
+            url: https://docs.jaamd.org
+        secrets: inherit
