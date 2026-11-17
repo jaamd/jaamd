@@ -52,6 +52,21 @@ test('frontmatter order moves the opening page', () => {
     }
 })
 
+// The collection reads frontmatter as YAML: a comment, a capitalised boolean or
+// a byte order mark mean the same to it, and so they must here.
+test('frontmatter is read as YAML, comments, booleans and BOM included', () => {
+    const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-yaml-'))
+    try {
+        writeFileSync(join(docsDir, '00-scratch.md'), '---\ndraft: True\n---\n\n# Scratch')
+        writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
+        writeFileSync(join(docsDir, '02-welcome.md'), '\uFEFF---\norder: 0 # first\n---\n\n# Welcome')
+
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'welcome' }])
+    } finally {
+        rmSync(docsDir, { recursive: true })
+    }
+})
+
 test("the sitemap omits only the opening page's named redirect", () => {
     const filter = createSitemapFilter('/docs', {
         deploymentBase: '/repo',

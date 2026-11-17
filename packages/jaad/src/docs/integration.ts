@@ -8,6 +8,7 @@ import { prefixedLocales } from '../site/locales.ts'
 import { normaliseBasePath } from '../site/urls.ts'
 import { docsRoots } from './config.ts'
 import { rehypeDocLinks, satteriDocLinks } from './link-plugins.ts'
+import { readFrontmatter } from './model/frontmatter.ts'
 import { getDocCollectionId, splitDocLocale } from './model/ids.ts'
 import { buildDocsTree, type DocsSource } from './model/tree.ts'
 import { docsPageHref, type DocsUrlOptions } from './urls.ts'
@@ -52,19 +53,6 @@ const routeEntrypoint = (file: string) => fileURLToPath(new URL(`./routes/${file
 
 export function shouldInjectNotFound(docsBase: string, srcDir: URL): boolean {
     return docsBase === '' && !NOT_FOUND_PAGE_NAMES.some((name) => existsSync(new URL(`pages/${name}`, srcDir)))
-}
-
-/** The two fields that move the first page of the docs or of a section. */
-function readFrontmatter(source: string): { order?: number; draft?: boolean } {
-    const block = /^---\r?\n([\s\S]*?)\r?\n---/.exec(source)
-    if (!block) return {}
-
-    const order = /^order:\s*(-?\d+)\s*$/m.exec(block[1])
-    const draft = /^draft:\s*(true|false)\s*$/m.exec(block[1])
-    return {
-        order: order ? Number(order[1]) : undefined,
-        draft: draft ? draft[1] === 'true' : undefined,
-    }
 }
 
 /** The aliases of every locale. The content collection is not available this
