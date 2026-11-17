@@ -44,7 +44,7 @@ import MarkdownContent from '@jaamd/astro/components'
 </MarkdownContent>
 ```
 
-Requires Astro `^7.3.0` and Node `>=22.12.0`.
+Requires Astro `^7.3.0` and Node `>=22.23.4`.
 
 ## Documentation
 

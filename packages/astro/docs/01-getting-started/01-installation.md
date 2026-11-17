@@ -63,7 +63,7 @@ export default defineConfig({
 | Requirement                | Detail                                                    |
 | -------------------------- | --------------------------------------------------------- |
 | Astro                      | `^7.3.0`                                                  |
-| Node                       | `>=22.12.0`                                               |
+| Node                       | `>=22.23.4`                                               |
 | Markdown processor         | Sätteri (Astro's default) or `unified()`                  |
 | `@astrojs/markdown-remark` | Only with `unified()`: an optional peer, installed by you |
 | Toolchain                  | Must compile TypeScript and `.astro` sources              |
