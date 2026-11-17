@@ -24,6 +24,8 @@ export function allCss() {
 
 export const escapeClass = (cls) => cls.replace(/[.:/[\]%()!,#]/g, (c) => '\\' + c)
 
+const QUOTED = /(["'])([^"']+)\1/g
+
 export function packageClasses(srcDir) {
     const classes = new Set()
     const add = (value) => {
@@ -31,15 +33,18 @@ export function packageClasses(srcDir) {
     }
     for (const file of walk(srcDir).filter((f) => f.endsWith('.astro'))) {
         const source = readFileSync(file, 'utf8')
-        for (const m of source.matchAll(/\bclass(?:Name)?="([^"{}]+)"/g)) add(m[1])
+        // Either quote, in markup, expressions and scripts alike.
+        for (const m of source.matchAll(/\bclass(?:Name)?=(["'])([^"'{}]+)\1/g)) add(m[2])
         for (const m of source.matchAll(/\bclass=\{([^}]*)\}/g)) {
-            for (const lit of m[1].matchAll(/"([^"]+)"/g)) add(lit[1])
+            for (const lit of m[1].matchAll(QUOTED)) add(lit[2])
         }
         for (const m of source.matchAll(/\bclass:list=\{\[([^\]]*)\]\}/g)) {
-            for (const lit of m[1].matchAll(/"([^"]+)"/g)) add(lit[1])
+            for (const lit of m[1].matchAll(QUOTED)) add(lit[2])
         }
-        for (const m of source.matchAll(/\.(?:className\s*=|classList\.(?:add|remove|toggle)\()\s*"([^"]+)"/g)) {
-            add(m[1])
+        for (const m of source.matchAll(
+            /\.(?:className\s*=|classList\.(?:add|remove|toggle)\()\s*(["'`])([^"'`$]+)\1/g,
+        )) {
+            add(m[2])
         }
     }
     return classes

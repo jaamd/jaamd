@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
+import { inferRepo } from '../../src/site/infer.ts'
 import { page, distFiles, allCss } from '../dist.mjs'
+
+// The fixture infers its repository from this checkout's remote, whatever its forge.
+const repo = inferRepo(fileURLToPath(new URL('../fixture', import.meta.url)))
 
 test("jaamd's remark plugins ran", () => {
     const markdown = page('docs/markdown/index.html')
@@ -57,13 +62,13 @@ test('the fonts are served from the site itself', () => {
     }
 })
 
-test('the inferred repository is a single icon, with no menu to repeat it', () => {
-    const home = page('docs/index.html')
-    const match = home.match(/href="(https:\/\/github\.com\/[\w-]+\/[\w-]+)"/)
-    assert.ok(match, 'no repository link was rendered at all')
-    const repo = match[1]
+const noRemote = repo ? false : 'no git remote to infer a repository from'
 
-    assert.equal(home.split(`href="${repo}"`).length - 1, 1, 'the repository link is listed twice')
+test('the inferred repository is a single icon, with no menu to repeat it', { skip: noRemote }, () => {
+    const home = page('docs/index.html')
+    const links = home.split(`href="${repo.url}"`).length - 1
+    assert.notEqual(links, 0, 'no repository link was rendered at all')
+    assert.equal(links, 1, 'the repository link is listed twice')
     assert.doesNotMatch(home, /<jaad-nav-mobile/, 'an empty mobile menu shipped')
 })
 

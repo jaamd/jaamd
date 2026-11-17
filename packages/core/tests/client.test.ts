@@ -14,6 +14,7 @@ for (const name of [
     'HTMLElement',
     'HTMLButtonElement',
     'HTMLDialogElement',
+    'KeyboardEvent',
     'IntersectionObserver',
     'getComputedStyle',
     'getSelection',
@@ -187,6 +188,107 @@ test('without invoker commands, images are left as they are', () => {
     } finally {
         Object.defineProperty(window.HTMLButtonElement.prototype, 'command', descriptor)
     }
+})
+
+const press = (el: Element | null, key: string) =>
+    el?.dispatchEvent(new window.KeyboardEvent('keydown', { key, bubbles: true }) as unknown as Event)
+
+test('arrow keys, Home and End move between tabs, wrapping at the ends', () => {
+    const root = mount()
+    const dispose = enhance(root)
+    const buttons = () => root.querySelectorAll('.jaamd-code-tab-btn')
+
+    press(buttons()[0], 'ArrowRight')
+    assert.deepEqual(selected(root), ['false', 'true'])
+    press(buttons()[1], 'ArrowRight')
+    assert.deepEqual(selected(root), ['true', 'false'], 'the last tab does not wrap to the first')
+    press(buttons()[0], 'ArrowLeft')
+    assert.deepEqual(selected(root), ['false', 'true'], 'the first tab does not wrap to the last')
+    press(buttons()[1], 'Home')
+    assert.deepEqual(selected(root), ['true', 'false'])
+    press(buttons()[0], 'End')
+    assert.deepEqual(selected(root), ['false', 'true'])
+
+    dispose()
+})
+
+/** Replaces the clipboard for one test; `undefined` leaves none. */
+function withClipboard(writeText: ((text: string) => Promise<void>) | undefined) {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis.navigator, 'clipboard')
+    Object.defineProperty(globalThis.navigator, 'clipboard', {
+        value: writeText ? { writeText } : undefined,
+        configurable: true,
+    })
+    return () => {
+        if (descriptor) Object.defineProperty(globalThis.navigator, 'clipboard', descriptor)
+        else delete (globalThis.navigator as { clipboard?: unknown }).clipboard
+    }
+}
+
+/** Lets the click handler's awaited clipboard write settle. */
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+test('the copy button writes the code, and selects it when there is no clipboard', async () => {
+    const root = mount()
+    const dispose = enhance(root)
+    const button = root.querySelector('pre')!.querySelector<HTMLElement>('.jaamd-copy-btn')!
+
+    const written: string[] = []
+    let restore = withClipboard(async (text) => {
+        written.push(text)
+    })
+    try {
+        click(button)
+        await settle()
+        assert.deepEqual(written, ['npm install'])
+        assert.equal(button.dataset.copied, 'true')
+    } finally {
+        restore()
+    }
+
+    restore = withClipboard(undefined)
+    try {
+        click(button)
+        await settle()
+        assert.equal(button.dataset.copied, 'manual')
+        assert.equal(document.getSelection()?.toString(), 'npm install', 'the code was not selected')
+    } finally {
+        restore()
+    }
+
+    dispose()
+})
+
+test('the lightbox shows the image of the button that opened it', () => {
+    const root = mount()
+    const dispose = enhance(root)
+    const trigger = root.querySelector('.jaamd-lightbox-trigger')!
+    const dialog = document.getElementById('jaamd-lightbox')!
+
+    const event = new window.Event('command')
+    Object.assign(event, { command: 'show-modal', source: trigger })
+    dialog.dispatchEvent(event)
+
+    const preview = dialog.querySelector('img')!
+    assert.match(preview.src, /\/a\.png$/)
+    assert.equal(preview.alt, 'A diagram')
+
+    dispose()
+})
+
+test('headings with the same text get numbered ids, as GitHub gives them', () => {
+    const root = document.createElement('div')
+    root.className = 'jaamd-content'
+    root.innerHTML = '<h2>Setup</h2><h2>Setup</h2><h3>Setup</h3>'
+    document.body.append(root)
+    const dispose = enhance(root as unknown as HTMLElement)
+
+    assert.deepEqual(
+        [...root.querySelectorAll('h2, h3')].map((heading) => heading.id),
+        ['setup', 'setup-1', 'setup-2'],
+    )
+
+    dispose()
 })
 
 test('the cleanup releases the listeners once no call is left', () => {
