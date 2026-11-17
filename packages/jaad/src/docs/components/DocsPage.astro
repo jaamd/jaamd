@@ -3,7 +3,7 @@ import type { DocsSourceEntry } from '../collection.ts'
 import type { DocsPage, DocsTree } from '../model/tree.ts'
 import MarkdownContent from '@jaamd/astro/components'
 import config from 'virtual:jaad/config'
-import { DEFAULT_LOCALE, LOCALES, ui } from '../../site/runtime.ts'
+import { languageOf, ui } from '../../site/runtime.ts'
 import DocsLayout from '../layouts/Docs.astro'
 import { editPathFor } from '../model/ids.ts'
 import { pageHeadings } from '../model/rendered.ts'
@@ -35,7 +35,7 @@ const editPath = editPathFor(
 )
 const headings = pageHeadings(page.source.rendered)
 const t = ui(page.locale)
-const language = LOCALES.find((known) => known.code === (page.locale ?? DEFAULT_LOCALE))?.tag ?? config.lang
+const language = languageOf(page.locale)
 const updated = page.data.lastUpdated
 const navigation = buildDocsNavigation(tree, page.id, SECTIONS)
 const contentAttrs = { id: 'content' }

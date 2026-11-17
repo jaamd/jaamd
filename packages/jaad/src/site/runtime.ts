@@ -13,6 +13,11 @@ export const buildLocales = () => locales.routedLocales(LOCALES)
 
 export const prefixedCodes = () => locales.prefixedLocales(LOCALES, DEFAULT_LOCALE)
 
+/** The language tag of a locale's pages; `lang` when the site is not localised. */
+export function languageOf(locale: string = DEFAULT_LOCALE): string {
+    return LOCALES.find((known) => known.code === locale)?.tag ?? config.lang
+}
+
 /** The interface strings for a page, already resolved. */
 export function ui(locale: string = DEFAULT_LOCALE) {
     return (key: UiKey) => uiString(config.ui, locale, key)
