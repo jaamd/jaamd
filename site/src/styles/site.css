@@ -288,7 +288,6 @@ header.site-bar {
 /* The preview is JAAMD's: its theme, the site's type. */
 .landing-preview {
     --jaamd-font-sans: var(--identity-font-sans);
-    --jaamd-font-serif: var(--identity-font-serif);
     --jaamd-font-mono: var(--identity-font-mono);
     --jaamd-font-size: 1rem;
 
