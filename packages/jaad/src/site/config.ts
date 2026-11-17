@@ -7,8 +7,19 @@ import { z } from 'astro/zod'
 import { inferDescription, type RepoInfo } from './infer.ts'
 import { PRESETS, PRESET_NAMES, isPreset } from './themes.ts'
 
+/** A BCP 47 tag `Intl` accepts: "en_US" is not one, and would throw when a date is formatted. */
+function isLanguageTag(tag: string): boolean {
+    try {
+        Intl.getCanonicalLocales(tag)
+        return true
+    } catch {
+        return false
+    }
+}
+
 const publicUrl = (field: string, example: string) =>
-    z.string().refine((v) => v.startsWith('/') || /^https?:\/\//.test(v), {
+    // A root-relative path or an http(s) URL; `//host/...` is neither.
+    z.string().refine((v) => /^\/(?!\/)/.test(v) || /^https?:\/\//.test(v), {
         message: `${field} must be a public url, such as "${example}"`,
     })
 
@@ -16,7 +27,10 @@ const publicUrl = (field: string, example: string) =>
 export const siteConfigShape = {
     title: z.string(),
     description: z.string().optional(),
-    lang: z.string().default('en'),
+    lang: z
+        .string()
+        .refine(isLanguageTag, { message: 'lang must be a language tag, such as "en" or "pt-BR"' })
+        .default('en'),
     logo: publicUrl('logo', '/logo.svg').optional(),
     /** Where the site name in the header leads: the site root, or another site. */
     homeLink: z.string().default('/'),

@@ -50,6 +50,9 @@ const data = base && {
         })),
     },
 }
+
+// `<` escaped: a `</script>` in a title or description would close the element.
+const json = data ? JSON.stringify(data).replaceAll('<', '\\u003c') : ''
 ---
 
-{data && <script type="application/ld+json" set:html={JSON.stringify(data)} is:inline />}
+{data && <script type="application/ld+json" set:html={json} is:inline />}

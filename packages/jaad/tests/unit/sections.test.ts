@@ -292,6 +292,23 @@ test('a relative link to a markdown file resolves to the page url', () => {
     )
 })
 
+test('a link to a draft resolves, and is reported once per link', () => {
+    withTree({ 'docs/01-intro.md': '', 'docs/02-wip.md': '---\ndraft: true\n---\n# WIP' }, (root) => {
+        const reported: string[] = []
+        const context = {
+            roots: [{ dir: join(root, 'docs') }],
+            locales: [],
+            urls: () => ({ docsBase: '' }),
+            onDraftLink: (_from: string, href: string) => reported.push(href),
+        }
+        const from = join(root, 'docs', '01-intro.md')
+
+        assert.equal(resolveDocLink('./02-wip.md', from, context), '/wip')
+        assert.equal(resolveDocLink('./01-intro.md', from, context), '/intro')
+        assert.deepEqual(reported, ['./02-wip.md'])
+    })
+})
+
 test('a link in a localised tree keeps its language', () => {
     withTree({ 'docs/it/01-intro.md': '', 'docs/it/02-guida.md': '' }, (root) => {
         const context = {

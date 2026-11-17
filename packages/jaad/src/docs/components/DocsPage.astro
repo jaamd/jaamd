@@ -5,6 +5,7 @@ import MarkdownContent from '@jaamd/astro/components'
 import config from 'virtual:jaad/config'
 import { DEFAULT_LOCALE, LOCALES, ui } from '../../site/runtime.ts'
 import DocsLayout from '../layouts/Docs.astro'
+import { editPathFor } from '../model/ids.ts'
 import { pageHeadings } from '../model/rendered.ts'
 import { buildDocsNavigation } from '../navigation.ts'
 import { SECTIONS } from '../runtime.ts'
@@ -27,7 +28,11 @@ const section = SECTIONS.find((known) => known.key === page.section)
 const title = headTitle && section ? `${headTitle} · ${section.label}` : headTitle
 // A section's files sit in its own directory.
 const editBase = section ? section.editBase : config.docs.editBase
-const editPath = [page.locale, page.path].filter(Boolean).join('/')
+const editPath = editPathFor(
+    page.source.filePath,
+    section ? section.dir : config.docs.dir,
+    [page.locale, page.path].filter(Boolean).join('/'),
+)
 const headings = pageHeadings(page.source.rendered)
 const t = ui(page.locale)
 const language = LOCALES.find((known) => known.code === (page.locale ?? DEFAULT_LOCALE))?.tag ?? config.lang

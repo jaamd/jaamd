@@ -182,7 +182,7 @@ test('docs and the page layout share one padding token', () => {
     // The page nav takes its width from the main it sits in, not its own number.
     const nav = page('docs/getting-started/installation/index.html')
         .match(/<nav[^>]*>/g)
-        ?.find((tag) => tag.includes('aria-label="Page navigation"'))
+        ?.find((tag) => tag.includes('class="docs-page-nav"'))
 
     assert.ok(nav, 'the page navigation is missing from the built page')
     assert.doesNotMatch(nav, /max-w-/, 'the page nav pins itself to an absolute width again')

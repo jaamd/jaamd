@@ -33,6 +33,8 @@ export interface DocsPageData {
  *  collection types in the consumer project, so the package states its own contract. */
 export interface DocsEntry {
     id: string
+    /** Relative to the project, as Astro's glob loader records it. */
+    filePath?: string
     body?: string
     data: DocsPageData
     rendered?: RenderedMarkdown

@@ -134,12 +134,19 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         #section = ''
         #restoreFocus: HTMLElement | null = null
         #previousOverflow = ''
+        /** The persisted header is moved on every navigation, which disconnects
+         *  and reconnects it: the children's listeners are bound once. */
+        #bound = false
 
         get #open() {
             return !this.#overlay.hidden
         }
 
         connectedCallback() {
+            document.addEventListener('keydown', this.#onGlobalKey)
+            if (this.#bound) return
+            this.#bound = true
+
             this.#overlay = this.querySelector('[data-overlay]')!
             this.#input = this.querySelector('[data-input]')!
             this.#filters = this.querySelector('[data-filters]')!
@@ -165,28 +172,10 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
             this.#input.addEventListener('input', () => this.#render())
             this.#input.addEventListener('keydown', (e) => this.#onInputKey(e))
-
-            document.addEventListener('keydown', this.#onGlobalKey)
-            document.addEventListener('astro:before-swap', this.#syncLocale)
         }
 
         disconnectedCallback() {
             document.removeEventListener('keydown', this.#onGlobalKey)
-            document.removeEventListener('astro:before-swap', this.#syncLocale)
-        }
-
-        /** Each locale has its own index, so a language switch drops the cache. */
-        #syncLocale = (event: Event) => {
-            const next = (event as Event & { newDocument: Document }).newDocument.querySelector<HTMLElement>(
-                'jaad-search',
-            )
-            const indexUrl = next?.dataset.indexUrl
-            if (indexUrl && indexUrl !== this.dataset.indexUrl) {
-                this.dataset.indexUrl = indexUrl
-                this.#index = null
-                this.#request = null
-                this.#section = ''
-            }
         }
 
         #onGlobalKey = (e: KeyboardEvent) => {
@@ -200,6 +189,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         }
 
         #onInputKey(e: KeyboardEvent) {
+            // Enter also confirms a character being composed with an input method.
+            if (e.isComposing) return
+
             if (e.key === 'ArrowDown') {
                 e.preventDefault()
                 this.#select(Math.min(this.#selected + 1, this.#options.length - 1))
@@ -216,7 +208,10 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             if (!this.#request) {
                 const url = this.dataset.indexUrl ?? '/search-index.json'
                 this.#request = fetch(url)
-                    .then((res) => (res.ok ? res.json() : EMPTY_INDEX))
+                    .then((res) => {
+                        if (!res.ok) throw new Error(`${url} answered ${res.status}`)
+                        return res.json()
+                    })
                     .then((data: SearchIndex) => {
                         this.#index = data
                         this.#renderFilters(data)

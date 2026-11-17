@@ -7,7 +7,7 @@ import { docsMarkdownHref } from '../urls.ts'
 interface Props {
     /** Where the page's directory is edited, or null to leave the link out. */
     editBase: string | null
-    /** The file below that directory, without its extension. */
+    /** The file below that directory, extension included. */
     editPath: string
     /** URL-safe slug, e.g. "markdown/inner-html". */
     cleanSlug: string
@@ -18,7 +18,7 @@ const { editBase, editPath, cleanSlug, locale } = Astro.props
 const t = ui(locale)
 
 const mdHref = docsMarkdownHref(cleanSlug, docsUrls(locale))
-const editHref = editBase ? editUrl(editBase, `${editPath}.md`) : null
+const editHref = editBase ? editUrl(editBase, editPath) : null
 ---
 
 <div class="docs-page-actions">

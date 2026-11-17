@@ -27,13 +27,13 @@ their own layout, styles and metadata.
 
 ## Identity
 
-| Option        | Type     | Default        | Description                                       |
-| ------------- | -------- | -------------- | ------------------------------------------------- |
-| `title`       | `string` | none           | **Required.** Site name and metadata              |
-| `description` | `string` | `package.json` | Site description                                  |
-| `lang`        | `string` | `"en"`         | Site language, and the default when localised     |
-| `logo`        | `string` | none           | Public path or URL shown instead of the site name |
-| `homeLink`    | `string` | `"/"`          | Where the site name in the header leads           |
+| Option        | Type     | Default        | Description                                          |
+| ------------- | -------- | -------------- | ---------------------------------------------------- |
+| `title`       | `string` | none           | **Required.** Site name and metadata                 |
+| `description` | `string` | `package.json` | Site description                                     |
+| `lang`        | `string` | `"en"`         | Language tag, as `pt-BR`; the default when localised |
+| `logo`        | `string` | none           | Public path or URL shown instead of the site name    |
+| `homeLink`    | `string` | `"/"`          | Where the site name in the header leads              |
 
 A source file path passed to `logo` produces a build error. Use a public path
 such as `/logo.svg`.
@@ -127,8 +127,14 @@ defineJaadConfig({
 })
 ```
 
-The link is omitted when the git remote, branch or repository root cannot be
-resolved safely.
+The inferred link follows the editor URLs of GitHub, GitLab, Gitea, Forgejo,
+Codeberg and Bitbucket, self-hosted ones included when their host begins with
+the forge's name, as `gitlab.example.dev`. Elsewhere, pass a URL.
+
+The branch is the one checked out. On a detached checkout, as in many CI
+builds, it is the branch GitHub Actions, GitLab CI, Cloudflare Pages, Vercel or
+Netlify names. The link is omitted when the git remote or the branch cannot be
+resolved.
 
 With [sections](../01-getting-started/02-pages.md#sections), each one links
 to its own directory. A URL passed here applies to all of them, and `:path` is
