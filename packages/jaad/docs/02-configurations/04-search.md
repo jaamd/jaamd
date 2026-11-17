@@ -15,7 +15,7 @@ with:
 
 - the page title, its chapter and its `keywords`;
 - the heading;
-- the text below it, excluding code blocks, images and directives.
+- the text below it, excluding code blocks, images and tables of contents.
 
 Drafts are left out of production builds. The index is emitted at
 `<routeBase>/search-index.json`, one per language, loaded on first use and

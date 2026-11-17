@@ -178,8 +178,8 @@ keep their existing configuration and merge JAAD manually.
 Add the integration to the Astro configuration:
 
 ```ts
-import jaad from '@jaamd/jaad'
 // astro.config.ts
+import jaad from '@jaamd/jaad'
 import { defineConfig } from 'astro/config'
 import jaadConfig from './jaad.config'
 
@@ -190,16 +190,17 @@ export default defineConfig({
 })
 ```
 
-`jaad()` returns integrations only. `site` and `base` are lifted above, and the
-[`astro`](../02-configurations/01-reference.md#extending-astro) field is ignored here.
-Write those options in `defineConfig`.
+`jaad()` returns integrations only. `site` and `base` are lifted above. Of the
+[`astro`](../02-configurations/01-reference.md#extending-astro) field, only
+`astro.fonts` is read here, to load those fonts on JAAD's pages: write the
+other options, and the same fonts, in `defineConfig`.
 
 If the project defines content collections, add JAAD's collection without
 replacing them:
 
 ```ts
-import { collections as jaadCollections } from '@jaamd/jaad/content'
 // src/content.config.ts
+import { collections as jaadCollections } from '@jaamd/jaad/content'
 import { defineCollection } from 'astro:content'
 
 const blog = defineCollection({/* existing loader and schema */})

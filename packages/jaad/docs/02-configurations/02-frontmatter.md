@@ -44,8 +44,8 @@ reads can sit alongside these. A wrong type is a build error.
 
 ## Naming
 
-`title` names the page in metadata, breadcrumbs, search and the table of
-contents. The filename still determines the URL, whatever the title says.
+`title` names the page in metadata, breadcrumbs, search, and the sidebar unless
+`label` is set. The filename still determines the URL, whatever the title says.
 
 `label` is for pages whose title is too long for a sidebar entry. It changes
 the sidebar, the mobile selectors and the previous/next links, and nothing
@@ -89,8 +89,8 @@ data and `llms.txt`. Without it, JAAD uses the first paragraph of the page, foll
 by the site description.
 
 `keywords` become `<meta name="keywords">` and the `keywords` of the page's
-structured data, and they rank a page in search below its chapter and above
-its body. They are metadata, not a visible list: JAAD renders nothing for
+structured data, and they rank a page in search below its title and above its
+chapter and body. They are metadata, not a visible list: JAAD renders nothing for
 them, though a frame of your own can, through
 [`page.data`](08-advanced-layout.md).
 
