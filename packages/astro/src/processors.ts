@@ -2,7 +2,7 @@ import type { Features, Labels } from '@jaamd/core/client'
 import type { HeadingText } from '@jaamd/core/satteri'
 import type { AstroConfig, RehypePlugins, RemarkPlugins } from 'astro'
 import { satteriPlugins as coreSatteriPlugins } from '@jaamd/core/satteri'
-import { rehypeHeadingLinks, unifiedPlugins as coreUnifiedPlugins } from '@jaamd/core/unified'
+import { rehypeHeadingLinks, remarkDirectiveFallback, unifiedPlugins as coreUnifiedPlugins } from '@jaamd/core/unified'
 import { satteriCollectHastText, satteriHeadingIdsPlugin } from './astro-satteri.ts'
 
 export interface PluginOptions {
@@ -72,7 +72,8 @@ const satteriNames = (entry: unknown): string[] =>
           ? [String(entry.name)]
           : []
 
-/** Name of a unified entry: the plugin function or module, alone or as `[plugin, options]`. */
+/** Name of a unified entry: the plugin function or module, alone or as `[plugin, options]`.
+ *  JAAMD's own functions carry a `Jaamd` name, so a third-party `remarkToc` is not taken for one. */
 const unifiedNames = (entry: unknown): string[] => {
     const plugin = Array.isArray(entry) ? entry[0] : entry
     if (typeof plugin === 'string') return [plugin]
@@ -86,6 +87,7 @@ function missing<T>(existing: readonly unknown[], plugins: readonly T[], names: 
 }
 
 const isFallback = (plugin: { name: string }) => plugin.name === 'jaamd-directive-fallback'
+const isUnifiedFallback = (plugin: unknown) => plugin === remarkDirectiveFallback
 
 /** Ahead of the user's mdast plugins, the directive fallback after them; hast plugins after the user's. */
 function registerSatteri(processor: SatteriProcessorOptions, options: PluginOptions): Registration {
@@ -104,7 +106,7 @@ function registerSatteri(processor: SatteriProcessorOptions, options: PluginOpti
     return { added: mdast.length + hast.length, total: preset.mdastPlugins.length + preset.hastPlugins.length }
 }
 
-/** remark plugins ahead of the user's, rehype plugins after them. */
+/** remark plugins ahead of the user's, the directive fallback after them; rehype plugins after the user's. */
 function registerUnified(processor: UnifiedProcessorOptions, options: PluginOptions): Registration {
     const preset = unifiedPlugins(options)
     const remark = missing(processor.remarkPlugins, preset.remarkPlugins, unifiedNames)
@@ -113,7 +115,11 @@ function registerUnified(processor: UnifiedProcessorOptions, options: PluginOpti
     const links = missingRehype.some(isHeadingLinks)
     const rehype = missingRehype.filter((plugin) => links || plugin !== REHYPE_HEADING_IDS)
 
-    processor.remarkPlugins = [...remark, ...processor.remarkPlugins]
+    processor.remarkPlugins = [
+        ...remark.filter((plugin) => !isUnifiedFallback(plugin)),
+        ...processor.remarkPlugins,
+        ...remark.filter(isUnifiedFallback),
+    ]
     processor.rehypePlugins = [...processor.rehypePlugins, ...rehype]
 
     return { added: remark.length + rehype.length, total: preset.remarkPlugins.length + preset.rehypePlugins.length }

@@ -26,7 +26,7 @@ function textOf(node: Nodes): string {
  *
  * Requires remark-directive to run before this plugin.
  */
-export const remarkToc: Plugin<[RemarkTocOptions?], Root> = function remarkToc(options = {}) {
+export const remarkToc: Plugin<[RemarkTocOptions?], Root> = function remarkJaamdToc(options = {}) {
     const fallback = options.label ?? DEFAULT_LABELS.toc
 
     return (tree) => {

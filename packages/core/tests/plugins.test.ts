@@ -11,6 +11,7 @@ import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { markdownToHtml } from 'satteri'
 import { unified } from 'unified'
+import { splitCodeTabMeta } from '../src/render.ts'
 import { satteriPlugins, type SatteriOptions } from '../src/satteri/index.ts'
 import { unifiedPlugins, type UnifiedOptions } from '../src/unified/index.ts'
 
@@ -145,6 +146,78 @@ for (const [name, render] of Object.entries(processors)) {
             assert.match(html, /<nav class="jaamd-toc" aria-label="Indice">\s*<ul>/)
         })
 
+        test('an alert marker with text on its line leaves a plain blockquote', async () => {
+            const html = await render({}, '> [!NOTE] Hello world\n')
+            assert.doesNotMatch(html, /markdown-alert/)
+            assert.match(html, /\[!NOTE\] Hello world/)
+        })
+
+        test('an alert marker counts on the first line only', async () => {
+            const html = await render({}, '> Intro.\n>\n> [!TIP]\n> Later.\n')
+            assert.doesNotMatch(html, /markdown-alert/)
+            assert.match(html, /Later\./)
+        })
+
+        test('an alert marker alone in its paragraph leaves no empty paragraph', async () => {
+            const html = await render({}, '> [!NOTE]\n>\n> Body.\n')
+            assert.match(html, /markdown-alert-note/)
+            assert.doesNotMatch(html, /<p><\/p>/)
+            assert.match(html, /<p>Body\.<\/p>/)
+        })
+
+        test('an alert marker ended by a hard break takes the break with it', async () => {
+            const html = await render({}, '> [!NOTE]  \n> Body.\n')
+            assert.match(html, /markdown-alert-note/)
+            assert.doesNotMatch(html, /<br/)
+            assert.match(html, /<p>Body\.<\/p>/)
+        })
+
+        test('a colon inside a word or a time stays text', async () => {
+            const html = await render({}, 'Error:Fatal at 10:30.\n')
+            assert.match(html, /<p>Error:Fatal at 10:30\.<\/p>/)
+        })
+
+        test('an inline directive no plugin claimed keeps its source', async () => {
+            const html = await render({}, 'See :note[this]{#x} here.\n')
+            assert.match(html, /<p>See :note\[this\]\{#x\} here\.<\/p>/)
+        })
+
+        test('a block directive no plugin claimed keeps its content', async () => {
+            assert.match(await render(), /<div><p>Kept\.<\/p><\/div>/)
+        })
+
+        test('code tabs keep what surrounds the code blocks', async () => {
+            const source = [
+                ':::code-tabs',
+                'Before.',
+                '',
+                '```js npm {1}',
+                'x',
+                '```',
+                '',
+                'After npm.',
+                '',
+                '```js pnpm',
+                'y',
+                '```',
+                ':::',
+                '',
+            ].join('\n')
+            const html = await render({}, source)
+
+            assert.ok(html.indexOf('Before.') < html.indexOf('jaamd-code-tabs'), 'leading content moved into the tabs')
+            const [, firstPanel] = html.split('role="tabpanel"')
+            assert.match(firstPanel, /After npm\./)
+            assert.match(html, /tabindex="0">npm<\/button>/)
+        })
+
+        test('two code-tabs groups get two ids', async () => {
+            const html = await render({}, `${SOURCE}\n${SOURCE.replace('## Setup', '## Again')}`)
+            const ids = [...html.matchAll(/class="jaamd-code-tabs" id="(jaamd-tabs-[a-z0-9]+)"/g)].map((m) => m[1])
+            assert.equal(ids.length, 2)
+            assert.notEqual(ids[0], ids[1])
+        })
+
         test('a feature turned off leaves its markdown alone', async () => {
             const html = await render({ features: { alerts: false, tables: false, headingLinks: false } })
             assert.doesNotMatch(html, /markdown-alert|jaamd-table-wrapper|jaamd-heading-link/)
@@ -167,15 +240,21 @@ for (const [name, render] of Object.entries(processors)) {
     })
 }
 
-test('satteri keeps a directive no plugin claimed', async () => {
-    assert.match(await processors.satteri(), /<div><p>Kept\.<\/p><\/div>/)
+test('both processors give code-tabs groups the same ids', async () => {
+    const source = `${SOURCE}\n${SOURCE.replace('## Setup', '## Again')}`
+    const ids = (html: string) =>
+        [...html.matchAll(/class="jaamd-code-tabs" id="(jaamd-tabs-[a-z0-9]+)"/g)].map((m) => m[1])
+    const [a, b] = await Promise.all([processors.unified({}, source), processors.satteri({}, source)])
+    assert.equal(ids(a).length, 2)
+    assert.deepEqual(ids(a), ids(b))
 })
 
-test('both processors give a code-tabs group the same id', async () => {
-    const id = (html: string) => html.match(/id="(jaamd-tabs-[a-z0-9]+)"/)?.[1]
-    const [a, b] = await Promise.all([processors.unified(), processors.satteri()])
-    assert.ok(id(a))
-    assert.equal(id(a), id(b))
+test('a code tab label stops where the annotations start', () => {
+    assert.deepEqual(splitCodeTabMeta('npm {1,3}'), { label: 'npm', annotations: '{1,3}' })
+    assert.deepEqual(splitCodeTabMeta('npm title="a.js"'), { label: 'npm', annotations: 'title="a.js"' })
+    assert.deepEqual(splitCodeTabMeta('{2}'), { label: '', annotations: '{2}' })
+    assert.deepEqual(splitCodeTabMeta('Yarn Berry'), { label: 'Yarn Berry', annotations: null })
+    assert.deepEqual(splitCodeTabMeta(null), { label: '', annotations: null })
 })
 
 test('without an id plugin, headings that have no id get no link', async () => {

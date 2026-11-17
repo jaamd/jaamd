@@ -1,8 +1,10 @@
-/* Shiki dual-theme switching. Injected when `theme` is { light, dark }. */
+/* Shiki dual-theme switching. Injected when `theme` is { light, dark }: Shiki
+   then leaves every code block of the site without a colour of its own, inside
+   `.jaamd-content` or not, so these rules apply to all of them. */
 
 /* Light mode (default) */
-.jaamd-content .astro-code span,
-.jaamd-content .shiki span {
+.astro-code span,
+.shiki span {
     color: var(--shiki-light) !important;
     font-style: var(--shiki-light-font-style) !important;
     font-weight: var(--shiki-light-font-weight) !important;
@@ -10,8 +12,8 @@
 }
 
 /* Dark mode */
-html.dark .jaamd-content .astro-code span,
-html.dark .jaamd-content .shiki span {
+html.dark .astro-code span,
+html.dark .shiki span {
     color: var(--shiki-dark) !important;
     font-style: var(--shiki-dark-font-style) !important;
     font-weight: var(--shiki-dark-font-weight) !important;

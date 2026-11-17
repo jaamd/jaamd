@@ -30,10 +30,18 @@ GitHub-style blockquote alerts, in five types: `NOTE`, `TIP`, `IMPORTANT`,
 > [!WARNING]
 > Urgent information needing immediate attention.
 
+As on GitHub, the marker is the first line of the blockquote, alone on it.
+`> [!NOTE] Some text` stays a plain blockquote.
+
 ## Code tabs
 
 Group several code blocks into a tabbed panel. The text after the language is
-the tab label; it falls back to the language, then to `Tab N`.
+the tab label; it falls back to the language, then to `Tab N`. Annotations
+after the label, such as `{1,3}` or `title="app.js"`, stay on the code block
+for the highlighter: `bash npm {2}` is the tab "npm".
+
+Text between the code blocks goes in the panel of the block above it, so a tab
+can carry a note. Text before the first block stays above the tabs.
 
 ````markdown
 :::code-tabs

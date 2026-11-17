@@ -13,15 +13,17 @@ import type {
 import { resolveFeatures } from '../features.ts'
 import { CLASS, DEFAULT_LABELS, withLabels } from '../markup.ts'
 import {
-    ALERT_MARKER,
     TOC_CLOSE_HTML,
     alertData,
     alertTitle,
     codeTabLabel,
     codeTabsGroupId,
     codeTabsHtml,
+    groupCodeTabs,
     headingLinkHtml,
+    readAlertMarker,
     spoilerData,
+    splitCodeTabMeta,
     tocOpenHtml,
 } from '../render.ts'
 
@@ -30,28 +32,32 @@ export function satteriAlert(): MdastPluginDefinition {
     return {
         name: 'jaamd-alert',
         blockquote(node, ctx) {
-            for (const paragraph of node.children) {
-                if (paragraph.type !== 'paragraph') continue
-
-                const [first, second] = paragraph.children
-                if (first?.type !== 'text') continue
-                const match = first.value.match(ALERT_MARKER)
-                if (!match) continue
-
-                const alertType = match[1].toLowerCase()
-
-                if (first.value.includes('\n')) {
-                    ctx.setProperty(first, 'value', first.value.replace(ALERT_MARKER, '').replace(/^\n+/, ''))
-                } else {
-                    // Marker is the whole first line: drop it and the following break.
-                    ctx.removeNode(first)
-                    if (second?.type === 'break') ctx.removeNode(second)
-                }
-
-                ctx.setProperty(node, 'data', alertData(alertType))
-                ctx.prependChild(node, alertTitle(alertType, alertType.toUpperCase()))
+            const paragraph = node.children[0]
+            if (paragraph?.type !== 'paragraph') {
                 return
             }
+
+            const found = readAlertMarker(paragraph.children)
+            if (!found) {
+                return
+            }
+
+            const [first, second] = paragraph.children
+            const alertType = found.match[1].toLowerCase()
+
+            if (found.emptiesParagraph) {
+                ctx.removeNode(paragraph)
+            } else if (found.rest === null) {
+                ctx.removeNode(first)
+                if (found.dropsBreak) {
+                    ctx.removeNode(second)
+                }
+            } else if (first.type === 'text') {
+                ctx.setProperty(first, 'value', found.rest)
+            }
+
+            ctx.setProperty(node, 'data', alertData(alertType))
+            ctx.prependChild(node, alertTitle(alertType, alertType.toUpperCase()))
         },
     }
 }
@@ -64,28 +70,30 @@ export function satteriCodeTabs(): MdastPluginDefinition {
     return {
         name: 'jaamd-code-tabs',
         containerDirective(node, ctx) {
-            if (node.name !== 'code-tabs') return
+            if (node.name !== 'code-tabs') {
+                return
+            }
 
-            const codeNodes = node.children.filter((child) => child.type === 'code')
-            if (codeNodes.length === 0) return
+            const { leading, tabs } = groupCodeTabs(node.children, (child) => child.type === 'code')
+            if (tabs.length === 0) {
+                return
+            }
 
             const groupIndex = tabGroups.get(ctx.data) ?? 0
             tabGroups.set(ctx.data, groupIndex + 1)
 
             const html = codeTabsHtml(
-                codeTabsGroupId(
-                    groupIndex,
-                    codeNodes.map((code) => code.value),
-                ),
-                codeNodes.map(codeTabLabel),
+                codeTabsGroupId(ctx.source, groupIndex),
+                tabs.map(({ code }, i) => codeTabLabel(code, i)),
             )
 
             ctx.replaceNode(node, [
+                ...leading,
                 { type: 'html', value: html.open },
-                ...codeNodes.flatMap((codeNode, i) => [
+                ...tabs.flatMap(({ code, after }, i) => [
                     { type: 'html' as const, value: html.panelOpen(i) },
-                    // Strip meta so Shiki doesn't render it as a title annotation
-                    { ...codeNode, meta: null },
+                    { ...code, meta: splitCodeTabMeta(code.meta).annotations },
+                    ...after,
                     { type: 'html' as const, value: html.panelClose },
                 ]),
                 { type: 'html', value: html.close },

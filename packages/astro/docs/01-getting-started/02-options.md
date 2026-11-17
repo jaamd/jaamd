@@ -57,7 +57,9 @@ client script:
 | `lightbox`     | Images open in a dialog                      | client        |
 
 `directives` stays on while `codeTabs`, `toc` or `spoilers` is, since they are
-written in it.
+written in it. A directive no plugin claims keeps its content: a `:::name`
+block renders as a plain `<div>`, and an inline `:name` as the text it was
+written with, so `10:30` and `Error:Fatal` read as written.
 
 ## `labels`
 

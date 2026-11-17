@@ -1,7 +1,7 @@
 import { CLASS } from '../../markup.ts'
 import { qsa } from '../dom.ts'
 
-/** Previous run's observers: re-init must not stack them. */
+/** The observer watching each nav: a new run replaces the previous one's. */
 const observers = new WeakMap<HTMLElement, IntersectionObserver>()
 
 /** `link.hash` is percent-encoded; a malformed escape is used verbatim. */
@@ -23,6 +23,8 @@ function scrollMarginTop(heading: Element): number {
  *  Returns what stops the watching. */
 export function initToc(root: ParentNode): () => void {
     const navs = [...qsa<HTMLElement>(root, `.${CLASS.toc}`)]
+    // Only these are stopped by the returned function: a later run's are its own.
+    const created = new Map<HTMLElement, IntersectionObserver>()
 
     for (const nav of navs) {
         observers.get(nav)?.disconnect()
@@ -70,12 +72,15 @@ export function initToc(root: ParentNode): () => void {
 
         links.forEach((_link, target) => observer.observe(target))
         observers.set(nav, observer)
+        created.set(nav, observer)
     }
 
     return () => {
-        for (const nav of navs) {
-            observers.get(nav)?.disconnect()
-            observers.delete(nav)
+        for (const [nav, observer] of created) {
+            observer.disconnect()
+            if (observers.get(nav) === observer) {
+                observers.delete(nav)
+            }
         }
     }
 }
