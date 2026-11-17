@@ -209,7 +209,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         #loadIndex(): Promise<SearchIndex> {
             if (this.#index) return Promise.resolve(this.#index)
             if (!this.#request) {
-                const url = this.dataset.indexUrl ?? '/search-index.json'
+                const url = this.dataset.indexUrl!
                 this.#request = fetch(url)
                     .then((res) => {
                         if (!res.ok) throw new Error(`${url} answered ${res.status}`)

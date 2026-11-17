@@ -10,7 +10,7 @@ import DocsFrame from 'virtual:jaad/docs-frame'
 import Footer from '../../site/components/Footer.astro'
 import Head from '../../site/components/Head.astro'
 import Header from '../../site/components/Header.astro'
-import { DEFAULT_LOCALE, LOCALES } from '../../site/runtime.ts'
+import { DEFAULT_LOCALE, languageOf } from '../../site/runtime.ts'
 import { getLocaleAlternates } from '../collection.ts'
 import DocsSidebarLeft from '../components/DocsSidebarLeft.astro'
 import StructuredData from '../components/StructuredData.astro'
@@ -43,7 +43,7 @@ const description =
     page.data.description ?? pageDescription(page.source.rendered, page.title) ?? config.description ?? config.title
 
 const locale = page.locale ?? DEFAULT_LOCALE
-const language = LOCALES.find((known) => known.code === locale)?.tag ?? config.lang
+const language = languageOf(locale)
 
 const indexUrl = docsFileHref('search-index.json', docsUrls(locale))
 

@@ -74,11 +74,11 @@ export function collectionIdFor(filePath: string, section: string | undefined, l
     return [locale, section, id].filter(Boolean).join('/')
 }
 
-/** Decodes percent-escapes, so "detail_%26_summary" → "Detail & Summary". */
+/** "getting-started" → "Getting Started". */
 export function slugToTitle(slug: string): string {
     return slug
         .split(/[-_]+/)
-        .map((word) => ucfirst(decodeURIComponent(word)))
+        .map((word) => ucfirst(word))
         .join(' ')
 }
 
