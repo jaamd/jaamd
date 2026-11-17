@@ -18,10 +18,16 @@ function scrollMarginTop(heading: Element): number {
     return Number.isFinite(parsed) ? parsed : 80
 }
 
-/** Marks the entry whose section is in view. The links stay plain anchors.
- *  Returns what stops the watching. */
-export function initToc(root: ParentNode): () => void {
-    const navs = [...root.querySelectorAll<HTMLElement>(`.${CLASS.toc}`)]
+export interface TocOptions {
+    /** The navs to watch, inside `root`: JAAMD's `:::toc` by default. */
+    selector?: string
+}
+
+/** Marks the entry whose section is in view, in every nav that `selector`
+ *  matches. The links stay plain anchors. Returns what stops the watching. */
+export function initToc(root: ParentNode, options: TocOptions = {}): () => void {
+    const { selector = `.${CLASS.toc}` } = options
+    const navs = [...root.querySelectorAll<HTMLElement>(selector)]
     // Only these are stopped by the returned function: a later run's are its own.
     const created = new Map<HTMLElement, IntersectionObserver>()
 

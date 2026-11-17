@@ -10,9 +10,17 @@ import { visit } from 'unist-util-visit'
 import { ALERT_LEGACY_MARKER, ALERT_MARKER, alertData, alertTitle, readAlertMarker } from '../render.ts'
 
 export interface RemarkAlertOptions {
-    /** Use legacy title format (allows optional slash-suffix). @default false */
+    /**
+     * Reads a title after a slash, as in `[!NOTE/Heads up]`.
+     * @deprecated Kept for 1.x, removed in 2.0. Sätteri never read it.
+     * @default false
+     */
     legacyTitle?: boolean
-    /** HTML tag name for the alert wrapper. @default "div" */
+    /**
+     * HTML tag name for the alert wrapper.
+     * @deprecated Kept for 1.x, removed in 2.0: the wrapper is a `div`, as on Sätteri.
+     * @default "div"
+     */
     tagName?: string
 }
 

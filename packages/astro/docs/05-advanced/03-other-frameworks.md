@@ -36,7 +36,7 @@ The package ships compiled JavaScript with its types: it loads in Node and in an
 | --------------------------------------------------------------------- | -------------------------------------------------------------- |
 | `@jaamd/core/unified`                                                 | remark and rehype plugins                                      |
 | `@jaamd/core/satteri`                                                 | Sätteri mdast and hast plugins                                 |
-| `@jaamd/core/client`                                                  | `enhance(root, options)` and `DEFAULT_SELECTOR`                |
+| `@jaamd/core/client`                                                  | `enhance(root, options)`, `initToc()` and `DEFAULT_SELECTOR`   |
 | `@jaamd/core/styles.css`                                              | The stylesheet                                                 |
 | `@jaamd/core/default.css`                                             | Fallback values of the CSS variables                           |
 | `@jaamd/core/shiki-dual.css`                                          | Light and dark code colours for a dual Shiki theme             |

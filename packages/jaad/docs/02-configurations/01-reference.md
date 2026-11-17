@@ -5,6 +5,8 @@ description: Every option of jaad.config.ts, and the values JAAD detects from th
 # Configuration
 
 All JAAD options live in `jaad.config.ts`. Only `title` is required.
+`@jaamd/jaad/site` looks for it in the directory Astro runs from, so run Astro
+from the project root.
 
 ```ts
 import { defineJaadConfig } from '@jaamd/jaad'

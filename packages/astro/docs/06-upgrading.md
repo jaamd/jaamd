@@ -27,6 +27,27 @@ bun add @jaamd/astro@latest
 
 :::
 
+## From 1.0
+
+### Node 22.23.4
+
+JAAMD requires Node 22.23.4 or later, the minimum of Astro 7.4.
+
+### Spoilers stay revealed
+
+A revealed spoiler stays open until the page reloads, and reads as ordinary
+content: its links work and its text can be selected. Without JavaScript,
+spoilers are shown.
+
+### `--jaamd-font-serif` is gone
+
+No style read it. Remove it from your stylesheet; nothing changes on screen.
+
+### Legacy alert options
+
+On unified, the `legacyTitle` and `tagName` options of the alert plugin are
+deprecated and will be removed in 2.0.
+
 ## From 0.11
 
 ### The package is now @jaamd/astro

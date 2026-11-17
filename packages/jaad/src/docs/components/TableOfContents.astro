@@ -31,41 +31,16 @@ const t = ui(locale)
 )}
 
 <script>
-    function initToc(): void {
-        const sidebar = document.getElementById('docs-toc')
-        // astro:page-load also fires on the first load, which would observe twice.
-        if (!sidebar || sidebar.dataset.tocInit) return
-        sidebar.dataset.tocInit = '1'
+    import { initToc } from '@jaamd/astro/client'
 
-        const links = Array.from(sidebar.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'))
-        const headingEls = links
-            .map((link) => document.getElementById(link.getAttribute('href')!.slice(1)))
-            .filter(Boolean) as HTMLElement[]
-
-        if (!headingEls.length) return
-
-        const setActive = (id: string): void => {
-            links.forEach((link) => {
-                const isActive = link.getAttribute('href') === `#${id}`
-                if (isActive) link.setAttribute('aria-current', 'location')
-                else link.removeAttribute('aria-current')
-            })
-        }
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) setActive(entry.target.id)
-                })
-            },
-            { rootMargin: '-100px 0px -66%', threshold: 0 },
-        )
-
-        headingEls.forEach((el) => observer.observe(el))
-
-        document.addEventListener('astro:before-preparation', () => observer.disconnect(), { once: true })
+    // The same watching as JAAMD's `:::toc`: the heading in view, measured from
+    // where an anchored heading comes to rest. Each run replaces the last.
+    let stop: (() => void) | undefined
+    function watchToc(): void {
+        stop?.()
+        stop = initToc(document, { selector: '#docs-toc' })
     }
 
-    initToc()
-    document.addEventListener('astro:page-load', initToc)
+    watchToc()
+    document.addEventListener('astro:page-load', watchToc)
 </script>
