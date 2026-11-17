@@ -63,7 +63,7 @@ export const siteConfigShape = {
         .union([z.string(), z.literal(false)], {
             error:
                 'footer is one line of text, or false to remove it. ' +
-                'The message/copyright pair is gone: write them as a single string, ' +
+                'Write a message and a copyright as a single string, ' +
                 'e.g. "MIT Licensed · © 2026 Me · :credit".',
         })
         .optional(),

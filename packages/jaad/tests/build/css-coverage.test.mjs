@@ -71,8 +71,8 @@ test('the package styles no bare element outside a cascade layer', () => {
 })
 
 // The bare-element check above reads the bundle, where a class selector is
-// indistinguishable from a utility. docs.css went unlayered for a whole release
-// because of that, outranking every utility a consumer writes on a .docs-* box.
+// indistinguishable from a utility. Unlayered, docs.css would outrank every
+// utility a consumer writes on a .docs-* box.
 test('the documentation stylesheet is layered as a whole', () => {
     const source = readFileSync(join(SRC, 'docs/styles/docs.css'), 'utf8')
 
