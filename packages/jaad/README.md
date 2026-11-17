@@ -11,7 +11,7 @@
 <div align="center">
 
 [![main](https://github.com/jaamd/jaamd/actions/workflows/ci.yml/badge.svg)](https://github.com/jaamd/jaamd/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/withastro/astro/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/jaamd/jaamd/blob/main/packages/jaad/LICENSE)
 [![npm version](https://badge.fury.io/js/@jaamd%2Fjaad.svg)](https://badge.fury.io/js/@jaamd%2Fjaad)
 </div>
 
@@ -25,10 +25,10 @@ Or add it to a repository that already has a `docs/` folder:
 npm create @jaamd/jaad@latest -- --here
 ```
 
-By hand:
+By hand, install it with Astro and write three files:
 
 ```bash
-npm install @jaamd/jaad
+npm install astro @jaamd/jaad
 ```
 
 ```ts
@@ -41,6 +41,16 @@ export default defineJaadConfig({
 })
 ```
 
+```js
+// astro.config.mjs
+export { default } from '@jaamd/jaad/site'
+```
+
+```ts
+// src/content.config.ts
+export { collections } from '@jaamd/jaad/content'
+```
+
 ## Documentation
 
 The documentation ships with the package, in
@@ -51,9 +61,9 @@ there; projects made with `create-jaad` already do. It is also published at
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md), including the guide for contributing
+See [CONTRIBUTING.md](https://github.com/jaamd/jaamd/blob/main/CONTRIBUTING.md), including the guide for contributing
 new interface translations.
 
 ## License
 
-jaad is released under the [MIT License](/LICENSE).
+jaad is released under the [MIT License](https://github.com/jaamd/jaamd/blob/main/packages/jaad/LICENSE).
