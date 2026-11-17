@@ -12,6 +12,7 @@ with Astro's own heading ids. On Sätteri, Astro's default:
 // astro.config.mjs
 import { satteri } from '@astrojs/markdown-satteri'
 import { satteriPlugins } from '@jaamd/astro'
+import { defineConfig } from 'astro/config'
 
 export default defineConfig({
     markdown: {
@@ -26,6 +27,7 @@ On unified:
 // astro.config.mjs
 import { unified } from '@astrojs/markdown-remark'
 import { unifiedPlugins } from '@jaamd/astro'
+import { defineConfig } from 'astro/config'
 
 export default defineConfig({
     markdown: {

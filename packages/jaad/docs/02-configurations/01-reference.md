@@ -92,7 +92,8 @@ defineJaadConfig({
 ```
 
 Bundled forge icons are available for `github`, `gitlab`, `codeberg`, `gitea`,
-`forgejo`, `bitbucket` and `sourcehut`. Other keys require an `svg`.
+`forgejo`, `bitbucket` and `sourcehut`. Any other key shows its `svg`, or else
+its label as text.
 
 Object entries accept `href`, with optional `label` and `svg` fields.
 
@@ -230,7 +231,9 @@ defineJaadConfig({
 })
 ```
 
-`astro` is read by `@jaamd/jaad/site`. `jaad(config)` ignores it.
+`astro` is read by `@jaamd/jaad/site`. `jaad(config)` reads only `astro.fonts`,
+to load those fonts on its pages: declare the same fonts in your own
+`defineConfig`.
 
 For full control, use a regular Astro configuration and add `jaad(config)` to
 its integrations, as shown in

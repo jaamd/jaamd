@@ -41,7 +41,7 @@ Site: [jaamd.org](https://jaamd.org). Documentation: [docs.jaamd.org](https://do
 | [`@jaamd/jaad`](/packages/jaad)               | A documentation site from a folder of Markdown, built on jaamd |
 | [`@jaamd/create-jaad`](/packages/create-jaad) | Scaffolds a jaad site: `npm create @jaamd/jaad@latest`         |
 
-Each package keeps its tests in `tests/`, with a fixture site for the build assertions.
+Each package keeps its tests in `tests/`; `astro` and `jaad` add a fixture site for the build assertions.
 
 ```bash
 pnpm install

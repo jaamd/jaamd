@@ -44,18 +44,17 @@ import MarkdownContent from '@jaamd/astro/components'
 
 ## Themes
 
-The picker in the header switches between JAAMD's own palette, which follows your
-system, and the presets the package ships. The whole page follows, syntax colours
-included: Shiki bakes one variable per theme at build time and the switch is pure
-CSS.
+JAAMD's own palette follows your system, light or dark, and the package ships
+presets to replace it. Syntax colours follow too: with a dual Shiki theme, each
+token carries both colours and the switch is pure CSS.
 
 ```css
 @import '@jaamd/astro/default.css';
 @import '@jaamd/astro/themes/nord.css';
 ```
 
-A theme declares nine seed colours and everything else derives from them. Adding
-one is a directory and a manifest entry.
+A theme declares fourteen colours and everything else derives from them. Adding
+one is a directory with a `palette.js` and a manifest entry.
 
 ---
 
@@ -134,9 +133,9 @@ export function hello(name: string): string {
 
 ## Heading links
 
-Hover any heading on this page to reveal the anchor icon. It links to that
-section. All six levels have one, and an anchored heading comes to rest
-clear of the sticky header above.
+Hover or focus any heading on this page to reveal the anchor icon. It links to
+that section. All six levels have one, and an anchored heading comes to rest
+`--jaamd-scroll-margin-top` below the top of the window.
 
 ### Headings that mention frontmatter
 
@@ -195,7 +194,7 @@ Wrapped in a scroll container, so a wide table never pushes the page sideways.
 | Alerts            | `> [!NOTE]`      | Five variants            |
 | Code tabs         | `:::code-tabs`   | Keyboard navigable       |
 | Copy buttons      | any `pre`        | Resets after 2 s         |
-| Heading links     | `h1`–`h6`        | Copies the section URL   |
+| Heading links     | `h1`–`h6`        | Links to the section     |
 | Image lightbox    | any `img`        | Backdrop + Esc to close  |
 | Details           | `<details>`      | Animated in CSS          |
 | Spoilers          | `:spoiler[text]` | Click or Enter to reveal |

@@ -14,15 +14,15 @@ export interface JaamdOptions extends PluginOptions {
 
     /**
      * Shiki theme. `{ light, dark }` switches on a `.dark` class on `<html>`.
-     * Unset, `markdown.shikiConfig` is left as configured; "github-light"
-     * replaces only Astro's own default.
-     * @default "github-light"
+     * Unset, `markdown.shikiConfig` is left as configured, except that Astro's
+     * own default theme becomes "github-light".
      */
     theme?: ShikiTheme
 
     /**
-     * Injects the default `--jaamd-*` values on every page. `<MarkdownContent>`
-     * imports them anyway.
+     * Injects the default `--jaamd-*` values into every page. They are layered,
+     * so any `:root` value of yours wins either way: `false` only drops the file.
+     * `<MarkdownContent>` imports them anyway.
      * @default true
      */
     defaultVariables?: boolean

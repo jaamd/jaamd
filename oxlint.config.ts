@@ -1,7 +1,7 @@
 import { defineConfig } from 'oxlint'
 
 export default defineConfig({
-    ignorePatterns: ['**/dist/**', '**/.astro/**', 'packages/create-jaad/templates/**', '_import/**'],
+    ignorePatterns: ['**/dist/**', '**/.astro/**', 'packages/create-jaad/templates/**'],
     plugins: ['typescript', 'unicorn', 'oxc', 'import'],
     categories: {
         correctness: 'error',

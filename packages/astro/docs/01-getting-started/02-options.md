@@ -34,10 +34,13 @@ It does not affect the CSS file, which always uses `.jaamd-content`.
 
 ## `defaultVariables`
 
-Set to `false` when you supply a complete `--jaamd-*` variable set of your own.
-It has no effect on `<MarkdownContent>`, which imports the defaults directly;
-with a custom wrapper, control them by importing `@jaamd/astro/default.css` or
-not.
+Injects `default.css`, the default `--jaamd-*` values, into every page. They sit
+in `@layer jaamd.defaults`, so your own `:root` values and the theme presets win
+over them whether this is on or off.
+
+Set it to `false` only to drop that file when you supply every variable
+yourself. `<MarkdownContent>` imports the defaults anyway, so pages that use it
+keep them; with a custom wrapper, import `@jaamd/astro/default.css` or not.
 
 ## `features`
 

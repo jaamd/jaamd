@@ -147,13 +147,13 @@ test('a footer line is taken verbatim, placeholder and all', () => {
     assert.equal(bare({ footer: '© 2026 Me · :credit' }).footer, '© 2026 Me · :credit')
 })
 
-// `false` was accepted by the schema but never read, so the footer still rendered.
+// The footer component reads `false`: the parse must keep it.
 test('footer false survives the parse, so the component can act on it', () => {
     assert.equal(bare({ footer: false }).footer, false)
 })
 
-// The message/copyright pair was dropped; the error has to say where it went.
-test('the old footer object is refused with its replacement spelled out', () => {
+// A footer written as an object is refused, and the error says how to write it.
+test('a footer object is refused with its replacement spelled out', () => {
     assert.throws(
         () => bare({ footer: { message: 'MIT', copyright: '© 2026' } }),
         (error: Error) => {
@@ -165,7 +165,7 @@ test('the old footer object is refused with its replacement spelled out', () => 
     )
 })
 
-// A back-reference in an integration used to throw during serialisation.
+// An integration can reference itself, so it must stay out of the serialised config.
 test("astro's own options never reach the resolved config", () => {
     const integration = { name: 'x', hooks: {} } as Record<string, unknown>
     integration.self = integration

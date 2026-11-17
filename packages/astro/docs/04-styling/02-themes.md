@@ -24,16 +24,16 @@ schemes. A **dual** preset carries a light and a dark palette and follows
 | Rosé Pine Moon | `@jaamd/astro/themes/rose-pine-moon.css` | dual | `rose-pine-dawn` / `rose-pine-moon`            |
 | Tokyo Night    | `@jaamd/astro/themes/tokyo-night.css`    | dark | `tokyo-night`                                  |
 
-As a standalone theme, replacing the default light theme:
+As a standalone theme, replacing the default light theme, set its Shiki theme
+and import its palette. The integration already loads the defaults and the
+styles:
 
 ```ts
 jaamd({ theme: 'dracula' })
 ```
 
 ```css
-@import '@jaamd/astro/default.css';
 @import '@jaamd/astro/themes/dracula.css';
-@import '@jaamd/astro/styles.css';
 ```
 
 A single-palette preset can also be scoped to `html.dark` via the `/dark`
@@ -51,8 +51,8 @@ import '@jaamd/astro/themes/dracula/dark.css'
 > [!IMPORTANT]
 > A preset declares a palette, not the whole variable set: surfaces, borders and
 > the table-of-contents card are derived from it by `default.css`. Load the
-> defaults alongside it. Do **not** pair a preset with `defaultVariables: false`: those
-> derived tokens fall back to the light palette.
+> defaults alongside it. With `defaultVariables: false`, a page without
+> `<MarkdownContent>` has no derived tokens, and those parts lose their colours.
 
 Each theme declares itself, so a picker can be built from data:
 

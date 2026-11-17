@@ -68,7 +68,7 @@ defineJaadConfig({
 
 - The key is the URL segment: `api/01-client.md` is served at `/api/client`.
 - `label` names the section, in the sidebar and in the browser title of its
-  pages; it defaults to the key.
+  pages; it defaults to the key, title-cased: `api` becomes `Api`.
 - A directory can sit outside the project, such as the `docs/` of a package. No
   section's directory can be inside another's.
 - Sections appear in the order they are declared. `docsDir` is read alongside

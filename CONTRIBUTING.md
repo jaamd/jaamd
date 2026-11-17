@@ -15,7 +15,7 @@ Before opening a pull request, run the same checks as CI:
 ```bash
 pnpm format:check && pnpm lint && pnpm check
 pnpm test
-pnpm test:build      # builds each package fixture and asserts on its output
+pnpm test:build      # builds each fixture, the site and the docs, and asserts on their output
 pnpm test:consumer   # installs the packed tarballs into throwaway projects
 ```
 
@@ -115,14 +115,14 @@ To contribute another language:
 
 1. Copy `packages/jaad/contributing/ui-locale.template.ts` to
    `packages/jaad/src/site/ui/<language>.ts`, using a lowercase ISO 639-1 language
-   code for the filename.
+   code for the filename, and import `UiCatalog` from `'../ui.ts'` in the copy.
 2. Rename `UI_LOCALE` to a language-specific constant and translate every
    value. Do not leave empty strings.
 3. Import the catalogue in `packages/jaad/src/site/ui.ts` and add its language code
    to `UI_CATALOGS`.
-4. Add the catalogue to the completeness test in `packages/jaad/tests/unit/ui.test.ts` and
-   update the supported-language list in
-   `packages/jaad/docs/02-configurations/03-i18n.md`.
+4. Update the supported-language list in
+   `packages/jaad/docs/02-configurations/03-i18n.md`. The tests check every
+   registered catalogue for missing or empty strings.
 5. Run the checks above.
 
 Translate meaning rather than individual words. Keep labels concise, preserve

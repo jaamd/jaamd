@@ -110,8 +110,9 @@ conditional placement. JAAD's internal components are not part of this API.
 
 ### Navigation shapes
 
-`DocsNavGroup` is a union discriminated on `type`. With sections, every group
-is a `section`, holding the pages and chapters of that section.
+`DocsNavGroup` is a union discriminated on `type`. With sections, the pages and
+chapters outside every section come first, then one `section` group each,
+holding the pages and chapters of that section.
 
 ```ts
 type DocsNavEntry = { type: 'page'; item: DocsNavItem } | { type: 'chapter'; chapter: string; items: DocsNavItem[] }
