@@ -9,7 +9,7 @@ export type UiCatalog = Record<UiKey, string>
 
 export type UiOverrides = Record<string, Partial<Record<string, string>>>
 
-const UI_CATALOGS = {
+export const UI_CATALOGS = {
     en: ENGLISH_UI,
     it: ITALIAN_UI,
 } satisfies Record<string, UiCatalog>

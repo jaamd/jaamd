@@ -1,7 +1,8 @@
 import type { UiCatalog } from '../src/site/ui.ts'
 
-/** Copy this file into packages/jaad/src/site/ui/, rename the constant, then fill
- *  every value. Registering an unfinished catalogue makes the tests fail. */
+/** Copy this file into packages/jaad/src/site/ui/, import `UiCatalog` from
+ *  '../ui.ts' there, rename the constant, then fill every value. Registering an
+ *  unfinished catalogue makes the tests fail. */
 export const UI_LOCALE = {
     'breadcrumb.label': '',
     home: '',

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { resolveConfig } from '../../src/config.ts'
-import { UI_DEFAULTS, UI_KEYS, UI_SUPPORTED_LOCALES, uiString } from '../../src/site/ui.ts'
+import { UI_CATALOGS, UI_DEFAULTS, UI_KEYS, UI_SUPPORTED_LOCALES, uiString } from '../../src/site/ui.ts'
 import { ITALIAN_UI } from '../../src/site/ui/it.ts'
 
 test("a locale's override wins over its bundled catalogue", () => {
@@ -55,11 +55,12 @@ test('unlocalised docs use the lang override as their default locale', () => {
 })
 
 test('every bundled catalogue is complete and non-empty', () => {
-    assert.deepEqual(UI_SUPPORTED_LOCALES, ['en', 'it'])
-    assert.deepEqual(Object.keys(ITALIAN_UI), UI_KEYS)
+    assert.ok(UI_SUPPORTED_LOCALES.includes('en'), 'English is the fallback')
 
-    for (const key of UI_KEYS) {
-        assert.ok(UI_DEFAULTS[key].length > 0, key)
-        assert.ok(ITALIAN_UI[key].length > 0, `it.${key}`)
+    for (const [code, catalogue] of Object.entries(UI_CATALOGS)) {
+        assert.deepEqual(Object.keys(catalogue), UI_KEYS, code)
+        for (const key of UI_KEYS) {
+            assert.ok(catalogue[key].length > 0, `${code}.${key}`)
+        }
     }
 })
