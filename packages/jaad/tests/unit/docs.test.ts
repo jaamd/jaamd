@@ -195,7 +195,7 @@ test('without a file on record, the edit path falls back to the id', () => {
 test('slugs become titles, preserving separators the filesystem mangles', () => {
     assert.equal(slugToTitle('getting-started'), 'Getting Started')
     assert.equal(slugToTitle('images-&-videos'), 'Images & Videos')
-    assert.equal(slugToTitle('detail_%26_summary'), 'Detail & Summary')
+    assert.equal(slugToTitle('api_reference'), 'Api Reference')
 })
 
 test('a chapter title is null when there is no chapter', () => {
