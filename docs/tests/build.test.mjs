@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { MOVED } from '../worker.ts'
+import { MARKDOWN_SOURCES, MOVED } from '../worker.ts'
 
 const DIST = fileURLToPath(new URL('../dist', import.meta.url))
 const PACKAGES = fileURLToPath(new URL('../../packages', import.meta.url))
@@ -55,6 +55,11 @@ test('a page title names its section, the opening page the site alone', () => {
     assert.equal(title('index.html'), 'JAAMD Docs')
     assert.equal(title('jaamd/index.html'), 'Overview · JAAMD | JAAMD Docs')
     assert.equal(title('jaad/getting-started/installation/index.html'), 'Installation · JAAD | JAAMD Docs')
+})
+
+test('the Markdown of every opening page is built where the Worker looks for it', () => {
+    const missing = Object.values(MARKDOWN_SOURCES).filter((source) => !existsSync(join(DIST, source)))
+    assert.deepEqual(missing, [])
 })
 
 test('every moved page has a built target', () => {
