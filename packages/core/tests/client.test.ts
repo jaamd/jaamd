@@ -12,6 +12,7 @@ for (const name of [
     'document',
     'Element',
     'HTMLElement',
+    'HTMLButtonElement',
     'HTMLDialogElement',
     'IntersectionObserver',
     'getComputedStyle',
@@ -20,6 +21,9 @@ for (const name of [
 ] as const) {
     Object.defineProperty(globalThis, name, { value: window[name], configurable: true })
 }
+
+// happy-dom has no invoker commands; the browsers JAAMD targets do.
+Object.defineProperty(window.HTMLButtonElement.prototype, 'command', { value: '', writable: true, configurable: true })
 
 // After the globals: the module reads `document` when called, not when loaded.
 const { enhance } = await import('../src/client/index.ts')
@@ -130,9 +134,59 @@ test('a click selects a tab and reveals a spoiler', () => {
     const spoiler = root.querySelector('.jaamd-spoiler')
     click(spoiler)
     assert.ok(spoiler?.hasAttribute('data-revealed'))
-    assert.equal(spoiler?.getAttribute('aria-expanded'), 'true')
 
     dispose()
+})
+
+test('a revealed spoiler is plain content again, and a click inside keeps it so', () => {
+    const root = mount()
+    root.insertAdjacentHTML('beforeend', '<div class="jaamd-spoiler"><p>See <a href="#x">this</a>.</p></div>')
+    const dispose = enhance(root)
+
+    const spoiler = root.querySelector('div.jaamd-spoiler')!
+    assert.equal(spoiler.getAttribute('role'), 'button')
+    assert.equal(spoiler.getAttribute('aria-expanded'), 'false')
+
+    click(spoiler)
+    assert.ok(spoiler.hasAttribute('data-revealed'))
+    assert.equal(spoiler.getAttribute('role'), null, 'the content is still read as a button label')
+    assert.equal(spoiler.getAttribute('aria-label'), null)
+    assert.equal(spoiler.getAttribute('tabindex'), '-1')
+
+    click(spoiler.querySelector('a'))
+    assert.ok(spoiler.hasAttribute('data-revealed'), 'a click on a link hid the spoiler again')
+
+    dispose()
+})
+
+test('a picture is wrapped whole, so its sources still apply', () => {
+    const root = mount()
+    root.insertAdjacentHTML(
+        'beforeend',
+        '<picture><source srcset="/a.avif" type="image/avif"><img src="/a.png" alt="Photo"></picture>',
+    )
+    const dispose = enhance(root)
+
+    const picture = root.querySelector('picture')!
+    assert.equal(picture.parentElement?.className, 'jaamd-lightbox-trigger')
+    assert.equal(picture.querySelector('img')?.parentElement, picture, 'the image left its picture')
+    assert.equal(picture.querySelector('img')?.title, '', 'the image got a title it did not have')
+
+    dispose()
+})
+
+test('without invoker commands, images are left as they are', () => {
+    const descriptor = Object.getOwnPropertyDescriptor(window.HTMLButtonElement.prototype, 'command')!
+    delete (window.HTMLButtonElement.prototype as { command?: string }).command
+    const root = mount()
+
+    try {
+        const dispose = enhance(root)
+        assert.equal(root.querySelectorAll('.jaamd-lightbox-trigger').length, 0)
+        dispose()
+    } finally {
+        Object.defineProperty(window.HTMLButtonElement.prototype, 'command', descriptor)
+    }
 })
 
 test('the cleanup releases the listeners once no call is left', () => {

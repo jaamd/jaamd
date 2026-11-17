@@ -50,24 +50,42 @@ const editHref = editBase ? editUrl(editBase, editPath) : null
 </div>
 
 <script>
+    /** Safari allows a clipboard write only while the click is being handled:
+     *  a ClipboardItem starts it there and lets the Markdown arrive later. */
+    async function copyMarkdown(href: string): Promise<void> {
+        const text = fetch(href).then((res) => {
+            if (!res.ok) throw new Error(`${href} answered ${res.status}`)
+            return res.text()
+        })
+
+        if (typeof ClipboardItem === 'undefined') {
+            await navigator.clipboard.writeText(await text)
+            return
+        }
+
+        const blob = text.then((markdown) => new Blob([markdown], { type: 'text/plain' }))
+        await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })])
+    }
+
     function initCopyPageButtons(): void {
         document.querySelectorAll<HTMLButtonElement>('[data-copy-page]').forEach((btn) => {
             if (btn.dataset.copyInit) return
             btn.dataset.copyInit = '1'
 
             const label = btn.querySelector<HTMLElement>('[data-copy-label]')
+            // Read once: a second click within the two seconds would read "Copied!".
+            const original = label?.textContent ?? ''
+            let restore: ReturnType<typeof setTimeout> | undefined
 
             btn.addEventListener('click', async () => {
                 const href = btn.dataset.mdHref
                 if (!href) return
                 try {
-                    const res = await fetch(href)
-                    const text = await res.text()
-                    await navigator.clipboard.writeText(text)
+                    await copyMarkdown(href)
                     if (label) {
-                        const original = label.textContent
                         label.textContent = btn.dataset.copied ?? 'Copied!'
-                        setTimeout(() => {
+                        clearTimeout(restore)
+                        restore = setTimeout(() => {
                             label.textContent = original
                         }, 2000)
                     }

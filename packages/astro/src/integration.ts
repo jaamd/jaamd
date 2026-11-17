@@ -80,12 +80,20 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
                 )
 
                 // Again on every View Transitions navigation, releasing the previous run.
+                // `astro:page-load` also fires on the first load with <ClientRouter />,
+                // and every navigation brings a new <body>: one run per body.
                 injectScript(
                     'page',
                     [
                         `import { enhance } from ${CLIENT};`,
                         `let dispose;`,
-                        `const run = () => { dispose?.(); dispose = enhance(${JSON.stringify(selector)}, ${client}); };`,
+                        `let enhanced;`,
+                        `const run = () => {`,
+                        `  if (enhanced === document.body) return;`,
+                        `  enhanced = document.body;`,
+                        `  dispose?.();`,
+                        `  dispose = enhance(${JSON.stringify(selector)}, ${client});`,
+                        `};`,
                         `run();`,
                         `document.addEventListener("astro:page-load", run);`,
                     ].join('\n'),

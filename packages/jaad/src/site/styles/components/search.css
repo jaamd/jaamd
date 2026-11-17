@@ -20,8 +20,18 @@
         @apply md:hidden;
     }
 
+    /* A modal <dialog>, laid over the whole viewport: the UA's box is reset. */
     .jaad-search-overlay {
-        @apply fixed inset-0 z-50 flex items-start justify-center px-4 pt-[15vh];
+        @apply fixed inset-0 z-50 m-0 h-full max-h-none w-full max-w-none items-start justify-center border-0 bg-transparent px-4 pt-[15vh];
+    }
+
+    .jaad-search-overlay[open] {
+        @apply flex;
+    }
+
+    /* The panel draws its own backdrop. */
+    .jaad-search-overlay::backdrop {
+        background: transparent;
     }
 
     .jaad-search-backdrop {
@@ -45,7 +55,7 @@
     }
 
     .jaad-search-close {
-        @apply bg-background-secondary text-foreground-muted shrink-0 cursor-pointer rounded px-1.5 py-0.5 text-xs;
+        @apply bg-background-secondary text-foreground-muted shrink-0 cursor-pointer rounded border-0 px-1.5 py-0.5 font-mono text-xs;
     }
 
     .jaad-search-filters {
