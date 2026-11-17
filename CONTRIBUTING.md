@@ -15,7 +15,7 @@ Before opening a pull request, run the same checks as CI:
 ```bash
 pnpm format:check && pnpm lint && pnpm check
 pnpm test
-pnpm test:build      # builds each package fixture and asserts on its output
+pnpm test:build      # builds each fixture, the site and the docs, and asserts on their output
 pnpm test:consumer   # installs the packed tarballs into throwaway projects
 ```
 

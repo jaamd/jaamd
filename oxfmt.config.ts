@@ -15,6 +15,5 @@ export default defineConfig({
     ignorePatterns: [
         // Copied verbatim into scaffolded projects.
         'packages/create-jaad/templates/**',
-        '_import/**',
     ],
 })
