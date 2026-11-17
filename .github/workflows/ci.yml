@@ -26,7 +26,8 @@ jobs:
               with:
                   node-version: '24'
                   cache: pnpm
-            - run: pnpm install --frozen-lockfile
+            # Formatting and linting read sources only: nothing needs building.
+            - run: pnpm install --frozen-lockfile --ignore-scripts
             - run: pnpm format:check
             - run: pnpm lint
 
