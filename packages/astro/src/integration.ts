@@ -21,8 +21,9 @@ export interface JaamdOptions extends PluginOptions {
     theme?: ShikiTheme
 
     /**
-     * Injects the default `--jaamd-*` values on every page. `<MarkdownContent>`
-     * imports them anyway.
+     * Injects the default `--jaamd-*` values into every page. They are layered,
+     * so any `:root` value of yours wins either way: `false` only drops the file.
+     * `<MarkdownContent>` imports them anyway.
      * @default true
      */
     defaultVariables?: boolean

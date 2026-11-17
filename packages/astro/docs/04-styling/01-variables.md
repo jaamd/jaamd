@@ -83,6 +83,19 @@ follow `-p`; only their title is separate. The copy button, code-tab labels and
 heading-link icons stay tied to `--jaamd-font-size`: they are JAAMD's chrome,
 not your document's typography.
 
+## Beyond the variables
+
+When no variable covers what you want to change, override the rule itself.
+JAAMD's rules sit outside any cascade layer and start from the wrapper, as in
+`.jaamd-content h2`. A rule of yours wins when it is more specific, or as
+specific and loaded later:
+
+```css
+.jaamd-content h2 {
+    letter-spacing: -0.01em;
+}
+```
+
 ## Dark mode
 
 The default set includes dark-mode overrides activated by the `dark` class on
