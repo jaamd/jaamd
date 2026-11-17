@@ -9,20 +9,22 @@ default set, `@jaamd/astro/default.css`, is injected automatically.
 
 ## Colours
 
-Four seeds set most of the palette:
+Four seeds set most of the palette. These are the light defaults:
 
 ```css
 :root {
-    --jaamd-bg: #ffffff;
+    --jaamd-bg: #faf8f5;
     --jaamd-color-fg: #3a3a3a;
     --jaamd-color-fg-bright: #1a1a1a;
-    --jaamd-color-primary: #3b5bdb;
+    --jaamd-color-primary: #2d2d2d;
 }
 ```
 
 Surfaces, borders and the table-of-contents card are derived from them with
 `color-mix()`, supported in Chrome and Edge 111+, Safari 16.2+ and Firefox
-113+. Override any variable on `:root` in your own stylesheet; for example:
+113+. Heading borders and rules use relative colours, `rgb(from …)`, which need
+Chrome and Edge 119+, Safari 16.4+ and Firefox 128+. Override any variable on
+`:root` in your own stylesheet; for example:
 
 ```css
 :root {
@@ -35,7 +37,7 @@ Defaults live in `@layer jaamd.defaults`, so an unlayered `:root` block always
 wins regardless of import order.
 
 See [`variables.css`](https://github.com/jaamd/jaamd/blob/main/packages/core/src/styles/variables.css)
-for all 60 variables and their default values.
+for every variable and its default value.
 
 ## Font sizes
 

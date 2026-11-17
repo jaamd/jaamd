@@ -67,13 +67,32 @@ const html = await unified()
     .process(source)
 ```
 
-`satteriPlugins()` does the same for Sätteri, parser features included:
+`allowDangerousHtml` keeps the HTML the plugins write, such as heading links and
+code tabs: without it, `remark-rehype` and `rehype-stringify` drop it.
+
+`satteriPlugins()` does the same for Sätteri, parser features included. Sätteri
+gives headings no ids of its own, so this example adds GitHub's:
 
 ```ts
 import { satteriPlugins } from '@jaamd/core/satteri'
+import GithubSlugger from 'github-slugger'
 import { markdownToHtml } from 'satteri'
 
-const html = await markdownToHtml(source, satteriPlugins({ headingIds }))
+/** GitHub's heading ids, numbered within one document. */
+function headingIds() {
+    const slugger = new GithubSlugger()
+    return {
+        name: 'heading-ids',
+        element: {
+            filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+            visit(node, ctx) {
+                ctx.setProperty(node, 'id', slugger.slug(ctx.textContent(node)))
+            },
+        },
+    }
+}
+
+const html = await markdownToHtml(source, satteriPlugins({ headingIds: headingIds() }))
 ```
 
 Heading links are added to headings that have an `id`. Core assigns none:

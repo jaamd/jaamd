@@ -20,11 +20,11 @@ yours; JAAMD only changes how Markdown looks and behaves.
 
 ## Packages
 
-| Package        | What it is                                                                       |
-| -------------- | -------------------------------------------------------------------------------- |
-| `@jaamd/astro` | The Astro integration and the `<MarkdownContent>` component. Install this one.   |
-| `@jaamd/core`  | The plugins, the client script and the styles, with no framework around them.    |
-| `@jaamd/jaad`  | A [documentation site generator](../../jaad/docs/00-overview.md) built on JAAMD. |
+| Package        | What it is                                                                     |
+| -------------- | ------------------------------------------------------------------------------ |
+| `@jaamd/astro` | The Astro integration and the `<MarkdownContent>` component. Install this one. |
+| `@jaamd/core`  | The plugins, the client script and the styles, with no framework around them.  |
+| `@jaamd/jaad`  | A [documentation site generator](https://docs.jaamd.org/jaad) built on JAAMD.  |
 
 `@jaamd/astro` brings `@jaamd/core` with it: an Astro project never installs
 core itself. To use JAAMD with another framework, see
