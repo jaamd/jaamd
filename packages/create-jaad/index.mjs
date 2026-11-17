@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs'
-import { writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { styleText } from 'node:util'
 import * as p from '@clack/prompts'
 import {
     DEFAULT_TEMPLATE,
     HELP,
+    completeManifest,
+    devCommand,
     fail,
+    formatManifest,
     missingAnswers,
     normaliseDir,
     packageManager,
@@ -20,14 +22,21 @@ import {
 // Every package is released at one version: this one's is JAAD's.
 const JAAD = `^${JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version}`
 const ASTRO = '^7.4.2'
-const ASTRO_CONFIG_NAMES = ['astro.config.ts', 'astro.config.mjs', 'astro.config.js']
-const CONTENT_CONFIG_NAMES = ['src/content.config.ts', 'src/content.config.mjs', 'src/content.config.js']
+// The names Astro itself looks for.
+const ASTRO_CONFIG_NAMES = ['astro.config.ts', 'astro.config.mts', 'astro.config.mjs', 'astro.config.js']
+const CONTENT_CONFIG_NAMES = [
+    'src/content.config.ts',
+    'src/content.config.mts',
+    'src/content.config.mjs',
+    'src/content.config.js',
+]
 const JAAD_CONFIG_NAMES = ['jaad.config.ts', 'jaad.config.mjs', 'jaad.config.js']
 const ASTRO_CONFIG = 'export { default } from "@jaamd/jaad/site";\n'
 const CONTENT_CONFIG = 'export { collections } from "@jaamd/jaad/content";\n'
 const MANUAL_SETUP_URL = 'https://docs.jaamd.org/jaad/getting-started/installation#existing-astro-project'
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
 const FAVICON_NAMES = ['favicon.svg', 'favicon.ico', 'favicon.png']
+const DEFAULT_DIR = 'my-docs'
 
 function markdownUnder(dir) {
     if (!existsSync(dir)) return 0
@@ -38,15 +47,19 @@ function markdownUnder(dir) {
     )
 }
 
-/** Never overwrites: an existing file is the user's, not ours. */
+/** Never overwrites: an existing file is the user's, not ours. `wx` also
+ *  refuses a symlink, even one that points nowhere yet. */
 function write(target, relative, contents, written, skipped) {
     const file = join(target, relative)
-    if (existsSync(file)) {
+    mkdirSync(dirname(file), { recursive: true })
+
+    try {
+        writeFileSync(file, contents, { flag: 'wx' })
+    } catch (error) {
+        if (error.code !== 'EEXIST') throw error
         skipped.push(relative)
         return
     }
-    mkdirSync(dirname(file), { recursive: true })
-    writeFileSync(file, contents)
     written.push(relative)
 }
 
@@ -77,9 +90,10 @@ function readManifest(target) {
     const file = manifestPath(target)
     if (!existsSync(file)) return { manifest: null, issue: null }
 
+    const source = readFileSync(file, 'utf8').replace(/^\uFEFF/, '')
     let manifest
     try {
-        manifest = JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, ''))
+        manifest = JSON.parse(source)
     } catch {
         return {
             manifest: null,
@@ -103,7 +117,7 @@ function readManifest(target) {
         }
     }
 
-    return { manifest, issue: null }
+    return { manifest, source, issue: null }
 }
 
 const isRecord = (value) => typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -142,7 +156,7 @@ function failSetup(issues) {
 /** Inspect everything before writing: a failed --here setup is a no-op. */
 function inspectExistingProject(target) {
     const issues = []
-    const { manifest, issue: manifestIssue } = readManifest(target)
+    const { manifest, source, issue: manifestIssue } = readManifest(target)
     if (manifestIssue) issues.push(manifestIssue)
 
     const astroConfig = inspectConfig(target, ASTRO_CONFIG_NAMES, ASTRO_CONFIG, 'Astro configuration', issues)
@@ -151,34 +165,19 @@ function inspectExistingProject(target) {
 
     if (issues.length > 0) failSetup(issues)
 
-    return { manifest, astroConfig, contentConfig, jaadConfig }
+    return { manifest, manifestSource: source ?? null, astroConfig, contentConfig, jaadConfig }
 }
 
-/**
- * Adds what is missing rather than replacing. `type` is set only on a manifest
- * we create: adding it to someone's library would change how Node reads every
- * file in it, and `astro.config.mjs` is ESM either way.
- */
-function writeManifest(target, existing, name) {
-    const manifest = existing ?? { name, private: true, type: 'module' }
+/** Writes package.json only when it gains something: "created", "updated" or null. */
+function writeManifest(target, existing, source, name) {
+    const manifest = completeManifest(existing, {
+        name,
+        dependencies: { astro: ASTRO, '@jaamd/jaad': JAAD },
+    })
+    if (existing && JSON.stringify(manifest) === JSON.stringify(existing)) return null
 
-    manifest.scripts = {
-        dev: 'astro dev',
-        build: 'astro build',
-        preview: 'astro preview',
-        ...manifest.scripts,
-    }
-    const dependencies = { ...manifest.dependencies }
-    if (!('astro' in dependencies) && !('astro' in (manifest.devDependencies ?? {}))) {
-        dependencies.astro = ASTRO
-    }
-    if (!('@jaamd/jaad' in dependencies) && !('@jaamd/jaad' in (manifest.devDependencies ?? {}))) {
-        dependencies['@jaamd/jaad'] = JAAD
-    }
-
-    if (Object.keys(dependencies).length > 0) manifest.dependencies = dependencies
-
-    writeFileSync(manifestPath(target), JSON.stringify(manifest, null, 2) + '\n')
+    writeFileSync(manifestPath(target), formatManifest(manifest, source))
+    return existing ? 'updated' : 'created'
 }
 
 function answer(value) {
@@ -191,13 +190,50 @@ function answer(value) {
 
 const IGNORED_WHEN_EMPTY = ['.git', '.gitignore', '.DS_Store', 'Thumbs.db']
 
-function assertTargetAvailable(args, target) {
-    if (args.here || !existsSync(target)) return
+/** Missing, or holding nothing but repository and system files. A file is not empty. */
+function isEmptyDirectory(target) {
+    if (!existsSync(target)) return true
+    if (!statSync(target).isDirectory()) return false
 
     const entries = readdirSync(target).filter((entry) => !IGNORED_WHEN_EMPTY.includes(entry))
-    if (entries.length > 0) {
-        fail(`${args.dir} exists and is not empty. Use --here to add JAAD to it.`)
-    }
+    return entries.length === 0
+}
+
+function assertTargetAvailable(args, target) {
+    if (args.here || isEmptyDirectory(target)) return
+    fail(`${args.dir} exists and is not empty. Use --here to add JAAD to it.`)
+}
+
+/** Asks for a directory. The current one, when it is not empty, is used only once confirmed. */
+async function askDirectory(args) {
+    const dir = answer(
+        await p.text({
+            message: 'Where should we create the project?',
+            placeholder: DEFAULT_DIR,
+            defaultValue: DEFAULT_DIR,
+            validate(value) {
+                const { dir, here } = normaliseDir({ dir: value || DEFAULT_DIR, here: false })
+                if (!here && !isEmptyDirectory(resolve(dir))) {
+                    return `${dir} is not empty: pick another directory, or run this inside it with --here.`
+                }
+                return undefined
+            },
+        }),
+    )
+    if (dir === null) return false
+
+    args.dir = dir
+    normaliseDir(args)
+    if (!args.here || isEmptyDirectory(resolve('.'))) return true
+
+    const confirmed = answer(
+        await p.confirm({
+            message: 'The current directory is not empty. Add JAAD to it?',
+            initialValue: false,
+        }),
+    )
+    if (confirmed === false) p.cancel('Setup cancelled.')
+    return confirmed === true
 }
 
 async function collectAnswers(args) {
@@ -216,18 +252,7 @@ async function collectAnswers(args) {
         )
     }
 
-    if (!args.here && !args.dir) {
-        const dir = answer(
-            await p.text({
-                message: 'Where should we create the project?',
-                placeholder: '.',
-                defaultValue: '.',
-            }),
-        )
-        if (dir === null) return null
-        args.dir = dir
-        normaliseDir(args)
-    }
+    if (!args.here && !args.dir && !(await askDirectory(args))) return null
 
     const target = resolve(args.here ? '.' : args.dir)
     assertTargetAvailable(args, target)
@@ -236,6 +261,7 @@ async function collectAnswers(args) {
         ? inspectExistingProject(target)
         : {
               manifest: null,
+              manifestSource: null,
               astroConfig: null,
               contentConfig: null,
               jaadConfig: null,
@@ -344,8 +370,8 @@ function scaffold(request) {
         write(target, destination, withTitle(source, title), written, skipped)
     }
 
-    writeManifest(target, manifest, basename(target))
-    return { written, skipped, found }
+    const manifestChange = writeManifest(target, manifest, existing.manifestSource, basename(target))
+    return { written, skipped, found, manifestChange }
 }
 
 async function main() {
@@ -381,24 +407,29 @@ async function main() {
         return
     }
 
-    const { written, skipped, found } = result
+    const { written, skipped, found, manifestChange } = result
     p.log.success(request.title)
-    p.log.step([...written.map((file) => `created  ${file}`), 'updated  package.json'].join('\n'))
+
+    const changed = written.map((file) => `created  ${file}`)
+    if (manifestChange) changed.push(`${manifestChange}  package.json`)
+    if (changed.length > 0) p.log.step(changed.join('\n'))
 
     const kept = [
         ...skipped.map((file) => `kept     ${file}`),
+        ...(manifestChange ? [] : ['kept     package.json']),
         ...(found > 0 ? [`found    ${found} markdown file(s) in docs/`] : []),
     ]
     if (kept.length > 0) p.log.info(kept.join('\n'))
 
     const pm = packageManager()
     if (request.install) {
-        const installed = spawnSync(pm, ['install'], {
-            cwd: request.target,
-            stdio: 'inherit',
-            // npm and pnpm are .cmd shims on Windows.
-            shell: process.platform === 'win32',
-        })
+        const options = { cwd: request.target, stdio: 'inherit' }
+        // npm and pnpm are .cmd shims on Windows, run through a shell, which
+        // takes one command line rather than an argument list.
+        const installed =
+            process.platform === 'win32'
+                ? spawnSync(`${pm} install`, { ...options, shell: true })
+                : spawnSync(pm, ['install'], options)
         if (installed.status !== 0) {
             p.log.error(installed.error ? `could not run ${pm}: ${installed.error.message}` : `${pm} install failed.`)
             process.exitCode = 1
@@ -409,7 +440,7 @@ async function main() {
     const next = []
     if (!request.here) next.push(`cd ${quoteArg(request.dir)}`)
     if (!request.install) next.push(`${pm} install`)
-    next.push(`${pm} run dev`)
+    next.push(devCommand(pm, request.manifest?.scripts))
 
     const start = written.includes('docs/01-introduction.md') ? 'docs/01-introduction.md' : 'docs/'
     p.note(`${next.join('\n')}\n\nStart writing in ${start}`, 'Next steps')

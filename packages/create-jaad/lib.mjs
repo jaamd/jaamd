@@ -1,9 +1,12 @@
-import { resolve } from 'node:path'
+import { homedir } from 'node:os'
+import { join, resolve } from 'node:path'
 
 export const TEMPLATES = ['docs', 'site']
 export const DEFAULT_TEMPLATE = 'docs'
 
-export const HELP = `Usage: npm create @jaamd/jaad@latest [directory] [options]
+export const HELP = `Usage: npm create @jaamd/jaad@latest [directory] -- [options]
+
+npm hands options on only after --; pnpm, yarn and bun need no --.
 
   --here                    Set up JAAD in the current directory.
   --template <docs|site>    Docs at / (default), or a landing page with
@@ -24,8 +27,19 @@ function takeValue(argv, index, option) {
     return value
 }
 
+/** A prompt answer reaches no shell, so `~` is expanded here. */
+function expandHome(dir) {
+    if (dir === '~') return homedir()
+    if (dir.startsWith('~/')) return join(homedir(), dir.slice(2))
+    return dir
+}
+
 /** A path naming the current directory is --here, however it was spelled. */
 export function normaliseDir(args) {
+    if (typeof args.dir === 'string') {
+        const dir = expandHome(args.dir.trim())
+        args.dir = dir === '' ? null : dir
+    }
     if (args.dir && resolve(args.dir) === resolve('.')) {
         args.here = true
         args.dir = null
@@ -45,6 +59,8 @@ export function parseArgs(argv) {
 
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
+        // What npm leaves behind when it hands the options on.
+        if (arg === '--') continue
         if (arg === '--here') args.here = true
         else if (arg === '--template') args.template = takeValue(argv, i++, arg)
         else if (arg === '--title') args.title = takeValue(argv, i++, arg)
@@ -93,6 +109,58 @@ export function packageManager() {
         if (agent.startsWith(name)) return name
     }
     return 'npm'
+}
+
+const PACKAGE_RUNNERS = {
+    npm: 'npx',
+    pnpm: 'pnpm exec',
+    yarn: 'yarn',
+    bun: 'bunx',
+}
+
+/** How to start Astro: the `dev` script, unless the project uses that name for something else. */
+export function devCommand(pm, scripts = {}) {
+    const dev = scripts.dev
+    if (typeof dev !== 'string' || /\bastro\b/.test(dev)) return `${pm} run dev`
+    return `${PACKAGE_RUNNERS[pm]} astro dev`
+}
+
+const SCRIPTS = {
+    dev: 'astro dev',
+    build: 'astro build',
+    preview: 'astro preview',
+}
+
+/**
+ * The manifest with what JAAD needs added: the missing scripts, after the
+ * existing ones, and the missing dependencies. `type` is set only on a manifest
+ * we create: adding it to someone's library would change how Node reads every
+ * file in it, and `astro.config.mjs` is ESM either way.
+ */
+export function completeManifest(existing, { name, dependencies }) {
+    const manifest = existing ? structuredClone(existing) : { name, private: true, type: 'module' }
+
+    const scripts = { ...manifest.scripts }
+    for (const [script, command] of Object.entries(SCRIPTS)) {
+        if (!(script in scripts)) scripts[script] = command
+    }
+    manifest.scripts = scripts
+
+    const declared = { ...manifest.devDependencies, ...manifest.dependencies }
+    const missing = Object.entries(dependencies).filter(([dependency]) => {
+        return !(dependency in declared)
+    })
+    if (missing.length > 0) {
+        manifest.dependencies = { ...manifest.dependencies, ...Object.fromEntries(missing) }
+    }
+
+    return manifest
+}
+
+/** The manifest as text, indented as the file it replaces. */
+export function formatManifest(manifest, source = null) {
+    const indent = source?.match(/^[ \t]+(?=")/m)?.[0] ?? 2
+    return JSON.stringify(manifest, null, indent) + '\n'
 }
 
 export function missingAnswers(args) {
