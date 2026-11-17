@@ -1,30 +1,16 @@
 import type { AstroIntegration } from 'astro'
-import sitemap from '@astrojs/sitemap'
 import jaamd from '@jaamd/astro'
-import { resolveConfig, type JaadUserConfig } from './src/config.ts'
-import { createIntegrationState, createSitemapFilter } from './src/docs/integration.ts'
+import { parseConfig, type JaadUserConfig } from './src/config.ts'
+import { createIntegrationState } from './src/docs/integration.ts'
 import { createJaadIntegration } from './src/integration.ts'
-import { resolveStylesheets } from './src/site/config.ts'
+import { shikiTheme } from './src/site/config.ts'
 
-/** The whole set: Astro flattens nested arrays in `integrations`. */
+/** The whole set: Astro flattens nested arrays in `integrations`. The options
+ *  are checked here, so a wrong one fails as the config loads; the rest is
+ *  resolved once Astro knows the project's directories. */
 export default function jaad(options: JaadUserConfig): AstroIntegration[] {
-    const config = resolveConfig(options)
-    const css = resolveStylesheets(config)
-    const state = createIntegrationState()
-    const core = createJaadIntegration(config, css, state, Boolean(options.site))
-
-    // Without `site` the sitemap integration can only warn and skip.
-    return [
-        jaamd({ theme: config.shiki }),
-        ...(options.site
-            ? [
-                  sitemap({
-                      filter: createSitemapFilter(config.docs.base, state, config.defaultLocale),
-                  }),
-              ]
-            : []),
-        core,
-    ]
+    const config = parseConfig(options)
+    return [jaamd({ theme: shikiTheme(config) }), createJaadIntegration(options, createIntegrationState())]
 }
 
 export { defineJaadConfig } from './src/config.ts'

@@ -191,6 +191,7 @@ export function setupDocs(
             deploymentBase: normaliseBasePath(astroConfig.base),
             locale,
             defaultLocale: config.defaultLocale,
+            trailingSlash: config.docs.trailingSlash,
         }),
     }
     // New arrays: a shared processor would stack duplicates across setup runs.

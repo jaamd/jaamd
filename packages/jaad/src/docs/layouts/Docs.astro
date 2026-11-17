@@ -17,7 +17,7 @@ import StructuredData from '../components/StructuredData.astro'
 import TableOfContents from '../components/TableOfContents.astro'
 import { pageDescription } from '../model/rendered.ts'
 import { docsUrls } from '../runtime.ts'
-import { docsPageHref } from '../urls.ts'
+import { docsFileHref } from '../urls.ts'
 import '../../../dist/jaad.css'
 import '../styles/docs.css'
 import '../styles/jaamd.css'
@@ -45,7 +45,7 @@ const description =
 const locale = page.locale ?? DEFAULT_LOCALE
 const language = LOCALES.find((known) => known.code === locale)?.tag ?? config.lang
 
-const indexUrl = docsPageHref('search-index.json', docsUrls(locale))
+const indexUrl = docsFileHref('search-index.json', docsUrls(locale))
 
 const switcherAlternates = await getLocaleAlternates(page.translationKey)
 

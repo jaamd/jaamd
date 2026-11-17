@@ -74,3 +74,17 @@ test('the opening page redirect is not listed as canonical content', () => {
         .join('\n')
     assert.doesNotMatch(sitemap, /\/docs\/overview\/?<\/loc>/)
 })
+
+// A link that differs from the canonical by its slash costs a redirect on most
+// hosts, and search engines ignore an hreflang that is not canonical.
+test("a page's canonical, its sidebar link and the sitemap agree on the slash", () => {
+    const html = page('docs/getting-started/installation/index.html')
+    const canonical = html.match(/<link rel="canonical" href="([^"]*)"/)?.[1]
+    assert.equal(canonical, 'https://docs.example.com/docs/getting-started/installation/')
+    assert.ok(html.includes('href="/docs/getting-started/installation/"'), 'the sidebar links to another url')
+
+    const sitemap = distFiles('.xml')
+        .map((file) => readFileSync(file, 'utf8'))
+        .join('\n')
+    assert.match(sitemap, /<loc>https:\/\/docs\.example\.com\/docs\/getting-started\/installation\/<\/loc>/)
+})

@@ -194,6 +194,22 @@ pages, `Page` pages and a custom `DocsFrame`; see
 | Locales                                   | Directory names under `docsDir`                   |
 | Sitemap                                   | Generated when `site` is set                      |
 | Search index, `llms.txt` and raw Markdown | Generated below `routeBase`                       |
+| Trailing slash of page links              | Astro's `trailingSlash` and `build.format`        |
+
+`public/` and `src/` are Astro's `publicDir` and `srcDir`, and every path is
+read from the project's `root`, so `astro build --root` and custom directories
+are followed. `site` counts wherever it is set, in the JAAD config or in
+Astro's.
+
+Page links end with a slash when Astro builds them so: with
+`trailingSlash: 'always'`, or with the default `'ignore'` while pages are
+directories, as `build.format: 'directory'` makes them. Links then match the
+canonical URL and the sitemap, and need no redirect.
+
+Unknown keys are refused at every level, not only at the top: a misspelt
+`attributes` in a `head` entry or a `search.placeholer` in `ui` stops the build
+and names its path. Links in `nav`, `social` and `homeLink` are paths or
+`http(s)`, `mailto` and `tel` URLs.
 
 ## Extending Astro
 

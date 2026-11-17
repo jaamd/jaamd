@@ -175,7 +175,7 @@ export default defineJaadConfig({
         assert.match(deepDive, /<title>A Deep Dive Into Everything \| /)
         assert.match(
             deepDive,
-            /<a[^>]+href="\/guides\/deep-dive"[^>]*>[\s\S]{0,200}?Deep Dive</,
+            /<a[^>]+href="\/guides\/deep-dive\/"[^>]*>[\s\S]{0,200}?Deep Dive</,
             'the sidebar does not use the short label',
         )
 
@@ -222,7 +222,7 @@ export default defineJaadConfig({
         const italian = JSON.parse(localised.read('it/search-index.json'))
         assert.deepEqual(
             italian.pages.map((page) => page.href),
-            ['/it', '/it/guides/deep-dive', '/it/guides/solo-italiano', '/it/guida/installazione'],
+            ['/it/', '/it/guides/deep-dive/', '/it/guides/solo-italiano/', '/it/guida/installazione/'],
             'the italian index is not scoped to italian',
         )
         assert.match(localised.read('it/llms.txt'), /\/it\//)
@@ -231,7 +231,7 @@ export default defineJaadConfig({
     test('a localised page declares its own language and its alternates', () => {
         const italian = localised.read('it/index.html')
         assert.match(italian, /<html lang="it"/)
-        assert.match(italian, /<link rel="alternate" hreflang="it" href="https:\/\/example\.dev\/it"/)
+        assert.match(italian, /<link rel="alternate" hreflang="it" href="https:\/\/example\.dev\/it\/"/)
 
         const english = localised.read('index.html')
         assert.match(english, /<html lang="en"/)
@@ -244,7 +244,7 @@ export default defineJaadConfig({
         // Two files at the same slug are translations, and say so both ways.
         const pair = localised.read('it/guides/deep-dive/index.html')
         assert.match(pair, /<meta property="og:locale:alternate" content="en_GB"/)
-        assert.match(pair, /<link rel="alternate" hreflang="en" href="https:\/\/example\.dev\/guides\/deep-dive"/)
+        assert.match(pair, /<link rel="alternate" hreflang="en" href="https:\/\/example\.dev\/guides\/deep-dive\/"/)
 
         // Untranslated, so x-default still has to name somewhere to land.
         const onlyItalian = localised.read('it/guides/solo-italiano/index.html')
@@ -263,16 +263,16 @@ export default defineJaadConfig({
         const english = localised.read('handbook/setup/index.html')
         assert.match(
             english,
-            /<link rel="alternate" hreflang="it" href="https:\/\/example\.dev\/it\/guida\/installazione"/,
+            /<link rel="alternate" hreflang="it" href="https:\/\/example\.dev\/it\/guida\/installazione\/"/,
         )
         assert.match(
             english,
-            /<a href="\/it\/guida\/installazione" hreflang="it"/,
+            /<a href="\/it\/guida\/installazione\/" hreflang="it"/,
             'the switcher does not follow the key',
         )
 
         const italian = localised.read('it/guida/installazione/index.html')
-        assert.match(italian, /<link rel="alternate" hreflang="en" href="https:\/\/example\.dev\/handbook\/setup"/)
+        assert.match(italian, /<link rel="alternate" hreflang="en" href="https:\/\/example\.dev\/handbook\/setup\/"/)
         assert.match(italian, /<meta property="og:locale:alternate" content="en_GB"/)
     })
 
@@ -304,7 +304,7 @@ export default defineJaadConfig({
         const ld = (html) => JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])
 
         const italian = ld(localised.read('it/index.html'))
-        assert.equal(italian.breadcrumb.itemListElement[0].item, 'https://example.dev/it')
+        assert.equal(italian.breadcrumb.itemListElement[0].item, 'https://example.dev/it/')
 
         const english = ld(localised.read('index.html'))
         assert.equal(english.breadcrumb.itemListElement[0].item, 'https://example.dev/')
@@ -316,11 +316,11 @@ export default defineJaadConfig({
         assert.match(onlyEnglish, /Italiano/)
         assert.doesNotMatch(onlyEnglish, /hreflang="fr"/, 'an empty locale was offered')
         // No Italian twin, so Italian lands on the Italian opening page.
-        assert.match(onlyEnglish, /<a href="\/it" hreflang="it"/)
+        assert.match(onlyEnglish, /<a href="\/it\/" hreflang="it"/)
 
         // With a twin it links to the twin instead.
         const pair = localised.read('guides/deep-dive/index.html')
-        assert.match(pair, /<a href="\/it\/guides\/deep-dive" hreflang="it"/)
+        assert.match(pair, /<a href="\/it\/guides\/deep-dive\/" hreflang="it"/)
     })
 
     test('a single-locale site renders no switcher at all', () => {
@@ -464,7 +464,7 @@ export default defineJaadConfig({
         assert.match(remounted.read('docs/index.html'), /docs-sidebar-left/, 'the nested page is not the docs index')
 
         const page = remounted.read('docs/guides/deep-dive/index.html')
-        assert.match(page, /href="\/repo\/docs"/, 'the opening-page link missed the deployment base')
+        assert.match(page, /href="\/repo\/docs\/"/, 'the opening-page link missed the deployment base')
         assert.match(page, /src="\/repo\/logo\.svg"/, 'a public asset missed the deployment base')
         assert.match(
             page,
@@ -485,7 +485,7 @@ export default defineJaadConfig({
         assert.ok(remounted.files.includes('/docs/search-index.json'))
         assert.equal(
             JSON.parse(remounted.read('docs/search-index.json')).pages[1].href,
-            '/repo/docs/guides/deep-dive',
+            '/repo/docs/guides/deep-dive/',
             'search missed the docs and deployment bases',
         )
         assert.match(
