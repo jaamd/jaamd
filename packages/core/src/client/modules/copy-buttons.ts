@@ -1,6 +1,5 @@
 import type { Labels } from '../../markup.ts'
 import { CLASS, ICON, ID } from '../../markup.ts'
-import { qs, qsa } from '../dom.ts'
 
 const RESET_MS = 2000
 
@@ -9,9 +8,9 @@ const resetTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>()
 const messages = new WeakMap<Element, Pick<Labels, 'copied' | 'copySelected'>>()
 
 export function addCopyButtons(root: ParentNode, labels: Labels): void {
-    qsa<HTMLElement>(root, 'pre').forEach((pre) => {
-        if (qs(pre, `.${CLASS.copyButton}`)) return
-        if (!qs(pre, 'code')) return
+    root.querySelectorAll<HTMLElement>('pre').forEach((pre) => {
+        if (pre.querySelector(`.${CLASS.copyButton}`)) return
+        if (!pre.querySelector('code')) return
 
         const btn = document.createElement('button')
         btn.type = 'button'
@@ -29,7 +28,7 @@ export function addCopyButtons(root: ParentNode, labels: Labels): void {
 /** The only clipboard write in the package. */
 export async function onCopyClick(target: Element): Promise<void> {
     const btn = target.closest<HTMLElement>(`.${CLASS.copyButton}`)
-    const code = btn?.parentElement && qs<HTMLElement>(btn.parentElement, 'code')
+    const code = btn?.parentElement?.querySelector<HTMLElement>('code')
     const labels = btn && messages.get(btn)
     if (!btn || !code || !labels) return
 
