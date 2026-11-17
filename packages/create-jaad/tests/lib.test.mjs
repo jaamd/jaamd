@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path'
 import { test } from 'node:test'
 import {
     completeManifest,
+    devCommand,
     formatManifest,
     missingAnswers,
     normaliseDir,
@@ -144,6 +145,13 @@ test('the manifest keeps the indentation of the file it replaces', () => {
     assert.equal(formatManifest({ a: 1 }), '{\n  "a": 1\n}\n')
     assert.equal(formatManifest({ a: 1 }, '{\n    "name": "x"\n}\n'), '{\n    "a": 1\n}\n')
     assert.equal(formatManifest({ a: 1 }, '{\n\t"name": "x"\n}\n'), '{\n\t"a": 1\n}\n')
+})
+
+test('the dev command is the script, unless the script is not Astro', () => {
+    assert.equal(devCommand('npm'), 'npm run dev')
+    assert.equal(devCommand('pnpm', { dev: 'astro dev --port 4000' }), 'pnpm run dev')
+    assert.equal(devCommand('npm', { dev: 'vite' }), 'npx astro dev')
+    assert.equal(devCommand('pnpm', { dev: 'vite' }), 'pnpm exec astro dev')
 })
 
 // ── Non-interactive completeness ─────────────────────────────────────────────

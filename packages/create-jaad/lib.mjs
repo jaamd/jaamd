@@ -107,6 +107,20 @@ export function packageManager() {
     return 'npm'
 }
 
+const PACKAGE_RUNNERS = {
+    npm: 'npx',
+    pnpm: 'pnpm exec',
+    yarn: 'yarn',
+    bun: 'bunx',
+}
+
+/** How to start Astro: the `dev` script, unless the project uses that name for something else. */
+export function devCommand(pm, scripts = {}) {
+    const dev = scripts.dev
+    if (typeof dev !== 'string' || /\bastro\b/.test(dev)) return `${pm} run dev`
+    return `${PACKAGE_RUNNERS[pm]} astro dev`
+}
+
 const SCRIPTS = {
     dev: 'astro dev',
     build: 'astro build',

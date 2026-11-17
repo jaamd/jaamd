@@ -8,6 +8,7 @@ import {
     DEFAULT_TEMPLATE,
     HELP,
     completeManifest,
+    devCommand,
     fail,
     formatManifest,
     missingAnswers,
@@ -428,7 +429,7 @@ async function main() {
     const next = []
     if (!request.here) next.push(`cd ${quoteArg(request.dir)}`)
     if (!request.install) next.push(`${pm} install`)
-    next.push(`${pm} run dev`)
+    next.push(devCommand(pm, request.manifest?.scripts))
 
     const start = written.includes('docs/01-introduction.md') ? 'docs/01-introduction.md' : 'docs/'
     p.note(`${next.join('\n')}\n\nStart writing in ${start}`, 'Next steps')

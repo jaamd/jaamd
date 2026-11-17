@@ -380,3 +380,14 @@ test('--here adds to a package.json in its own indentation and script order', ()
     assert.match(source, /^ {4}"name": "lib",$/m, 'the indentation changed')
     assert.deepEqual(Object.keys(JSON.parse(source).scripts), ['test', 'build', 'dev', 'preview'])
 })
+
+test('--here points at Astro itself when dev runs something else', () => {
+    const project = temporaryDirectory('jaad-here-dev-script-')
+    writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'app', scripts: { dev: 'vite' } }))
+
+    const result = runScaffolderHere(project, 'docs')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 0, output)
+    assert.match(output, /npx astro dev/)
+    assert.doesNotMatch(output, /npm run dev/)
+})
