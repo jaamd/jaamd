@@ -1,39 +1,45 @@
 name: Publish to npm
 
-# A `v<version>` tag publishes every package at that version.
+# A `v<version>` tag publishes every package at that version. Running it by hand
+# on the tag publishes what is missing, e.g. after a failed run.
 on:
     push:
         tags: ['v*']
-    # Publishes what is missing at the version of the chosen ref, e.g. after a failed run.
     workflow_dispatch:
 
 concurrency:
     group: publish
     cancel-in-progress: false
 
-permissions:
-    id-token: write
-    contents: read
+permissions: {}
 
 env:
-    # Only until every package has a trusted publisher on npm.
-    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     # Dependencies first: each tarball names the version of the one before.
     PACKAGES: core astro jaad create-jaad
 
 jobs:
-    publish:
+    # Installs, tests and packs with no secrets and no publishing rights: the
+    # dependencies' install scripts and the test suite run here.
+    verify:
+        if: startsWith(github.ref, 'refs/tags/v')
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        outputs:
+            version: ${{ steps.release.outputs.version }}
+            dist-tag: ${{ steps.release.outputs.dist-tag }}
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
 
             # Version comes from "packageManager" in package.json.
-            - uses: pnpm/action-setup@v6
+            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
-            - uses: actions/setup-node@v7
+            # No dependency cache: a release builds from the registry alone.
+            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: '24'
-                  cache: pnpm
 
             - run: pnpm install --frozen-lockfile
 
@@ -56,7 +62,7 @@ jobs:
                       exit 1
                     fi
                   done
-                  if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+                  if [ "$GITHUB_REF_NAME" != "v$version" ]; then
                     echo "tag $GITHUB_REF_NAME does not match version $version" >&2
                     exit 1
                   fi
@@ -69,7 +75,7 @@ jobs:
                   echo "version=$version" >> "$GITHUB_OUTPUT"
 
             # The whole suite: create-jaad is tested through jaad, jaad through
-            # the site, and every package through its packed tarball.
+            # the site, and core, astro and jaad through their packed tarballs.
             - name: Check and test
               run: |
                   pnpm check
@@ -77,24 +83,67 @@ jobs:
                   pnpm test:build
                   pnpm test:consumer
 
-            - name: Authenticate with a token
-              if: env.NPM_TOKEN != ''
-              run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
-
             # pnpm writes the versions behind `workspace:` ranges into the tarball.
+            - name: Pack
+              run: |
+                  mkdir -p "$RUNNER_TEMP/tarballs"
+                  for dir in $PACKAGES; do
+                    (cd "packages/$dir" && pnpm pack --pack-destination "$RUNNER_TEMP/tarballs")
+                  done
+
+            - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: tarballs
+                  path: ${{ runner.temp }}/tarballs/*.tgz
+                  if-no-files-found: error
+                  retention-days: 7
+
+    # Publishes the tested tarballs. Nothing is installed or built here, so no
+    # third-party code runs next to the publishing rights.
+    publish:
+        needs: verify
+        runs-on: ubuntu-latest
+        # Its protection rules (reviewers, tag pattern) live in the repository settings.
+        environment: npm
+        permissions:
+            contents: read
+            id-token: write
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version: '24'
+
+            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+              with:
+                  name: tarballs
+                  path: ${{ runner.temp }}/tarballs
+
             # A package already on npm at this version is skipped, so a rerun
-            # finishes what a failed one left.
+            # finishes what a failed one left. Without NPM_TOKEN, npm publishes
+            # through the trusted publisher of each package.
             - name: Publish
               env:
-                  VERSION: ${{ steps.release.outputs.version }}
-                  DIST_TAG: ${{ steps.release.outputs.dist-tag }}
+                  VERSION: ${{ needs.verify.outputs.version }}
+                  DIST_TAG: ${{ needs.verify.outputs.dist-tag }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
+                  if [ -n "$NPM_TOKEN" ]; then
+                    echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+                  fi
+
                   for dir in $PACKAGES; do
                     name="$(node -p "require('./packages/$dir/package.json').name")"
                     if npm view "$name@$VERSION" version >/dev/null 2>&1; then
                       echo "$name@$VERSION is already on npm"
                       continue
                     fi
+
+                    # pnpm names a tarball after the package, scope included: @jaamd/core → jaamd-core-<version>.tgz
+                    tarball="$RUNNER_TEMP/tarballs/$(echo "${name#@}" | tr / -)-$VERSION.tgz"
                     echo "publishing $name@$VERSION as $DIST_TAG"
-                    (cd "packages/$dir" && pnpm publish --provenance --access public --no-git-checks --tag "$DIST_TAG")
+                    npm publish "$tarball" --provenance --access public --tag "$DIST_TAG"
                   done
