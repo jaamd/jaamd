@@ -107,7 +107,11 @@ test('the site template keeps the landing page separate from the docs', { timeou
     assert.ok(built.includes('/docs/index.html'), 'no docs index')
     assert.ok(built.includes('/docs/introduction/index.html'), 'no compatibility redirect for the sample page')
     const landing = readFileSync(join(project, 'dist', 'index.html'), 'utf8')
-    assert.match(landing, /href="\/docs"[^>]*>\s*Read the documentation/, 'the landing page does not link to the docs')
+    assert.match(
+        landing,
+        /href="\/docs\/"[^>]*>\s*Read the documentation/,
+        'the landing page does not link to the docs',
+    )
     assert.doesNotMatch(landing, /jaad-chrome|jaad-theme-toggle/)
     const landingSource = readFileSync(join(project, 'src', 'pages', 'index.astro'), 'utf8')
     assert.match(landingSource, /layouts\/SiteLayout\.astro/)

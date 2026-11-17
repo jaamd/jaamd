@@ -185,6 +185,7 @@ test('a scaffolded project is set up for the editor', () => {
 
         const tsconfig = JSON.parse(readFileSync(join(parent, 'project', 'tsconfig.json'), 'utf8'))
         assert.equal(tsconfig.extends, 'astro/tsconfigs/strict')
+        assert.ok(tsconfig.include?.includes('.astro/types.d.ts'), 'the generated types are left out')
     }
 })
 

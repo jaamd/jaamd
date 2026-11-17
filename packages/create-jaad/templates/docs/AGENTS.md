@@ -33,7 +33,7 @@ into this project.
 ## Writing pages
 
 - A numeric prefix sets the order and is stripped from the URL:
-  `02-guide.md` becomes `/guide`.
+  `02-guide.md` becomes `/guide/`.
 - A folder becomes a chapter. Only one level of nesting is supported,
   per language.
 - Link to another page by its file, relative to the one you are writing:

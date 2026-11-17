@@ -39,14 +39,14 @@ options apply to documentation pages only. `routeBase: "/docs"` in
 ## Writing pages
 
 - A numeric prefix sets the order and is stripped from the URL:
-  `02-guide.md` becomes `/docs/guide`.
+  `02-guide.md` becomes `/docs/guide/`.
 - A folder becomes a chapter. Only one level of nesting is supported,
   per language.
 - Link to another page by its file, relative to the one you are writing:
   `[Setup](./02-guides/01-setup.md)`. JAAD turns it into the page's URL.
 - The first `# Heading` is the page title; `##` and `###` build the table of
   contents.
-- The first page in sort order opens at `/docs`, and its named URL redirects
+- The first page in sort order opens at `/docs/`, and its named URL redirects
   there.
 - Removing the prefixes must leave every page with a unique path, or the build
   stops and names the conflicting files.
