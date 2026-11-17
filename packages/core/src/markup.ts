@@ -1,9 +1,6 @@
 /** The markup JAAMD emits: classes, ids, icons and the default labels. The
  *  plugins, the client script and the stylesheet all agree on these. */
 
-/** Wrapper the stylesheet and the client script select on. */
-export const DEFAULT_SELECTOR = '.jaamd-content'
-
 export const CLASS = {
     content: 'jaamd-content',
     headingLink: 'jaamd-heading-link',
@@ -28,6 +25,9 @@ export const CLASS = {
     alertTitle: 'markdown-alert-title',
     alertIcon: 'octicon',
 } as const
+
+/** Wrapper the stylesheet and the client script select on. */
+export const DEFAULT_SELECTOR = `.${CLASS.content}`
 
 export const ID = {
     live: 'jaamd-live',

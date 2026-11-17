@@ -1,6 +1,5 @@
 import type { Labels } from '../../markup.ts'
 import { CLASS, ICON, ID, labelled } from '../../markup.ts'
-import { qsa } from '../dom.ts'
 
 /**
  * Modal `<dialog>` driven by invoker commands: the triggers open it, the close
@@ -52,7 +51,7 @@ function lightbox(labels: Labels): HTMLDialogElement {
 export function addImageLightbox(root: ParentNode, labels: Labels): void {
     if (!('command' in HTMLButtonElement.prototype)) return
 
-    const images = [...qsa<HTMLImageElement>(root, 'img')].filter(
+    const images = [...root.querySelectorAll<HTMLImageElement>('img')].filter(
         (img) => !img.hasAttribute('data-no-lightbox') && !img.closest(`a, .${CLASS.lightboxTrigger}`),
     )
     if (images.length === 0) return

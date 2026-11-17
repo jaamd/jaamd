@@ -13,7 +13,6 @@
         /* ── Typography ─────────────────────────────────────────── */
 
         --jaamd-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-        --jaamd-font-serif: Georgia, 'Times New Roman', Times, serif;
         --jaamd-font-mono: 'SF Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
         --jaamd-font-size: 1.125rem;
         --jaamd-line-height: 1.6;

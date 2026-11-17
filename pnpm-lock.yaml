@@ -213,9 +213,6 @@ importers:
       astro:
         specifier: ^7.4.4
         version: 7.4.4(@astrojs/markdown-remark@7.3.5(supports-color@10.2.2))(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)
-      satteri:
-        specifier: ^0.10.5
-        version: 0.10.5
       typescript:
         specifier: ^6.0.0
         version: 6.0.3
@@ -225,9 +222,6 @@ importers:
       '@jaamd/astro':
         specifier: workspace:*
         version: link:../..
-      '@jaamd/core':
-        specifier: workspace:*
-        version: link:../../../core
       astro:
         specifier: ^7.4.4
         version: 7.4.4(@astrojs/markdown-remark@7.3.5(supports-color@10.2.2))(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)

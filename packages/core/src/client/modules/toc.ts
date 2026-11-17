@@ -1,5 +1,4 @@
 import { CLASS } from '../../markup.ts'
-import { qsa } from '../dom.ts'
 
 /** The observer watching each nav: a new run replaces the previous one's. */
 const observers = new WeakMap<HTMLElement, IntersectionObserver>()
@@ -22,7 +21,7 @@ function scrollMarginTop(heading: Element): number {
 /** Marks the entry whose section is in view. The links stay plain anchors.
  *  Returns what stops the watching. */
 export function initToc(root: ParentNode): () => void {
-    const navs = [...qsa<HTMLElement>(root, `.${CLASS.toc}`)]
+    const navs = [...root.querySelectorAll<HTMLElement>(`.${CLASS.toc}`)]
     // Only these are stopped by the returned function: a later run's are its own.
     const created = new Map<HTMLElement, IntersectionObserver>()
 
@@ -32,7 +31,7 @@ export function initToc(root: ParentNode): () => void {
 
         const links = new Map<Element, HTMLAnchorElement>()
 
-        qsa<HTMLAnchorElement>(nav, 'a[href*="#"]').forEach((link) => {
+        nav.querySelectorAll<HTMLAnchorElement>('a[href*="#"]').forEach((link) => {
             const id = link.hash.slice(1)
             if (!id) return
 

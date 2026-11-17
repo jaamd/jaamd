@@ -20,11 +20,3 @@ export function uniqueElementId(base: string): string {
     while (document.getElementById(`${seed}-${n}`)) n++
     return `${seed}-${n}`
 }
-
-export function qs<T extends Element = Element>(root: ParentNode, sel: string): T | null {
-    return root.querySelector<T>(sel)
-}
-
-export function qsa<T extends Element = Element>(root: ParentNode, sel: string): NodeListOf<T> {
-    return root.querySelectorAll<T>(sel)
-}

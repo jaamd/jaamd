@@ -1,8 +1,16 @@
 /** Markup shared by the remark and Sätteri plugins. */
 
 import type { Data, Emphasis, Paragraph } from 'mdast'
-import { escapeHtml } from './html.ts'
 import { CLASS, ICON, ID, labelled } from './markup.ts'
+
+export function escapeHtml(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+}
 
 export const ALERT_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i
 export const ALERT_LEGACY_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)(\/.*)?]/i

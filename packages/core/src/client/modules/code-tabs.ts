@@ -1,11 +1,10 @@
 import { CLASS } from '../../markup.ts'
-import { qsa } from '../dom.ts'
 
 const GROUP = `.${CLASS.codeTabs}[data-tabs-init]`
 const BUTTON = `.${CLASS.codeTabButton}`
 const PANEL = `.${CLASS.codeTabPanel}`
 
-const buttonsOf = (group: Element): HTMLButtonElement[] => Array.from(qsa<HTMLButtonElement>(group, BUTTON))
+const buttonsOf = (group: Element): HTMLButtonElement[] => Array.from(group.querySelectorAll<HTMLButtonElement>(BUTTON))
 
 /** `aria-selected`, the roving `tabindex` and the panel's `data-active` always
  *  change together (WAI-ARIA tabs pattern). */
@@ -18,7 +17,7 @@ function select(group: Element, index: number, moveFocus: boolean): void {
         btn.tabIndex = selected ? 0 : -1
     })
 
-    qsa<HTMLElement>(group, PANEL).forEach((panel) => {
+    group.querySelectorAll<HTMLElement>(PANEL).forEach((panel) => {
         panel.toggleAttribute('data-active', panel.dataset.tabIndex === String(index))
     })
 
@@ -27,7 +26,7 @@ function select(group: Element, index: number, moveFocus: boolean): void {
 
 /** Marks the tablists emitted by the `:::code-tabs` plugin as live. */
 export function initCodeTabs(root: ParentNode): void {
-    qsa<HTMLElement>(root, `.${CLASS.codeTabs}`).forEach((group) => {
+    root.querySelectorAll<HTMLElement>(`.${CLASS.codeTabs}`).forEach((group) => {
         if (group.dataset.tabsInit) return
         group.dataset.tabsInit = '1'
 

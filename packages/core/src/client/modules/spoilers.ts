@@ -1,12 +1,11 @@
 import type { Labels } from '../../markup.ts'
 import { CLASS } from '../../markup.ts'
-import { qsa } from '../dom.ts'
 
 const INITIALIZED = `.${CLASS.spoiler}[data-spoiler-init]`
 
 /** Gives a hidden spoiler button semantics, so it is reachable without a mouse. */
 export function initSpoilers(root: ParentNode, labels: Labels): void {
-    qsa<HTMLElement>(root, `.${CLASS.spoiler}`).forEach((el) => {
+    root.querySelectorAll<HTMLElement>(`.${CLASS.spoiler}`).forEach((el) => {
         if (el.dataset.spoilerInit) return
         el.dataset.spoilerInit = '1'
         if (el.hasAttribute('data-revealed')) return
