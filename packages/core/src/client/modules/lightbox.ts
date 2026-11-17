@@ -47,8 +47,11 @@ function lightbox(labels: Labels): HTMLDialogElement {
 
 /** Wraps each image in a button that opens the lightbox. Opt out with
  *  `data-no-lightbox`. Linked images are skipped: a click on
- *  `[![alt](src)](href)` must follow the link. */
+ *  `[![alt](src)](href)` must follow the link. Without invoker commands the
+ *  buttons could not open anything, so images are left as they are. */
 export function addImageLightbox(root: ParentNode, labels: Labels): void {
+    if (!('command' in HTMLButtonElement.prototype)) return
+
     const images = [...qsa<HTMLImageElement>(root, 'img')].filter(
         (img) => !img.hasAttribute('data-no-lightbox') && !img.closest(`a, .${CLASS.lightboxTrigger}`),
     )
@@ -63,9 +66,11 @@ export function addImageLightbox(root: ParentNode, labels: Labels): void {
         trigger.setAttribute('commandfor', ID.lightbox)
         trigger.setAttribute('command', 'show-modal')
         trigger.setAttribute('aria-label', labelled(labels.lightboxOpen, img.alt))
-        if (!img.title) img.title = img.alt || labels.lightboxOpen
 
-        img.replaceWith(trigger)
-        trigger.appendChild(img)
+        // A <source> only applies to an <img> right inside its <picture>: wrap the whole.
+        const picture = img.parentElement?.tagName === 'PICTURE' ? img.parentElement : null
+        const wrapped = picture ?? img
+        wrapped.replaceWith(trigger)
+        trigger.appendChild(wrapped)
     }
 }
