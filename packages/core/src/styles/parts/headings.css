@@ -14,7 +14,7 @@
             opacity: 0.6;
         }
 
-        & .jaamd-heading-link:hover {
+        & .jaamd-heading-link:is(:hover, :focus-visible) {
             opacity: 1;
         }
 
