@@ -86,7 +86,8 @@ const themeScript = `(function () {
 {favicon && <link rel="icon" href={favicon} />}
 
 <Font cssVariable="--font-inter" preload />
-<Font cssVariable="--font-merriweather" preload />
+{/* The italic face sets only the site name in the header, which a logo replaces. */}
+<Font cssVariable="--font-merriweather" preload={config.logo ? [{ style: 'normal' }] : true} />
 {config.fonts.map((cssVariable) => (
     <Font cssVariable={cssVariable as CssVariable} />
 ))}
