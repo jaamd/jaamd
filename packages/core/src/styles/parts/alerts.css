@@ -1,7 +1,7 @@
 .jaamd-content {
     & .markdown-alert {
-        border-left: 4px solid var(--jaamd-blockquote-border);
-        background-color: var(--jaamd-blockquote-bg);
+        border-left: 4px solid var(--_alert-color, var(--jaamd-blockquote-border));
+        background-color: var(--_alert-bg, var(--jaamd-blockquote-bg));
         padding: 0.875rem 1.25rem;
         margin-top: 1.5rem;
         margin-bottom: 1.5rem;
@@ -23,6 +23,8 @@
         text-transform: uppercase;
         letter-spacing: 0.04em;
         margin-bottom: 0.5rem;
+        /* Unset outside a typed alert, so the title keeps the text colour. */
+        color: var(--_alert-color);
 
         & svg {
             width: 1em;
@@ -32,48 +34,29 @@
         }
     }
 
+    /* Each type sets the colours read above. */
     & .markdown-alert-note {
-        border-left-color: var(--jaamd-alert-note-color);
-        background-color: var(--jaamd-alert-note-bg);
-
-        & .markdown-alert-title {
-            color: var(--jaamd-alert-note-color);
-        }
+        --_alert-color: var(--jaamd-alert-note-color);
+        --_alert-bg: var(--jaamd-alert-note-bg);
     }
 
     & .markdown-alert-tip {
-        border-left-color: var(--jaamd-alert-tip-color);
-        background-color: var(--jaamd-alert-tip-bg);
-
-        & .markdown-alert-title {
-            color: var(--jaamd-alert-tip-color);
-        }
+        --_alert-color: var(--jaamd-alert-tip-color);
+        --_alert-bg: var(--jaamd-alert-tip-bg);
     }
 
     & .markdown-alert-important {
-        border-left-color: var(--jaamd-alert-important-color);
-        background-color: var(--jaamd-alert-important-bg);
-
-        & .markdown-alert-title {
-            color: var(--jaamd-alert-important-color);
-        }
+        --_alert-color: var(--jaamd-alert-important-color);
+        --_alert-bg: var(--jaamd-alert-important-bg);
     }
 
     & .markdown-alert-warning {
-        border-left-color: var(--jaamd-alert-warning-color);
-        background-color: var(--jaamd-alert-warning-bg);
-
-        & .markdown-alert-title {
-            color: var(--jaamd-alert-warning-color);
-        }
+        --_alert-color: var(--jaamd-alert-warning-color);
+        --_alert-bg: var(--jaamd-alert-warning-bg);
     }
 
     & .markdown-alert-caution {
-        border-left-color: var(--jaamd-alert-caution-color);
-        background-color: var(--jaamd-alert-caution-bg);
-
-        & .markdown-alert-title {
-            color: var(--jaamd-alert-caution-color);
-        }
+        --_alert-color: var(--jaamd-alert-caution-color);
+        --_alert-bg: var(--jaamd-alert-caution-bg);
     }
 }
