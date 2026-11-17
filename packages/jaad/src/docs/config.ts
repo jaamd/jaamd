@@ -13,7 +13,7 @@ export const docsConfigShape = {
     routeBase: z.string().default('/'),
     /** One directory per section, keyed by its url segment. Replaces `docsDir`. */
     sections: z
-        .record(z.string(), z.object({ dir: z.string(), label: z.string().optional() }))
+        .record(z.string(), z.strictObject({ dir: z.string(), label: z.string().optional() }))
         .superRefine((sections, context) => {
             for (const key of Object.keys(sections)) {
                 if (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(key)) continue

@@ -206,6 +206,11 @@ Page links end with a slash when Astro builds them so: with
 directories, as `build.format: 'directory'` makes them. Links then match the
 canonical URL and the sitemap, and need no redirect.
 
+Unknown keys are refused at every level, not only at the top: a misspelt
+`attributes` in a `head` entry or a `search.placeholer` in `ui` stops the build
+and names its path. Links in `nav`, `social` and `homeLink` are paths or
+`http(s)`, `mailto` and `tel` URLs.
+
 ## Extending Astro
 
 | Option  | Type              | Default |

@@ -6,7 +6,9 @@ import { fileURLToPath } from 'node:url'
 import { z } from 'astro/zod'
 import { toProjectPaths, type ProjectPaths } from '../paths.ts'
 import { inferDescription, type RepoInfo } from './infer.ts'
+import { isLocale } from './locales.ts'
 import { PRESETS, PRESET_NAMES, isPreset } from './themes.ts'
+import { UI_KEYS } from './ui.ts'
 
 /** A BCP 47 tag `Intl` accepts: "en_US" is not one, and would throw when a date is formatted. */
 function isLanguageTag(tag: string): boolean {
@@ -24,6 +26,13 @@ const publicUrl = (field: string, example: string) =>
         message: `${field} must be a public url, such as "${example}"`,
     })
 
+/** A link's target: a path, or a URL in a scheme a browser opens as a page or
+ *  an address. `javascript:` and `data:` are refused. */
+const linkHref = (field: string) =>
+    z.string().refine((v) => !/^[a-z][a-z\d+.-]*:/i.test(v) || /^(https?|mailto|tel):/i.test(v), {
+        message: `${field} must be a path or an http(s), mailto or tel URL`,
+    })
+
 /** The options of the site around the pages: identity, header, footer, head and theme. */
 export const siteConfigShape = {
     title: z.string(),
@@ -34,22 +43,22 @@ export const siteConfigShape = {
         .default('en'),
     logo: publicUrl('logo', '/logo.svg').optional(),
     /** Where the site name in the header leads: the site root, or another site. */
-    homeLink: z.string().default('/'),
+    homeLink: linkHref('homeLink').default('/'),
 
     social: z
         .record(
             z.string(),
             z.union([
-                z.string(),
-                z.object({
-                    href: z.string(),
+                linkHref('a social link'),
+                z.strictObject({
+                    href: linkHref('a social link'),
                     label: z.string().optional(),
                     svg: z.string().optional(),
                 }),
             ]),
         )
         .default({}),
-    nav: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
+    nav: z.array(z.strictObject({ label: z.string(), href: linkHref('a nav link') })).default([]),
     footer: z
         .union([z.string(), z.literal(false)], {
             error:
@@ -61,7 +70,7 @@ export const siteConfigShape = {
 
     head: z
         .array(
-            z.object({
+            z.strictObject({
                 tag: z.string(),
                 attrs: z.record(z.string(), z.union([z.string(), z.boolean()])).optional(),
                 content: z.string().optional(),
@@ -75,7 +84,7 @@ export const siteConfigShape = {
             z.string().refine(isPreset, {
                 message: `unknown theme; available: ${PRESET_NAMES.join(', ')}`,
             }),
-            z.object({ light: z.string(), dark: z.string() }),
+            z.strictObject({ light: z.string(), dark: z.string() }),
         ])
         .default('default'),
 
@@ -89,7 +98,12 @@ export const siteConfigShape = {
     tailwind: z.boolean().default(false),
 
     /** Per-locale overrides for JAAD's bundled interface strings. */
-    ui: z.record(z.string(), z.record(z.string(), z.string())).default({}),
+    ui: z
+        .record(
+            z.string().refine(isLocale, { message: 'not a locale code' }),
+            z.partialRecord(z.enum(UI_KEYS), z.string()),
+        )
+        .default({}),
 }
 
 const siteConfigSchema = z.object(siteConfigShape)

@@ -255,6 +255,29 @@ test("public assets and jaad.css are found in Astro's directories, not below the
     assert.equal(resolveStylesheets(config, paths).user, join(root, 'source', 'jaad.css'))
 })
 
+test('a misspelt key inside an option is an error, not a silent no-op', () => {
+    assert.throws(() => bare({ head: [{ tag: 'meta', attributes: { name: 'x' } }] }), /head\.0/)
+    assert.throws(() => bare({ nav: [{ label: 'Blog', url: '/blog' }] }), /nav\.0/)
+    assert.throws(() => bare({ theme: { light: 'a', drak: 'b' } }), /theme/)
+    assert.throws(() => bare({ sections: { api: { dir: './api', lable: 'API' } } }), /sections\.api/)
+})
+
+test('ui overrides name strings JAAD has, in a locale code', () => {
+    assert.equal(bare({ ui: { it: { 'search.placeholder': 'Cerca' } } }).ui.it['search.placeholder'], 'Cerca')
+    assert.throws(() => bare({ ui: { it: { 'search.placeholer': 'Cerca' } } }), /ui\.it/)
+    assert.throws(() => bare({ ui: { italiano: {} } }), /ui\.italiano/)
+})
+
+test('a link is a path or an http(s), mailto or tel URL', () => {
+    assert.deepEqual(
+        bare({ nav: [{ label: 'Mail', href: 'mailto:me@example.dev' }] }).nav[0].href,
+        'mailto:me@example.dev',
+    )
+    assert.throws(() => bare({ nav: [{ label: 'x', href: 'javascript:alert(1)' }] }), /nav link must be a path/)
+    assert.throws(() => bare({ social: { x: 'javascript:alert(1)' } }), /social link must be a path/)
+    assert.throws(() => bare({ homeLink: 'data:text/html,x' }), /homeLink must be a path/)
+})
+
 test('an explicit social image has to be a public url', () => {
     assert.equal(bare({ ogImage: '/social.png' }).ogImage, '/social.png')
     assert.equal(bare({ ogImage: 'https://cdn.example.dev/social.png' }).ogImage, 'https://cdn.example.dev/social.png')
