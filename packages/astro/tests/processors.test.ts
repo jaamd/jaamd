@@ -62,19 +62,19 @@ test('unified: remark ahead of the user, the directive fallback last, Astro ids 
     registerPlugins(processor)
 
     assert.deepEqual(names(processor.options.remarkPlugins), [
-        'remarkAlert',
+        'remarkJaamdAlert',
         'remarkDirective',
-        'remarkCodeTabs',
-        'remarkToc',
-        'remarkSpoiler',
+        'remarkJaamdCodeTabs',
+        'remarkJaamdToc',
+        'remarkJaamdSpoiler',
         'user',
         'remarkJaamdDirectiveFallback',
     ])
     assert.deepEqual(names(processor.options.rehypePlugins), [
         'user',
-        'rehypeTableWrapper',
+        'rehypeJaamdTableWrapper',
         'rehype-heading-ids.js',
-        'rehypeHeadingLinks',
+        'rehypeJaamdHeadingLinks',
     ])
 })
 
@@ -82,10 +82,21 @@ test('unified: plugins the user registered are not added again, ids included', (
     const processor = unified({ remarkPlugins: [remarkAlert, [remarkToc, {}]], rehypePlugins: [rehypeHeadingLinks] })
     const registration = registerPlugins(processor)
 
-    assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkAlert').length, 1)
-    assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkToc').length, 1)
-    assert.deepEqual(names(processor.options.rehypePlugins), ['rehypeHeadingLinks', 'rehypeTableWrapper'])
+    assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkJaamdAlert').length, 1)
+    assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkJaamdToc').length, 1)
+    assert.deepEqual(names(processor.options.rehypePlugins), ['rehypeJaamdHeadingLinks', 'rehypeJaamdTableWrapper'])
     assert.deepEqual(registration, { added: 5, total: 9 })
+})
+
+test('unified: a third-party plugin with the name of a JAAMD one does not replace it', () => {
+    // remark-toc's default export is a function named remarkToc.
+    const thirdPartyToc = function remarkToc() {}
+    const processor = unified({ remarkPlugins: [thirdPartyToc] })
+    registerPlugins(processor)
+
+    const registered = names(processor.options.remarkPlugins)
+    assert.ok(registered.includes('remarkJaamdToc'), "JAAMD's :::toc plugin was skipped")
+    assert.ok(registered.includes('remarkToc'))
 })
 
 test('features turn plugins off on both processors', () => {

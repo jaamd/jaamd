@@ -72,7 +72,8 @@ const satteriNames = (entry: unknown): string[] =>
           ? [String(entry.name)]
           : []
 
-/** Name of a unified entry: the plugin function or module, alone or as `[plugin, options]`. */
+/** Name of a unified entry: the plugin function or module, alone or as `[plugin, options]`.
+ *  JAAMD's own functions carry a `Jaamd` name, so a third-party `remarkToc` is not taken for one. */
 const unifiedNames = (entry: unknown): string[] => {
     const plugin = Array.isArray(entry) ? entry[0] : entry
     if (typeof plugin === 'string') return [plugin]

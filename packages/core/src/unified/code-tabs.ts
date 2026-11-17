@@ -10,7 +10,7 @@ import { codeTabLabel, codeTabsGroupId, codeTabsHtml, groupCodeTabs, splitCodeTa
  *
  * Requires remark-directive to run before this plugin.
  */
-export const remarkCodeTabs: Plugin<[], Root> = function remarkCodeTabs() {
+export const remarkCodeTabs: Plugin<[], Root> = function remarkJaamdCodeTabs() {
     return (tree, file) => {
         const source = String(file.value)
         // Position of the group in the document, hashed into its id.

@@ -9,7 +9,7 @@ import { spoilerData } from '../render.ts'
  *
  * Requires remark-directive to run before this plugin.
  */
-export const remarkSpoiler: Plugin<[], Root> = function remarkSpoiler() {
+export const remarkSpoiler: Plugin<[], Root> = function remarkJaamdSpoiler() {
     return (tree) => {
         visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
             if (!('name' in node) || node.name !== 'spoiler') return

@@ -16,7 +16,7 @@ export interface RemarkAlertOptions {
     tagName?: string
 }
 
-export const remarkAlert: Plugin<[RemarkAlertOptions?], Root> = function remarkAlert(options = {}) {
+export const remarkAlert: Plugin<[RemarkAlertOptions?], Root> = function remarkJaamdAlert(options = {}) {
     const { legacyTitle = false, tagName = 'div' } = options
     const marker = legacyTitle ? ALERT_LEGACY_MARKER : ALERT_MARKER
 

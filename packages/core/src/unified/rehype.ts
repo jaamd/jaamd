@@ -7,7 +7,7 @@ import { CLASS, DEFAULT_LABELS } from '../markup.ts'
 import { headingLinkHtml } from '../render.ts'
 
 /** Wraps tables in a scroll container. */
-export const rehypeTableWrapper: Plugin<[], Root> = function rehypeTableWrapper() {
+export const rehypeTableWrapper: Plugin<[], Root> = function rehypeJaamdTableWrapper() {
     return (tree) => {
         visit(tree, 'element', (node, index, parent) => {
             if (node.tagName !== 'table' || index === undefined || !parent) return
@@ -44,7 +44,7 @@ export interface RehypeHeadingLinksOptions {
  * Appends the anchor to headings that have an id. Run the plugin that assigns
  * the ids before this one.
  */
-export const rehypeHeadingLinks: Plugin<[RehypeHeadingLinksOptions?], Root> = function rehypeHeadingLinks(
+export const rehypeHeadingLinks: Plugin<[RehypeHeadingLinksOptions?], Root> = function rehypeJaamdHeadingLinks(
     options = {},
 ) {
     const label = options.label ?? DEFAULT_LABELS.headingLink
