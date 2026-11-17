@@ -42,7 +42,8 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         </svg>
     </button>
 
-    <div data-overlay hidden class="jaad-search-overlay" role="dialog" aria-modal="true" aria-label={t('search.label')}>
+    {/* Opened with showModal(): the browser keeps focus inside and the page behind inert. */}
+    <dialog data-overlay class="jaad-search-overlay" aria-label={t('search.label')}>
         <div data-backdrop class="jaad-search-backdrop"></div>
 
         <div class="jaad-search-panel">
@@ -69,9 +70,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                     aria-autocomplete="list"
                     aria-label={t('search.label')}
                 />
-                <kbd data-close class="jaad-search-close">
+                <button type="button" data-close class="jaad-search-close" aria-label={t('search.close')}>
                     ESC
-                </kbd>
+                </button>
             </div>
 
             <div data-filters hidden class="jaad-search-filters" role="group" aria-label={t('search.sections')}>
@@ -103,7 +104,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                 </span>
             </div>
         </div>
-    </div>
+    </dialog>
 </jaad-search>
 
 <script>
@@ -121,7 +122,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
     const EMPTY_INDEX: SearchIndex = { sections: [], pages: [], entries: [] }
 
     class JaadSearch extends HTMLElement {
-        #overlay!: HTMLElement
+        #overlay!: HTMLDialogElement
         #input!: HTMLInputElement
         #filters!: HTMLElement
         #list!: HTMLUListElement
@@ -139,7 +140,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         #bound = false
 
         get #open() {
-            return !this.#overlay.hidden
+            return this.#overlay.open
         }
 
         connectedCallback() {
@@ -164,6 +165,8 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             }
 
             this.querySelector('[data-backdrop]')!.addEventListener('click', () => this.#setOpen(false))
+            // Escape closes a modal dialog on its own: the cleanup runs on every close.
+            this.#overlay.addEventListener('close', () => this.#onClose())
             this.querySelector('[data-close]')!.addEventListener('click', () => this.#setOpen(false))
             this.#filters.addEventListener('click', (e) => {
                 const button = (e.target as Element).closest<HTMLButtonElement>('[data-filter]')
@@ -228,20 +231,24 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
         #setOpen(open: boolean) {
             if (open === this.#open) return
-            this.#overlay.hidden = !open
-
-            if (open) {
-                this.#restoreFocus = document.activeElement as HTMLElement | null
-                this.#previousOverflow = document.body.style.overflow
-                document.body.style.overflow = 'hidden'
-                requestAnimationFrame(() => this.#input.focus())
-                void this.#loadIndex().then(() => this.#render())
-                this.#render()
-            } else {
-                document.body.style.overflow = this.#previousOverflow
-                this.#input.value = ''
-                this.#restoreFocus?.focus?.()
+            if (!open) {
+                this.#overlay.close()
+                return
             }
+
+            this.#restoreFocus = document.activeElement as HTMLElement | null
+            this.#previousOverflow = document.body.style.overflow
+            document.body.style.overflow = 'hidden'
+            this.#overlay.showModal()
+            this.#input.focus()
+            void this.#loadIndex().then(() => this.#render())
+            this.#render()
+        }
+
+        #onClose() {
+            document.body.style.overflow = this.#previousOverflow
+            this.#input.value = ''
+            this.#restoreFocus?.focus?.()
         }
 
         #go(href: string) {
