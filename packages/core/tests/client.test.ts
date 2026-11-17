@@ -152,3 +152,43 @@ test('the cleanup releases the listeners once no call is left', () => {
     // Calling it twice changes nothing.
     disposeSecond()
 })
+
+test("the cleanup of an earlier TOC run leaves a later run's observer alone", async () => {
+    const { initToc } = await import('../src/client/modules/toc.ts')
+
+    const observers: { disconnected: boolean }[] = []
+    class FakeObserver {
+        disconnected = false
+        constructor() {
+            observers.push(this)
+        }
+        observe() {}
+        disconnect() {
+            this.disconnected = true
+        }
+    }
+    Object.defineProperty(globalThis, 'IntersectionObserver', { value: FakeObserver, configurable: true })
+
+    const root = document.createElement('div')
+    root.innerHTML = '<h2 id="setup">Setup</h2><nav class="jaamd-toc"><a href="#setup">Setup</a></nav>'
+    document.body.append(root)
+
+    try {
+        const stopFirst = initToc(root as unknown as ParentNode)
+        const stopSecond = initToc(root as unknown as ParentNode)
+        assert.equal(observers.length, 2)
+        assert.equal(observers[0].disconnected, true, 'the second run did not replace the first')
+
+        stopFirst()
+        assert.equal(observers[1].disconnected, false, "the first cleanup stopped the second run's observer")
+
+        stopSecond()
+        assert.equal(observers[1].disconnected, true)
+    } finally {
+        root.remove()
+        Object.defineProperty(globalThis, 'IntersectionObserver', {
+            value: window.IntersectionObserver,
+            configurable: true,
+        })
+    }
+})
