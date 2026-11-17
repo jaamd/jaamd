@@ -189,6 +189,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         }
 
         #onInputKey(e: KeyboardEvent) {
+            // Enter also confirms a character being composed with an input method.
+            if (e.isComposing) return
+
             if (e.key === 'ArrowDown') {
                 e.preventDefault()
                 this.#select(Math.min(this.#selected + 1, this.#options.length - 1))
@@ -205,7 +208,10 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             if (!this.#request) {
                 const url = this.dataset.indexUrl ?? '/search-index.json'
                 this.#request = fetch(url)
-                    .then((res) => (res.ok ? res.json() : EMPTY_INDEX))
+                    .then((res) => {
+                        if (!res.ok) throw new Error(`${url} answered ${res.status}`)
+                        return res.json()
+                    })
                     .then((data: SearchIndex) => {
                         this.#index = data
                         this.#renderFilters(data)
