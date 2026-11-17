@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { docsMarkdownHref, docsPageHref } from '../../src/docs/urls.ts'
+import { docsFileHref, docsMarkdownHref, docsPageHref, pageUrlsEndWithSlash } from '../../src/docs/urls.ts'
 import { normaliseBasePath, withDeploymentBase } from '../../src/site/urls.ts'
 
 test('base paths are normalised without a trailing slash', () => {
@@ -69,4 +69,33 @@ test('the deployment base wraps the locale, and only once', () => {
         }),
         '/repo/docs/it/guida',
     )
+})
+
+test('page urls end with a slash when Astro builds them so', () => {
+    const urls = { docsBase: '/docs', deploymentBase: '/repo', trailingSlash: true }
+    assert.equal(docsPageHref('guide', urls), '/repo/docs/guide/')
+    assert.equal(docsPageHref('', urls), '/repo/docs/')
+    assert.equal(docsPageHref('', { docsBase: '', trailingSlash: true }), '/')
+    assert.equal(
+        docsPageHref('guide', { docsBase: '', locale: 'it', defaultLocale: 'en', trailingSlash: true }),
+        '/it/guide/',
+    )
+})
+
+test('files never take the slash of pages', () => {
+    const urls = { docsBase: '/docs', trailingSlash: true }
+    assert.equal(docsMarkdownHref('guide', urls), '/docs/guide.md')
+    assert.equal(docsFileHref('search-index.json', urls), '/docs/search-index.json')
+    assert.equal(
+        docsFileHref('search-index.json', { docsBase: '', locale: 'it', defaultLocale: 'en' }),
+        '/it/search-index.json',
+    )
+})
+
+test("the slash follows Astro's trailingSlash and build format", () => {
+    const astro = (trailingSlash: string, format: string) => ({ trailingSlash, build: { format } })
+    assert.equal(pageUrlsEndWithSlash(astro('ignore', 'directory')), true)
+    assert.equal(pageUrlsEndWithSlash(astro('ignore', 'file')), false)
+    assert.equal(pageUrlsEndWithSlash(astro('always', 'file')), true)
+    assert.equal(pageUrlsEndWithSlash(astro('never', 'directory')), false)
 })

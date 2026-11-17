@@ -101,7 +101,7 @@ export default defineJaadConfig({
 
     test('the first page of a later section owns the section url', () => {
         assert.match(page('api/index.html'), /<h1[^>]*>Client/)
-        assert.match(page('api/client/index.html'), /http-equiv="refresh"[^>]*url=\/api"/)
+        assert.match(page('api/client/index.html'), /http-equiv="refresh"[^>]*url=\/api\/"/)
         assert.match(page('api/server/index.html'), /<h1[^>]*>Server/)
     })
 
@@ -112,14 +112,20 @@ export default defineJaadConfig({
             home,
             /docs-sidebar-section-title">The Guide<[\s\S]*Install[\s\S]*docs-sidebar-section-title">Api<[\s\S]*Server/,
         )
-        assert.match(sidebar(page('api/server/index.html')), /Intro[\s\S]*href="\/api\/server"[^>]*aria-current="page"/)
+        assert.match(
+            sidebar(page('api/server/index.html')),
+            /Intro[\s\S]*href="\/api\/server\/"[^>]*aria-current="page"/,
+        )
 
         const header = page('index.html').match(/<header[\s\S]*?<\/header>/)[0]
         assert.doesNotMatch(header, /The Guide|Api/, 'the sections are in the header')
     })
 
     test('the page navigation runs on into the next section', () => {
-        assert.match(page('guide/setup/install/index.html'), /href="\/api"[^>]*rel="next"|rel="next"[^>]*href="\/api"/)
+        assert.match(
+            page('guide/setup/install/index.html'),
+            /href="\/api\/"[^>]*rel="next"|rel="next"[^>]*href="\/api\/"/,
+        )
     })
 
     test('the breadcrumbs name the section', () => {
@@ -134,10 +140,10 @@ export default defineJaadConfig({
 
     test('a relative link to a markdown file becomes the page url', () => {
         const home = page('index.html')
-        assert.match(home, /<a href="\/guide\/setup\/install#steps">Install<\/a>/)
-        assert.match(home, /<a href="\/api\/client">Client<\/a>/)
+        assert.match(home, /<a href="\/guide\/setup\/install\/#steps">Install<\/a>/)
+        assert.match(home, /<a href="\/api\/client\/">Client<\/a>/)
         assert.match(home, /<a href="https:\/\/astro\.build"/)
-        assert.match(page('guide/setup/install/index.html'), /<a href="\/guide\/intro">Back<\/a>/)
+        assert.match(page('guide/setup/install/index.html'), /<a href="\/guide\/intro\/">Back<\/a>/)
     })
 
     test('llms.txt groups the pages by section', () => {
@@ -154,9 +160,9 @@ export default defineJaadConfig({
             index.pages.map((entry) => [entry.href, entry.section]),
             [
                 ['/', 'guide'],
-                ['/guide/setup/install', 'guide'],
-                ['/api', 'api'],
-                ['/api/server', 'api'],
+                ['/guide/setup/install/', 'guide'],
+                ['/api/', 'api'],
+                ['/api/server/', 'api'],
             ],
         )
         assert.deepEqual(
@@ -175,8 +181,8 @@ export default defineJaadConfig({
         })
 
         test('the rehype plugin keeps a relative link in its language', () => {
-            assert.match(built('index.html'), /<a href="\/guide\/next">Next<\/a>/)
-            assert.match(built('it/index.html'), /<a href="\/it\/guide\/next">Next<\/a>/)
+            assert.match(built('index.html'), /<a href="\/guide\/next\/">Next<\/a>/)
+            assert.match(built('it/index.html'), /<a href="\/it\/guide\/next\/">Next<\/a>/)
         })
 
         test('a section with nothing to serve is not linked, and the next one opens the docs', () => {
@@ -184,7 +190,7 @@ export default defineJaadConfig({
             assert.doesNotMatch(home, /Drafts/)
             assert.ok(!existsSync(join(localised, 'drafts')))
             assert.match(home, /docs-sidebar-section-title">Guide<[\s\S]*docs-sidebar-section-title">Api</)
-            assert.match(built('it/index.html'), /href="\/it\/api"/)
+            assert.match(built('it/index.html'), /href="\/it\/api\/"/)
         })
     })
 })

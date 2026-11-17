@@ -106,13 +106,14 @@ test('the sidebar follows the numeric prefixes', () => {
         return index
     }
 
-    assert.equal(links[0], '/docs', 'the opening page should own routeBase')
+    // Astro's defaults build every page as a directory, so page urls end with a slash.
+    assert.equal(links[0], '/docs/', 'the opening page should own routeBase')
     assert.ok(
-        at('/docs/getting-started/installation') < at('/docs/markdown'),
+        at('/docs/getting-started/installation/') < at('/docs/markdown/'),
         'getting started must come before markdown',
     )
     assert.ok(
-        at('/docs/getting-started/installation') < at('/docs/getting-started/deployment'),
+        at('/docs/getting-started/installation/') < at('/docs/getting-started/deployment/'),
         'files inside a chapter must follow their own numbers',
     )
 })

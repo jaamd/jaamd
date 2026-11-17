@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import sitemap from '@astrojs/sitemap'
 import { resolveConfig } from './config.ts'
 import { createSitemapFilter, setupDocs } from './docs/integration.ts'
+import { pageUrlsEndWithSlash } from './docs/urls.ts'
 import { resolveStylesheets } from './site/config.ts'
 import { setupSite } from './site/integration.ts'
 import { normaliseBasePath } from './site/urls.ts'
@@ -22,7 +23,11 @@ export function createJaadIntegration(options: JaadUserConfig, state: Integratio
                     srcDir: fileURLToPath(astroConfig.srcDir),
                 }
 
-                const config = resolveConfig(options, paths)
+                const resolved = resolveConfig(options, paths)
+                const config = {
+                    ...resolved,
+                    docs: { ...resolved.docs, trailingSlash: pageUrlsEndWithSlash(astroConfig) },
+                }
                 const hasSite = Boolean(astroConfig.site)
 
                 setupSite(params, config, resolveStylesheets(config, paths))

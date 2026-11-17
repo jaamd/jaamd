@@ -49,6 +49,8 @@ export interface DocsResolvedConfig {
     sections: DocsSection[]
     /** Edit url of the pages in `dir`, `:path` standing for the file. */
     editBase: string | null
+    /** Page urls end with a slash, as Astro builds them; set from Astro's config. */
+    trailingSlash: boolean
 }
 
 export interface DocsSection {
@@ -117,6 +119,8 @@ export function resolveDocsConfig(
         dirInUse: sections.length === 0 || docsDirSet,
         sections,
         editBase: resolveEditBase(config.editLink, repo, config.docsDir),
+        // Astro's defaults, `trailingSlash: 'ignore'` with directories, until the integration knows better.
+        trailingSlash: true,
     }
 
     const roots = docsRoots(docs, cwd)
