@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs'
-import { writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { styleText } from 'node:util'
 import * as p from '@clack/prompts'
@@ -28,6 +27,7 @@ const CONTENT_CONFIG = 'export { collections } from "@jaamd/jaad/content";\n'
 const MANUAL_SETUP_URL = 'https://docs.jaamd.org/jaad/getting-started/installation#existing-astro-project'
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
 const FAVICON_NAMES = ['favicon.svg', 'favicon.ico', 'favicon.png']
+const DEFAULT_DIR = 'my-docs'
 
 function markdownUnder(dir) {
     if (!existsSync(dir)) return 0
@@ -191,13 +191,50 @@ function answer(value) {
 
 const IGNORED_WHEN_EMPTY = ['.git', '.gitignore', '.DS_Store', 'Thumbs.db']
 
-function assertTargetAvailable(args, target) {
-    if (args.here || !existsSync(target)) return
+/** Missing, or holding nothing but repository and system files. A file is not empty. */
+function isEmptyDirectory(target) {
+    if (!existsSync(target)) return true
+    if (!statSync(target).isDirectory()) return false
 
     const entries = readdirSync(target).filter((entry) => !IGNORED_WHEN_EMPTY.includes(entry))
-    if (entries.length > 0) {
-        fail(`${args.dir} exists and is not empty. Use --here to add JAAD to it.`)
-    }
+    return entries.length === 0
+}
+
+function assertTargetAvailable(args, target) {
+    if (args.here || isEmptyDirectory(target)) return
+    fail(`${args.dir} exists and is not empty. Use --here to add JAAD to it.`)
+}
+
+/** Asks for a directory. The current one, when it is not empty, is used only once confirmed. */
+async function askDirectory(args) {
+    const dir = answer(
+        await p.text({
+            message: 'Where should we create the project?',
+            placeholder: DEFAULT_DIR,
+            defaultValue: DEFAULT_DIR,
+            validate(value) {
+                const { dir, here } = normaliseDir({ dir: value || DEFAULT_DIR, here: false })
+                if (!here && !isEmptyDirectory(resolve(dir))) {
+                    return `${dir} is not empty: pick another directory, or run this inside it with --here.`
+                }
+                return undefined
+            },
+        }),
+    )
+    if (dir === null) return false
+
+    args.dir = dir
+    normaliseDir(args)
+    if (!args.here || isEmptyDirectory(resolve('.'))) return true
+
+    const confirmed = answer(
+        await p.confirm({
+            message: 'The current directory is not empty. Add JAAD to it?',
+            initialValue: false,
+        }),
+    )
+    if (confirmed === false) p.cancel('Setup cancelled.')
+    return confirmed === true
 }
 
 async function collectAnswers(args) {
@@ -216,18 +253,7 @@ async function collectAnswers(args) {
         )
     }
 
-    if (!args.here && !args.dir) {
-        const dir = answer(
-            await p.text({
-                message: 'Where should we create the project?',
-                placeholder: '.',
-                defaultValue: '.',
-            }),
-        )
-        if (dir === null) return null
-        args.dir = dir
-        normaliseDir(args)
-    }
+    if (!args.here && !args.dir && !(await askDirectory(args))) return null
 
     const target = resolve(args.here ? '.' : args.dir)
     assertTargetAvailable(args, target)

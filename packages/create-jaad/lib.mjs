@@ -1,4 +1,5 @@
-import { resolve } from 'node:path'
+import { homedir } from 'node:os'
+import { join, resolve } from 'node:path'
 
 export const TEMPLATES = ['docs', 'site']
 export const DEFAULT_TEMPLATE = 'docs'
@@ -24,8 +25,19 @@ function takeValue(argv, index, option) {
     return value
 }
 
+/** A prompt answer reaches no shell, so `~` is expanded here. */
+function expandHome(dir) {
+    if (dir === '~') return homedir()
+    if (dir.startsWith('~/')) return join(homedir(), dir.slice(2))
+    return dir
+}
+
 /** A path naming the current directory is --here, however it was spelled. */
 export function normaliseDir(args) {
+    if (typeof args.dir === 'string') {
+        const dir = expandHome(args.dir.trim())
+        args.dir = dir === '' ? null : dir
+    }
     if (args.dir && resolve(args.dir) === resolve('.')) {
         args.here = true
         args.dir = null

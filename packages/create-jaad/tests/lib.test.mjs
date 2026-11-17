@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { resolve } from 'node:path'
+import { homedir } from 'node:os'
+import { join, resolve } from 'node:path'
 import { test } from 'node:test'
 import { missingAnswers, normaliseDir, packageManager, parseArgs, quoteArg, titleFrom } from '../lib.mjs'
 
@@ -46,6 +47,12 @@ test('a real directory is left alone', () => {
     const args = normaliseDir({ dir: 'my-docs', here: false })
     assert.equal(args.here, false)
     assert.equal(args.dir, 'my-docs')
+})
+
+test('a typed directory loses its spaces and expands ~', () => {
+    assert.equal(normaliseDir({ dir: '  my-docs ', here: false }).dir, 'my-docs')
+    assert.equal(normaliseDir({ dir: '~/my-docs', here: false }).dir, join(homedir(), 'my-docs'))
+    assert.equal(normaliseDir({ dir: '   ', here: false }).dir, null)
 })
 
 test('the flag path normalises the same way', () => {
