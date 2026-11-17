@@ -145,6 +145,20 @@ for (const [name, render] of Object.entries(processors)) {
             assert.match(html, /<nav class="jaamd-toc" aria-label="Indice">\s*<ul>/)
         })
 
+        test('a colon inside a word or a time stays text', async () => {
+            const html = await render({}, 'Error:Fatal at 10:30.\n')
+            assert.match(html, /<p>Error:Fatal at 10:30\.<\/p>/)
+        })
+
+        test('an inline directive no plugin claimed keeps its source', async () => {
+            const html = await render({}, 'See :note[this]{#x} here.\n')
+            assert.match(html, /<p>See :note\[this\]\{#x\} here\.<\/p>/)
+        })
+
+        test('a block directive no plugin claimed keeps its content', async () => {
+            assert.match(await render(), /<div><p>Kept\.<\/p><\/div>/)
+        })
+
         test('a feature turned off leaves its markdown alone', async () => {
             const html = await render({ features: { alerts: false, tables: false, headingLinks: false } })
             assert.doesNotMatch(html, /markdown-alert|jaamd-table-wrapper|jaamd-heading-link/)
@@ -166,10 +180,6 @@ for (const [name, render] of Object.entries(processors)) {
         })
     })
 }
-
-test('satteri keeps a directive no plugin claimed', async () => {
-    assert.match(await processors.satteri(), /<div><p>Kept\.<\/p><\/div>/)
-})
 
 test('both processors give a code-tabs group the same id', async () => {
     const id = (html: string) => html.match(/id="(jaamd-tabs-[a-z0-9]+)"/)?.[1]

@@ -7,6 +7,7 @@ import { resolveFeatures, type Features } from '../features.ts'
 import { withLabels } from '../markup.ts'
 import { remarkAlert } from './alert.ts'
 import { remarkCodeTabs } from './code-tabs.ts'
+import { remarkDirectiveFallback } from './directive-fallback.ts'
 import { rehypeHeadingLinks, rehypeTableWrapper } from './rehype.ts'
 import { remarkSpoiler } from './spoiler.ts'
 import { remarkToc } from './toc.ts'
@@ -35,6 +36,8 @@ export function unifiedPlugins(options: UnifiedOptions = {}): {
             ...(on.codeTabs ? [remarkCodeTabs] : []),
             ...(on.toc ? [[remarkToc, { label: labels.toc }] satisfies Pluggable] : []),
             ...(on.spoilers ? [remarkSpoiler] : []),
+            // After every plugin that claims directives, the user's included.
+            ...(on.directives ? [remarkDirectiveFallback] : []),
         ],
         rehypePlugins: [
             ...(on.tables ? [rehypeTableWrapper] : []),
@@ -52,6 +55,7 @@ export {
     remarkAlert,
     remarkCodeTabs,
     remarkDirective,
+    remarkDirectiveFallback,
     remarkSpoiler,
     remarkToc,
     rehypeHeadingLinks,

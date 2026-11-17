@@ -56,7 +56,7 @@ test('Sätteri: a second run adds nothing', () => {
     assert.deepEqual(processor.options.mdastPlugins, before)
 })
 
-test('unified: remark ahead of the user, Astro ids right before the links', () => {
+test('unified: remark ahead of the user, the directive fallback last, Astro ids right before the links', () => {
     const user = function user() {}
     const processor = unified({ remarkPlugins: [user], rehypePlugins: [user] })
     registerPlugins(processor)
@@ -68,6 +68,7 @@ test('unified: remark ahead of the user, Astro ids right before the links', () =
         'remarkToc',
         'remarkSpoiler',
         'user',
+        'remarkJaamdDirectiveFallback',
     ])
     assert.deepEqual(names(processor.options.rehypePlugins), [
         'user',
@@ -84,7 +85,7 @@ test('unified: plugins the user registered are not added again, ids included', (
     assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkAlert').length, 1)
     assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkToc').length, 1)
     assert.deepEqual(names(processor.options.rehypePlugins), ['rehypeHeadingLinks', 'rehypeTableWrapper'])
-    assert.deepEqual(registration, { added: 4, total: 8 })
+    assert.deepEqual(registration, { added: 5, total: 9 })
 })
 
 test('features turn plugins off on both processors', () => {
