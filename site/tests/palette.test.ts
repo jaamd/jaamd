@@ -6,21 +6,39 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-/** Every `color-mix` token, as [name, formula] with the prefix normalised. */
-function derivedTokens(file: string): [string, string][] {
+/** The custom properties of the first block that `selector` opens, prefixes
+ *  dropped: `--identity-border`, `--color-border` and `--jaad-content-width`
+ *  become `border` and `content-width`. */
+function tokens(file: string, selector: string): Map<string, string> {
     const source = readFileSync(join(ROOT, file), 'utf8')
-    return [...source.matchAll(/--(?:color|identity)-([a-z-]+):\s*(color-mix\([^;]*\))/g)].map((match) => [
-        match[1],
-        match[2].replace(/\s+/g, ' ').replace(/--(?:color|identity)-/g, '--'),
-    ])
+    const start = source.indexOf(`${selector} {`)
+    assert.ok(start >= 0, `${file} has no ${selector} block`)
+    const block = source.slice(start, source.indexOf('\n}', start))
+
+    const declarations = [...block.matchAll(/(--[a-z-]+):\s*([^;]+);/g)].map((match) => {
+        const name = match[1].replace(/^--(?:identity|color|jaad)-/, '').replace(/^--/, '')
+        const value = match[2].replace(/\s+/g, ' ').replace(/--(?:identity|color)-/g, '--')
+        return [name, value] as const
+    })
+    return new Map(declarations)
 }
 
-// The landing keeps its own palette, so nothing forces it to agree with JAAD's.
-// If they drift, jaamd.org and docs.jaamd.org stop looking like one site.
-test('the site derives its palette the way the package does', () => {
-    const shipped = derivedTokens('packages/jaad/src/site/styles/global.css')
-    const site = derivedTokens('site/src/styles/identity.css')
+// jaamd.org keeps its own palette, so nothing forces it to agree with JAAD's,
+// which docs.jaamd.org uses. If they drift, the two stop looking like one site.
+for (const [mode, selectors] of [
+    ['light', [':root', '@theme static']],
+    ['dark', ['html.dark', 'html.dark']],
+] as const) {
+    test(`the site's ${mode} palette is JAAD's`, () => {
+        const site = tokens('site/src/styles/identity.css', selectors[0])
+        const jaad = tokens('packages/jaad/src/site/styles/global.css', selectors[1])
 
-    assert.ok(shipped.length > 0, 'no derived tokens found in the package')
-    assert.deepEqual(site, shipped)
-})
+        assert.ok(site.size > 0, 'no tokens found in the site')
+        const differing = [...site]
+            .filter(([name, value]) => {
+                return jaad.get(name) !== value
+            })
+            .map(([name, value]) => `${name}: ${value} (JAAD: ${jaad.get(name) ?? 'none'})`)
+        assert.deepEqual(differing, [])
+    })
+}

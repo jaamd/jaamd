@@ -1,8 +1,12 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { DIST, allCss, page, walk } from './dist.mjs'
+import { fileURLToPath } from 'node:url'
+import { allCss, brokenLinks, readBuilt } from '../../tests/dist.mjs'
+
+const DIST = fileURLToPath(new URL('../dist', import.meta.url))
+const page = (relative) => readBuilt(DIST, relative)
 
 const home = () => page('index.html')
 
@@ -23,7 +27,7 @@ test('the preview is rendered at build by JAAMD, so it shows without scripts', (
 })
 
 test('every JAAMD theme can dress the preview, and only the preview', () => {
-    const css = allCss()
+    const css = allCss(DIST)
     const options = [...home().matchAll(/<option value="([^"]+)"/g)].map((m) => m[1])
     assert.equal(options[0], 'default')
     for (const slug of options.slice(1)) {
@@ -45,23 +49,20 @@ test('the documentation is no longer built here', () => {
     assert.match(page('llms.txt'), /https:\/\/docs\.jaamd\.org\/llms\.txt/)
 })
 
-test('a wrong url gets the site page', () => {
-    assert.match(page('404.html'), /<title>404 \| JAAMD<\/title>/)
+test('a wrong url gets the site page, which names no url of its own', () => {
+    const notFound = page('404.html')
+    assert.match(notFound, /<title>404 \| JAAMD<\/title>/)
+    assert.doesNotMatch(notFound, /rel="canonical"|property="og:url"/)
+    assert.match(notFound, /<meta name="robots" content="noindex">/)
+    assert.match(home(), /<link rel="canonical" href="https:\/\/jaamd\.org\/">/)
 })
 
-const resolves = (path) =>
-    [join(DIST, path), join(DIST, path, 'index.html'), join(DIST, `${path}.html`)].some(
-        (file) => existsSync(file) && !file.endsWith('/'),
-    )
+test('robots.txt names no sitemap the build does not write', () => {
+    for (const [, url] of page('robots.txt').matchAll(/^Sitemap:\s*(\S+)/gm)) {
+        assert.ok(existsSync(join(DIST, new URL(url).pathname)), url)
+    }
+})
 
 test('every internal link points at a built page', () => {
-    const broken = walk()
-        .filter((file) => file.endsWith('.html'))
-        .flatMap((file) =>
-            [...readFileSync(file, 'utf8').matchAll(/href="(\/(?!\/)[^"#?]*)/g)]
-                .map((m) => decodeURI(m[1]))
-                .filter((href) => !resolves(href))
-                .map((href) => `${file.slice(DIST.length)} → ${href}`),
-        )
-    assert.deepEqual([...new Set(broken)], [])
+    assert.deepEqual(brokenLinks(DIST), [])
 })
