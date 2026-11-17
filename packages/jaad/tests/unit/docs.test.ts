@@ -152,6 +152,22 @@ test('an ordered page can take the opening route from the first file', () => {
     assert.equal(ids([source('01-intro'), source('02-welcome', { data: { order: 0 } })])[0], '02-welcome')
 })
 
+test('ties fall to the path, whatever order the files arrive in', () => {
+    const files = [source('beta'), source('alpha'), source('guides/b'), source('api/a'), source('gamma')]
+    const expected = ids(files)
+    assert.deepEqual(ids(files.toReversed()), expected)
+    assert.deepEqual(ids([files[2], files[0], files[4], files[1], files[3]]), expected)
+})
+
+test('an unnumbered chapter keeps its pages together, at the place of its first', () => {
+    assert.deepEqual(ids([source('guides/01-a'), source('api/02-c'), source('guides/03-b'), source('04-end')]), [
+        'guides/01-a',
+        'guides/03-b',
+        'api/02-c',
+        '04-end',
+    ])
+})
+
 test('ordering and chapters read the path, without the locale', () => {
     const [page] = treeOf([source('it/02-guides/01-setup', { path: '02-guides/01-setup', locale: 'it' })]).pages
     assert.equal(page.chapter, 'guides')
@@ -305,12 +321,12 @@ test('a directory that is not a configured locale is left in place', () => {
 // Without a key the slug decides, which is why two languages that translate
 // their file names stop being linked.
 test('the clean slug pairs translations until a key says otherwise', () => {
-    const [plain, keyed] = treeOf([
+    const { byId } = treeOf([
         source('02-guides/01-setup'),
         source('02-guida/01-installazione', { data: { translationKey: 'setup' } }),
-    ]).pages
-    assert.equal(plain.translationKey, 'guides/setup')
-    assert.equal(keyed.translationKey, 'setup')
+    ])
+    assert.equal(byId.get('02-guides/01-setup')?.translationKey, 'guides/setup')
+    assert.equal(byId.get('02-guida/01-installazione')?.translationKey, 'setup')
 })
 
 test('two pages of one locale cannot claim the same translation', () => {

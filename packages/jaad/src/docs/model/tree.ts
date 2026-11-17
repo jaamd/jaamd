@@ -63,22 +63,58 @@ export interface DocsTreeOptions {
     urls: DocsUrlOptions
 }
 
-/** The order of `sections` first, then chapter order, then file order within
- *  the chapter. Frontmatter `order` replaces a file's prefix number; root pages
- *  interleave with chapters by their own number. */
+/** The directory a page sits in, below its section and locale; empty at the root. */
+function directoryOf(path: string): string {
+    const slash = path.lastIndexOf('/')
+    return slash === -1 ? '' : path.slice(0, slash)
+}
+
+/**
+ * The order of `sections` first, then chapter order, then file order within
+ * the chapter. Frontmatter `order` replaces a file's prefix number; root pages
+ * interleave with chapters by their own number. A chapter without a prefix
+ * number takes its first page's, so its pages stay together. Ties fall to the
+ * directory, then the path, so the order never depends on how the files were
+ * read.
+ */
 function sortSources<S extends DocsSource>(sources: S[], sections: string[]): S[] {
-    return sources
-        .map((source) => {
-            const parsed = parseDocPath(source.path)
-            const order = source.data.order ?? parsed.order
-            return {
-                source,
-                section: sections.indexOf(source.section ?? ''),
-                primary: parsed.orderChapter ?? order,
-                secondary: order,
-            }
-        })
-        .toSorted((a, b) => a.section - b.section || a.primary - b.primary || a.secondary - b.secondary)
+    const entries = sources.map((source) => {
+        const parsed = parseDocPath(source.path)
+        return {
+            source,
+            parsed,
+            section: sections.indexOf(source.section ?? ''),
+            directory: directoryOf(source.path),
+            order: source.data.order ?? parsed.order,
+        }
+    })
+
+    // The first page of each unnumbered chapter, by section and directory.
+    const firstOrder = new Map<string, number>()
+    for (const entry of entries) {
+        if (!entry.parsed.chapter || entry.parsed.orderChapter !== undefined) {
+            continue
+        }
+        const key = `${entry.section}/${entry.directory}`
+        firstOrder.set(key, Math.min(firstOrder.get(key) ?? Infinity, entry.order))
+    }
+
+    const primary = (entry: (typeof entries)[number]): number => {
+        if (entry.parsed.orderChapter !== undefined) {
+            return entry.parsed.orderChapter
+        }
+        return entry.parsed.chapter ? firstOrder.get(`${entry.section}/${entry.directory}`)! : entry.order
+    }
+
+    return entries
+        .toSorted(
+            (a, b) =>
+                a.section - b.section ||
+                primary(a) - primary(b) ||
+                a.directory.localeCompare(b.directory) ||
+                a.order - b.order ||
+                a.source.path.localeCompare(b.source.path),
+        )
         .map((entry) => entry.source)
 }
 

@@ -22,8 +22,9 @@ previous and next links.
 ## Rules
 
 - A numeric prefix sets the order and is removed from the URL. Files without
-  one sort after the numbered files.
-- A folder becomes a chapter. Only one folder level is supported.
+  one sort after the numbered files. Files with the same number sort by name.
+- A folder becomes a chapter. Only one folder level is supported. A folder
+  without a prefix takes the place of its first page.
 - The first `# Heading` is the page title.
 - The `##` and `###` headings make the page's table of contents. Wrap headings
   in `<div data-toc-ignore>` to leave them out.
