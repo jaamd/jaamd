@@ -22,8 +22,14 @@ import {
 // Every package is released at one version: this one's is JAAD's.
 const JAAD = `^${JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version}`
 const ASTRO = '^7.4.2'
-const ASTRO_CONFIG_NAMES = ['astro.config.ts', 'astro.config.mjs', 'astro.config.js']
-const CONTENT_CONFIG_NAMES = ['src/content.config.ts', 'src/content.config.mjs', 'src/content.config.js']
+// The names Astro itself looks for.
+const ASTRO_CONFIG_NAMES = ['astro.config.ts', 'astro.config.mts', 'astro.config.mjs', 'astro.config.js']
+const CONTENT_CONFIG_NAMES = [
+    'src/content.config.ts',
+    'src/content.config.mts',
+    'src/content.config.mjs',
+    'src/content.config.js',
+]
 const JAAD_CONFIG_NAMES = ['jaad.config.ts', 'jaad.config.mjs', 'jaad.config.js']
 const ASTRO_CONFIG = 'export { default } from "@jaamd/jaad/site";\n'
 const CONTENT_CONFIG = 'export { collections } from "@jaamd/jaad/content";\n'
@@ -41,15 +47,19 @@ function markdownUnder(dir) {
     )
 }
 
-/** Never overwrites: an existing file is the user's, not ours. */
+/** Never overwrites: an existing file is the user's, not ours. `wx` also
+ *  refuses a symlink, even one that points nowhere yet. */
 function write(target, relative, contents, written, skipped) {
     const file = join(target, relative)
-    if (existsSync(file)) {
+    mkdirSync(dirname(file), { recursive: true })
+
+    try {
+        writeFileSync(file, contents, { flag: 'wx' })
+    } catch (error) {
+        if (error.code !== 'EEXIST') throw error
         skipped.push(relative)
         return
     }
-    mkdirSync(dirname(file), { recursive: true })
-    writeFileSync(file, contents)
     written.push(relative)
 }
 

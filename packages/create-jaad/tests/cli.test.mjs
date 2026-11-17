@@ -2,7 +2,16 @@
 
 import assert from 'node:assert/strict'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import {
+    existsSync,
+    mkdirSync,
+    mkdtempSync,
+    readFileSync,
+    readdirSync,
+    rmSync,
+    symlinkSync,
+    writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { after, test } from 'node:test'
@@ -255,9 +264,11 @@ test('--here recognizes canonical JAAD configurations on rerun', () => {
 test('--here recognizes every supported custom configuration filename', () => {
     const candidates = [
         'astro.config.ts',
+        'astro.config.mts',
         'astro.config.mjs',
         'astro.config.js',
         'src/content.config.ts',
+        'src/content.config.mts',
         'src/content.config.mjs',
         'src/content.config.js',
     ]
@@ -390,4 +401,16 @@ test('--here points at Astro itself when dev runs something else', () => {
     assert.equal(result.status, 0, output)
     assert.match(output, /npx astro dev/)
     assert.doesNotMatch(output, /npm run dev/)
+})
+
+test('a file that is a symlink is kept, even one that points nowhere yet', () => {
+    const project = temporaryDirectory('jaad-symlink-')
+    const outside = join(temporaryDirectory('jaad-symlink-target-'), 'planted.md')
+    symlinkSync(outside, join(project, 'CLAUDE.md'))
+
+    const result = runScaffolderHere(project, 'docs')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 0, output)
+    assert.match(output, /kept\s+CLAUDE\.md/)
+    assert.equal(existsSync(outside), false, 'the scaffolder wrote through the symlink')
 })
