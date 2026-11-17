@@ -4,7 +4,7 @@
  * color-mix(). Any individual token can still be overridden by name.
  *
  * Values live in @layer jaamd.defaults, so an unlayered :root rule always wins.
- * Opt out entirely with `noDefault: true`. */
+ * The Astro integration leaves this file out with `defaultVariables: false`. */
 
 @layer jaamd.defaults;
 
@@ -18,7 +18,7 @@
         --jaamd-line-height: 1.6;
 
         /* Per-element sizes are not declared here. Each is read as
-   * var(--jaamd-font-size-<x>, <current value>) in markdown.css, so unset they
+   * var(--jaamd-font-size-<x>, <current value>) in styles.css, so unset they
    * leave --jaamd-font-size the single knob for the whole scale. Declare one
    * to break it out:
    *
@@ -29,6 +29,7 @@
    *   --jaamd-font-size-table         (th and td)
    *   --jaamd-font-size-summary
    *   --jaamd-font-size-alert-title
+   *   --jaamd-font-size-toc   -toc-title
    *   --jaamd-font-size-footnotes
    */
 

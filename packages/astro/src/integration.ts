@@ -14,9 +14,8 @@ export interface JaamdOptions extends PluginOptions {
 
     /**
      * Shiki theme. `{ light, dark }` switches on a `.dark` class on `<html>`.
-     * Unset, `markdown.shikiConfig` is left as configured; "github-light"
-     * replaces only Astro's own default.
-     * @default "github-light"
+     * Unset, `markdown.shikiConfig` is left as configured, except that Astro's
+     * own default theme becomes "github-light".
      */
     theme?: ShikiTheme
 

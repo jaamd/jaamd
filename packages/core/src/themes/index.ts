@@ -6,7 +6,7 @@
 export type JaamdThemeMode = 'light' | 'dark' | 'dual'
 
 export interface JaamdTheme {
-    /** Directory name, and the value a `data-jaamd-theme` attribute would carry. */
+    /** Directory name: the stylesheet is `themes/<slug>.css`. */
     slug: string
     /** Human-readable name, for pickers. */
     name: string
