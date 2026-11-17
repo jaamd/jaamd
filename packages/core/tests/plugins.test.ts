@@ -145,6 +145,32 @@ for (const [name, render] of Object.entries(processors)) {
             assert.match(html, /<nav class="jaamd-toc" aria-label="Indice">\s*<ul>/)
         })
 
+        test('an alert marker with text on its line leaves a plain blockquote', async () => {
+            const html = await render({}, '> [!NOTE] Hello world\n')
+            assert.doesNotMatch(html, /markdown-alert/)
+            assert.match(html, /\[!NOTE\] Hello world/)
+        })
+
+        test('an alert marker counts on the first line only', async () => {
+            const html = await render({}, '> Intro.\n>\n> [!TIP]\n> Later.\n')
+            assert.doesNotMatch(html, /markdown-alert/)
+            assert.match(html, /Later\./)
+        })
+
+        test('an alert marker alone in its paragraph leaves no empty paragraph', async () => {
+            const html = await render({}, '> [!NOTE]\n>\n> Body.\n')
+            assert.match(html, /markdown-alert-note/)
+            assert.doesNotMatch(html, /<p><\/p>/)
+            assert.match(html, /<p>Body\.<\/p>/)
+        })
+
+        test('an alert marker ended by a hard break takes the break with it', async () => {
+            const html = await render({}, '> [!NOTE]  \n> Body.\n')
+            assert.match(html, /markdown-alert-note/)
+            assert.doesNotMatch(html, /<br/)
+            assert.match(html, /<p>Body\.<\/p>/)
+        })
+
         test('a colon inside a word or a time stays text', async () => {
             const html = await render({}, 'Error:Fatal at 10:30.\n')
             assert.match(html, /<p>Error:Fatal at 10:30\.<\/p>/)

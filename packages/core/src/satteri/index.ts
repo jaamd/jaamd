@@ -13,7 +13,6 @@ import type {
 import { resolveFeatures } from '../features.ts'
 import { CLASS, DEFAULT_LABELS, withLabels } from '../markup.ts'
 import {
-    ALERT_MARKER,
     TOC_CLOSE_HTML,
     alertData,
     alertTitle,
@@ -21,6 +20,7 @@ import {
     codeTabsGroupId,
     codeTabsHtml,
     headingLinkHtml,
+    readAlertMarker,
     spoilerData,
     tocOpenHtml,
 } from '../render.ts'
@@ -30,28 +30,32 @@ export function satteriAlert(): MdastPluginDefinition {
     return {
         name: 'jaamd-alert',
         blockquote(node, ctx) {
-            for (const paragraph of node.children) {
-                if (paragraph.type !== 'paragraph') continue
-
-                const [first, second] = paragraph.children
-                if (first?.type !== 'text') continue
-                const match = first.value.match(ALERT_MARKER)
-                if (!match) continue
-
-                const alertType = match[1].toLowerCase()
-
-                if (first.value.includes('\n')) {
-                    ctx.setProperty(first, 'value', first.value.replace(ALERT_MARKER, '').replace(/^\n+/, ''))
-                } else {
-                    // Marker is the whole first line: drop it and the following break.
-                    ctx.removeNode(first)
-                    if (second?.type === 'break') ctx.removeNode(second)
-                }
-
-                ctx.setProperty(node, 'data', alertData(alertType))
-                ctx.prependChild(node, alertTitle(alertType, alertType.toUpperCase()))
+            const paragraph = node.children[0]
+            if (paragraph?.type !== 'paragraph') {
                 return
             }
+
+            const found = readAlertMarker(paragraph.children)
+            if (!found) {
+                return
+            }
+
+            const [first, second] = paragraph.children
+            const alertType = found.match[1].toLowerCase()
+
+            if (found.emptiesParagraph) {
+                ctx.removeNode(paragraph)
+            } else if (found.rest === null) {
+                ctx.removeNode(first)
+                if (found.dropsBreak) {
+                    ctx.removeNode(second)
+                }
+            } else if (first.type === 'text') {
+                ctx.setProperty(first, 'value', found.rest)
+            }
+
+            ctx.setProperty(node, 'data', alertData(alertType))
+            ctx.prependChild(node, alertTitle(alertType, alertType.toUpperCase()))
         },
     }
 }

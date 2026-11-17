@@ -30,6 +30,9 @@ GitHub-style blockquote alerts, in five types: `NOTE`, `TIP`, `IMPORTANT`,
 > [!WARNING]
 > Urgent information needing immediate attention.
 
+As on GitHub, the marker is the first line of the blockquote, alone on it.
+`> [!NOTE] Some text` stays a plain blockquote.
+
 ## Code tabs
 
 Group several code blocks into a tabbed panel. The text after the language is

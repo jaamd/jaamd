@@ -7,7 +7,7 @@
 import type { Root } from 'mdast'
 import type { Plugin } from 'unified'
 import { visit } from 'unist-util-visit'
-import { ALERT_LEGACY_MARKER, ALERT_MARKER, alertData, alertTitle } from '../render.ts'
+import { ALERT_LEGACY_MARKER, ALERT_MARKER, alertData, alertTitle, readAlertMarker } from '../render.ts'
 
 export interface RemarkAlertOptions {
     /** Use legacy title format (allows optional slash-suffix). @default false */
@@ -22,31 +22,29 @@ export const remarkAlert: Plugin<[RemarkAlertOptions?], Root> = function remarkA
 
     return (tree) => {
         visit(tree, 'blockquote', (node) => {
-            for (const paragraph of node.children) {
-                if (paragraph.type !== 'paragraph') continue
-
-                const first = paragraph.children[0]
-                if (first?.type !== 'text') continue
-                const match = first.value.match(marker)
-                if (!match) continue
-
-                const alertType = match[1].toLowerCase()
-                const title = (legacyTitle && match[2] ? match[2] : alertType.toUpperCase()).replace(/^\//, '')
-
-                if (first.value.includes('\n')) {
-                    paragraph.children[0] = {
-                        type: 'text',
-                        value: first.value.replace(marker, '').replace(/^\n+/, ''),
-                    }
-                } else {
-                    // Marker is the whole first line: drop it and the following break.
-                    paragraph.children.splice(0, paragraph.children[1]?.type === 'break' ? 2 : 1)
-                }
-
-                node.data = alertData(alertType, tagName)
-                node.children.unshift(alertTitle(alertType, title))
+            const paragraph = node.children[0]
+            if (paragraph?.type !== 'paragraph') {
                 return
             }
+
+            const found = readAlertMarker(paragraph.children, marker)
+            if (!found) {
+                return
+            }
+
+            const alertType = found.match[1].toLowerCase()
+            const title = (legacyTitle && found.match[2] ? found.match[2] : alertType.toUpperCase()).replace(/^\//, '')
+
+            if (found.emptiesParagraph) {
+                node.children.shift()
+            } else if (found.rest === null) {
+                paragraph.children.splice(0, found.dropsBreak ? 2 : 1)
+            } else {
+                paragraph.children[0] = { type: 'text', value: found.rest }
+            }
+
+            node.data = alertData(alertType, tagName)
+            node.children.unshift(alertTitle(alertType, title))
         })
     }
 }

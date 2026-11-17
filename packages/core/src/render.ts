@@ -7,6 +7,58 @@ import { CLASS, ICON, ID, labelled } from './markup.ts'
 export const ALERT_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i
 export const ALERT_LEGACY_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)(\/.*)?]/i
 
+/** An inline node as both processors give it: text has a `value`. */
+interface InlineNode {
+    type: string
+    value?: string
+}
+
+export interface AlertMarker {
+    match: RegExpMatchArray
+    /** What the first text node keeps once the marker line is gone, or null
+     *  when the marker was all of it. */
+    rest: string | null
+    /** The marker line ended with a hard break, which goes with it. */
+    dropsBreak: boolean
+    /** Nothing else is in the paragraph: it goes too. */
+    emptiesParagraph: boolean
+}
+
+/**
+ * The marker a blockquote's first paragraph opens with. As on GitHub, it must
+ * be alone on its line: `> [!NOTE] text` stays a plain blockquote.
+ */
+export function readAlertMarker(children: readonly InlineNode[], marker: RegExp = ALERT_MARKER): AlertMarker | null {
+    const [first, second] = children
+    if (first?.type !== 'text' || first.value === undefined) {
+        return null
+    }
+
+    const match = first.value.match(marker)
+    if (!match) {
+        return null
+    }
+
+    const afterMarker = first.value.slice(match[0].length)
+    const lineEnd = /^[ \t]*\n/.exec(afterMarker)
+    if (lineEnd) {
+        return { match, rest: afterMarker.slice(lineEnd[0].length), dropsBreak: false, emptiesParagraph: false }
+    }
+
+    if (afterMarker.trim() !== '') {
+        return null
+    }
+
+    // The marker filled the text node: the line ends with the paragraph or a hard break.
+    if (second === undefined) {
+        return { match, rest: null, dropsBreak: false, emptiesParagraph: true }
+    }
+    if (second.type === 'break') {
+        return { match, rest: null, dropsBreak: true, emptiesParagraph: children.length === 2 }
+    }
+    return null
+}
+
 /** mdast `data` that renders the node as another hast element. */
 function asHast(hProperties: Record<string, unknown>, hName?: string): Data {
     return (hName ? { hName, hProperties } : { hProperties }) as Data
