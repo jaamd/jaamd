@@ -1,0 +1,28 @@
+name: Deploy site
+
+# jaamd.org follows main: the landing page and its live editor, which runs
+# @jaamd/core from the workspace.
+on:
+    push:
+        branches: [main]
+        paths:
+            - 'site/**'
+            - 'packages/core/**'
+            - '!packages/core/tests/**'
+            - 'package.json'
+            - 'pnpm-lock.yaml'
+            - 'pnpm-workspace.yaml'
+            - '.github/workflows/deploy.yml'
+            - '.github/workflows/deploy-site.yml'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    deploy:
+        uses: ./.github/workflows/deploy.yml
+        with:
+            project: site
+            url: https://jaamd.org
+        secrets: inherit

@@ -32,7 +32,9 @@ link to a file that does not exist.
 
 The `site/` project is jaamd.org, the landing page with the live editor: preview
 it with `pnpm --filter site dev`. Its Worker sends the old `jaamd.org/docs/...`
-addresses to docs.jaamd.org. Both projects deploy from `main`.
+addresses to docs.jaamd.org. jaamd.org deploys from `main`; docs.jaamd.org
+documents what is on npm, so it deploys from the release tags. To ship a fix to
+the documentation alone, run the `Deploy docs` workflow by hand on `main`.
 
 Every product is written the same way: "Just Another Astro …", the name in
 italic serif, and "<Subject>, refined." (`Markdown, refined.`,
