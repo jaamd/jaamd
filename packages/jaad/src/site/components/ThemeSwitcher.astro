@@ -41,7 +41,13 @@ const t = ui(Astro.props.locale)
 
 <script>
     class JaadThemeToggle extends HTMLElement {
+        /** Moved with the persisted header on every navigation: bound once. */
+        #bound = false
+
         connectedCallback() {
+            if (this.#bound) return
+            this.#bound = true
+
             this.querySelector('button')?.addEventListener('click', () => {
                 const isDark = document.documentElement.classList.toggle('dark')
                 localStorage.setItem('theme', isDark ? 'dark' : 'light')

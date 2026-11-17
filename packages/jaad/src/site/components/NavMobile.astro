@@ -60,6 +60,8 @@ const t = ui(Astro.props.locale)
     class JaadNavMobile extends HTMLElement {
         #button!: HTMLButtonElement
         #menu!: HTMLElement
+        /** Moved with the persisted header on every navigation: bound once. */
+        #bound = false
 
         #onPointer = (e: PointerEvent) => {
             if (!this.contains(e.target as Node)) this.#setOpen(false)
@@ -82,6 +84,9 @@ const t = ui(Astro.props.locale)
         }
 
         connectedCallback() {
+            if (this.#bound) return
+            this.#bound = true
+
             this.#button = this.querySelector('button')!
             this.#menu = this.querySelector('[data-menu]')!
 
