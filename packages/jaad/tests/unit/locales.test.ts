@@ -147,6 +147,25 @@ test('the match is case-insensitive, like the directory names', () => {
     }
 })
 
+test('a directory written with capitals is read from disk as written', () => {
+    // On a case-sensitive file system, `pt-br` would not find `pt-BR`.
+    const dir = docsTree(['en/01-intro.md', 'pt-BR/01-intro.md', 'zh-Hans/01-intro.md'])
+    try {
+        assert.deepEqual(detectLocales(dir, 'en'), ['en', 'pt-br', 'zh-hans'])
+    } finally {
+        rmSync(dir, { recursive: true })
+    }
+})
+
+test('a pinned list matches lang whatever its case', () => {
+    const dir = docsTree(['en/01-intro.md', 'pt-BR/01-intro.md'])
+    try {
+        assert.doesNotThrow(() => validateLocaleTree(dir, ['en', 'pt-BR'], 'pt-BR'))
+    } finally {
+        rmSync(dir, { recursive: true })
+    }
+})
+
 test('a tree with no locale directories is left alone', () => {
     const dir = docsTree(['01-intro.md', '02-guides'])
     try {
