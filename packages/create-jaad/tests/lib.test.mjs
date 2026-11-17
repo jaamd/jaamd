@@ -1,14 +1,7 @@
 import assert from 'node:assert/strict'
 import { resolve } from 'node:path'
 import { test } from 'node:test'
-import {
-    missingAnswers,
-    normaliseDir,
-    packageManager,
-    parseArgs,
-    quoteArg,
-    titleFrom,
-} from '../../../create-jaad/lib.mjs'
+import { missingAnswers, normaliseDir, packageManager, parseArgs, quoteArg, titleFrom } from '../lib.mjs'
 
 // ── Arguments ────────────────────────────────────────────────────────────────
 
@@ -41,8 +34,6 @@ test('--here and a directory are mutually exclusive', () => {
 
 // ── The current directory, however it is spelled ─────────────────────────────
 
-// The prompt used to compare against "." alone, so answering "./" aborted with
-// advice to use --here, which is what the answer meant.
 test('every spelling of the current directory becomes --here', () => {
     for (const dir of ['.', './', './/', resolve('.')]) {
         const args = normaliseDir({ dir, here: false })
