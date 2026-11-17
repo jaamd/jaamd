@@ -36,3 +36,9 @@ test('no selector is left without the jaamd prefix', () => {
         .filter((name) => !/^(jaamd|markdown-alert|octicon|astro-code|shiki|footnotes|data-footnote)/.test(name))
     assert.deepEqual([...new Set(bare)], [])
 })
+
+// Tailwind's preflight, and resets like it, set `margin: 0` on every element.
+test('the lightbox sets its own margin, so a reset cannot pin it to a corner', () => {
+    const rule = css.match(/\.jaamd-lightbox\s*\{([^}]*)/)?.[1] ?? ''
+    assert.match(rule, /(^|;|\s)margin:\s*auto\s*;/)
+})

@@ -1,5 +1,8 @@
 /* Sized to the image: a click on the backdrop around it closes the dialog. */
 .jaamd-lightbox {
+    /* The browser centres a modal dialog with this; a reset that zeroes every
+       margin, as Tailwind's does, would pin it to the top-left corner. */
+    margin: auto;
     max-width: none;
     max-height: none;
     padding: 0;
