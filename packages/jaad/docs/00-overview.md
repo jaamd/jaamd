@@ -42,7 +42,7 @@ there is no sidebar to declare and no route to write.
 - **Metadata** for search engines and social cards, a sitemap, raw Markdown
   routes and an `llms.txt` for language models.
 
-Pages are rendered with [JAAMD](../../astro/docs/00-overview.md), so its
+Pages are rendered with [JAAMD](https://docs.jaamd.org/jaamd), so its
 Markdown syntax and enhancements come with them.
 
 Start with [Installation](01-getting-started/01-installation.md).
