@@ -22,6 +22,25 @@ function decodeEntities(text: string): string {
     })
 }
 
+/** Characters of code kept per stretch of a page: enough for the names a
+ *  reader searches for, without letting long listings swell the index. */
+const CODE_LIMIT = 2000
+
+const PRE = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi
+
+/** The text of the code blocks of an HTML fragment, cut at `CODE_LIMIT`. */
+export function codeText(html: string): string {
+    const blocks = [...html.matchAll(PRE)].map((match) => {
+        // Line breaks are kept: they separate the tokens of a listing.
+        return decodeEntities(match[1].replace(/<[^>]*>/g, ''))
+    })
+    return blocks
+        .join('\n')
+        .replace(/[ \t]+/g, ' ')
+        .trim()
+        .slice(0, CODE_LIMIT)
+}
+
 /** The readable text of an HTML fragment, on one line. */
 export function htmlText(html: string): string {
     return decodeEntities(
@@ -130,12 +149,14 @@ export function pageHeadings(rendered: RenderedMarkdown | undefined): DocsHeadin
 export interface DocsChunk {
     heading: DocsHeading | null
     text: string
+    /** The text of its code blocks, empty when it has none. */
+    code: string
 }
 
 /** The page cut at the headings of its table of contents. The h1 is left out;
  *  any other heading stays in the text of the stretch it sits in. */
 export function pageChunks(rendered: RenderedMarkdown | undefined): DocsChunk[] {
-    if (!rendered) return [{ heading: null, text: '' }]
+    if (!rendered) return [{ heading: null, text: '', code: '' }]
     const { html } = rendered
     const tags = headingTags(html)
     const titles = tags.filter((tag) => tag.depth === 1)
@@ -153,12 +174,15 @@ export function pageChunks(rendered: RenderedMarkdown | undefined): DocsChunk[] 
         return htmlText(text + html.slice(at, to))
     }
 
+    const stretch = (heading: DocsHeading | null, from: number, to: number): DocsChunk => {
+        return { heading, text: between(from, to), code: codeText(html.slice(from, to)) }
+    }
+
     return [
-        { heading: null, text: between(0, cuts[0]?.start ?? html.length) },
-        ...cuts.map((tag, at) => ({
-            heading: headingOf(tag, rendered),
-            text: between(tag.end, cuts[at + 1]?.start ?? html.length),
-        })),
+        stretch(null, 0, cuts[0]?.start ?? html.length),
+        ...cuts.map((tag, at) => {
+            return stretch(headingOf(tag, rendered), tag.end, cuts[at + 1]?.start ?? html.length)
+        }),
     ]
 }
 

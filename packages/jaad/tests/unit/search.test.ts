@@ -10,18 +10,27 @@ import {
     openingPages,
     queryTerms,
     search,
+    SEARCH_INDEX_VERSION,
+    withinOneEdit,
     type SearchIndex,
     type SearchPage,
 } from '../../src/site/search.ts'
 
 /** An index of pages, each `[title, ...[heading, text]]`, the first pair
  *  with no heading being the text before the first one. */
-function indexOf(...pages: { page: Partial<SearchPage>; entries: [string | undefined, string][] }[]): SearchIndex {
-    const index: SearchIndex = { sections: [], pages: [], entries: [] }
+function indexOf(
+    ...pages: { page: Partial<SearchPage>; entries: [string | undefined, string, string?][] }[]
+): SearchIndex {
+    const index: SearchIndex = { version: SEARCH_INDEX_VERSION, sections: [], pages: [], entries: [] }
     pages.forEach(({ page, entries }, at) => {
         index.pages.push({ title: 'Page', href: `/p${at}`, ...page })
-        for (const [heading, text] of entries) {
-            index.entries.push({ page: at, ...(heading ? { heading, anchor: heading.toLowerCase() } : {}), text })
+        for (const [heading, text, code] of entries) {
+            index.entries.push({
+                page: at,
+                ...(heading ? { heading, anchor: heading.toLowerCase() } : {}),
+                text,
+                ...(code ? { code } : {}),
+            })
         }
     })
     return index
@@ -284,4 +293,56 @@ test('marks cover the matched start of each word, accents included', () => {
         { text: 'cafe\u0301', match: true },
         { text: 's', match: false },
     ])
+})
+
+// ── Code, other scripts and typos ────────────────────────────────────────────
+
+test('a stretch of a page keeps the text of its code blocks, apart from its prose', () => {
+    const [intro, setup] = pageChunks({
+        html: '<p>Intro.</p><h2 id="setup">Setup</h2><p>Write it.</p><pre><code><span>defineJaadConfig</span>({ title })</code></pre>',
+        metadata: { headings: [{ depth: 2, slug: 'setup', text: 'Setup' }] },
+    })
+    assert.equal(intro.code, '')
+    assert.equal(setup.text, 'Write it.')
+    assert.equal(setup.code, 'defineJaadConfig({ title })')
+})
+
+test('a name written only in code finds its page, below one in the prose', () => {
+    const index = indexOf(
+        { page: { title: 'Prose' }, entries: [[undefined, 'Call defineJaadConfig to type the file.']] },
+        { page: { title: 'Code' }, entries: [[undefined, 'The config file.', 'export default defineJaadConfig({})']] },
+    )
+    assert.deepEqual(titles(index, 'definejaadconfig'), ['Prose', 'Code'])
+})
+
+test('Chinese text, written without spaces, is found by one of its words', () => {
+    const index = indexOf({ page: { title: '安装' }, entries: [[undefined, '使用命令安装文档站点']] })
+    assert.deepEqual(titles(index, '文档'), ['安装'])
+})
+
+test('a longer word is found with one typo, a short one is not', () => {
+    const index = indexOf({
+        page: { title: 'Deploy' },
+        entries: [[undefined, 'Deployment to Cloudflare and Netlify.']],
+    })
+    assert.deepEqual(titles(index, 'cloudfalre'), ['Deploy'], 'two letters swapped')
+    assert.deepEqual(titles(index, 'netlfy'), ['Deploy'], 'a letter missing')
+    assert.deepEqual(titles(index, 'nto'), [], 'a three-letter term took a typo')
+})
+
+test('one edit is a letter added, removed, replaced, or two neighbours swapped', () => {
+    assert.equal(withinOneEdit('config', 'config'), true)
+    assert.equal(withinOneEdit('config', 'confg'), true)
+    assert.equal(withinOneEdit('config', 'configs'), true)
+    assert.equal(withinOneEdit('config', 'cinfig'), true)
+    assert.equal(withinOneEdit('config', 'cnofig'), true)
+    assert.equal(withinOneEdit('config', 'cnofgi'), false)
+    assert.equal(withinOneEdit('config', 'conf'), false)
+})
+
+test('the index carries its version and the Markdown of each page', () => {
+    const tree = buildDocsTree([{ id: 'guide', path: 'guide', data: {} } as DocsSource], { urls: { docsBase: '' } })
+    const index = buildSearchIndex(tree, [], (page) => `/${page.slug}.md`)
+    assert.equal(index.version, SEARCH_INDEX_VERSION)
+    assert.equal(index.pages[0].markdown, '/guide.md')
 })

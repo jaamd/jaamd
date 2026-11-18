@@ -86,6 +86,14 @@ test('every docs page carries its search index and llms entry', () => {
     assert.match(page('docs/llms.txt'), /^# /)
 })
 
+test('the search index is versioned, and names the Markdown of every page', () => {
+    const index = JSON.parse(page('docs/search-index.json'))
+    assert.equal(index.version, 1)
+    for (const entry of index.pages) {
+        assert.match(entry.markdown, /\.md$/, entry.title)
+    }
+})
+
 test('the Markdown of a page reads on its own: a title, no directives, no links to files', () => {
     const markdown = page('docs/markdown.md')
     assert.match(markdown, /^# Markdown\n/)

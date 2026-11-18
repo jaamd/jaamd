@@ -12,7 +12,9 @@ import { buildSearchIndex } from './search-index.ts'
 import { docsFileHref, docsMarkdownHref } from './urls.ts'
 
 export async function searchIndexResponse(locale?: string): Promise<Response> {
-    const index = buildSearchIndex(await getDocsTree(locale), SECTIONS)
+    const index = buildSearchIndex(await getDocsTree(locale), SECTIONS, (page) => {
+        return docsMarkdownHref(page.slug, docsUrls(locale))
+    })
 
     return new Response(JSON.stringify(index), {
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
