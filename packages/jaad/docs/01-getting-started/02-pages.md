@@ -11,9 +11,9 @@ and its place in the navigation; nothing else needs configuring.
 docs/
   01-introduction.md     → /
   02-guides/             → sidebar chapter "Guides"
-    01-setup.md          → /guides/setup
-    02-deployment.md     → /guides/deployment
-  03-reference.md        → /reference
+    01-setup.md          → /guides/setup/
+    02-deployment.md     → /guides/deployment/
+  03-reference.md        → /reference/
 ```
 
 The same tree builds the sidebar, the mobile menu, the line above each title and the
@@ -38,7 +38,7 @@ files.
 The file that sorts first opens the documentation at `routeBase`, which is `/`
 by default. Its browser title is the site name alone, and its own slug
 redirects to it: with `routeBase: "/docs"`, `01-introduction.md` opens at
-`/docs`, and `/docs/introduction` redirects there.
+`/docs/`, and `/docs/introduction/` redirects there.
 
 ## Linking between pages
 
