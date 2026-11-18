@@ -34,6 +34,7 @@
         "./advanced": "./src/docs/advanced.ts",
         "./content": "./src/docs/content.ts",
         "./layouts/Page.astro": "./src/docs/layouts/Page.astro",
+        "./negotiation": "./src/negotiation.ts",
         "./site": "./site.ts"
     },
     "publishConfig": {

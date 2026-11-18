@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import worker, { markdownSource, MOVED, movedTo, quality } from '../worker.ts'
+import worker, { markdownSource, MOVED, movedTo } from '../worker.ts'
 
 const FILES: Record<string, string> = {
     '/jaad/getting-started/installation/': '<html>installation</html>',
@@ -32,18 +32,6 @@ const env = {
 
 const get = (path: string, accept = 'text/html', method = 'GET') =>
     worker.fetch(new Request(`https://docs.jaamd.org${path}`, { method, headers: { Accept: accept } }), env)
-
-test('quality reads q values and defaults to 1', () => {
-    assert.equal(quality('text/markdown, text/html;q=0.9', 'text/markdown'), 1)
-    assert.equal(quality('text/markdown, text/html;q=0.9', 'text/html'), 0.9)
-    assert.equal(quality('text/html', 'text/markdown'), 0)
-})
-
-test('quality reads the parameter in any case and with spaces around =', () => {
-    assert.equal(quality('text/markdown;Q=0.2', 'text/markdown'), 0.2)
-    assert.equal(quality('text/markdown; q = 0.3', 'text/markdown'), 0.3)
-    assert.equal(quality('text/markdown;q=nope', 'text/markdown'), 0)
-})
 
 test('a browser gets the HTML page, varying on Accept as well', async () => {
     const response = await get('/jaad/getting-started/installation/', 'text/html,application/xhtml+xml,*/*;q=0.8')
