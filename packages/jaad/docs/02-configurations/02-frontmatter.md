@@ -85,8 +85,9 @@ with another page is reported while it is being written.
 ## Metadata
 
 `description` is used for the description metadata, Open Graph, structured
-data and `llms.txt`. Without it, JAAD uses the first paragraph of the page, followed
-by the site description.
+data, `llms.txt` and the top of the page's Markdown. Without it, the metadata
+use the first paragraph of the page, then the site description; `llms.txt` uses
+the first paragraph alone.
 
 `keywords` become `<meta name="keywords">` and the `keywords` of the page's
 structured data, and they rank a page in search below its title and above its

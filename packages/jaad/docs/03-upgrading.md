@@ -51,6 +51,22 @@ bun add @jaamd/jaad@latest
 
 Then run a build and read below the changes since the version you upgrade from.
 
+## From 1.1
+
+### The Markdown of each page
+
+The `.md` of a page is now written to read on its own, not served as its
+source: it opens with the title and the frontmatter description, its links
+lead to other pages' Markdown, and code tabs, tables of contents and spoilers
+become plain Markdown. A tool that read the `.md` as the page's source file
+should read the file in the repository instead.
+
+### New files for language models
+
+The build also writes `llms-full.txt`, and each page announces its Markdown in
+its head. `llms: false` turns these and `llms.txt` off; see
+[LLMs and agents](02-configurations/09-llms.md).
+
 ## From 1.0
 
 ### Node 22.23.4
@@ -183,9 +199,8 @@ frame renders is `DocsFrameProps['page']`.
 ### Search index
 
 `search-index.json` now holds one entry per heading, for
-[search by heading](02-configurations/04-search.md). Its format is internal to
-JAAD's search and can change in any release: do not read it from code of your
-own.
+[search by heading](02-configurations/04-search.md). Its format is described in
+[The index format](02-configurations/04-search.md#the-index-format).
 
 ### Fewer exports
 

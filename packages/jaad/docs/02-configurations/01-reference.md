@@ -149,9 +149,13 @@ the file's path inside its section's directory.
 | --------- | ----------------- | ---------------- | --------------------------------- |
 | `head`    | `object[]`        | `[]`             | Extra elements in `<head>`        |
 | `ogImage` | `string \| false` | detected or none | Social image path, URL or `false` |
+| `llms`    | `boolean`         | `true`           | Files for language models         |
 
 JAAD detects `public/og-image.png`, `.jpg`, `.jpeg` or `.webp`, in that order.
 Local images and canonical URLs require `site`; absolute image URLs do not.
+
+`llms: false` leaves out `llms.txt`, `llms-full.txt` and the Markdown link in
+each page's head; see [LLMs and agents](09-llms.md).
 
 Each `head` entry accepts `tag`, optional `attrs`, and optional `content`. Use
 it for analytics, verification tags and preconnects:
@@ -187,17 +191,17 @@ pages, `Page` pages and a custom `DocsFrame`; see
 
 ## Detected project values
 
-| Value                                     | Source                                            |
-| ----------------------------------------- | ------------------------------------------------- |
-| Repository and edit links                 | git remote, branch and `docsDir`                  |
-| Missing description                       | `package.json`                                    |
-| Favicon                                   | `public/favicon.svg`, `.ico` or `.png`            |
-| Social image                              | `public/og-image.png`, `.jpg`, `.jpeg` or `.webp` |
-| Custom styles                             | `src/jaad.css`                                    |
-| Locales                                   | Directory names under `docsDir`                   |
-| Sitemap                                   | Generated when `site` is set                      |
-| Search index, `llms.txt` and raw Markdown | Generated below `routeBase`                       |
-| Trailing slash of page links              | Astro's `trailingSlash` and `build.format`        |
+| Value                                 | Source                                            |
+| ------------------------------------- | ------------------------------------------------- |
+| Repository and edit links             | git remote, branch and `docsDir`                  |
+| Missing description                   | `package.json`                                    |
+| Favicon                               | `public/favicon.svg`, `.ico` or `.png`            |
+| Social image                          | `public/og-image.png`, `.jpg`, `.jpeg` or `.webp` |
+| Custom styles                         | `src/jaad.css`                                    |
+| Locales                               | Directory names under `docsDir`                   |
+| Sitemap                               | Generated when `site` is set                      |
+| Search index, `llms.txt` and Markdown | Generated below `routeBase`                       |
+| Trailing slash of page links          | Astro's `trailingSlash` and `build.format`        |
 
 `public/` and `src/` are Astro's `publicDir` and `srcDir`, and every path is
 read from the project's `root`, so `astro build --root` and custom directories
