@@ -26,6 +26,8 @@ export const docsConfigShape = {
         })
         .optional(),
     editLink: z.union([z.boolean(), z.string()]).default(true),
+    /** `llms.txt`, `llms-full.txt` and the Markdown alternate of each page; false leaves them out. */
+    llms: z.boolean().default(true),
     /** Only when detection guesses wrong: pin the set, or false to switch it off. */
     locales: z
         .union([z.array(z.string().refine(isLocale, { message: 'not a locale code' })), z.literal(false)])
@@ -51,6 +53,8 @@ export interface DocsResolvedConfig {
     editBase: string | null
     /** Page urls end with a slash, as Astro builds them; set from Astro's config. */
     trailingSlash: boolean
+    /** Whether the files for language models are written. */
+    llms: boolean
 }
 
 export interface DocsSection {
@@ -121,6 +125,7 @@ export function resolveDocsConfig(
         editBase: resolveEditBase(config.editLink, repo, config.docsDir),
         // Astro's defaults, `trailingSlash: 'ignore'` with directories, until the integration knows better.
         trailingSlash: true,
+        llms: config.llms,
     }
 
     const roots = docsRoots(docs, cwd)

@@ -226,6 +226,13 @@ export default defineJaadConfig({
             'the italian index is not scoped to italian',
         )
         assert.match(localised.read('it/llms.txt'), /\/it\//)
+        assert.match(localised.read('it/llms-full.txt'), /^Source: https:\/\/example\.dev\/it\//m)
+        assert.match(
+            localised.read('llms.txt'),
+            /## Other languages\n\n- \[[^\]]+\]\(https:\/\/example\.dev\/it\/llms\.txt\)/,
+            'the default llms.txt does not point at the other languages',
+        )
+        assert.doesNotMatch(localised.read('it/llms.txt'), /## Other languages/)
     })
 
     test('a localised page declares its own language and its alternates', () => {

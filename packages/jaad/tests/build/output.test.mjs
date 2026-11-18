@@ -86,6 +86,29 @@ test('every docs page carries its search index and llms entry', () => {
     assert.match(page('docs/llms.txt'), /^# /)
 })
 
+test('the Markdown of a page reads on its own: a title, no directives, no links to files', () => {
+    const markdown = page('docs/markdown.md')
+    assert.match(markdown, /^# Markdown\n/)
+    assert.doesNotMatch(markdown, /^:::/m, 'a directive was left raw')
+    assert.doesNotMatch(markdown, /\]\(\.{1,2}\/[^)]*\.md/, 'a link still points at a source file')
+    assert.match(markdown, /\*\*npm\*\*\n\n```bash/, 'code tabs did not become labelled blocks')
+})
+
+// llms.txt lists loose pages before the chapters; llms-full.txt reads in the site's order.
+test('llms-full.txt holds every page of llms.txt', () => {
+    const listed = [...page('docs/llms.txt').matchAll(/^- \[[^\]]+\]\(([^)]+)\)/gm)].map((match) => match[1])
+    const sources = [...page('docs/llms-full.txt').matchAll(/^Source: (\S+)$/gm)].map((match) => match[1])
+    assert.ok(listed.length > 0)
+    assert.deepEqual(sources.toSorted(), listed.toSorted())
+})
+
+test('a docs page announces its Markdown to agents', () => {
+    assert.match(
+        page('docs/markdown/index.html'),
+        /<link rel="alternate" type="text\/markdown" href="\/docs\/markdown\.md">/,
+    )
+})
+
 test('every heading in the search index is an id on its page', () => {
     const index = JSON.parse(page('docs/search-index.json'))
     const missing = index.entries
@@ -103,7 +126,7 @@ test('every heading in the search index is an id on its page', () => {
 })
 
 test('the sidebar follows the numeric prefixes', () => {
-    const links = [...page('docs/index.html').matchAll(/href="(\/docs(?:\/[^"#]*)?)"/g)].map((m) => m[1])
+    const links = [...page('docs/index.html').matchAll(/<a\b[^>]*\bhref="(\/docs(?:\/[^"#]*)?)"/g)].map((m) => m[1])
 
     const at = (href) => {
         const index = links.indexOf(href)
