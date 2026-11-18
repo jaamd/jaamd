@@ -97,21 +97,33 @@ export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlia
     })
 }
 
-export function getInjectedRoutes(docsBase: string, locales: string[] = []): [string, string][] {
-    // `[...slug]` already absorbs "it/guide" and "it". Only the two fixed
+export function getInjectedRoutes(docsBase: string, locales: string[] = [], llms: boolean = true): [string, string][] {
+    const llmsRoutes: [string, string][] = llms
+        ? [
+              [`${docsBase}/llms.txt`, 'llms.txt.ts'],
+              [`${docsBase}/llms-full.txt`, 'llms-full.txt.ts'],
+          ]
+        : []
+
+    // `[...slug]` already absorbs "it/guide" and "it". Only the fixed
     // endpoints need a route of their own, and `[locale]` hands them the code.
     const perLocale: [string, string][] =
         locales.length > 0
             ? [
                   [`${docsBase}/[locale]/search-index.json`, 'search-index-locale.json.ts'],
-                  [`${docsBase}/[locale]/llms.txt`, 'llms-locale.txt.ts'],
+                  ...(llms
+                      ? ([
+                            [`${docsBase}/[locale]/llms.txt`, 'llms-locale.txt.ts'],
+                            [`${docsBase}/[locale]/llms-full.txt`, 'llms-full-locale.txt.ts'],
+                        ] as [string, string][])
+                      : []),
               ]
             : []
 
     return [
         [docsBase, 'docs-index.astro'],
         [`${docsBase}/search-index.json`, 'search-index.json.ts'],
-        [`${docsBase}/llms.txt`, 'llms.txt.ts'],
+        ...llmsRoutes,
         ...perLocale,
         [`${docsBase}/[...slug]`, 'docs-slug.astro'],
         [`${docsBase}/[...slug].md`, 'docs-slug.md.ts'],
@@ -138,6 +150,7 @@ export function setupDocs(
     for (const [pattern, entrypoint] of getInjectedRoutes(
         config.docs.base,
         prefixedLocales(config.locales, config.defaultLocale),
+        config.docs.llms,
     )) {
         injectRoute({
             pattern,

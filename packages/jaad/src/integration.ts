@@ -16,7 +16,7 @@ export function createJaadIntegration(options: JaadUserConfig, state: Integratio
         name: 'jaad',
         hooks: {
             'astro:config:setup': (params) => {
-                const { config: astroConfig, updateConfig } = params
+                const { config: astroConfig, updateConfig, logger } = params
                 const paths = {
                     root: fileURLToPath(astroConfig.root),
                     publicDir: fileURLToPath(astroConfig.publicDir),
@@ -29,6 +29,12 @@ export function createJaadIntegration(options: JaadUserConfig, state: Integratio
                     docs: { ...resolved.docs, trailingSlash: pageUrlsEndWithSlash(astroConfig) },
                 }
                 const hasSite = Boolean(astroConfig.site)
+                if (!hasSite && config.docs.llms) {
+                    logger.warn(
+                        'site is not set, so llms.txt and the Markdown of each page link with relative URLs, ' +
+                            'which an agent reading them elsewhere cannot follow. Set site to the public URL.',
+                    )
+                }
 
                 setupSite(params, config, resolveStylesheets(config, paths))
                 setupDocs(params, config, state, hasSite)

@@ -1,8 +1,9 @@
 import type { APIRoute, GetStaticPaths } from 'astro'
 import { buildLocales, localePrefix } from '../../site/runtime.ts'
 import { getDocsTree } from '../collection.ts'
+import { pageMarkdown } from '../endpoints.ts'
 
-/** Raw markdown at the page's own url plus `.md`, for readers and for LLMs. */
+/** The page as Markdown at its own url plus `.md`, for readers and for LLMs. */
 export const getStaticPaths: GetStaticPaths = async () => {
     const paths: {
         params: { slug: string }
@@ -24,12 +25,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
     return paths
 }
 
-export const GET: APIRoute = async ({ props }) => {
+export const GET: APIRoute = async ({ props, site }) => {
     const { id, locale } = props as { id: string; locale?: string }
     const page = (await getDocsTree(locale)).byId.get(id)
     if (!page) return new Response('Not found', { status: 404 })
 
-    return new Response(page.source.body ?? '', {
+    return new Response(await pageMarkdown(page, site), {
         headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
     })
 }

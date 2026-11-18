@@ -17,7 +17,7 @@ import StructuredData from '../components/StructuredData.astro'
 import TableOfContents from '../components/TableOfContents.astro'
 import { pageDescription } from '../model/rendered.ts'
 import { docsUrls } from '../runtime.ts'
-import { docsFileHref } from '../urls.ts'
+import { docsFileHref, docsMarkdownHref } from '../urls.ts'
 import '../../../dist/jaad.css'
 import '../styles/docs.css'
 import '../styles/jaamd.css'
@@ -46,6 +46,7 @@ const locale = page.locale ?? DEFAULT_LOCALE
 const language = languageOf(locale)
 
 const indexUrl = docsFileHref('search-index.json', docsUrls(locale))
+const markdown = config.docs.llms ? docsMarkdownHref(page.slug, docsUrls(locale)) : undefined
 
 const switcherAlternates = await getLocaleAlternates(page.translationKey)
 
@@ -89,6 +90,7 @@ const frameProps: DocsFrameProps = {
             language={language}
             {alternates}
             {xDefault}
+            {markdown}
         />
         <StructuredData
             title={page.title || config.title}

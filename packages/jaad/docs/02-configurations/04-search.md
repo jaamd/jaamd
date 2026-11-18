@@ -15,7 +15,9 @@ with:
 
 - the page title, its chapter and its `keywords`;
 - the heading;
-- the text below it, excluding code blocks, images and tables of contents.
+- the text below it, excluding images and tables of contents;
+- its code blocks, up to a few thousand characters, so that a name written
+  only in code still finds its page.
 
 Drafts are left out of production builds. The index is emitted at
 `<routeBase>/search-index.json`, one per language, loaded on first use and
@@ -27,9 +29,13 @@ the documentation.
 - Every word of the query must appear in a part of a page or in the page's
   title, chapter or keywords.
 - A word also matches the words it starts: `config` finds `configuration`.
+- A word of five letters or more also matches with one typo: `deploymnet`
+  finds `deployment`.
 - Case and accents are ignored: `citta` finds `città`.
+- Languages written without spaces, such as Chinese, Japanese and Thai, are
+  split into words as the browser splits them.
 - A match in the title ranks first, then the heading, the keywords, the
-  chapter and the text.
+  chapter, the text, and last the code.
 
 Results are grouped by page. Under each page are the headings that matched,
 and choosing one opens the page at that heading.
@@ -38,6 +44,39 @@ With an empty query, search lists the first pages of the documentation. When
 the docs have [sections](../01-getting-started/02-pages.md#sections), it lists
 the first pages of each, and buttons above the results limit the search to one
 section.
+
+## The index format
+
+`search-index.json` is public: a tool of your own, or an agent, can read it.
+
+```ts
+interface SearchIndex {
+    version: 1
+    /** Empty when the docs have no sections. */
+    sections: { key: string; label: string }[]
+    pages: {
+        title: string
+        href: string
+        /** The page as Markdown. */
+        markdown?: string
+        section?: string
+        chapter?: string
+        keywords?: string[]
+    }[]
+    /** One per heading of a page, and one for the text before them. */
+    entries: {
+        /** The position of its page in `pages`. */
+        page: number
+        heading?: string
+        anchor?: string
+        text: string
+        code?: string
+    }[]
+}
+```
+
+A change that would break a reader raises `version`. Fields added along the way
+are optional.
 
 ## Keyboard shortcuts
 

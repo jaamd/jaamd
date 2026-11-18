@@ -70,6 +70,7 @@ export function resolveConfig(
         routeBase: _routeBase,
         sections: _sections,
         editLink: _editLink,
+        llms: _llms,
         locales: _locales,
         ...siteOptions
     } = config

@@ -136,11 +136,31 @@ test('the fallback 404 belongs only to a docs-only site', () => {
 test('technical routes stay inside the documentation mount', () => {
     assert.deepEqual(
         getInjectedRoutes('/docs').map(([pattern]) => pattern),
-        ['/docs', '/docs/search-index.json', '/docs/llms.txt', '/docs/[...slug]', '/docs/[...slug].md'],
+        [
+            '/docs',
+            '/docs/search-index.json',
+            '/docs/llms.txt',
+            '/docs/llms-full.txt',
+            '/docs/[...slug]',
+            '/docs/[...slug].md',
+        ],
     )
     assert.deepEqual(
         getInjectedRoutes('').map(([pattern]) => pattern),
-        ['', '/search-index.json', '/llms.txt', '/[...slug]', '/[...slug].md'],
+        ['', '/search-index.json', '/llms.txt', '/llms-full.txt', '/[...slug]', '/[...slug].md'],
+    )
+})
+
+test('llms: false leaves out the files for language models, not the Markdown of each page', () => {
+    assert.deepEqual(
+        getInjectedRoutes('/docs', ['it'], false).map(([pattern]) => pattern),
+        [
+            '/docs',
+            '/docs/search-index.json',
+            '/docs/[locale]/search-index.json',
+            '/docs/[...slug]',
+            '/docs/[...slug].md',
+        ],
     )
 })
 
@@ -152,8 +172,10 @@ test('a localised site adds one route per fixed endpoint, not per locale', () =>
             '/docs',
             '/docs/search-index.json',
             '/docs/llms.txt',
+            '/docs/llms-full.txt',
             '/docs/[locale]/search-index.json',
             '/docs/[locale]/llms.txt',
+            '/docs/[locale]/llms-full.txt',
             '/docs/[...slug]',
             '/docs/[...slug].md',
         ],

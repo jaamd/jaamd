@@ -18,6 +18,8 @@ interface Props {
     alternates?: { code: string; tag: string; href: string }[]
     /** Where a reader with no matching language should land. */
     xDefault?: string
+    /** The page as Markdown, announced to agents. */
+    markdown?: string
 }
 
 const {
@@ -30,6 +32,7 @@ const {
     language = config.lang,
     alternates = [],
     xDefault,
+    markdown,
 } = Astro.props
 const canonical = Astro.site ? Astro.url.href : null
 
@@ -84,6 +87,7 @@ const themeScript = `(function () {
 {Astro.site && xDefault && <link rel="alternate" hreflang="x-default" href={new URL(xDefault, Astro.site).href} />}
 
 {favicon && <link rel="icon" href={favicon} />}
+{markdown && <link rel="alternate" type="text/markdown" href={markdown} />}
 
 <Font cssVariable="--font-inter" preload />
 {/* The italic face sets only the site name in the header, which a logo replaces. */}

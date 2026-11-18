@@ -39,8 +39,10 @@ there is no sidebar to declare and no route to write.
   See [Languages](02-configurations/03-i18n.md).
 - **Themes** for the interface and the code, light and dark. See
   [Themes](02-configurations/05-themes.md).
-- **Metadata** for search engines and social cards, a sitemap, raw Markdown
-  routes and an `llms.txt` for language models.
+- **Metadata** for search engines and social cards, and a sitemap.
+- **Files for language models and agents**: `llms.txt`, `llms-full.txt` and
+  every page as Markdown that reads on its own. See
+  [LLMs and agents](02-configurations/09-llms.md).
 
 Pages are rendered with [JAAMD](https://docs.jaamd.org/jaamd), so its
 Markdown syntax and enhancements come with them.

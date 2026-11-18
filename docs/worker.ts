@@ -1,3 +1,5 @@
+import { markdownPathFor, prefersMarkdown } from '@jaamd/jaad/negotiation'
+
 interface Env {
     ASSETS: { fetch(request: Request | URL | string): Promise<Response> }
 }
@@ -30,30 +32,9 @@ export function movedTo(path: string): string | null {
     return markdown ? `${target}.md` : `${target}/`
 }
 
-/** Quality of `type` in an Accept header, 0 when absent. */
-export function quality(accept: string, type: string): number {
-    for (const part of accept.split(',')) {
-        const [media, ...params] = part.split(';').map((s) => s.trim())
-        if (media.toLowerCase() !== type) continue
-        // Parameter names are case-insensitive, and may have spaces around `=`.
-        const q = params.find((param) => /^q\s*=/i.test(param))
-        if (!q) return 1
-
-        const value = Number(q.slice(q.indexOf('=') + 1).trim())
-        return Number.isFinite(value) ? value : 0
-    }
-    return 0
-}
-
-export function prefersMarkdown(request: Request): boolean {
-    const accept = request.headers.get('Accept') ?? ''
-    return quality(accept, 'text/markdown') > quality(accept, 'text/html')
-}
-
 /** Where the Markdown of a page is, or null for a file of another type. */
 export function markdownSource(path: string): string | null {
-    if (path in MARKDOWN_SOURCES) return MARKDOWN_SOURCES[path]
-    return path.slice(path.lastIndexOf('/')).includes('.') ? null : `${path}.md`
+    return markdownPathFor(path, MARKDOWN_SOURCES)
 }
 
 /** The response, varying on Accept besides whatever it already varies on. */
