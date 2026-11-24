@@ -1,5 +1,5 @@
-import { localeSegment } from '../site/locales.ts'
-import { normaliseBasePath, withDeploymentBase } from '../site/urls.ts'
+import { localeSegment } from '@jaamd/site/locales.ts'
+import { normaliseBasePath, withDeploymentBase } from '@jaamd/site/urls.ts'
 
 export interface DocsUrlOptions {
     /** routeBase, normalised here: empty at the application root. */

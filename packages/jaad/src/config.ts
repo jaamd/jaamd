@@ -1,10 +1,10 @@
 import type { AstroUserConfig, FontProvider, Locales, SessionDriverConfig } from 'astro'
+import { resolveSiteConfig, siteConfigShape, type SiteResolvedConfig } from '@jaamd/site/config.ts'
+import { inferRepo } from '@jaamd/site/infer.ts'
+import { describeLocale } from '@jaamd/site/locales.ts'
+import { toProjectPaths, type ProjectPaths } from '@jaamd/site/paths.ts'
 import { z } from 'astro/zod'
 import { docsConfigShape, resolveDocsConfig, type DocsResolvedConfig } from './docs/config.ts'
-import { toProjectPaths, type ProjectPaths } from './paths.ts'
-import { resolveSiteConfig, siteConfigShape, type SiteResolvedConfig } from './site/config.ts'
-import { inferRepo } from './site/infer.ts'
-import { describeLocale } from './site/locales.ts'
 
 /** Site options, then docs options: the order the error for an unknown one lists them. */
 export const jaadConfigSchema = z.object({ ...siteConfigShape, ...docsConfigShape })

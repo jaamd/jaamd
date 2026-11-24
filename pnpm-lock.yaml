@@ -296,36 +296,18 @@ importers:
       '@jaamd/astro':
         specifier: workspace:^
         version: link:../astro
+      '@jaamd/site':
+        specifier: workspace:*
+        version: link:../site
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.5(vite@8.3.5(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
-      '@types/mdast':
-        specifier: ^4.0.4
-        version: 4.0.4
       astro:
         specifier: ^7.3.0
         version: 7.4.4(@astrojs/markdown-remark@7.3.5(supports-color@10.2.2))(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
-      remark-directive:
-        specifier: ^4.0.0
-        version: 4.0.0(supports-color@10.2.2)
-      remark-gfm:
-        specifier: ^4.0.1
-        version: 4.0.1(supports-color@10.2.2)
-      remark-parse:
-        specifier: ^11.0.0
-        version: 11.0.0(supports-color@10.2.2)
-      remark-stringify:
-        specifier: ^11.0.0
-        version: 11.0.0
-      unified:
-        specifier: ^11.0.5
-        version: 11.0.5
-      unist-util-visit:
-        specifier: ^5.1.0
-        version: 5.1.0
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
@@ -358,6 +340,46 @@ importers:
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.5
+
+  packages/site:
+    dependencies:
+      '@jaamd/astro':
+        specifier: workspace:^
+        version: link:../astro
+      '@tailwindcss/vite':
+        specifier: ^4.3.0
+        version: 4.3.5(vite@8.3.5(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
+      astro:
+        specifier: ^7.3.0
+        version: 7.4.4(@astrojs/markdown-remark@7.3.5(supports-color@10.2.2))(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)
+      remark-directive:
+        specifier: ^4.0.0
+        version: 4.0.0(supports-color@10.2.2)
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1(supports-color@10.2.2)
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0(supports-color@10.2.2)
+      remark-stringify:
+        specifier: ^11.0.0
+        version: 11.0.0
+      tailwindcss:
+        specifier: ^4.3.0
+        version: 4.3.5
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
+      unist-util-visit:
+        specifier: ^5.1.0
+        version: 5.1.0
+    devDependencies:
+      '@astrojs/check':
+        specifier: ^0.9.12
+        version: 0.9.12(prettier@3.9.6)(typescript@6.0.3)
 
   site:
     dependencies:

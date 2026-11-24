@@ -4,11 +4,8 @@ import config from 'virtual:jaad/config'
 import Footer from '../components/Footer.astro'
 import Head from '../components/Head.astro'
 import Header from '../components/Header.astro'
-import '../../../dist/jaad.css'
-import 'virtual:jaad/theme.css'
-import 'virtual:jaad/bridge.css'
-import 'virtual:jaad/user.css'
-import 'virtual:jaad/tailwind.css'
+// No stylesheets here: the page imports its package's, then the site's own,
+// in that order, so a project's CSS comes last.
 
 interface Props {
     title?: string

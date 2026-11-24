@@ -1,7 +1,7 @@
 import type { DocsSection } from './config.ts'
 import type { DocsUrlOptions } from './urls.ts'
+import { DEFAULT_LOCALE } from '@jaamd/site/runtime.ts'
 import config from 'virtual:jaad/config'
-import { DEFAULT_LOCALE } from '../site/runtime.ts'
 
 /** The virtual config, read once. */
 export const SECTIONS: DocsSection[] = config.docs.sections

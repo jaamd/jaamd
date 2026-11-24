@@ -1,5 +1,5 @@
 import type { APIRoute, GetStaticPaths } from 'astro'
-import { buildLocales, localePrefix } from '../../site/runtime.ts'
+import { buildLocales, localePrefix } from '@jaamd/site/runtime.ts'
 import { getDocsTree } from '../collection.ts'
 import { pageMarkdown } from '../endpoints.ts'
 

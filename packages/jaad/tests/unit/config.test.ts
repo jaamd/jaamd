@@ -3,9 +3,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test, type TestContext } from 'node:test'
+import { resolveStylesheets } from '@jaamd/site/config.ts'
 import { fontProviders } from 'astro/config'
 import { defineJaadConfig, resolveConfig } from '../../src/config.ts'
-import { resolveStylesheets } from '../../src/site/config.ts'
 
 // Resolved outside a repository, so nothing is inferred and the defaults show.
 const bare = (over = {}) => resolveConfig({ title: 'T', ...over }, '/')

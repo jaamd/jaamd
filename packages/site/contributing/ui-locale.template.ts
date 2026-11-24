@@ -1,6 +1,6 @@
-import type { UiCatalog } from '../src/site/ui.ts'
+import type { UiCatalog } from '../src/ui.ts'
 
-/** Copy this file into packages/jaad/src/site/ui/, import `UiCatalog` from
+/** Copy this file into packages/site/src/ui/, import `UiCatalog` from
  *  '../ui.ts' there, rename the constant, then fill every value. Registering an
  *  unfinished catalogue makes the tests fail. */
 export const UI_LOCALE = {

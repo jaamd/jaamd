@@ -1,0 +1,31 @@
+---
+import StructuredData from '@jaamd/site/components/StructuredData.astro'
+import config from 'virtual:jaad/config'
+import { slugToTitle } from '../model/ids.ts'
+import { docsUrls } from '../runtime.ts'
+import { docsPageHref } from '../urls.ts'
+
+interface Props {
+    title: string
+    description: string
+    chapter?: string
+    keywords?: string[]
+    author?: string
+    modified?: Date
+    /** BCP-47 tag of this page's locale. */
+    language?: string
+    locale?: string
+}
+
+const { chapter, locale, ...page } = Astro.props
+
+// The docs' home, then the chapter, then the page.
+const home = new URL(docsPageHref('', docsUrls(locale)), Astro.url.origin).href
+const crumbs = [
+    { name: config.title, url: home },
+    ...(chapter ? [{ name: slugToTitle(chapter), url: null }] : []),
+    { name: page.title, url: Astro.url.href },
+]
+---
+
+<StructuredData type="TechArticle" {crumbs} {...page} />

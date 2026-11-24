@@ -31,7 +31,7 @@ for (const [mode, selectors] of [
 ] as const) {
     test(`the site's ${mode} palette is JAAD's`, () => {
         const site = tokens('site/src/styles/identity.css', selectors[0])
-        const jaad = tokens('packages/jaad/src/site/styles/global.css', selectors[1])
+        const jaad = tokens('packages/site/src/styles/global.css', selectors[1])
 
         assert.ok(site.size > 0, 'no tokens found in the site')
         const differing = [...site]

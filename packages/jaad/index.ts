@@ -1,9 +1,9 @@
 import type { AstroIntegration } from 'astro'
 import jaamd from '@jaamd/astro'
+import { shikiTheme } from '@jaamd/site/config.ts'
 import { parseConfig, type JaadUserConfig } from './src/config.ts'
 import { createIntegrationState } from './src/docs/integration.ts'
 import { createJaadIntegration } from './src/integration.ts'
-import { shikiTheme } from './src/site/config.ts'
 
 /** The whole set: Astro flattens nested arrays in `integrations`. The options
  *  are checked here, so a wrong one fails as the config loads; the rest is

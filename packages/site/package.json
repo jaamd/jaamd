@@ -1,0 +1,63 @@
+{
+    "name": "@jaamd/site",
+    "version": "1.1.0",
+    "description": "Internal: the site shell shared by JAAD and JAAB. Not a public API: install @jaamd/jaad or @jaamd/jaab.",
+    "keywords": [
+        "astro",
+        "jaamd"
+    ],
+    "homepage": "https://docs.jaamd.org",
+    "bugs": "https://github.com/jaamd/jaamd/issues",
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
+        "directory": "packages/site"
+    },
+    "files": [
+        "src",
+        "README.md",
+        "LICENSE"
+    ],
+    "type": "module",
+    "exports": {
+        "./*": "./src/*"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "check": "astro check && tsc --noEmit -p tests",
+        "test": "node --test \"tests/unit/**/*.test.ts\""
+    },
+    "dependencies": {
+        "@jaamd/astro": "workspace:^",
+        "@types/mdast": "^4.0.4",
+        "remark-directive": "^4.0.0",
+        "remark-gfm": "^4.0.1",
+        "remark-parse": "^11.0.0",
+        "remark-stringify": "^11.0.0",
+        "unified": "^11.0.5",
+        "unist-util-visit": "^5.1.0"
+    },
+    "devDependencies": {
+        "@astrojs/check": "^0.9.12"
+    },
+    "peerDependencies": {
+        "@tailwindcss/vite": "^4.3.0",
+        "astro": "^7.3.0",
+        "tailwindcss": "^4.3.0"
+    },
+    "peerDependenciesMeta": {
+        "tailwindcss": {
+            "optional": true
+        },
+        "@tailwindcss/vite": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=22.23.4"
+    }
+}

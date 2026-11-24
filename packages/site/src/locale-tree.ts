@@ -1,6 +1,6 @@
 import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { isLocale } from '../site/locales.ts'
+import { isLocale } from './locales.ts'
 
 function hasMarkdown(dir: string): boolean {
     return readdirSync(dir, { withFileTypes: true }).some((entry) =>

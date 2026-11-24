@@ -36,6 +36,8 @@ export default defineConfig({
                                     '@jaamd/astro/*',
                                     '@jaamd/jaad',
                                     '@jaamd/jaad/*',
+                                    '@jaamd/site',
+                                    '@jaamd/site/*',
                                 ],
                                 message: 'core is framework-agnostic and sits below the adapters.',
                             },
@@ -45,15 +47,15 @@ export default defineConfig({
             },
         },
         {
-            files: ['packages/jaad/src/site/**'],
+            files: ['packages/site/**'],
             rules: {
                 'no-restricted-imports': [
                     'error',
                     {
                         patterns: [
                             {
-                                group: ['**/docs/*', '**/docs/**/*'],
-                                message: 'the site layer sits below the docs: it may not import them.',
+                                group: ['@jaamd/jaad', '@jaamd/jaad/*', '**/jaad/**'],
+                                message: 'the site shell sits below JAAD and JAAB: it may not import them.',
                             },
                         ],
                     },

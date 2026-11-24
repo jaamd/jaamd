@@ -113,12 +113,12 @@ contain exactly the same keys.
 
 To contribute another language:
 
-1. Copy `packages/jaad/contributing/ui-locale.template.ts` to
-   `packages/jaad/src/site/ui/<language>.ts`, using a lowercase ISO 639-1 language
+1. Copy `packages/site/contributing/ui-locale.template.ts` to
+   `packages/site/src/ui/<language>.ts`, using a lowercase ISO 639-1 language
    code for the filename, and import `UiCatalog` from `'../ui.ts'` in the copy.
 2. Rename `UI_LOCALE` to a language-specific constant and translate every
    value. Do not leave empty strings.
-3. Import the catalogue in `packages/jaad/src/site/ui.ts` and add its language code
+3. Import the catalogue in `packages/site/src/ui.ts` and add its language code
    to `UI_CATALOGS`.
 4. Update the supported-language list in
    `packages/jaad/docs/02-configurations/03-i18n.md`. The tests check every
