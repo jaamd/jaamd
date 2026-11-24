@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { normaliseRemote, editBaseFrom, inferRepo, inferDescription } from '../../src/site/infer.ts'
+import { normaliseRemote, editBaseFrom, inferRepo, inferDescription } from '../../src/infer.ts'
 
 test('ssh and https remotes normalise to the same browsable url', () => {
     const expected = 'https://github.com/owner/repo'

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { inferRepo } from '../../src/site/infer.ts'
+import { inferRepo } from '@jaamd/site/infer.ts'
 import { page, distFiles, allCss } from '../dist.mjs'
 
 // The fixture infers its repository from this checkout's remote, whatever its forge.

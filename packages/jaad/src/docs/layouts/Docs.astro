@@ -4,18 +4,18 @@ import type { DocsSourceEntry } from '../collection.ts'
 import type { DocsPage } from '../model/tree.ts'
 import type { DocsNavigation } from '../navigation.ts'
 import type { DocsHeading } from '../types.ts'
+import Footer from '@jaamd/site/components/Footer.astro'
+import Head from '@jaamd/site/components/Head.astro'
+import Header from '@jaamd/site/components/Header.astro'
+import TableOfContents from '@jaamd/site/components/TableOfContents.astro'
+import { pageDescription } from '@jaamd/site/rendered.ts'
+import { DEFAULT_LOCALE, languageOf } from '@jaamd/site/runtime.ts'
 import { ClientRouter } from 'astro:transitions'
 import config from 'virtual:jaad/config'
 import DocsFrame from 'virtual:jaad/docs-frame'
-import Footer from '../../site/components/Footer.astro'
-import Head from '../../site/components/Head.astro'
-import Header from '../../site/components/Header.astro'
-import { DEFAULT_LOCALE, languageOf } from '../../site/runtime.ts'
 import { getLocaleAlternates } from '../collection.ts'
 import DocsSidebarLeft from '../components/DocsSidebarLeft.astro'
-import StructuredData from '../components/StructuredData.astro'
-import TableOfContents from '../components/TableOfContents.astro'
-import { pageDescription } from '../model/rendered.ts'
+import DocsStructuredData from '../components/DocsStructuredData.astro'
 import { docsUrls } from '../runtime.ts'
 import { docsFileHref, docsMarkdownHref } from '../urls.ts'
 import '../../../dist/jaad.css'
@@ -92,7 +92,7 @@ const frameProps: DocsFrameProps = {
             {xDefault}
             {markdown}
         />
-        <StructuredData
+        <DocsStructuredData
             title={page.title || config.title}
             description={description}
             chapter={page.chapter}

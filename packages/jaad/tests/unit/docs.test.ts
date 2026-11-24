@@ -2,6 +2,7 @@ import type { DocsSource } from '../../src/docs/model/tree.ts'
 import type { DocsUrlOptions } from '../../src/docs/urls.ts'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { htmlText, pageDescription, pageHeadings } from '@jaamd/site/rendered.ts'
 import {
     editPathFor,
     formatChapterTitle,
@@ -11,7 +12,6 @@ import {
     slugToTitle,
     splitDocLocale,
 } from '../../src/docs/model/ids.ts'
-import { htmlText, pageDescription, pageHeadings } from '../../src/docs/model/rendered.ts'
 import { buildDocsTree } from '../../src/docs/model/tree.ts'
 import { validateDocsStructure } from '../../src/docs/model/validate.ts'
 import { buildDocsNavigation } from '../../src/docs/navigation.ts'

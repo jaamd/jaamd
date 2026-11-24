@@ -1,8 +1,8 @@
 import type { DocsSection } from './config.ts'
 import type { DocsPage, DocsTree } from './model/tree.ts'
-import { SEARCH_INDEX_VERSION, type SearchIndex } from '../site/search.ts'
+import { pageChunks } from '@jaamd/site/rendered.ts'
+import { SEARCH_INDEX_VERSION, type SearchIndex } from '@jaamd/site/search.ts'
 import { formatChapterTitle } from './model/ids.ts'
-import { pageChunks } from './model/rendered.ts'
 
 /** One entry per h2 and h3 of every page, plus one for the text before them.
  *  `markdownHref` gives each page the url of its Markdown. */

@@ -1,9 +1,9 @@
 ---
-import type { DocsHeading } from '../types.ts'
-import { ui } from '../../site/runtime.ts'
+import type { PageHeading } from '../rendered.ts'
+import { ui } from '../runtime.ts'
 
 interface Props {
-    headings: DocsHeading[]
+    headings: PageHeading[]
     locale?: string
 }
 

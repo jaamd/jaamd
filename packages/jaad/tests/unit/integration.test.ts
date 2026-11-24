@@ -5,13 +5,13 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { pathToFileURL } from 'node:url'
+import { loadTailwindPlugin } from '@jaamd/site/integration.ts'
 import {
     createSitemapFilter,
     findAliases,
     getInjectedRoutes,
     shouldInjectNotFound,
 } from '../../src/docs/integration.ts'
-import { loadTailwindPlugin } from '../../src/site/integration.ts'
 
 test('opening-page discovery follows collection slugging and numeric order', () => {
     const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-'))

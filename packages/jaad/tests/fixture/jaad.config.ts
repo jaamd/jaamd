@@ -22,7 +22,7 @@ export default defineJaadConfig({
                         {
                             weight: '400',
                             style: 'normal',
-                            src: [new URL('../../src/site/fonts/inter.woff2', import.meta.url)],
+                            src: [new URL('../../../site/src/fonts/inter.woff2', import.meta.url)],
                         },
                     ],
                 },

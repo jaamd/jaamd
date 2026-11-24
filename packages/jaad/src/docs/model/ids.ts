@@ -1,6 +1,6 @@
 import { posix } from 'node:path'
+import { ucfirst } from '@jaamd/site/helpers.ts'
 import { slug as githubSlug } from 'github-slugger'
-import { ucfirst } from '../../site/helpers.ts'
 
 /** A numeric order prefix, e.g. "01-" or "123-". */
 const NUMBERED_PREFIX_RE = /^(\d+)-(.+)$/

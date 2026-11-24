@@ -3,12 +3,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { resolveStylesheets } from '@jaamd/site/config.ts'
+import { PRESETS } from '@jaamd/site/themes.ts'
 import { bundledThemes } from 'shiki'
 import { resolveConfig } from '../../src/config.ts'
-import { resolveStylesheets } from '../../src/site/config.ts'
-import { PRESETS } from '../../src/site/themes.ts'
 
-const SITE = join(dirname(fileURLToPath(import.meta.url)), '../../src/site')
+const SITE = join(dirname(fileURLToPath(import.meta.url)), '../../../site/src')
 
 test('every preset resolves to a stylesheet JAAMD actually ships', () => {
     for (const name of Object.keys(PRESETS)) {

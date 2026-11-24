@@ -1,39 +1,33 @@
 ---
 import config from 'virtual:jaad/config'
-import { scriptJson } from '../../site/helpers.ts'
-import { slugToTitle } from '../model/ids.ts'
-import { docsUrls } from '../runtime.ts'
-import { docsPageHref } from '../urls.ts'
+import { scriptJson } from '../helpers.ts'
+
+/** A step of the page's breadcrumb; one without a url is a label only. */
+export interface Crumb {
+    name: string
+    url: string | null
+}
 
 interface Props {
+    /** The schema.org type of the page, as `TechArticle`. */
+    type: string
     title: string
     description: string
-    chapter?: string
+    /** From the site's home to the page itself. */
+    crumbs: Crumb[]
     keywords?: string[]
     author?: string
     modified?: Date
     /** BCP-47 tag of this page's locale. */
     language?: string
-    locale?: string
 }
 
-const { title, description, chapter, keywords = [], author, modified, language = config.lang, locale } = Astro.props
+const { type, title, description, crumbs, keywords = [], author, modified, language = config.lang } = Astro.props
 
 // Relative ids are worthless to a crawler, so without `site` emit nothing.
-const site = Astro.site
-const base = site ? docsPageHref('', docsUrls(locale)) : null
-
-const crumbs = base
-    ? [
-          { name: config.title, url: new URL(base, Astro.url.origin).href },
-          ...(chapter ? [{ name: slugToTitle(chapter), url: null }] : []),
-          { name: title, url: Astro.url.href },
-      ]
-    : []
-
-const data = base && {
+const data = Astro.site && {
     '@context': 'https://schema.org',
-    '@type': 'TechArticle',
+    '@type': type,
     headline: title,
     description,
     inLanguage: language,

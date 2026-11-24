@@ -1,12 +1,13 @@
 import type { DocsSourceEntry } from './collection.ts'
-import type { MarkdownExportContext } from './markdown-export.ts'
 import type { DocsPage } from './model/tree.ts'
+import type { MarkdownExportContext } from '@jaamd/site/markdown-export.ts'
+import { absoluteHref, llmsDocument, llmsFullDocument, llmsLine, textResponse } from '@jaamd/site/llms.ts'
+import { exportMarkdown, sourceKey } from '@jaamd/site/markdown-export.ts'
+import { pageDescription } from '@jaamd/site/rendered.ts'
+import { DEFAULT_LOCALE, LOCALES, buildLocales } from '@jaamd/site/runtime.ts'
 import config from 'virtual:jaad/config'
-import { DEFAULT_LOCALE, LOCALES, buildLocales } from '../site/runtime.ts'
 import { getDocsTree, getServedLocales } from './collection.ts'
-import { exportMarkdown, sourceKey } from './markdown-export.ts'
 import { slugToTitle } from './model/ids.ts'
-import { pageDescription } from './model/rendered.ts'
 import { SECTIONS, docsUrls } from './runtime.ts'
 import { buildSearchIndex } from './search-index.ts'
 import { docsFileHref, docsMarkdownHref } from './urls.ts'
@@ -21,9 +22,6 @@ export async function searchIndexResponse(locale?: string): Promise<Response> {
     })
 }
 
-/** An href made absolute when the site's url is known. */
-const absolute = (href: string, site: URL | undefined): string => (site ? new URL(href, site.origin).href : href)
-
 let exportContext: Promise<MarkdownExportContext> | undefined
 
 /** Where every page's Markdown is, in every locale. Built once per build: in
@@ -36,7 +34,7 @@ function markdownContext(site: URL | undefined): Promise<MarkdownExportContext> 
             for (const page of pages) {
                 if (!page.source.filePath) continue
                 const href = docsMarkdownHref(page.slug, docsUrls(page.locale ?? locale))
-                markdownUrls.set(sourceKey(page.source.filePath), absolute(href, site))
+                markdownUrls.set(sourceKey(page.source.filePath), absoluteHref(href, site))
             }
         }
         return { markdownUrls, origin: site ? site.origin : null }
@@ -65,18 +63,15 @@ export async function llmsFullResponse(site: URL | undefined, locale?: string): 
     const { pages } = await getDocsTree(locale)
     const parts = await Promise.all(
         pages.map(async (page) => {
-            const source = absolute(docsMarkdownHref(page.slug, docsUrls(locale)), site)
-            return `${(await pageMarkdown(page, site)).trimEnd()}\n\nSource: ${source}`
+            return {
+                markdown: await pageMarkdown(page, site),
+                source: absoluteHref(docsMarkdownHref(page.slug, docsUrls(locale)), site),
+            }
         }),
     )
 
-    return new Response(parts.join('\n\n---\n\n') + '\n', {
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    })
+    return textResponse(llmsFullDocument(parts))
 }
-
-/** Text that cannot close the brackets of a Markdown link. */
-const linkText = (text: string): string => text.replace(/[\\[\]]/g, '\\$&')
 
 interface Row {
     title: string
@@ -88,10 +83,9 @@ interface Row {
 export async function llmsResponse(site: URL | undefined, locale?: string): Promise<Response> {
     const { pages: sortedPages } = await getDocsTree(locale)
 
-    const markdownHref = (slug: string): string => absolute(docsMarkdownHref(slug, docsUrls(locale)), site)
+    const markdownHref = (slug: string): string => absoluteHref(docsMarkdownHref(slug, docsUrls(locale)), site)
 
-    const toLine = (row: Row): string =>
-        `- [${linkText(row.title)}](${markdownHref(row.slug)})${row.description ? `: ${row.description}` : ''}`
+    const toLine = (row: Row): string => llmsLine(row.title, markdownHref(row.slug), row.description)
 
     /** Standalone pages first, then one heading per chapter. */
     const outline = (pages: DocsPage[], heading: string): string[] => {
@@ -147,21 +141,12 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
                   others
                       .map((code) => {
                           const name = LOCALES.find((known) => known.code === code)?.name ?? code
-                          const href = absolute(docsFileHref('llms.txt', docsUrls(code)), site)
-                          return `- [${linkText(name)}](${href})`
+                          const href = absoluteHref(docsFileHref('llms.txt', docsUrls(code)), site)
+                          return llmsLine(name, href)
                       })
                       .join('\n'),
               ]
             : []
 
-    const content = [
-        `# ${config.title}`,
-        ...(config.description ? [`> ${config.description}`] : []),
-        ...sections,
-        ...languages,
-    ].join('\n\n')
-
-    return new Response(content + '\n', {
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    })
+    return textResponse(llmsDocument(config.title, config.description, [...sections, ...languages]))
 }

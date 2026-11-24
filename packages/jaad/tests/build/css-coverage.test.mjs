@@ -6,21 +6,27 @@ import { fileURLToPath } from 'node:url'
 import { allCss, packageClasses, missingFrom, themeTokens } from '../dist.mjs'
 
 const SRC = join(dirname(fileURLToPath(import.meta.url)), '../../src')
+// The shell's markup and tokens live in @jaamd/site; JAAD's stylesheet carries them.
+const SITE_SRC = join(dirname(fileURLToPath(import.meta.url)), '../../../site/src')
+
+/** Every class the markup of JAAD and of the shell uses. */
+const allClasses = () => new Set([...packageClasses(SRC), ...packageClasses(SITE_SRC)])
 
 test('every class used by the package ships in the built CSS', () => {
-    const classes = packageClasses(SRC)
+    const classes = allClasses()
     assert.ok(classes.size > 0, 'no classes found; did the source move?')
 
     assert.deepEqual(missingFrom(allCss(), classes), [], 'a class used in markup has no rule in the package CSS')
 })
 
 const source = (name) => readFileSync(join(SRC, name), 'utf8')
+const siteSource = (name) => readFileSync(join(SITE_SRC, name), 'utf8')
 
 // Tokens are public: emitted even when no package rule uses them.
 test('every @theme token ships in the package stylesheet', () => {
     const dist = source('../dist/jaad.css')
     assert.deepEqual(
-        themeTokens(source('site/styles/global.css')).filter((t) => !dist.includes(`${t}:`)),
+        themeTokens(siteSource('styles/global.css')).filter((t) => !dist.includes(`${t}:`)),
         [],
     )
 })
@@ -28,15 +34,15 @@ test('every @theme token ships in the package stylesheet', () => {
 // `tailwind: true` exposes exactly JAAD's colour and font tokens.
 test('tailwind.css names every colour and font token', () => {
     const pick = (tokens) => tokens.filter((t) => /^--(color|font)-/.test(t)).toSorted()
-    const declared = pick(themeTokens(source('site/styles/global.css')))
-    const bridged = pick(themeTokens(source('site/styles/tailwind.css')))
+    const declared = pick(themeTokens(siteSource('styles/global.css')))
+    const bridged = pick(themeTokens(siteSource('styles/tailwind.css')))
     assert.deepEqual(bridged, declared)
 })
 
 // Components stay semantic: styling lives in CSS, not in utilities.
 test('package markup uses only jaad-* and docs-* classes', () => {
     const allowed = /^(jaad-|docs-|font-brand$|dark$)/
-    const utilities = [...packageClasses(SRC)].filter((c) => !allowed.test(c))
+    const utilities = [...allClasses()].filter((c) => !allowed.test(c))
     assert.deepEqual(utilities.toSorted(), [])
 })
 

@@ -52,7 +52,7 @@ export function setupSite(
                     : []),
             ],
             // Package .astro sources must reach the Astro compiler.
-            ssr: { noExternal: ['@jaamd/jaad'] },
+            ssr: { noExternal: ['@jaamd/jaad', '@jaamd/site'] },
         },
         fonts,
     })

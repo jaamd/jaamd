@@ -1,9 +1,9 @@
 import type { DocsPageData } from '../types.ts'
 import type { DocsUrlOptions } from '../urls.ts'
-import type { RenderedMarkdown } from './rendered.ts'
+import type { RenderedMarkdown } from '@jaamd/site/rendered.ts'
+import { renderedTitle } from '@jaamd/site/rendered.ts'
 import { docsPageHref } from '../urls.ts'
 import { namedSlug, parseDocPath, slugToTitle } from './ids.ts'
-import { renderedTitle } from './rendered.ts'
 
 /** A markdown file of one locale: a collection entry, or a file read from disk. */
 export interface DocsSource {

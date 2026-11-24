@@ -1,9 +1,7 @@
 import type { DocsSource } from '../../src/docs/model/tree.ts'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { pageChunks } from '../../src/docs/model/rendered.ts'
-import { buildDocsTree } from '../../src/docs/model/tree.ts'
-import { buildSearchIndex } from '../../src/docs/search-index.ts'
+import { pageChunks } from '@jaamd/site/rendered.ts'
 import {
     getSnippet,
     markWords,
@@ -14,7 +12,9 @@ import {
     withinOneEdit,
     type SearchIndex,
     type SearchPage,
-} from '../../src/site/search.ts'
+} from '@jaamd/site/search.ts'
+import { buildDocsTree } from '../../src/docs/model/tree.ts'
+import { buildSearchIndex } from '../../src/docs/search-index.ts'
 
 /** An index of pages, each `[title, ...[heading, text]]`, the first pair
  *  with no heading being the text before the first one. */

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { exportMarkdown, sourceKey, type MarkdownExportContext } from '../../src/docs/markdown-export.ts'
+import { exportMarkdown, sourceKey, type MarkdownExportContext } from '../../src/markdown-export.ts'
 
 const CONTEXT: MarkdownExportContext = {
     markdownUrls: new Map([

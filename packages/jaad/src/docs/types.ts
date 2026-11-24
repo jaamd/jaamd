@@ -1,4 +1,4 @@
-import type { RenderedMarkdown } from './model/rendered.ts'
+import type { PageHeading, RenderedMarkdown } from '@jaamd/site/rendered.ts'
 
 export interface DocsNavItem {
     title: string
@@ -9,11 +9,8 @@ export interface DocsNavItem {
     isActive: boolean
 }
 
-export interface DocsHeading {
-    depth: 2 | 3
-    slug: string
-    text: string
-}
+/** An h2 or h3 of a page, as the table of contents lists it. */
+export type DocsHeading = PageHeading
 
 /** Resolved frontmatter. Mirrors the schema in content.ts. */
 export interface DocsPageData {

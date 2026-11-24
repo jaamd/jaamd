@@ -3,12 +3,12 @@ import type { IntegrationState } from './docs/integration.ts'
 import type { AstroIntegration } from 'astro'
 import { fileURLToPath } from 'node:url'
 import sitemap from '@astrojs/sitemap'
+import { resolveStylesheets } from '@jaamd/site/config.ts'
+import { setupSite } from '@jaamd/site/integration.ts'
+import { normaliseBasePath } from '@jaamd/site/urls.ts'
 import { resolveConfig } from './config.ts'
 import { createSitemapFilter, setupDocs } from './docs/integration.ts'
 import { pageUrlsEndWithSlash } from './docs/urls.ts'
-import { resolveStylesheets } from './site/config.ts'
-import { setupSite } from './site/integration.ts'
-import { normaliseBasePath } from './site/urls.ts'
 
 /** The site, then the docs on it, resolved against the project Astro loaded. */
 export function createJaadIntegration(options: JaadUserConfig, state: IntegrationState): AstroIntegration {

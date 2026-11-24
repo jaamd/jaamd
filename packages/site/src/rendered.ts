@@ -1,4 +1,9 @@
-import type { DocsHeading } from '../types.ts'
+/** An h2 or h3 of a page, as the table of contents lists it. */
+export interface PageHeading {
+    depth: 2 | 3
+    slug: string
+    text: string
+}
 
 /** What Astro's renderer leaves on a markdown entry. */
 export interface RenderedMarkdown {
@@ -128,7 +133,7 @@ export function renderedTitle(rendered: RenderedMarkdown | undefined): string | 
 
 const isOutline = (heading: HeadingTag) => !heading.ignored && (heading.depth === 2 || heading.depth === 3)
 
-function headingOf(tag: HeadingTag, rendered: RenderedMarkdown): DocsHeading {
+function headingOf(tag: HeadingTag, rendered: RenderedMarkdown): PageHeading {
     const known = rendered.metadata?.headings?.find((heading) => heading.slug === tag.id)
     return {
         depth: tag.depth as 2 | 3,
@@ -138,7 +143,7 @@ function headingOf(tag: HeadingTag, rendered: RenderedMarkdown): DocsHeading {
 }
 
 /** The h2 and h3 of the page outside `data-toc-ignore`: its table of contents. */
-export function pageHeadings(rendered: RenderedMarkdown | undefined): DocsHeading[] {
+export function pageHeadings(rendered: RenderedMarkdown | undefined): PageHeading[] {
     if (!rendered) return []
     return headingTags(rendered.html)
         .filter(isOutline)
@@ -146,8 +151,8 @@ export function pageHeadings(rendered: RenderedMarkdown | undefined): DocsHeadin
 }
 
 /** A stretch of a page: the text under one h2 or h3, or before the first. */
-export interface DocsChunk {
-    heading: DocsHeading | null
+export interface PageChunk {
+    heading: PageHeading | null
     text: string
     /** The text of its code blocks, empty when it has none. */
     code: string
@@ -155,7 +160,7 @@ export interface DocsChunk {
 
 /** The page cut at the headings of its table of contents. The h1 is left out;
  *  any other heading stays in the text of the stretch it sits in. */
-export function pageChunks(rendered: RenderedMarkdown | undefined): DocsChunk[] {
+export function pageChunks(rendered: RenderedMarkdown | undefined): PageChunk[] {
     if (!rendered) return [{ heading: null, text: '', code: '' }]
     const { html } = rendered
     const tags = headingTags(html)
@@ -174,7 +179,7 @@ export function pageChunks(rendered: RenderedMarkdown | undefined): DocsChunk[] 
         return htmlText(text + html.slice(at, to))
     }
 
-    const stretch = (heading: DocsHeading | null, from: number, to: number): DocsChunk => {
+    const stretch = (heading: PageHeading | null, from: number, to: number): PageChunk => {
         return { heading, text: between(from, to), code: codeText(html.slice(from, to)) }
     }
 
