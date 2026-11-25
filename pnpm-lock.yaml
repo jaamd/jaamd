@@ -312,6 +312,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.12
         version: 0.9.12(prettier@3.9.6)(typescript@6.0.3)
+      '@astrojs/markdown-remark':
+        specifier: ^7.3.5
+        version: 7.3.5(supports-color@10.2.2)
       '@tailwindcss/cli':
         specifier: ^4.3.3
         version: 4.3.5

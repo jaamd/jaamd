@@ -1,29 +1,21 @@
 import assert from 'node:assert/strict'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { after, describe, test } from 'node:test'
-import { fileURLToPath } from 'node:url'
 import { siteCoordinator, siteIntegration, siteMember } from '@jaamd/site/integration.ts'
 import { packageVersion } from '@jaamd/site/members.ts'
 import { build, sync } from 'astro'
 import jaad from '../../index.ts'
 import { parseConfig, siteOptionsOf } from '../../src/config.ts'
+import { inline, project, removeProjects } from './projects.mjs'
 
-// Inside the fixture, so the projects resolve astro and JAAD from its node_modules.
-const FIXTURE = fileURLToPath(new URL('../fixture', import.meta.url))
 const VERSION = packageVersion(new URL('../../package.json', import.meta.url))
 
 const SITE = { site: 'https://example.dev', title: 'Coordination' }
 
-const projects = []
-
 /** A project with one docs page, and the files the stub package serves. */
-function project(files = {}) {
-    const root = mkdtempSync(join(FIXTURE, '.coordination-'))
-    projects.push(root)
-
-    const all = {
-        'src/content.config.ts': "export { collections } from '@jaamd/jaad/content'\n",
+function withStub(files = {}) {
+    return project({
         'docs/01-intro.md': '# Intro\n\nThe docs.\n',
         'stub/page.astro': '<html><body><h1>Notes</h1></body></html>\n',
         'stub/llms.mjs': [
@@ -32,12 +24,7 @@ function project(files = {}) {
             '',
         ].join('\n'),
         ...files,
-    }
-    for (const [path, content] of Object.entries(all)) {
-        mkdirSync(join(root, path, '..'), { recursive: true })
-        writeFileSync(join(root, path), content)
-    }
-    return root
+    })
 }
 
 /** A second package of the site, as JAAB will be: its own site integration,
@@ -68,24 +55,20 @@ function stub(root, { base = '/notes', version = VERSION, options = SITE } = {})
 }
 
 // `site` reaches Astro only through `@jaamd/jaad/site`, so it is passed here too.
-const inline = (root, integrations) => {
-    return { root, site: SITE.site, configFile: false, logLevel: 'silent', integrations }
+const config = (root, integrations) => {
+    return inline(root, integrations, { site: SITE.site })
 }
 
 const read = (root, path) => {
     return readFileSync(join(root, 'dist', path), 'utf8')
 }
 
-after(() => {
-    for (const root of projects) {
-        rmSync(root, { recursive: true, force: true })
-    }
-})
+after(removeProjects)
 
 describe('docs and another package on one site', () => {
     test('below the root, each keeps its llms files and the site indexes both', async () => {
-        const root = project()
-        await build(inline(root, [jaad({ ...SITE, routeBase: '/docs' }), stub(root)]))
+        const root = withStub()
+        await build(config(root, [jaad({ ...SITE, routeBase: '/docs' }), stub(root)]))
 
         const llms = read(root, 'llms.txt')
         assert.match(llms, /^# Coordination\n/)
@@ -102,8 +85,8 @@ describe('docs and another package on one site', () => {
     })
 
     test('docs at the root give the site their llms files, and keep their 404', async () => {
-        const root = project()
-        await build(inline(root, [jaad(SITE), stub(root)]))
+        const root = withStub()
+        await build(config(root, [jaad(SITE), stub(root)]))
 
         const llms = read(root, 'llms.txt')
         assert.match(llms, /## Docs\n\n- \[Intro\]\(https:\/\/example\.dev\/intro\.md\)/)
@@ -114,41 +97,41 @@ describe('docs and another package on one site', () => {
 
 describe('the site stops a build whose packages disagree', () => {
     test('on versions, naming the install command', async () => {
-        const root = project()
+        const root = withStub()
         await assert.rejects(
-            sync(inline(root, [jaad(SITE), stub(root, { version: '9.9.9' })])),
+            sync(config(root, [jaad(SITE), stub(root, { version: '9.9.9' })])),
             new RegExp(`npm i @jaamd/jaad@9\\.9\\.9 @jaamd/stub@9\\.9\\.9`),
         )
     })
 
     test('on site options, naming the keys', async () => {
-        const root = project()
+        const root = withStub()
         await assert.rejects(
-            sync(inline(root, [jaad(SITE), stub(root, { options: { ...SITE, title: 'Other' } })])),
+            sync(config(root, [jaad(SITE), stub(root, { options: { ...SITE, title: 'Other' } })])),
             /@jaamd\/jaad and @jaamd\/stub: title/,
         )
     })
 
     test('on a base both take', async () => {
-        const root = project()
+        const root = withStub()
         await assert.rejects(
-            sync(inline(root, [jaad({ ...SITE, routeBase: '/notes' }), stub(root)])),
+            sync(config(root, [jaad({ ...SITE, routeBase: '/notes' }), stub(root)])),
             /both mount their pages at "\/notes"/,
         )
     })
 
     test('on docs pages inside the base of another package', async () => {
-        const root = project({ 'docs/02-notes/01-draft.md': '# Draft\n' })
+        const root = withStub({ 'docs/02-notes/01-draft.md': '# Draft\n' })
         await assert.rejects(
-            sync(inline(root, [jaad(SITE), stub(root)])),
+            sync(config(root, [jaad(SITE), stub(root)])),
             /docs\/02-notes\/01-draft\.md would be served at \/notes\/draft, which @jaamd\/stub serves/,
         )
     })
 
     test('on a project page that takes a route of a package', async () => {
-        const root = project({ 'src/pages/notes.astro': '<h1>Mine</h1>\n' })
+        const root = withStub({ 'src/pages/notes.astro': '<h1>Mine</h1>\n' })
         await assert.rejects(
-            build(inline(root, [jaad({ ...SITE, routeBase: '/docs' }), stub(root)])),
+            build(config(root, [jaad({ ...SITE, routeBase: '/docs' }), stub(root)])),
             /src\/pages\/notes\.astro takes \/notes, which @jaamd\/stub serves/,
         )
     })

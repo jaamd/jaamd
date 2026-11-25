@@ -21,6 +21,12 @@ pnpm test:consumer   # installs the packed tarballs into throwaway projects
 
 Each check runs per package as well, for example `pnpm --filter @jaamd/jaad test`.
 
+A test goes in the cheapest tier that can see the bug:
+
+- `tests/unit` for logic.
+- `tests/build` for what a build writes. Each project needing its own configuration is built from inline config, with `tests/build/projects.mjs` in JAAD.
+- `tests/consumer` only for what shows up when the packed tarball is installed: resolution, the files shipped, the conventions read from a project.
+
 ## Documentation
 
 Each package's documentation is the markdown in its `docs/` folder, published

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { cpSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs'
+import { cpSync, writeFileSync, readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -10,61 +10,40 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..', '..')
 const PKG = ROOT
 
-/** A built directory, frozen so the later rebuilds can be compared to it. */
+/** The built files, read once: each by its path, and the CSS of all of them. */
 function snapshot(dist) {
-    const files = walk(dist)
     const contents = new Map(
-        files.map((f) => {
-            return [f.slice(dist.length), readFileSync(f, 'utf8')]
+        walk(dist).map((file) => {
+            return [file.slice(dist.length), readFileSync(file, 'utf8')]
         }),
     )
 
     return {
-        files: [...contents.keys()],
-        pages: [...contents.keys()].filter((f) => {
-            return f.endsWith('.html')
-        }),
         read: (relative) => {
             const file = contents.get('/' + relative)
             assert.ok(file !== undefined, `${relative} was not built`)
             return file
         },
         css: [...contents]
-            .filter(([f]) => {
-                return f.endsWith('.css') || f.endsWith('.html')
+            .filter(([file]) => {
+                return file.endsWith('.css') || file.endsWith('.html')
             })
             .map(([, body]) => {
                 return body
             })
             .join('\n'),
-        /** Only the stylesheets one page links, so a layout's set is testable. */
-        cssOf: (relative) => {
-            const html = contents.get('/' + relative)
-            assert.ok(html !== undefined, `${relative} was not built`)
-            const linked = [
-                ...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g),
-                // The href carries Astro's base; dist keys do not.
-            ].map((m) => {
-                return contents.get(m[1].slice(m[1].indexOf('/_astro/'))) ?? ''
-            })
-            const inline = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => {
-                return m[1]
-            })
-            return [...linked, ...inline].join('\n')
-        },
     }
 }
 
 /**
  * Installs the packed tarball into a throwaway project, the way a reader would.
  * Everything that has broken so far — transitive resolution, Tailwind scanning
- * node_modules, .astro files shipped as source — only shows up here.
+ * node_modules, .astro files shipped as source — only shows up here. What JAAD
+ * does with the docs is tested on the build fixture, in tests/build.
  */
 describe('a project that installed the published tarball', () => {
     let project
     let built
-    let remounted
-    let localised
 
     before(() => {
         const tarball = packPackage(PKG)
@@ -92,293 +71,9 @@ describe('a project that installed the published tarball', () => {
         run('npm', ['install', '--no-audit', '--no-fund'], project)
         run('npx', ['astro', 'build'], project)
         built = snapshot(join(project, 'dist'))
-
-        // A landing-page site opts into nested docs. Astro's deployment base and
-        // every JAAD-owned URL have to move together.
-        writeFileSync(
-            join(project, 'jaad.config.ts'),
-            `import { defineJaadConfig } from "@jaamd/jaad";
-export default defineJaadConfig({
-  site: "https://example.dev",
-  base: "/repo",
-  title: "Consumer Test",
-  routeBase: "/docs",
-  logo: "/logo.svg",
-  appearance: "dark",
-  theme: "dracula",
-});
-`,
-        )
-        run('npx', ['astro', 'build'], project)
-        remounted = snapshot(join(project, 'dist'))
-
-        // Locale directories under docs/: the same pages, in two languages.
-        const docs = join(project, 'docs')
-        rmSync(docs, { recursive: true })
-        mkdirSync(join(docs, 'en', '02-guides'), { recursive: true })
-        mkdirSync(join(docs, 'it'), { recursive: true })
-        // Created but never written: it must not reach the switcher or the routes.
-        mkdirSync(join(docs, 'fr'), { recursive: true })
-        writeFileSync(
-            join(docs, 'en', '01-getting-started.md'),
-            '---\ntitle: Getting Started\n---\n\n# Getting Started\n\nEnglish.\n',
-        )
-        writeFileSync(join(docs, 'en', '02-guides', '01-deep-dive.md'), '# Deep Dive\n\nTranslated.\n')
-        writeFileSync(
-            join(docs, 'en', '02-guides', '02-only-in-english.md'),
-            '# Only In English\n\nNo Italian counterpart.\n',
-        )
-        mkdirSync(join(docs, 'en', '03-handbook'), { recursive: true })
-        writeFileSync(
-            join(docs, 'en', '03-handbook', '01-setup.md'),
-            '---\ntranslationKey: setup\n---\n\n# Setup\n\nPaired by key.\n',
-        )
-        writeFileSync(
-            join(docs, 'it', '01-per-iniziare.md'),
-            '---\ntitle: Per iniziare\n---\n\n# Per iniziare\n\nItaliano.\n',
-        )
-        // A matching slug pairs two files; so does a shared translationKey, which
-        // is what lets a language translate its own file and directory names.
-        mkdirSync(join(docs, 'it', '02-guides'), { recursive: true })
-        writeFileSync(join(docs, 'it', '02-guides', '01-deep-dive.md'), '# Analisi\n\nPaired by slug.\n')
-        writeFileSync(
-            join(docs, 'it', '02-guides', '02-solo-italiano.md'),
-            '# Solo italiano\n\nNo English counterpart.\n',
-        )
-        mkdirSync(join(docs, 'it', '03-guida'), { recursive: true })
-        writeFileSync(
-            join(docs, 'it', '03-guida', '01-installazione.md'),
-            '---\ntranslationKey: setup\n---\n\n# Installazione\n\nPaired by key.\n',
-        )
-        writeFileSync(
-            join(project, 'jaad.config.ts'),
-            `import { defineJaadConfig } from "@jaamd/jaad";
-export default defineJaadConfig({
-  site: "https://example.dev",
-  title: "Consumer Test",
-  lang: "en",
-  ui: { it: { "page.copy": "Copia" } },
-});
-`,
-        )
-        run('npx', ['astro', 'build'], project)
-        localised = snapshot(join(project, 'dist'))
     })
 
     after(cleanupTemporaryDirectories)
-
-    test('every documentation page is built, nesting included', () => {
-        assert.ok(built.pages.includes('/index.html'), 'no docs index')
-        assert.ok(built.pages.includes('/getting-started/index.html'))
-        assert.ok(built.pages.includes('/guides/deep-dive/index.html'), 'nested chapter page missing')
-
-        assert.match(
-            built.read('getting-started/index.html'),
-            /http-equiv="refresh"[^>]+url=\//,
-            "the opening page's named slug is not a redirect",
-        )
-
-        const index = JSON.parse(built.read('search-index.json'))
-        assert.equal(index.pages.length, 2, 'the search index missed a page')
-        assert.equal(index.pages[0].href, '/', 'search does not point at the docs root')
-    })
-
-    test('frontmatter renames, reorders and describes a page', () => {
-        const deepDive = built.read('guides/deep-dive/index.html')
-
-        assert.match(deepDive, /<title>A Deep Dive Into Everything \| /)
-        assert.match(
-            deepDive,
-            /<a[^>]+href="\/guides\/deep-dive\/"[^>]*>[\s\S]{0,200}?Deep Dive</,
-            'the sidebar does not use the short label',
-        )
-
-        assert.match(deepDive, /<meta name="author" content="Ada Lovelace"/)
-        assert.match(deepDive, /<meta property="article:modified_time" content="2026-09-12T/)
-        assert.match(
-            deepDive,
-            /<meta property="og:image" content="https:\/\/example\.dev\/logo\.svg"/,
-            "a page-level ogImage did not override the site's",
-        )
-        assert.match(deepDive, /"author":\{"@type":"Person","name":"Ada Lovelace"\}/)
-
-        const home = built.read('index.html')
-        assert.match(home, /<meta name="keywords" content="alpha, beta"/)
-        assert.match(home, /"keywords":\["alpha","beta"\]/)
-        assert.deepEqual(JSON.parse(built.read('search-index.json')).pages[0].keywords, ['alpha', 'beta'])
-    })
-
-    test('a draft is left out of the production build entirely', () => {
-        assert.ok(
-            !built.pages.some((file) => {
-                return file.includes('draft')
-            }),
-            'a draft page was routed',
-        )
-
-        const index = JSON.parse(built.read('search-index.json'))
-        assert.ok(
-            !index.pages.some((page) => {
-                return page.href.includes('draft')
-            }),
-            'a draft page reached the search index',
-        )
-        assert.doesNotMatch(built.read('llms.txt'), /\/draft/)
-    })
-
-    test('locale directories build one documentation site per language', () => {
-        // The default locale keeps the urls it had before the second language.
-        assert.ok(localised.pages.includes('/index.html'), 'no default index')
-        assert.ok(
-            localised.pages.includes('/guides/deep-dive/index.html'),
-            'the default locale lost its chaptered page',
-        )
-        // Three directory levels, which were a structure error before i18n.
-        assert.ok(localised.pages.includes('/it/index.html'), 'no /it index')
-
-        assert.ok(
-            !localised.pages.includes('/it/guides/only-in-english/index.html'),
-            'an untranslated page was built anyway',
-        )
-
-        assert.ok(
-            !localised.files.some((file) => {
-                return file.startsWith('/fr')
-            }),
-            'an empty locale directory was built anyway',
-        )
-
-        const italian = JSON.parse(localised.read('it/search-index.json'))
-        assert.deepEqual(
-            italian.pages.map((page) => {
-                return page.href
-            }),
-            ['/it/', '/it/guides/deep-dive/', '/it/guides/solo-italiano/', '/it/guida/installazione/'],
-            'the italian index is not scoped to italian',
-        )
-        assert.match(localised.read('it/llms.txt'), /\/it\//)
-        assert.match(localised.read('it/llms-full.txt'), /^Source: https:\/\/example\.dev\/it\//m)
-        assert.match(
-            localised.read('llms.txt'),
-            /## Other languages\n\n- \[[^\]]+\]\(https:\/\/example\.dev\/it\/llms\.txt\)/,
-            'the default llms.txt does not point at the other languages',
-        )
-        assert.doesNotMatch(localised.read('it/llms.txt'), /## Other languages/)
-    })
-
-    test('a localised page declares its own language and its alternates', () => {
-        const italian = localised.read('it/index.html')
-        assert.match(italian, /<html lang="it"/)
-        assert.match(italian, /<link rel="alternate" hreflang="it" href="https:\/\/example\.dev\/it\/"/)
-
-        const english = localised.read('index.html')
-        assert.match(english, /<html lang="en"/)
-        assert.match(english, /<link rel="alternate" hreflang="x-default" href="https:\/\/example\.dev\/"/)
-
-        // Open Graph wants language_TERRITORY; a bare tag is invalid.
-        assert.match(english, /<meta property="og:locale" content="en_GB"/)
-        assert.match(italian, /<meta property="og:locale" content="it_IT"/)
-
-        // Two files at the same slug are translations, and say so both ways.
-        const pair = localised.read('it/guides/deep-dive/index.html')
-        assert.match(pair, /<meta property="og:locale:alternate" content="en_GB"/)
-        assert.match(pair, /<link rel="alternate" hreflang="en" href="https:\/\/example\.dev\/guides\/deep-dive\/"/)
-
-        // Untranslated, so x-default still has to name somewhere to land.
-        const onlyItalian = localised.read('it/guides/solo-italiano/index.html')
-        assert.doesNotMatch(onlyItalian, /<link rel="alternate" hreflang="en"/)
-        assert.match(onlyItalian, /<link rel="alternate" hreflang="x-default" href="https:\/\/example\.dev\/"/)
-
-        // An untranslated page advertises no alternate it does not have. The
-        // switcher still links to Italian, so this looks only at <head>.
-        const onlyEnglish = localised.read('guides/only-in-english/index.html')
-        assert.doesNotMatch(onlyEnglish, /<link rel="alternate" hreflang="it"/)
-    })
-
-    // Without this, a language that translates its own file names silently loses
-    // every hreflang and every switcher link but the fallback.
-    test('a shared translationKey pairs pages whose slugs differ', () => {
-        const english = localised.read('handbook/setup/index.html')
-        assert.match(
-            english,
-            /<link rel="alternate" hreflang="it" href="https:\/\/example\.dev\/it\/guida\/installazione\/"/,
-        )
-        assert.match(
-            english,
-            /<a href="\/it\/guida\/installazione\/" hreflang="it"/,
-            'the switcher does not follow the key',
-        )
-
-        const italian = localised.read('it/guida/installazione/index.html')
-        assert.match(italian, /<link rel="alternate" hreflang="en" href="https:\/\/example\.dev\/handbook\/setup\/"/)
-        assert.match(italian, /<meta property="og:locale:alternate" content="en_GB"/)
-    })
-
-    // A date in frontmatter that nothing renders is a field nobody would set.
-    test("a lastUpdated date is shown, formatted for the page's language", () => {
-        const page = built.read('guides/deep-dive/index.html')
-        assert.match(page, /<time datetime="2026-09-12T00:00:00\.000Z">/)
-        assert.match(page, />Last updated on <time/)
-        assert.match(page, /September 12, 2026|12 September 2026/)
-    })
-
-    test('interface strings follow the locale, key by key', () => {
-        const italian = localised.read('it/index.html')
-        // The explicit per-locale value is rendered alongside the bundled strings.
-        assert.match(italian, />Copia</)
-        assert.match(italian, /title="Pagina iniziale"/)
-        // Everything else comes from the bundled Italian catalogue.
-        assert.match(italian, />Cerca…<\/span>/)
-        assert.match(italian, /placeholder="Cerca nella documentazione…"/)
-        assert.match(italian, /aria-label="Cerca nella documentazione"/)
-
-        // English is untouched by an italian override.
-        const english = localised.read('index.html')
-        assert.match(english, />Copy page</)
-        assert.match(english, /title="Home"/)
-    })
-
-    test("structured data roots the breadcrumb in the page's own locale", () => {
-        const ld = (html) => {
-            return JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])
-        }
-
-        const italian = ld(localised.read('it/index.html'))
-        assert.equal(italian.breadcrumb.itemListElement[0].item, 'https://example.dev/it/')
-
-        const english = ld(localised.read('index.html'))
-        assert.equal(english.breadcrumb.itemListElement[0].item, 'https://example.dev/')
-    })
-
-    test('the switcher ships with two locales and falls back per page', () => {
-        const onlyEnglish = localised.read('guides/only-in-english/index.html')
-        assert.match(onlyEnglish, /<jaad-locale-switcher/)
-        assert.match(onlyEnglish, /Italiano/)
-        assert.doesNotMatch(onlyEnglish, /hreflang="fr"/, 'an empty locale was offered')
-        // No Italian twin, so Italian lands on the Italian opening page.
-        assert.match(onlyEnglish, /<a href="\/it\/" hreflang="it"/)
-
-        // With a twin it links to the twin instead.
-        const pair = localised.read('guides/deep-dive/index.html')
-        assert.match(pair, /<a href="\/it\/guides\/deep-dive\/" hreflang="it"/)
-    })
-
-    test('a single-locale site renders no switcher at all', () => {
-        assert.doesNotMatch(built.read('index.html'), /<jaad-locale-switcher/)
-        assert.doesNotMatch(remounted.read('docs/index.html'), /jaad-locale-switcher/)
-    })
-
-    // A preset's palette reaches JAAD's tokens only through the reverse bridge.
-    // Without it a page renders the default palette while the docs render dracula.
-    test('a preset palette reaches pages of your own, not just the docs', () => {
-        const bridge = /--color-background:\s*var\(--jaamd-bg\)/
-        assert.match(remounted.cssOf('docs/index.html'), bridge, 'the docs lost the preset bridge')
-        assert.match(
-            remounted.cssOf('page/index.html'),
-            bridge,
-            'a page built on the exported Page.astro has no preset palette',
-        )
-    })
 
     test('the config reaches the head of the page', () => {
         const home = built.read('index.html')
@@ -397,30 +92,6 @@ export default defineJaadConfig({
             'a missing social image was advertised',
         )
         assert.match(home, /name="twitter:card" content="summary"/)
-    })
-
-    test('the repository is listed once, and the mobile menu does not repeat it', () => {
-        const home = built.read('index.html')
-        const found = home.match(/<jaad-nav-mobile[\s\S]*?<\/jaad-nav-mobile>/)
-        assert.ok(found, 'the mobile menu was not rendered at all')
-        const menu = found[0]
-
-        assert.match(menu, />API</, 'the mobile menu lost the nav links')
-        assert.doesNotMatch(menu, /github\.com/, 'the mobile menu repeats an icon')
-        assert.equal(
-            (home.match(/href="https:\/\/github\.com\/example\/consumer"/g) ?? []).length,
-            1,
-            'the repository link is not listed exactly once',
-        )
-        assert.match(home, /aria-label="GitHub"/, 'no forge label on the icon')
-    })
-
-    test('an empty nav renders no mobile menu at all', () => {
-        assert.doesNotMatch(
-            remounted.read('docs/index.html'),
-            /<jaad-nav-mobile/,
-            'the mobile menu is rendered with nothing to put in it',
-        )
     })
 
     test("a page of the consumer's own keeps its local layout", () => {
@@ -483,69 +154,5 @@ export default defineJaadConfig({
             /--jaad-content-width:\s*71rem/,
             'the content width override did not win',
         )
-    })
-
-    test('the theme switcher and its script ship by default', () => {
-        const home = built.read('index.html')
-        assert.match(home, /<jaad-theme-toggle>/, 'no theme switcher by default')
-        assert.match(home, /prefers-color-scheme/, 'no theme script by default')
-    })
-
-    test("routeBase nests the docs and every link follows Astro's base", () => {
-        assert.ok(remounted.pages.includes('/docs/getting-started/index.html'), 'pages not remounted')
-        assert.ok(remounted.pages.includes('/docs/guides/deep-dive/index.html'))
-        assert.ok(remounted.pages.includes('/docs/index.html'), 'no index at the nested docs root')
-        assert.ok(!remounted.pages.includes('/404.html'), "JAAD still owns the site's global 404 when docs are nested")
-        assert.match(remounted.read('docs/index.html'), /docs-sidebar-left/, 'the nested page is not the docs index')
-
-        const page = remounted.read('docs/guides/deep-dive/index.html')
-        assert.match(page, /href="\/repo\/docs\/"/, 'the opening-page link missed the deployment base')
-        assert.match(page, /src="\/repo\/logo\.svg"/, 'a public asset missed the deployment base')
-        assert.match(
-            page,
-            /data-index-url="\/repo\/docs\/search-index\.json"/,
-            'the search index escaped the documentation mount',
-        )
-        assert.match(
-            page,
-            /data-md-href="\/repo\/docs\/guides\/deep-dive\.md"/,
-            'the raw markdown action missed the deployment base',
-        )
-        assert.match(
-            remounted.read('docs/llms.txt'),
-            /https:\/\/example\.dev\/repo\/docs\/getting-started\.md/,
-            'llms.txt missed the deployment base',
-        )
-        assert.doesNotMatch(remounted.files.join('\n'), /^\/search-index\.json$/m)
-        // The convention looks for llms.txt at the root: the site writes one there.
-        assert.match(
-            remounted.read('llms.txt'),
-            /## Docs\n\n[^]*https:\/\/example\.dev\/repo\/docs\/getting-started\.md/,
-            'the root llms.txt missed the docs or the deployment base',
-        )
-        assert.ok(remounted.files.includes('/docs/search-index.json'))
-        assert.equal(
-            JSON.parse(remounted.read('docs/search-index.json')).pages[1].href,
-            '/repo/docs/guides/deep-dive/',
-            'search missed the docs and deployment bases',
-        )
-        assert.match(
-            remounted.read('docs/getting-started/index.html'),
-            /url=\/repo\/docs/,
-            'the opening-page redirect missed the deployment base',
-        )
-    })
-
-    test('a pinned appearance drops the switcher and the script', () => {
-        for (const name of ['docs/index.html', 'docs/guides/deep-dive/index.html']) {
-            const html = remounted.read(name)
-            assert.match(html, /<html lang="en" class="dark"/, `${name} does not carry the pinned appearance`)
-            assert.doesNotMatch(html, /jaad-theme-toggle/, `${name} still renders the switcher for a pinned appearance`)
-            assert.doesNotMatch(
-                html,
-                /prefers-color-scheme/,
-                `${name} still ships the theme script for a pinned appearance`,
-            )
-        }
     })
 })
