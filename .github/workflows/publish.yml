@@ -84,10 +84,16 @@ jobs:
                   pnpm test:consumer
 
             # pnpm writes the versions behind `workspace:` ranges into the tarball.
+            # A private package is still versioned with the others, but not packed:
+            # without a tarball it is never published.
             - name: Pack
               run: |
                   mkdir -p "$RUNNER_TEMP/tarballs"
                   for dir in $PACKAGES; do
+                    if [ "$(node -p "require('./packages/$dir/package.json').private === true")" = true ]; then
+                      echo "packages/$dir is private: not packed"
+                      continue
+                    fi
                     (cd "packages/$dir" && pnpm pack --pack-destination "$RUNNER_TEMP/tarballs")
                   done
 
@@ -138,6 +144,10 @@ jobs:
 
                   for dir in $PACKAGES; do
                     name="$(node -p "require('./packages/$dir/package.json').name")"
+                    if [ "$(node -p "require('./packages/$dir/package.json').private === true")" = true ]; then
+                      echo "$name is private: not published"
+                      continue
+                    fi
                     if npm view "$name@$VERSION" version >/dev/null 2>&1; then
                       echo "$name@$VERSION is already on npm"
                       continue
