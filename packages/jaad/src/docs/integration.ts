@@ -1,6 +1,8 @@
 import type { JaadResolvedConfig } from '../config.ts'
 import type { DocsRoot } from './config.ts'
 import type { DocLinkContext } from './links.ts'
+import type { DocsPage } from './model/tree.ts'
+import type { ReservedPath } from '@jaamd/site/members.ts'
 import type { AstroIntegration } from 'astro'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
@@ -43,8 +45,6 @@ export interface IntegrationState {
 
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
 
-const NOT_FOUND_PAGE_NAMES = ['404.astro', '404.md', '404.mdx', '404.html', '404.js', '404.ts']
-
 /** A plugin this integration registered on an earlier setup run. */
 const isDocLinks = (plugin: unknown): boolean =>
     (typeof plugin === 'function' || (typeof plugin === 'object' && plugin !== null)) &&
@@ -52,14 +52,18 @@ const isDocLinks = (plugin: unknown): boolean =>
 
 const routeEntrypoint = (file: string) => fileURLToPath(new URL(`./routes/${file}`, import.meta.url))
 
-export function shouldInjectNotFound(docsBase: string, srcDir: URL): boolean {
-    return docsBase === '' && !NOT_FOUND_PAGE_NAMES.some((name) => existsSync(new URL(`pages/${name}`, srcDir)))
+/** A page read from disk, with the file it was read from. */
+interface DiskSource extends DocsSource {
+    file: string
 }
 
-/** The aliases of every locale. The content collection is not available this
- *  early, so the pages are read from disk. */
-export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlias[] {
-    const sources: DocsSource[] = []
+/** The pages of every locale. The content collection is not available this
+ *  early, so they are read from disk. */
+function readDocsTrees(
+    roots: DocsRoot[],
+    locales: string[],
+): { locale: string | undefined; pages: DocsPage<DiskSource>[] }[] {
+    const sources: DiskSource[] = []
 
     const visit = (root: DocsRoot, current: string) => {
         for (const entry of readdirSync(current, { withFileTypes: true }).toSorted((a, b) =>
@@ -73,6 +77,7 @@ export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlia
 
                 const { locale, id } = splitDocLocale(getDocCollectionId(relative(root.dir, file)), locales)
                 sources.push({
+                    file,
                     id,
                     path: id,
                     locale: locale ?? undefined,
@@ -87,23 +92,80 @@ export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlia
     }
 
     const sections = roots.flatMap((root) => root.section ?? [])
-    return (locales.length > 0 ? locales : [undefined]).flatMap((locale) => {
+    return (locales.length > 0 ? locales : [undefined]).map((locale) => {
         // The slugs are all that is read: the urls need no mount.
         const tree = buildDocsTree(
             sources.filter((source) => source.locale === locale),
             { sections, urls: { docsBase: '' } },
         )
-        return tree.pages.flatMap((page) => page.aliases.map((slug) => ({ locale, slug })))
+        return { locale, pages: tree.pages }
     })
 }
 
-export function getInjectedRoutes(docsBase: string, locales: string[] = [], llms: boolean = true): [string, string][] {
-    const llmsRoutes: [string, string][] = llms
-        ? [
-              [`${docsBase}/llms.txt`, 'llms.txt.ts'],
-              [`${docsBase}/llms-full.txt`, 'llms-full.txt.ts'],
-          ]
-        : []
+/** The aliases of every locale. */
+export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlias[] {
+    return readDocsTrees(roots, locales).flatMap(({ locale, pages }) => {
+        return pages.flatMap((page) => {
+            return page.aliases.map((slug) => {
+                return { locale, slug }
+            })
+        })
+    })
+}
+
+/** A page served inside the base of another package. */
+export interface DocsTrespass {
+    file: string
+    /** Below the docs mount. */
+    path: string
+    package: string
+}
+
+/** The pages whose url, or one of its aliases, falls inside another
+ *  package's base. `defaultLocale` is the one served without a prefix. */
+export function findTrespasses(
+    roots: DocsRoot[],
+    locales: string[],
+    defaultLocale: string,
+    reserved: ReservedPath[],
+): DocsTrespass[] {
+    if (reserved.length === 0) {
+        return []
+    }
+
+    return readDocsTrees(roots, locales).flatMap(({ locale, pages }) => {
+        const prefix = locale && locale !== defaultLocale ? `${locale}/` : ''
+
+        return pages.flatMap((page) => {
+            const paths = [page.canonical, ...page.aliases].map((slug) => {
+                return `${prefix}${slug}`.replace(/\/$/, '')
+            })
+
+            return reserved.flatMap((other) => {
+                const inside = paths.find((path) => {
+                    return path === other.path || path.startsWith(`${other.path}/`)
+                })
+                return inside === undefined ? [] : [{ file: page.source.file, path: inside, package: other.package }]
+            })
+        })
+    })
+}
+
+/** `rootLlms` false leaves the default-language llms files out of a docs
+ *  mount at the root, where the site serves its own. */
+export function getInjectedRoutes(
+    docsBase: string,
+    locales: string[] = [],
+    llms: boolean = true,
+    rootLlms: boolean = true,
+): [string, string][] {
+    const llmsRoutes: [string, string][] =
+        llms && (docsBase !== '' || rootLlms)
+            ? [
+                  [`${docsBase}/llms.txt`, 'llms.txt.ts'],
+                  [`${docsBase}/llms-full.txt`, 'llms-full.txt.ts'],
+              ]
+            : []
 
     // `[...slug]` already absorbs "it/guide" and "it". Only the fixed
     // endpoints need a route of their own, and `[locale]` hands them the code.
@@ -138,20 +200,32 @@ export function createIntegrationState(): IntegrationState {
     }
 }
 
-/** Routes, the docs frame, the 404 page, aliases and the link plugins. */
+export interface DocsSetupOptions {
+    /** Read the aliases from disk, for the sitemap to leave out. */
+    discoverAliases: boolean
+    /** Whether the root llms files are the docs' to serve. */
+    rootLlms: boolean
+    /** What other packages own inside the docs mount. */
+    reserved: ReservedPath[]
+}
+
+/** Routes, the docs frame, aliases and the link plugins. Returns the patterns
+ *  of the routes a project page must not take. */
 export function setupDocs(
     { config: astroConfig, updateConfig, injectRoute, addWatchFile, logger }: SetupParams,
     config: JaadResolvedConfig,
     state: IntegrationState,
-    discoverAliases: boolean,
-): void {
+    { discoverAliases, rootLlms, reserved }: DocsSetupOptions,
+): string[] {
     updateConfig({ vite: { plugins: [docsFrameVirtualPlugin(() => state.docsFrame)] } })
 
-    for (const [pattern, entrypoint] of getInjectedRoutes(
+    const routes = getInjectedRoutes(
         config.docs.base,
         prefixedLocales(config.locales, config.defaultLocale),
         config.docs.llms,
-    )) {
+        rootLlms,
+    )
+    for (const [pattern, entrypoint] of routes) {
         injectRoute({
             pattern,
             entrypoint: routeEntrypoint(entrypoint),
@@ -163,14 +237,6 @@ export function setupDocs(
     if (existsSync(customDocsFrame)) {
         state.docsFrame = fileURLToPath(customDocsFrame)
         addWatchFile(customDocsFrame)
-    }
-
-    if (shouldInjectNotFound(config.docs.base, astroConfig.srcDir)) {
-        injectRoute({
-            pattern: '/404',
-            entrypoint: routeEntrypoint('404.astro'),
-            prerender: true,
-        })
     }
 
     const root = fileURLToPath(astroConfig.root)
@@ -186,6 +252,18 @@ export function setupDocs(
     }
     if (discoverAliases && missing.length < roots.length) {
         state.aliases = findAliases(roots, locales)
+    }
+
+    const trespasses = findTrespasses(roots, locales, config.defaultLocale, reserved)
+    if (trespasses.length > 0) {
+        const lines = trespasses.map((trespass) => {
+            const url = `${config.docs.base}/${trespass.path}`
+            return `  ${relative(root, trespass.file)} would be served at ${url}, which ${trespass.package} serves`
+        })
+        throw new Error(
+            `jaad: docs pages inside the pages of another package\n${lines.join('\n')}\n` +
+                'Rename the file or its directory, or mount the docs elsewhere with routeBase.',
+        )
     }
     for (const { dir } of roots) addWatchFile(pathToFileURL(dir))
 
@@ -233,6 +311,12 @@ export function setupDocs(
             )
         }
     }
+
+    // The docs index is left out: a landing page of the project's own has long
+    // been allowed to take it, with the warning above.
+    return routes.flatMap(([pattern, entrypoint]) => {
+        return entrypoint === 'docs-index.astro' ? [] : [pattern]
+    })
 }
 
 const withoutTrailingSlash = (value: string) => (value.length > 1 ? value.replace(/\/$/, '') : value)

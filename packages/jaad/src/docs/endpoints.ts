@@ -1,5 +1,6 @@
 import type { DocsSourceEntry } from './collection.ts'
 import type { DocsPage } from './model/tree.ts'
+import type { FullPage } from '@jaamd/site/llms.ts'
 import type { MarkdownExportContext } from '@jaamd/site/markdown-export.ts'
 import { absoluteHref, llmsDocument, llmsFullDocument, llmsLine, textResponse } from '@jaamd/site/llms.ts'
 import { exportMarkdown, sourceKey } from '@jaamd/site/markdown-export.ts'
@@ -58,10 +59,10 @@ export async function pageMarkdown(page: DocsPage<DocsSourceEntry>, site: URL | 
     )
 }
 
-/** Every page of a locale in one file, in the order of the site. */
-export async function llmsFullResponse(site: URL | undefined, locale?: string): Promise<Response> {
+/** Every page of a locale as Markdown, in the order of the site. */
+async function fullPages(site: URL | undefined, locale?: string): Promise<FullPage[]> {
     const { pages } = await getDocsTree(locale)
-    const parts = await Promise.all(
+    return Promise.all(
         pages.map(async (page) => {
             return {
                 markdown: await pageMarkdown(page, site),
@@ -69,8 +70,16 @@ export async function llmsFullResponse(site: URL | undefined, locale?: string): 
             }
         }),
     )
+}
 
-    return textResponse(llmsFullDocument(parts))
+/** Every page of a locale in one file, in the order of the site. */
+export async function llmsFullResponse(site: URL | undefined, locale?: string): Promise<Response> {
+    return textResponse(llmsFullDocument(await fullPages(site, locale)))
+}
+
+/** The docs' pages in the site's `llms-full.txt`: the default language's. */
+export function llmsFullPages(site: URL | undefined): Promise<FullPage[]> {
+    return fullPages(site)
 }
 
 interface Row {
@@ -79,9 +88,11 @@ interface Row {
     description: string | null
 }
 
-/** Plain-text index of every page, per the llms.txt convention. */
-export async function llmsResponse(site: URL | undefined, locale?: string): Promise<Response> {
+/** The index of every page of a locale, its headings from `level` down. */
+async function llmsBlocks(site: URL | undefined, locale: string | undefined, level: number): Promise<string[]> {
     const { pages: sortedPages } = await getDocsTree(locale)
+    const top = '#'.repeat(level)
+    const below = '#'.repeat(level + 1)
 
     const markdownHref = (slug: string): string => absoluteHref(docsMarkdownHref(slug, docsUrls(locale)), site)
 
@@ -123,12 +134,12 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
     const loose = sortedPages.filter((page) => !page.section)
     const sections: string[] =
         SECTIONS.length === 0
-            ? outline(sortedPages, '##')
+            ? outline(sortedPages, top)
             : [
-                  ...(loose.length > 0 ? outline(loose, '##') : []),
+                  ...(loose.length > 0 ? outline(loose, top) : []),
                   ...SECTIONS.flatMap((section) => {
                       const pages = sortedPages.filter((page) => page.section === section.key)
-                      return pages.length > 0 ? [`## ${section.label}`, ...outline(pages, '###')] : []
+                      return pages.length > 0 ? [`${top} ${section.label}`, ...outline(pages, below)] : []
                   }),
               ]
 
@@ -137,7 +148,7 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
     const languages =
         others.length > 0
             ? [
-                  '## Other languages',
+                  `${top} Other languages`,
                   others
                       .map((code) => {
                           const name = LOCALES.find((known) => known.code === code)?.name ?? code
@@ -148,5 +159,17 @@ export async function llmsResponse(site: URL | undefined, locale?: string): Prom
               ]
             : []
 
-    return textResponse(llmsDocument(config.title, config.description, [...sections, ...languages]))
+    return [...sections, ...languages]
+}
+
+/** Plain-text index of every page, per the llms.txt convention. */
+export async function llmsResponse(site: URL | undefined, locale?: string): Promise<Response> {
+    const blocks = await llmsBlocks(site, locale, 2)
+    return textResponse(llmsDocument(config.title, config.description, blocks))
+}
+
+/** The docs in the site's `llms.txt`: the default language's index, which
+ *  points at the others. */
+export function llmsSection(site: URL | undefined, level: number): Promise<string[]> {
+    return llmsBlocks(site, undefined, level)
 }

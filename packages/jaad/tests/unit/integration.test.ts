@@ -4,14 +4,8 @@ import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { pathToFileURL } from 'node:url'
 import { loadTailwindPlugin } from '@jaamd/site/integration.ts'
-import {
-    createSitemapFilter,
-    findAliases,
-    getInjectedRoutes,
-    shouldInjectNotFound,
-} from '../../src/docs/integration.ts'
+import { createSitemapFilter, findAliases, findTrespasses, getInjectedRoutes } from '../../src/docs/integration.ts'
 
 test('opening-page discovery follows collection slugging and numeric order', () => {
     const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-'))
@@ -117,19 +111,44 @@ test('the sitemap omits the named redirect of every locale', () => {
     assert.equal(filter('https://example.dev/guide/'), true)
 })
 
-test('the fallback 404 belongs only to a docs-only site', () => {
-    const root = mkdtempSync(join(tmpdir(), 'jaad-404-'))
-    const srcDir = pathToFileURL(`${root}/`)
-
+test('docs pages inside the base of another package are found, with their file', () => {
+    const docsDir = mkdtempSync(join(tmpdir(), 'jaad-trespass-'))
     try {
-        assert.equal(shouldInjectNotFound('', srcDir), true)
-        assert.equal(shouldInjectNotFound('/docs', srcDir), false)
+        mkdirSync(join(docsDir, '02-blog'))
+        writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
+        writeFileSync(join(docsDir, '02-blog', '01-hello.md'), '# Hello')
+        writeFileSync(join(docsDir, '03-blogroll.md'), '# Blogroll')
 
-        mkdirSync(join(root, 'pages'))
-        writeFileSync(join(root, 'pages', '404.astro'), '<h1>Mine</h1>')
-        assert.equal(shouldInjectNotFound('', srcDir), false)
+        const reserved = [{ path: 'blog', package: '@jaamd/jaab' }]
+        assert.deepEqual(findTrespasses([{ dir: docsDir }], [], 'en', reserved), [
+            { file: join(docsDir, '02-blog', '01-hello.md'), path: 'blog/hello', package: '@jaamd/jaab' },
+        ])
+        assert.deepEqual(findTrespasses([{ dir: docsDir }], [], 'en', []), [])
     } finally {
-        rmSync(root, { recursive: true })
+        rmSync(docsDir, { recursive: true })
+    }
+})
+
+test('a locale prefix counts toward the url a page would take', () => {
+    const docsDir = mkdtempSync(join(tmpdir(), 'jaad-trespass-locale-'))
+    try {
+        mkdirSync(join(docsDir, 'en'))
+        mkdirSync(join(docsDir, 'it'))
+        writeFileSync(join(docsDir, 'en', '01-intro.md'), '# Intro')
+        writeFileSync(join(docsDir, 'it', '01-intro.md'), '# Intro')
+        writeFileSync(join(docsDir, 'it', '02-guide.md'), '# Guide')
+
+        const reserved = [{ path: 'it', package: '@jaamd/jaab' }]
+        const found = findTrespasses([{ dir: docsDir }], ['en', 'it'], 'en', reserved)
+        assert.deepEqual(
+            found.map((trespass) => {
+                return trespass.path
+            }),
+            // The opening page is served at the locale's own root.
+            ['it', 'it/guide'],
+        )
+    } finally {
+        rmSync(docsDir, { recursive: true })
     }
 })
 
@@ -149,6 +168,23 @@ test('technical routes stay inside the documentation mount', () => {
         getInjectedRoutes('').map(([pattern]) => pattern),
         ['', '/search-index.json', '/llms.txt', '/llms-full.txt', '/[...slug]', '/[...slug].md'],
     )
+})
+
+test('at the root, the site may serve the llms files in place of the docs', () => {
+    assert.deepEqual(
+        getInjectedRoutes('', ['it'], true, false).map(([pattern]) => pattern),
+        [
+            '',
+            '/search-index.json',
+            '/[locale]/search-index.json',
+            '/[locale]/llms.txt',
+            '/[locale]/llms-full.txt',
+            '/[...slug]',
+            '/[...slug].md',
+        ],
+    )
+    // Below the root the files are the docs' own either way.
+    assert.ok(getInjectedRoutes('/docs', [], true, false).some(([pattern]) => pattern === '/docs/llms.txt'))
 })
 
 test('llms: false leaves out the files for language models, not the Markdown of each page', () => {

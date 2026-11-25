@@ -1,8 +1,14 @@
 /// <reference types="astro/client" />
 
-// Served by the package that registers the site: it holds at least the site's fields.
-declare module 'virtual:jaad/config' {
+// Served by the site integration, once every package has registered.
+declare module 'virtual:jaamd/site' {
     // oxlint-disable-next-line typescript/consistent-type-imports
     const config: import('./config.ts').SiteResolvedConfig
     export default config
+}
+
+declare module 'virtual:jaamd/llms' {
+    // oxlint-disable-next-line typescript/consistent-type-imports
+    const sources: import('./llms-root.ts').LlmsSourceModule[]
+    export default sources
 }

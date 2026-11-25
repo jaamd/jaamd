@@ -49,7 +49,6 @@
         "test:build": "pnpm --filter jaad-fixture build && node --test \"tests/build/**/*.test.mjs\""
     },
     "dependencies": {
-        "@astrojs/sitemap": "^3.7.4",
         "@jaamd/astro": "workspace:^",
         "@jaamd/site": "workspace:*",
         "github-slugger": "^2.0.0",
