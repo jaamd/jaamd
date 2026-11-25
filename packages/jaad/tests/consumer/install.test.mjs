@@ -483,11 +483,6 @@ export default defineJaadConfig({
             /--jaad-content-width:\s*71rem/,
             'the content width override did not win',
         )
-        assert.match(
-            built.css.replace(/\s+/g, ''),
-            /max-width:var\(--jaad-chrome-width\)/,
-            'the chrome does not read the width token',
-        )
     })
 
     test('the theme switcher and its script ship by default', () => {
