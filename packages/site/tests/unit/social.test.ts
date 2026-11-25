@@ -1,10 +1,10 @@
-import type { JaadResolvedConfig } from '../../src/config.ts'
+import type { SiteResolvedConfig } from '../../src/config.ts'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { buildSocialLinks } from '@jaamd/site/social.ts'
+import { buildSocialLinks } from '../../src/social.ts'
 
-const config = (over: Partial<JaadResolvedConfig>) => {
-    return { social: {}, repoUrl: null, ...over } as JaadResolvedConfig
+const config = (over: Partial<SiteResolvedConfig>) => {
+    return { social: {}, repoUrl: null, ...over } as SiteResolvedConfig
 }
 
 test('a known key gets the forge label and icon', () => {

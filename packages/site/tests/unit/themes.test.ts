@@ -1,21 +1,26 @@
+import type { SiteConfig } from '../../src/config.ts'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { resolveStylesheets } from '@jaamd/site/config.ts'
-import { PRESETS } from '@jaamd/site/themes.ts'
 import { bundledThemes } from 'shiki'
-import { resolveConfig } from '../../src/config.ts'
+import { resolveStylesheets, shikiTheme } from '../../src/config.ts'
+import { PRESETS } from '../../src/themes.ts'
 
-const SITE = join(dirname(fileURLToPath(import.meta.url)), '../../../site/src')
+const SITE = join(dirname(fileURLToPath(import.meta.url)), '../../src')
+
+/** Only the theme matters to the stylesheets and to Shiki. */
+const withTheme = (theme: SiteConfig['theme']) => {
+    return { theme } as SiteConfig
+}
 
 test('every preset resolves to a stylesheet JAAMD actually ships', () => {
     for (const name of Object.keys(PRESETS)) {
         if (PRESETS[name].theme === null) {
             continue
         }
-        const { theme } = resolveStylesheets(resolveConfig({ title: 'T', theme: name }, '/'), '/')
+        const { theme } = resolveStylesheets(withTheme(name), '/')
         assert.ok(theme && existsSync(theme), `${name} points at ${String(theme)}`)
     }
 })
@@ -25,11 +30,8 @@ test('the default preset ships no stylesheet, so it changes nothing', () => {
 })
 
 test('a preset flips the bridge, so the palette travels from JAAMD', () => {
-    const config = (theme: string) => {
-        return resolveConfig({ title: 'T', theme }, '/')
-    }
-    const withPreset = resolveStylesheets(config('dracula'), '/')
-    const without = resolveStylesheets(config('default'), '/')
+    const withPreset = resolveStylesheets(withTheme('dracula'), '/')
+    const without = resolveStylesheets(withTheme('default'), '/')
 
     assert.match(withPreset.bridge, /jaamd-reverse\.css$/)
     assert.match(without.bridge, /jaamd-forward\.css$/)
@@ -76,29 +78,18 @@ test('the reverse bridge covers every seed global.css expects', () => {
 })
 
 test('a preset name resolves to its shiki theme', () => {
-    assert.equal(resolveConfig({ title: 'T', theme: 'dracula' }, '/').shiki, 'dracula')
-    assert.deepEqual(resolveConfig({ title: 'T' }, '/').shiki, {
+    assert.equal(shikiTheme(withTheme('dracula')), 'dracula')
+    assert.deepEqual(shikiTheme(withTheme('default')), {
         light: 'github-light',
         dark: 'github-dark',
     })
 })
 
 test('an explicit pair bypasses the presets', () => {
-    assert.deepEqual(resolveConfig({ title: 'T', theme: { light: 'a', dark: 'b' } }, '/').shiki, {
+    assert.deepEqual(shikiTheme(withTheme({ light: 'a', dark: 'b' })), {
         light: 'a',
         dark: 'b',
     })
-})
-
-test('an unknown theme is a build error, not a silent fallback', () => {
-    assert.throws(
-        () => {
-            return resolveConfig({ title: 'T', theme: 'solarized' }, '/')
-        },
-        (e: Error) => {
-            return /unknown theme/.test(String(e)) && /dracula/.test(String(e))
-        },
-    )
 })
 
 test('every preset names shiki themes that shiki actually bundles', () => {

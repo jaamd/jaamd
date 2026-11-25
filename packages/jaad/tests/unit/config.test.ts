@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test, type TestContext } from 'node:test'
 import { resolveStylesheets } from '@jaamd/site/config.ts'
+import { uiString } from '@jaamd/site/ui.ts'
+import { ITALIAN_UI } from '@jaamd/site/ui/it.ts'
 import { fontProviders } from 'astro/config'
 import { defineJaadConfig, resolveConfig } from '../../src/config.ts'
 
@@ -135,6 +137,17 @@ test('the shorthand and full theme forms both parse', () => {
         light: 'a',
         dark: 'b',
     })
+})
+
+test('an unknown theme is a build error, not a silent fallback', () => {
+    assert.throws(
+        () => {
+            return resolveConfig({ title: 'T', theme: 'solarized' }, '/')
+        },
+        (e: Error) => {
+            return /unknown theme/.test(String(e)) && /dracula/.test(String(e))
+        },
+    )
 })
 
 test('social accepts a bare url or a full entry', () => {
@@ -400,4 +413,18 @@ test('a locale code the config pins has to be a real one', () => {
     assert.throws(() => {
         return bare({ locales: ['nope'] })
     }, /not a locale code/)
+})
+
+test('unlocalised docs use the lang override as their default locale', () => {
+    const config = resolveConfig(
+        {
+            title: 'T',
+            lang: 'it',
+        },
+        '/',
+    )
+
+    assert.deepEqual(config.locales, [])
+    assert.equal(config.defaultLocale, 'it')
+    assert.equal(uiString(config.ui, config.defaultLocale, 'page.copy'), ITALIAN_UI['page.copy'])
 })

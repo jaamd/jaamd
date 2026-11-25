@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { UI_CATALOGS, UI_DEFAULTS, UI_KEYS, UI_SUPPORTED_LOCALES, uiString } from '@jaamd/site/ui.ts'
-import { ITALIAN_UI } from '@jaamd/site/ui/it.ts'
-import { resolveConfig } from '../../src/config.ts'
+import { UI_CATALOGS, UI_DEFAULTS, UI_KEYS, UI_SUPPORTED_LOCALES, uiString } from '../../src/ui.ts'
+import { ITALIAN_UI } from '../../src/ui/it.ts'
 
 test("a locale's override wins over its bundled catalogue", () => {
     const overrides = { it: { 'page.copy': 'Copia la pagina' } }
@@ -38,20 +37,6 @@ test('exact and base overrides precede bundled catalogues', () => {
     assert.equal(uiString(overrides, 'it-IT', 'home'), 'Partenza')
     assert.equal(uiString(overrides, 'it-CH', 'home'), 'Inizio')
     assert.equal(uiString(overrides, 'it-IT', 'page.edit'), ITALIAN_UI['page.edit'])
-})
-
-test('unlocalised docs use the lang override as their default locale', () => {
-    const config = resolveConfig(
-        {
-            title: 'T',
-            lang: 'it',
-        },
-        '/',
-    )
-
-    assert.deepEqual(config.locales, [])
-    assert.equal(config.defaultLocale, 'it')
-    assert.equal(uiString(config.ui, config.defaultLocale, 'page.copy'), ITALIAN_UI['page.copy'])
 })
 
 test('every bundled catalogue is complete and non-empty', () => {

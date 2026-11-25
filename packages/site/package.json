@@ -43,7 +43,8 @@
         "unist-util-visit": "^5.1.0"
     },
     "devDependencies": {
-        "@astrojs/check": "^0.9.12"
+        "@astrojs/check": "^0.9.12",
+        "shiki": "^4.5.0"
     },
     "peerDependencies": {
         "@tailwindcss/vite": "^4.3.0",
