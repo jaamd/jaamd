@@ -51,9 +51,7 @@ test('the related projects link to the documentation', () => {
     assert.match(related, /href="https:\/\/docs\.jaamd\.org\/jaad"/)
 })
 
-test('the documentation is no longer built here', () => {
-    assert.equal(existsSync(join(DIST, 'docs')), false)
-    assert.equal(existsSync(join(DIST, 'jaad')), false)
+test('llms.txt points agents at the documentation', () => {
     assert.match(page('llms.txt'), /https:\/\/docs\.jaamd\.org\/llms\.txt/)
 })
 

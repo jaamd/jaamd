@@ -1,20 +1,18 @@
-#!/usr/bin/env node
 /**
- * Post-build assertions on the fixture. A green `astro build` proves nothing: jaamd
- * only warns when it cannot register its plugins.
+ * Post-build assertions on the fixture, run once per processor. A green
+ * `astro build` proves nothing: jaamd only warns when it cannot register its plugins.
  */
 
+import assert from 'node:assert/strict'
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
 const DIST = fileURLToPath(new URL('../fixture/dist', import.meta.url))
 const PAGE = join(DIST, 'index.html')
 
-if (!existsSync(PAGE)) {
-    console.error(`✗ built page not found: ${PAGE}\n  Did \`pnpm build\` run?`)
-    process.exit(1)
-}
+assert.ok(existsSync(PAGE), `${PAGE} was not built: run the fixture build first`)
 
 const html = readFileSync(PAGE, 'utf8')
 
@@ -29,11 +27,11 @@ const css = [...html.matchAll(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/g)]
     })
     .join('\n')
 
-/** @type {{ name: string, ok: boolean, hint: string }[]} */
-const results = []
-
+/** One test per check; the hint says where to look when it fails. */
 const check = (name, condition, hint) => {
-    return results.push({ name, ok: Boolean(condition), hint })
+    test(name, () => {
+        assert.ok(condition, hint)
+    })
 }
 
 const countOf = (re) => {
@@ -228,23 +226,3 @@ check(
     /<script[^>]+type="module"/.test(html),
     'the injected page script did not make it into the build',
 )
-
-// ─── report ──────────────────────────────────────────────────────────────────
-
-const failed = results.filter((r) => {
-    return !r.ok
-})
-
-for (const r of results) {
-    console.log(`${r.ok ? '✓' : '✗'} ${r.name}${r.ok ? '' : `\n    → ${r.hint}`}`)
-}
-
-console.log(`\n${results.length - failed.length}/${results.length} checks passed`)
-
-if (failed.length > 0) {
-    console.error(
-        `\n${failed.length} check(s) failed. The build succeeded but the markdown ` +
-            `pipeline did not produce the expected output.`,
-    )
-    process.exit(1)
-}
