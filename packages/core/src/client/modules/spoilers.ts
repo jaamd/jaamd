@@ -6,14 +6,24 @@ const INITIALIZED = `.${CLASS.spoiler}[data-spoiler-init]`
 /** Gives a hidden spoiler button semantics, so it is reachable without a mouse. */
 export function initSpoilers(root: ParentNode, labels: Labels): void {
     root.querySelectorAll<HTMLElement>(`.${CLASS.spoiler}`).forEach((el) => {
-        if (el.dataset.spoilerInit) return
+        if (el.dataset.spoilerInit) {
+            return
+        }
         el.dataset.spoilerInit = '1'
-        if (el.hasAttribute('data-revealed')) return
+        if (el.hasAttribute('data-revealed')) {
+            return
+        }
 
-        if (!el.hasAttribute('tabindex')) el.tabIndex = 0
-        if (!el.hasAttribute('role')) el.setAttribute('role', 'button')
+        if (!el.hasAttribute('tabindex')) {
+            el.tabIndex = 0
+        }
+        if (!el.hasAttribute('role')) {
+            el.setAttribute('role', 'button')
+        }
         el.setAttribute('aria-expanded', 'false')
-        if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', labels.spoiler)
+        if (!el.hasAttribute('aria-label')) {
+            el.setAttribute('aria-label', labels.spoiler)
+        }
     })
 }
 
@@ -23,7 +33,9 @@ export function initSpoilers(root: ParentNode, labels: Labels): void {
  * inside another control. Focus stays on it, out of the tab order.
  */
 function reveal(el: Element): void {
-    if (el.hasAttribute('data-revealed')) return
+    if (el.hasAttribute('data-revealed')) {
+        return
+    }
 
     el.setAttribute('data-revealed', '')
     el.removeAttribute('role')
@@ -34,13 +46,19 @@ function reveal(el: Element): void {
 
 export function onSpoilerClick(target: Element): void {
     const el = target.closest(INITIALIZED)
-    if (el) reveal(el)
+    if (el) {
+        reveal(el)
+    }
 }
 
 export function onSpoilerKeydown(target: Element, e: KeyboardEvent): void {
-    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return
+    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') {
+        return
+    }
     // The hidden spoiler itself, not a focusable child or a revealed one.
-    if (!target.matches(INITIALIZED) || target.hasAttribute('data-revealed')) return
+    if (!target.matches(INITIALIZED) || target.hasAttribute('data-revealed')) {
+        return
+    }
     e.preventDefault() // Space would scroll the page
     reveal(target)
 }

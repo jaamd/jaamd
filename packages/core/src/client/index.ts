@@ -16,14 +16,18 @@ export interface EnhanceOptions {
 }
 
 function onClick(e: MouseEvent): void {
-    if (!(e.target instanceof Element)) return
+    if (!(e.target instanceof Element)) {
+        return
+    }
     void onCopyClick(e.target)
     onTabClick(e.target)
     onSpoilerClick(e.target)
 }
 
 function onKeydown(e: KeyboardEvent): void {
-    if (!(e.target instanceof Element)) return
+    if (!(e.target instanceof Element)) {
+        return
+    }
     onTabKeydown(e.target, e)
     onSpoilerKeydown(e.target, e)
 }
@@ -46,14 +50,28 @@ export function enhance(root: ParentNode | string = DEFAULT_SELECTOR, options: E
     const disposers: (() => void)[] = []
 
     for (const el of roots) {
-        if (on.headingLinks) addHeadingLinks(el, labels)
+        if (on.headingLinks) {
+            addHeadingLinks(el, labels)
+        }
         // After addHeadingLinks: the ids must exist.
-        if (on.toc) disposers.push(initToc(el))
-        if (on.copyButtons) addCopyButtons(el, labels)
-        if (on.lightbox) addImageLightbox(el, labels)
-        if (on.tables) wrapTables(el)
-        if (on.codeTabs) initCodeTabs(el)
-        if (on.spoilers) initSpoilers(el, labels)
+        if (on.toc) {
+            disposers.push(initToc(el))
+        }
+        if (on.copyButtons) {
+            addCopyButtons(el, labels)
+        }
+        if (on.lightbox) {
+            addImageLightbox(el, labels)
+        }
+        if (on.tables) {
+            wrapTables(el)
+        }
+        if (on.codeTabs) {
+            initCodeTabs(el)
+        }
+        if (on.spoilers) {
+            initSpoilers(el, labels)
+        }
     }
 
     const call = Symbol('enhance')
@@ -64,8 +82,12 @@ export function enhance(root: ParentNode | string = DEFAULT_SELECTOR, options: E
     live.add(call)
 
     return () => {
-        if (!live.delete(call)) return
-        for (const dispose of disposers) dispose()
+        if (!live.delete(call)) {
+            return
+        }
+        for (const dispose of disposers) {
+            dispose()
+        }
         if (live.size === 0) {
             document.removeEventListener('click', onClick)
             document.removeEventListener('keydown', onKeydown)

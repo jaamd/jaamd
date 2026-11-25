@@ -52,16 +52,22 @@ const switcherAlternates = await getLocaleAlternates(page.translationKey)
 
 // x-default is a landing place, so it takes the fallback when this page has no
 // translation into the default locale.
-const xDefault = switcherAlternates.find((alternate) => alternate.locale.code === DEFAULT_LOCALE)?.href
+const xDefault = switcherAlternates.find((alternate) => {
+    return alternate.locale.code === DEFAULT_LOCALE
+})?.href
 
 // hreflang describes translations of this page, not the switcher's fallbacks.
 const alternates = switcherAlternates
-    .filter((alternate) => alternate.translated)
-    .map((alternate) => ({
-        code: alternate.locale.code,
-        tag: alternate.locale.tag,
-        href: alternate.href,
-    }))
+    .filter((alternate) => {
+        return alternate.translated
+    })
+    .map((alternate) => {
+        return {
+            code: alternate.locale.code,
+            tag: alternate.locale.tag,
+            href: alternate.href,
+        }
+    })
 
 const frameProps: DocsFrameProps = {
     page: {
@@ -126,7 +132,9 @@ const frameProps: DocsFrameProps = {
                 next: HTMLAnchorElement | null
             } {
                 const nav = document.querySelector('nav.docs-page-nav')
-                if (!nav) return { prev: null, next: null }
+                if (!nav) {
+                    return { prev: null, next: null }
+                }
                 return {
                     prev: nav.querySelector<HTMLAnchorElement>('a[rel~="prev"][href]'),
                     next: nav.querySelector<HTMLAnchorElement>('a[rel~="next"][href]'),
@@ -138,8 +146,9 @@ const frameProps: DocsFrameProps = {
                 for (let node = el; node && node !== document.body;) {
                     if (node instanceof HTMLElement) {
                         const overflowX = getComputedStyle(node).overflowX
-                        if ((overflowX === 'auto' || overflowX === 'scroll') && node.scrollWidth > node.clientWidth)
+                        if ((overflowX === 'auto' || overflowX === 'scroll') && node.scrollWidth > node.clientWidth) {
                             return true
+                        }
                     }
                     node = node.parentElement
                 }
@@ -151,21 +160,37 @@ const frameProps: DocsFrameProps = {
 
             function onKey(e: KeyboardEvent) {
                 // Already handled, e.g. by code tabs switching tab.
-                if (e.defaultPrevented) return
+                if (e.defaultPrevented) {
+                    return
+                }
                 // Leave modified chords alone, notably the browser's back/forward.
-                if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
-                if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+                if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
+                    return
+                }
+                if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+                    return
+                }
 
                 const active = document.activeElement as HTMLElement | null
                 const tag = active?.tagName
-                if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
-                if (active?.isContentEditable) return
-                if (active?.closest(ARROW_WIDGETS)) return
-                if (inHorizontallyScrollable(active)) return
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+                    return
+                }
+                if (active?.isContentEditable) {
+                    return
+                }
+                if (active?.closest(ARROW_WIDGETS)) {
+                    return
+                }
+                if (inHorizontallyScrollable(active)) {
+                    return
+                }
 
                 const { prev, next } = getPageLinks()
                 const target = e.key === 'ArrowLeft' ? prev : next
-                if (!target) return
+                if (!target) {
+                    return
+                }
                 e.preventDefault()
                 navigate(target.href)
             }

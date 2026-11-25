@@ -17,28 +17,41 @@ import { validateDocsStructure } from '../../src/docs/model/validate.ts'
 import { buildDocsNavigation } from '../../src/docs/navigation.ts'
 
 /** A file of one locale; its path is its id unless given. */
-const source = (id: string, more: Partial<DocsSource> = {}): DocsSource => ({ id, path: id, data: {}, ...more })
+const source = (id: string, more: Partial<DocsSource> = {}): DocsSource => {
+    return { id, path: id, data: {}, ...more }
+}
 
-const treeOf = (sources: DocsSource[], urls: DocsUrlOptions = { docsBase: '/docs' }) => buildDocsTree(sources, { urls })
+const treeOf = (sources: DocsSource[], urls: DocsUrlOptions = { docsBase: '/docs' }) => {
+    return buildDocsTree(sources, { urls })
+}
 
-const ids = (sources: DocsSource[]) => treeOf(sources).pages.map((page) => page.id)
+const ids = (sources: DocsSource[]) => {
+    return treeOf(sources).pages.map((page) => {
+        return page.id
+    })
+}
 
-const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) =>
-    navigation.groups.flatMap((group) =>
-        group.type === 'page' ? [group.item] : group.type === 'chapter' ? group.items : [],
-    )
+const navigationItems = (navigation: ReturnType<typeof buildDocsNavigation>) => {
+    return navigation.groups.flatMap((group) => {
+        return group.type === 'page' ? [group.item] : group.type === 'chapter' ? group.items : []
+    })
+}
 
 /** Rendered markdown from HTML, with Astro's headings read off it. */
-const rendered = (html: string) => ({
-    html,
-    metadata: {
-        headings: [...html.matchAll(/<h([1-6]) id="([^"]*)">(.*?)<\/h\1>/g)].map(([, depth, slug, text]) => ({
-            depth: Number(depth),
-            slug,
-            text: htmlText(text),
-        })),
-    },
-})
+const rendered = (html: string) => {
+    return {
+        html,
+        metadata: {
+            headings: [...html.matchAll(/<h([1-6]) id="([^"]*)">(.*?)<\/h\1>/g)].map(([, depth, slug, text]) => {
+                return {
+                    depth: Number(depth),
+                    slug,
+                    text: htmlText(text),
+                }
+            }),
+        },
+    }
+}
 
 // ── Numeric prefixes: the ordering convention the whole product rests on ──────
 
@@ -92,7 +105,11 @@ test('only the first page has an empty canonical slug', () => {
 
 test('every page has its href, from the url options', () => {
     const sources = [source('01-intro'), source('02-guides/01-setup')]
-    const hrefs = (urls: DocsUrlOptions) => treeOf(sources, urls).pages.map((page) => page.href)
+    const hrefs = (urls: DocsUrlOptions) => {
+        return treeOf(sources, urls).pages.map((page) => {
+            return page.href
+        })
+    }
 
     assert.deepEqual(hrefs({ docsBase: '/docs' }), ['/docs', '/docs/guides/setup'])
     // routeBase "/" is normalised to "" by the caller, so links stay single-slashed.
@@ -278,7 +295,9 @@ test('a structure error names the file on disk, locale included', () => {
 test('the first nav item owns the docs root and later links use their slugs', () => {
     const tree = treeOf([source('01-intro'), source('02-guides/01-setup')])
     assert.deepEqual(
-        navigationItems(buildDocsNavigation(tree, '01-intro')).map((item) => item.href),
+        navigationItems(buildDocsNavigation(tree, '01-intro')).map((item) => {
+            return item.href
+        }),
         ['/docs', '/docs/guides/setup'],
     )
 })
@@ -291,13 +310,13 @@ test('root pages and chapters interleave by number', () => {
         source('03-changelog'),
     ])
     assert.deepEqual(
-        buildDocsNavigation(tree, '01-intro').groups.map((group) =>
-            group.type === 'page'
+        buildDocsNavigation(tree, '01-intro').groups.map((group) => {
+            return group.type === 'page'
                 ? group.item.title
                 : group.type === 'chapter'
                   ? `${group.chapter}(${String(group.items.length)})`
-                  : group.label,
-        ),
+                  : group.label
+        }),
         ['Intro', 'guides(2)', 'Changelog'],
     )
 })
@@ -315,7 +334,12 @@ test('navigation derives active, previous and next pages together', () => {
     )
     assert.equal(navigation.previousPage?.title, 'Intro')
     assert.equal(navigation.nextPage?.title, 'Api')
-    assert.equal(navigation.groups.filter((group) => group.type === 'page' && group.item.isActive).length, 1)
+    assert.equal(
+        navigation.groups.filter((group) => {
+            return group.type === 'page' && group.item.isActive
+        }).length,
+        1,
+    )
 })
 
 // ── The locale directory is split off before anything else reads the id ──────
@@ -372,7 +396,9 @@ test('only h2 and h3 reach the table of contents, with the renderer’s ids and 
         ),
     )
     assert.deepEqual(
-        headings.map((h) => [h.depth, h.slug, h.text]),
+        headings.map((h) => {
+            return [h.depth, h.slug, h.text]
+        }),
         [
             [2, 'two', 'Two it'],
             [3, 'three', 'Three'],
@@ -395,7 +421,9 @@ test('headings inside a data-toc-ignore element stay out of the toc', () => {
         ),
     )
     assert.deepEqual(
-        headings.map((h) => h.slug),
+        headings.map((h) => {
+            return h.slug
+        }),
         ['setup', 'setup-2'],
     )
 })
@@ -406,7 +434,9 @@ test('data-toc-ignore in inline code ignores nothing', () => {
         rendered('<p>Wrap headings in <code>&#x3C;div data-toc-ignore></code>.</p><h2 id="after">After</h2>'),
     )
     assert.deepEqual(
-        headings.map((h) => h.slug),
+        headings.map((h) => {
+            return h.slug
+        }),
         ['after'],
     )
 })

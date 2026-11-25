@@ -26,10 +26,11 @@ const DEFAULTS = (() => {
 })()
 
 /** The custom properties a block declares. */
-const declared = (block: string) =>
-    [...block.matchAll(/^\s*(--[a-z0-9-]+)\s*:/gm)].map((match) => {
+const declared = (block: string) => {
+    return [...block.matchAll(/^\s*(--[a-z0-9-]+)\s*:/gm)].map((match) => {
         return match[1]
     })
+}
 
 test('the tokens a theme must declare are the seeds the defaults derive from', () => {
     const notSeeds = REQUIRED_TOKENS.filter((token) => {
@@ -40,12 +41,23 @@ test('the tokens a theme must declare are the seeds the defaults derive from', (
 })
 
 const directories = readdirSync(THEMES, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
+    .filter((entry) => {
+        return entry.isDirectory()
+    })
+    .map((entry) => {
+        return entry.name
+    })
     .toSorted()
 
 test('every directory is declared in the manifest, and every entry has a directory', () => {
-    assert.deepEqual(themes.map((theme) => theme.slug).toSorted(), directories)
+    assert.deepEqual(
+        themes
+            .map((theme) => {
+                return theme.slug
+            })
+            .toSorted(),
+        directories,
+    )
 })
 
 for (const theme of themes) {
@@ -55,7 +67,9 @@ for (const theme of themes) {
         test('pairs with Shiki themes that exist, two for a dual palette', () => {
             const shiki = typeof theme.shiki === 'string' ? [theme.shiki] : Object.values(theme.shiki)
             assert.deepEqual(
-                shiki.filter((name) => !Object.hasOwn(bundledThemes, name)),
+                shiki.filter((name) => {
+                    return !Object.hasOwn(bundledThemes, name)
+                }),
                 [],
             )
             assert.equal(shiki.length, dual ? 2 : 1)
@@ -69,10 +83,18 @@ for (const theme of themes) {
             const sets = [palette.light, palette.dark].filter(Boolean)
             assert.equal(sets.length, dual ? 2 : 1)
 
-            const gaps = sets.flatMap((set) => [
-                ...LEVELS.filter((level) => !set[level]),
-                ...ALERTS.filter((kind) => !set.alert?.[kind]).map((kind) => `alert.${kind}`),
-            ])
+            const gaps = sets.flatMap((set) => {
+                return [
+                    ...LEVELS.filter((level) => {
+                        return !set[level]
+                    }),
+                    ...ALERTS.filter((kind) => {
+                        return !set.alert?.[kind]
+                    }).map((kind) => {
+                        return `alert.${kind}`
+                    }),
+                ]
+            })
             assert.deepEqual([...new Set(gaps)], [])
         })
 
@@ -84,13 +106,17 @@ for (const theme of themes) {
             assert.equal(blocks.length, dual ? 2 : 1)
 
             const missing = blocks.flatMap((block) => {
-                return REQUIRED_TOKENS.filter((token) => !declared(block).includes(token))
+                return REQUIRED_TOKENS.filter((token) => {
+                    return !declared(block).includes(token)
+                })
             })
             assert.deepEqual([...new Set(missing)], [])
 
             // A misspelt or retired name would build, and change nothing on screen.
             const unknown = blocks.flatMap((block) => {
-                return declared(block).filter((token) => !DEFAULTS.has(token))
+                return declared(block).filter((token) => {
+                    return !DEFAULTS.has(token)
+                })
             })
             assert.deepEqual([...new Set(unknown)], [])
 

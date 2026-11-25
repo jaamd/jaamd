@@ -11,7 +11,9 @@ export interface RemarkTocOptions {
 
 /** Plain text of a label paragraph. */
 function textOf(node: Nodes): string {
-    if ('value' in node) return node.value
+    if ('value' in node) {
+        return node.value
+    }
     return 'children' in node ? node.children.map(textOf).join('') : ''
 }
 
@@ -31,7 +33,9 @@ export const remarkToc: Plugin<[RemarkTocOptions?], Root> = function remarkJaamd
 
     return (tree) => {
         visit(tree, 'containerDirective', (node, index, parent) => {
-            if (node.name !== 'toc' || index === undefined || !parent) return
+            if (node.name !== 'toc' || index === undefined || !parent) {
+                return
+            }
 
             const children = [...node.children]
 
@@ -42,7 +46,9 @@ export const remarkToc: Plugin<[RemarkTocOptions?], Root> = function remarkJaamd
                     ? textOf(children.shift()!).trim()
                     : ''
 
-            if (children.length === 0) return
+            if (children.length === 0) {
+                return
+            }
 
             const replacement: RootContent[] = [
                 { type: 'html', value: tocOpenHtml(title, fallback) },

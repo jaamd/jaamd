@@ -9,7 +9,9 @@ import { CLASS, ICON, ID, labelled } from '../../markup.ts'
 function lightbox(labels: Labels): HTMLDialogElement {
     // Looked up each time: View Transitions swap <body>.
     const existing = document.getElementById(ID.lightbox)
-    if (existing instanceof HTMLDialogElement) return existing
+    if (existing instanceof HTMLDialogElement) {
+        return existing
+    }
 
     const dialog = document.createElement('dialog')
     dialog.id = ID.lightbox
@@ -34,7 +36,9 @@ function lightbox(labels: Labels): HTMLDialogElement {
     dialog.addEventListener('command', (e) => {
         const { command, source } = e as CommandEvent
         const img = source?.querySelector('img')
-        if (command !== 'show-modal' || !img) return
+        if (command !== 'show-modal' || !img) {
+            return
+        }
 
         preview.src = img.currentSrc || img.src
         preview.alt = img.alt
@@ -49,12 +53,16 @@ function lightbox(labels: Labels): HTMLDialogElement {
  *  `[![alt](src)](href)` must follow the link. Without invoker commands the
  *  buttons could not open anything, so images are left as they are. */
 export function addImageLightbox(root: ParentNode, labels: Labels): void {
-    if (!('command' in HTMLButtonElement.prototype)) return
+    if (!('command' in HTMLButtonElement.prototype)) {
+        return
+    }
 
-    const images = [...root.querySelectorAll<HTMLImageElement>('img')].filter(
-        (img) => !img.hasAttribute('data-no-lightbox') && !img.closest(`a, .${CLASS.lightboxTrigger}`),
-    )
-    if (images.length === 0) return
+    const images = [...root.querySelectorAll<HTMLImageElement>('img')].filter((img) => {
+        return !img.hasAttribute('data-no-lightbox') && !img.closest(`a, .${CLASS.lightboxTrigger}`)
+    })
+    if (images.length === 0) {
+        return
+    }
 
     lightbox(labels)
 

@@ -14,8 +14,14 @@ export function buildSearchIndex(
     const index: SearchIndex = {
         version: SEARCH_INDEX_VERSION,
         sections: sections
-            .filter(({ key }) => tree.pages.some((page) => page.section === key))
-            .map(({ key, label }) => ({ key, label })),
+            .filter(({ key }) => {
+                return tree.pages.some((page) => {
+                    return page.section === key
+                })
+            })
+            .map(({ key, label }) => {
+                return { key, label }
+            }),
         pages: [],
         entries: [],
     }
@@ -33,7 +39,9 @@ export function buildSearchIndex(
         })
 
         for (const { heading, text, code } of pageChunks(page.source.rendered)) {
-            if (!heading && !text && !code) continue
+            if (!heading && !text && !code) {
+                continue
+            }
             index.entries.push({
                 page: page.index,
                 ...(heading ? { heading: heading.text, anchor: heading.slug } : {}),

@@ -17,13 +17,17 @@ export function withTheme(current: ShikiConfig, theme?: ShikiTheme): { shikiConf
     const resolved = theme ?? (configured ? undefined : 'github-light')
 
     if (typeof resolved === 'object') {
-        if (!resolved.light || !resolved.dark) return { shikiConfig, dual: false }
+        if (!resolved.light || !resolved.dark) {
+            return { shikiConfig, dual: false }
+        }
         delete shikiConfig.theme
         shikiConfig.themes = { light: resolved.light, dark: resolved.dark } as ShikiConfig['themes']
         shikiConfig.defaultColor = false
         return { shikiConfig, dual: true }
     }
 
-    if (resolved) shikiConfig.theme = resolved as ShikiConfig['theme']
+    if (resolved) {
+        shikiConfig.theme = resolved as ShikiConfig['theme']
+    }
     return { shikiConfig, dual: false }
 }

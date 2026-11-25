@@ -5,16 +5,20 @@ import { defineCollection } from 'astro:content'
 import config from 'virtual:jaad/config'
 import { collectionIdFor, collectionName } from './model/ids.ts'
 
-const LOCALES = config.locales.map((locale) => locale.code)
+const LOCALES = config.locales.map((locale) => {
+    return locale.code
+})
 
 /** The markdown of one directory, as the pages of `section` when there is one. */
-const docs = (base: string, section?: string) =>
-    defineCollection({
+const docs = (base: string, section?: string) => {
+    return defineCollection({
         loader: glob({
             pattern: '**/*.md',
             base,
             // Keep URLs file-driven even if markdown contains an unrelated slug field.
-            generateId: ({ entry }) => collectionIdFor(entry, section, LOCALES),
+            generateId: ({ entry }) => {
+                return collectionIdFor(entry, section, LOCALES)
+            },
         }),
         // Every field is optional: markdown without frontmatter works as-is.
         schema: z.object({
@@ -27,10 +31,13 @@ const docs = (base: string, section?: string) =>
             order: z.number().int().optional(),
         }),
     })
+}
 
 /** `docsPages` for `docsDir`, and one collection per section: each watches its
  *  own directory. */
 export const collections = Object.fromEntries([
     ...(config.docs.dirInUse ? [[collectionName(), docs(config.docs.dir)]] : []),
-    ...config.docs.sections.map((section) => [collectionName(section.key), docs(section.dir, section.key)]),
+    ...config.docs.sections.map((section) => {
+        return [collectionName(section.key), docs(section.dir, section.key)]
+    }),
 ])

@@ -33,7 +33,9 @@ export function parseDocPath(path: string): ParsedDocPath {
 export function getCleanSlug(id: string): string {
     return id
         .split('/')
-        .map((part) => part.replace(NUMBERED_PREFIX_RE, '$2'))
+        .map((part) => {
+            return part.replace(NUMBERED_PREFIX_RE, '$2')
+        })
         .join('/')
 }
 
@@ -46,10 +48,14 @@ export function namedSlug(path: string, section?: string): string {
 /** "it/02-guides/01-setup" becomes locale "it" and "02-guides/01-setup". */
 export function splitDocLocale(id: string, locales: string[]): { locale: string | null; id: string } {
     const slash = id.indexOf('/')
-    if (slash === -1) return { locale: null, id }
+    if (slash === -1) {
+        return { locale: null, id }
+    }
 
     const first = id.slice(0, slash)
-    if (!locales.includes(first)) return { locale: null, id }
+    if (!locales.includes(first)) {
+        return { locale: null, id }
+    }
     return { locale: first, id: id.slice(slash + 1) }
 }
 
@@ -58,7 +64,9 @@ export function getDocCollectionId(filePath: string): string {
     return filePath
         .replace(/\.md$/, '')
         .split(/[\\/]/)
-        .map((part) => githubSlug(part))
+        .map((part) => {
+            return githubSlug(part)
+        })
         .join('/')
 }
 
@@ -78,12 +86,16 @@ export function collectionIdFor(filePath: string, section: string | undefined, l
 export function slugToTitle(slug: string): string {
     return slug
         .split(/[-_]+/)
-        .map((word) => ucfirst(word))
+        .map((word) => {
+            return ucfirst(word)
+        })
         .join(' ')
 }
 
 export function formatChapterTitle(chapter: string | undefined): string | null {
-    if (!chapter) return null
+    if (!chapter) {
+        return null
+    }
     return slugToTitle(chapter)
 }
 

@@ -22,16 +22,29 @@ function isLanguageTag(tag: string): boolean {
 
 const publicUrl = (field: string, example: string) =>
     // A root-relative path or an http(s) URL; `//host/...` is neither.
-    z.string().refine((v) => /^\/(?!\/)/.test(v) || /^https?:\/\//.test(v), {
-        message: `${field} must be a public url, such as "${example}"`,
-    })
+    {
+        return z.string().refine(
+            (v) => {
+                return /^\/(?!\/)/.test(v) || /^https?:\/\//.test(v)
+            },
+            {
+                message: `${field} must be a public url, such as "${example}"`,
+            },
+        )
+    }
 
 /** A link's target: a path, or a URL in a scheme a browser opens as a page or
  *  an address. `javascript:` and `data:` are refused. */
-const linkHref = (field: string) =>
-    z.string().refine((v) => !/^[a-z][a-z\d+.-]*:/i.test(v) || /^(https?|mailto|tel):/i.test(v), {
-        message: `${field} must be a path or an http(s), mailto or tel URL`,
-    })
+const linkHref = (field: string) => {
+    return z.string().refine(
+        (v) => {
+            return !/^[a-z][a-z\d+.-]*:/i.test(v) || /^(https?|mailto|tel):/i.test(v)
+        },
+        {
+            message: `${field} must be a path or an http(s), mailto or tel URL`,
+        },
+    )
+}
 
 /** The options of the site around the pages: identity, header, footer, head and theme. */
 export const siteConfigShape = {
@@ -132,7 +145,9 @@ const OG_IMAGES = ['og-image.png', 'og-image.jpg', 'og-image.jpeg', 'og-image.we
 
 function findPublicAsset(publicDir: string, candidates: string[]): string | null {
     for (const name of candidates) {
-        if (existsSync(join(publicDir, name))) return `/${name}`
+        if (existsSync(join(publicDir, name))) {
+            return `/${name}`
+        }
     }
     return null
 }
@@ -159,7 +174,9 @@ export function resolveSiteConfig(
 
 const requireFrom = createRequire(import.meta.url)
 
-const styleInPackage = (name: string) => fileURLToPath(new URL(`./styles/${name}`, import.meta.url))
+const styleInPackage = (name: string) => {
+    return fileURLToPath(new URL(`./styles/${name}`, import.meta.url))
+}
 
 /** Absolute paths, kept off the resolved config, which gets serialised. */
 export function resolveStylesheets(

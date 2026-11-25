@@ -200,8 +200,12 @@ export function groupCodeTabs<N extends { type: string; data?: unknown }, C exte
 
 /** HTML around the code blocks of one `:::code-tabs` group. */
 export function codeTabsHtml(group: string, labels: string[]) {
-    const tabId = (i: number) => `${group}-tab-${i}`
-    const panelId = (i: number) => `${group}-panel-${i}`
+    const tabId = (i: number) => {
+        return `${group}-tab-${i}`
+    }
+    const panelId = (i: number) => {
+        return `${group}-panel-${i}`
+    }
 
     const buttons = labels
         .map((label, i) => {
@@ -217,11 +221,14 @@ export function codeTabsHtml(group: string, labels: string[]) {
 
     return {
         open: `<div class="${CLASS.codeTabs}" id="${group}"><div class="${CLASS.codeTabButtons}" role="tablist">${buttons}</div>`,
-        panelOpen: (i: number) =>
-            `<div class="${CLASS.codeTabPanel}"${i === 0 ? ' data-active' : ''} ` +
-            `id="${panelId(i)}" data-tab-index="${i}" role="tabpanel" ` +
-            // Focusable so wide samples can be scrolled by keyboard.
-            `aria-labelledby="${tabId(i)}" tabindex="0">`,
+        panelOpen: (i: number) => {
+            return (
+                `<div class="${CLASS.codeTabPanel}"${i === 0 ? ' data-active' : ''} ` +
+                `id="${panelId(i)}" data-tab-index="${i}" role="tabpanel" ` +
+                // Focusable so wide samples can be scrolled by keyboard.
+                `aria-labelledby="${tabId(i)}" tabindex="0">`
+            )
+        },
         panelClose: `</div>`,
         close: `</div>`,
     }

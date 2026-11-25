@@ -5,7 +5,9 @@ import { parse as parseYaml } from 'yaml'
  *  collection reads them. */
 export function readFrontmatter(source: string): { order?: number; draft?: boolean } {
     const block = /^\uFEFF?---\r?\n([\s\S]*?)\r?\n---/.exec(source)
-    if (!block) return {}
+    if (!block) {
+        return {}
+    }
 
     let data: unknown
     try {
@@ -14,7 +16,9 @@ export function readFrontmatter(source: string): { order?: number; draft?: boole
         // The content collection reports the error when it loads the file.
         return {}
     }
-    if (!data || typeof data !== 'object') return {}
+    if (!data || typeof data !== 'object') {
+        return {}
+    }
 
     const { order, draft } = data as Record<string, unknown>
     return {

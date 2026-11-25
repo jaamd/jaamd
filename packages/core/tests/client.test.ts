@@ -48,11 +48,15 @@ function mount(): HTMLElement {
     return root as unknown as HTMLElement
 }
 
-const click = (el: Element | null) =>
-    el?.dispatchEvent(new window.MouseEvent('click', { bubbles: true }) as unknown as Event)
+const click = (el: Element | null) => {
+    return el?.dispatchEvent(new window.MouseEvent('click', { bubbles: true }) as unknown as Event)
+}
 
-const selected = (root: HTMLElement) =>
-    [...root.querySelectorAll('.jaamd-code-tab-btn')].map((btn) => btn.getAttribute('aria-selected'))
+const selected = (root: HTMLElement) => {
+    return [...root.querySelectorAll('.jaamd-code-tab-btn')].map((btn) => {
+        return btn.getAttribute('aria-selected')
+    })
+}
 
 beforeEach(() => {
     document.body.innerHTML = ''
@@ -95,7 +99,9 @@ test('only the given root is touched, and a second call adds nothing', () => {
 test('a selector enhances every wrapper it matches', () => {
     const roots = [mount(), mount()]
     const dispose = enhance('.jaamd-content')
-    for (const root of roots) assert.equal(root.querySelectorAll('.jaamd-copy-btn').length, 3)
+    for (const root of roots) {
+        assert.equal(root.querySelectorAll('.jaamd-copy-btn').length, 3)
+    }
     dispose()
 })
 
@@ -128,7 +134,9 @@ test('a click selects a tab and reveals a spoiler', () => {
     click(root.querySelectorAll('.jaamd-code-tab-btn')[1])
     assert.deepEqual(selected(root), ['false', 'true'])
     assert.deepEqual(
-        [...root.querySelectorAll('.jaamd-code-tab-panel')].map((panel) => panel.hasAttribute('data-active')),
+        [...root.querySelectorAll('.jaamd-code-tab-panel')].map((panel) => {
+            return panel.hasAttribute('data-active')
+        }),
         [false, true],
     )
 
@@ -190,13 +198,16 @@ test('without invoker commands, images are left as they are', () => {
     }
 })
 
-const press = (el: Element | null, key: string) =>
-    el?.dispatchEvent(new window.KeyboardEvent('keydown', { key, bubbles: true }) as unknown as Event)
+const press = (el: Element | null, key: string) => {
+    return el?.dispatchEvent(new window.KeyboardEvent('keydown', { key, bubbles: true }) as unknown as Event)
+}
 
 test('arrow keys, Home and End move between tabs, wrapping at the ends', () => {
     const root = mount()
     const dispose = enhance(root)
-    const buttons = () => root.querySelectorAll('.jaamd-code-tab-btn')
+    const buttons = () => {
+        return root.querySelectorAll('.jaamd-code-tab-btn')
+    }
 
     press(buttons()[0], 'ArrowRight')
     assert.deepEqual(selected(root), ['false', 'true'])
@@ -220,13 +231,20 @@ function withClipboard(writeText: ((text: string) => Promise<void>) | undefined)
         configurable: true,
     })
     return () => {
-        if (descriptor) Object.defineProperty(globalThis.navigator, 'clipboard', descriptor)
-        else delete (globalThis.navigator as { clipboard?: unknown }).clipboard
+        if (descriptor) {
+            Object.defineProperty(globalThis.navigator, 'clipboard', descriptor)
+        } else {
+            delete (globalThis.navigator as { clipboard?: unknown }).clipboard
+        }
     }
 }
 
 /** Lets the click handler's awaited clipboard write settle. */
-const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
+const settle = () => {
+    return new Promise((resolve) => {
+        return setTimeout(resolve, 0)
+    })
+}
 
 test('the copy button writes the code, and selects it when there is no clipboard', async () => {
     const root = mount()
@@ -284,7 +302,9 @@ test('headings with the same text get numbered ids, as GitHub gives them', () =>
     const dispose = enhance(root as unknown as HTMLElement)
 
     assert.deepEqual(
-        [...root.querySelectorAll('h2, h3')].map((heading) => heading.id),
+        [...root.querySelectorAll('h2, h3')].map((heading) => {
+            return heading.id
+        }),
         ['setup', 'setup-1', 'setup-2'],
     )
 
@@ -371,7 +391,9 @@ test('a selector points the TOC watching at navs of another markup', async () =>
 
         const stop = initToc(root as unknown as ParentNode, { selector: '#side' })
         assert.deepEqual(
-            observed.map((target) => target.id),
+            observed.map((target) => {
+                return target.id
+            }),
             ['setup'],
         )
         stop()

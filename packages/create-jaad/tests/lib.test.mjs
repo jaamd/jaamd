@@ -25,22 +25,36 @@ test('a bare directory is the target, and the rest keep their defaults', () => {
 })
 
 test('install and no-install contradict each other', () => {
-    assert.throws(() => parseArgs(['--install', '--no-install']), /cannot be used together/)
-    assert.throws(() => parseArgs(['--no-install', '--install']), /cannot be used together/)
+    assert.throws(() => {
+        return parseArgs(['--install', '--no-install'])
+    }, /cannot be used together/)
+    assert.throws(() => {
+        return parseArgs(['--no-install', '--install'])
+    }, /cannot be used together/)
 })
 
 test('an option that needs a value says so', () => {
-    assert.throws(() => parseArgs(['--title']), /--title needs a value/)
-    assert.throws(() => parseArgs(['--title', '--here']), /needs a value/)
+    assert.throws(() => {
+        return parseArgs(['--title'])
+    }, /--title needs a value/)
+    assert.throws(() => {
+        return parseArgs(['--title', '--here'])
+    }, /needs a value/)
 })
 
 test('an unknown template names the ones that exist', () => {
-    assert.throws(() => parseArgs(['--template', 'blog']), /docs, site/)
+    assert.throws(() => {
+        return parseArgs(['--template', 'blog'])
+    }, /docs, site/)
 })
 
 test('--here and a directory are mutually exclusive', () => {
-    assert.throws(() => parseArgs(['--here', 'x']), /cannot be used together/)
-    assert.throws(() => parseArgs(['a', 'b']), /only one directory/)
+    assert.throws(() => {
+        return parseArgs(['--here', 'x'])
+    }, /cannot be used together/)
+    assert.throws(() => {
+        return parseArgs(['a', 'b'])
+    }, /only one directory/)
 })
 
 test('the -- npm leaves in place is no directory', () => {
@@ -106,8 +120,11 @@ test('the package manager comes from the agent that invoked us', () => {
             assert.equal(packageManager(), expected, ua)
         }
     } finally {
-        if (agent === undefined) delete process.env.npm_config_user_agent
-        else process.env.npm_config_user_agent = agent
+        if (agent === undefined) {
+            delete process.env.npm_config_user_agent
+        } else {
+            process.env.npm_config_user_agent = agent
+        }
     }
 })
 

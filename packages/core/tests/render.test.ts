@@ -7,10 +7,11 @@ import { codeTabsHtml, headingLinkHtml, tocOpenHtml } from '../src/render.ts'
 const HOSTILE = `"><script>alert('x')</script>&`
 
 /** Every attribute value, as written between double quotes. */
-const attributes = (html: string) =>
-    [...html.matchAll(/\s[\w-]+="([^"]*)"/g)].map((match) => {
+const attributes = (html: string) => {
+    return [...html.matchAll(/\s[\w-]+="([^"]*)"/g)].map((match) => {
         return match[1]
     })
+}
 
 test('a heading link escapes its id and its accessible name', () => {
     const html = headingLinkHtml(HOSTILE, HOSTILE, 'Link to section')

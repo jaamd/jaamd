@@ -146,7 +146,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
         connectedCallback() {
             document.addEventListener('keydown', this.#onGlobalKey)
-            if (this.#bound) return
+            if (this.#bound) {
+                return
+            }
             this.#bound = true
 
             this.#overlay = this.querySelector('[data-overlay]')!
@@ -160,22 +162,40 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
             for (const sel of ['[data-trigger-desktop]', '[data-trigger-icon]']) {
                 const trigger = this.querySelector<HTMLElement>(sel)!
-                trigger.addEventListener('click', () => this.#setOpen(true))
-                trigger.addEventListener('mouseenter', () => void this.#loadIndex())
-                trigger.addEventListener('focus', () => void this.#loadIndex())
+                trigger.addEventListener('click', () => {
+                    return this.#setOpen(true)
+                })
+                trigger.addEventListener('mouseenter', () => {
+                    return void this.#loadIndex()
+                })
+                trigger.addEventListener('focus', () => {
+                    return void this.#loadIndex()
+                })
             }
 
-            this.querySelector('[data-backdrop]')!.addEventListener('click', () => this.#setOpen(false))
+            this.querySelector('[data-backdrop]')!.addEventListener('click', () => {
+                return this.#setOpen(false)
+            })
             // Escape closes a modal dialog on its own: the cleanup runs on every close.
-            this.#overlay.addEventListener('close', () => this.#onClose())
-            this.querySelector('[data-close]')!.addEventListener('click', () => this.#setOpen(false))
+            this.#overlay.addEventListener('close', () => {
+                return this.#onClose()
+            })
+            this.querySelector('[data-close]')!.addEventListener('click', () => {
+                return this.#setOpen(false)
+            })
             this.#filters.addEventListener('click', (e) => {
                 const button = (e.target as Element).closest<HTMLButtonElement>('[data-filter]')
-                if (button) this.#filter(button.dataset.filter ?? '')
+                if (button) {
+                    this.#filter(button.dataset.filter ?? '')
+                }
             })
 
-            this.#input.addEventListener('input', () => this.#render())
-            this.#input.addEventListener('keydown', (e) => this.#onInputKey(e))
+            this.#input.addEventListener('input', () => {
+                return this.#render()
+            })
+            this.#input.addEventListener('keydown', (e) => {
+                return this.#onInputKey(e)
+            })
         }
 
         disconnectedCallback() {
@@ -194,7 +214,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
         #onInputKey(e: KeyboardEvent) {
             // Enter also confirms a character being composed with an input method.
-            if (e.isComposing) return
+            if (e.isComposing) {
+                return
+            }
 
             if (e.key === 'ArrowDown') {
                 e.preventDefault()
@@ -208,12 +230,16 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         }
 
         #loadIndex(): Promise<SearchIndex> {
-            if (this.#index) return Promise.resolve(this.#index)
+            if (this.#index) {
+                return Promise.resolve(this.#index)
+            }
             if (!this.#request) {
                 const url = this.dataset.indexUrl!
                 this.#request = fetch(url)
                     .then((res) => {
-                        if (!res.ok) throw new Error(`${url} answered ${res.status}`)
+                        if (!res.ok) {
+                            throw new Error(`${url} answered ${res.status}`)
+                        }
                         return res.json()
                     })
                     .then((data: SearchIndex) => {
@@ -231,7 +257,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         }
 
         #setOpen(open: boolean) {
-            if (open === this.#open) return
+            if (open === this.#open) {
+                return
+            }
             if (!open) {
                 this.#overlay.close()
                 return
@@ -242,7 +270,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             document.body.style.overflow = 'hidden'
             this.#overlay.showModal()
             this.#input.focus()
-            void this.#loadIndex().then(() => this.#render())
+            void this.#loadIndex().then(() => {
+                return this.#render()
+            })
             this.#render()
         }
 
@@ -285,8 +315,12 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         #select(i: number) {
             this.#selected = i
             const option = this.#options[i]
-            if (option) this.#input.setAttribute('aria-activedescendant', option.li.id)
-            this.#options.forEach(({ li }, n) => li.setAttribute('aria-selected', String(n === i)))
+            if (option) {
+                this.#input.setAttribute('aria-activedescendant', option.li.id)
+            }
+            this.#options.forEach(({ li }, n) => {
+                return li.setAttribute('aria-selected', String(n === i))
+            })
             option?.li.scrollIntoView({ block: 'nearest' })
         }
 
@@ -321,8 +355,12 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
             if (terms.length === 0) {
                 for (const group of openingPages(this.#index, section)) {
-                    if (group.label) this.#list.append(this.#label(group.label))
-                    for (const page of group.pages) this.#option(page.href, this.#pageRow(page, [], ''))
+                    if (group.label) {
+                        this.#list.append(this.#label(group.label))
+                    }
+                    for (const page of group.pages) {
+                        this.#option(page.href, this.#pageRow(page, [], ''))
+                    }
                 }
             } else {
                 for (const group of search(this.#index, query, section)) {
@@ -350,8 +388,12 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             li.id = `search-option-${i}`
             li.setAttribute('role', 'option')
             li.className = 'jaad-search-result'
-            li.addEventListener('click', () => this.#go(href))
-            li.addEventListener('mouseenter', () => this.#select(i))
+            li.addEventListener('click', () => {
+                return this.#go(href)
+            })
+            li.addEventListener('mouseenter', () => {
+                return this.#select(i)
+            })
             li.append(content)
             this.#list.append(li)
             this.#options.push({ li, href })
@@ -383,7 +425,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         }
 
         #snippet(parent: HTMLElement, text: string, terms: string[]) {
-            if (!text) return
+            if (!text) {
+                return
+            }
             const p = document.createElement('p')
             p.className = 'jaad-search-result-snippet'
             p.append(this.#marked(text, terms))

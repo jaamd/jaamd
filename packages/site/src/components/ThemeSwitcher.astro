@@ -45,7 +45,9 @@ const t = ui(Astro.props.locale)
         #bound = false
 
         connectedCallback() {
-            if (this.#bound) return
+            if (this.#bound) {
+                return
+            }
             this.#bound = true
 
             this.querySelector('button')?.addEventListener('click', () => {

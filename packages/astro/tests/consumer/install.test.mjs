@@ -41,9 +41,15 @@ describe('a pnpm project that installed the packed tarballs', () => {
         html = readFileSync(join(project, 'dist', 'index.html'), 'utf8')
         css = [
             ...readdirSync(assets)
-                .filter((file) => file.endsWith('.css'))
-                .map((file) => readFileSync(join(assets, file), 'utf8')),
-            ...[...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]),
+                .filter((file) => {
+                    return file.endsWith('.css')
+                })
+                .map((file) => {
+                    return readFileSync(join(assets, file), 'utf8')
+                }),
+            ...[...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => {
+                return m[1]
+            }),
         ].join('\n')
     })
 
@@ -58,23 +64,35 @@ describe('a pnpm project that installed the packed tarballs', () => {
     test('the labels reach the build and the client', () => {
         assert.match(html, /aria-label="Lien vers la section: Setup"/)
         const scripts = readdirSync(join(project, 'dist', '_astro'))
-            .filter((file) => file.endsWith('.js'))
-            .map((file) => readFileSync(join(project, 'dist', '_astro', file), 'utf8'))
-        assert.ok(scripts.some((script) => script.includes('Lien vers la section')))
+            .filter((file) => {
+                return file.endsWith('.js')
+            })
+            .map((file) => {
+                return readFileSync(join(project, 'dist', '_astro', file), 'utf8')
+            })
+        assert.ok(
+            scripts.some((script) => {
+                return script.includes('Lien vers la section')
+            }),
+        )
     })
 
     test('the only copy of @astrojs/markdown-satteri is the one Astro installs', () => {
-        const copies = readdirSync(join(project, 'node_modules', '.pnpm')).filter((dir) =>
-            dir.startsWith('@astrojs+markdown-satteri@'),
-        )
+        const copies = readdirSync(join(project, 'node_modules', '.pnpm')).filter((dir) => {
+            return dir.startsWith('@astrojs+markdown-satteri@')
+        })
         assert.equal(copies.length, 1, copies.join(', '))
     })
 
     test('the documentation is installed with the package', () => {
         const installed = join(project, 'node_modules', '@jaamd', 'astro', 'docs')
         const missing = readdirSync(DOCS, { recursive: true })
-            .filter((file) => file.endsWith('.md'))
-            .filter((file) => !existsSync(join(installed, file)))
+            .filter((file) => {
+                return file.endsWith('.md')
+            })
+            .filter((file) => {
+                return !existsSync(join(installed, file))
+            })
         assert.deepEqual(missing, [])
     })
 

@@ -20,7 +20,9 @@ function docsTree(entries: string[]): string {
         if (entry.endsWith('.md')) {
             mkdirSync(join(dir, entry, '..'), { recursive: true })
             writeFileSync(join(dir, entry), '# Page')
-        } else mkdirSync(join(dir, entry), { recursive: true })
+        } else {
+            mkdirSync(join(dir, entry), { recursive: true })
+        }
     }
     return dir
 }
@@ -160,7 +162,9 @@ test('a directory written with capitals is read from disk as written', () => {
 test('a pinned list matches lang whatever its case', () => {
     const dir = docsTree(['en/01-intro.md', 'pt-BR/01-intro.md'])
     try {
-        assert.doesNotThrow(() => validateLocaleTree(dir, ['en', 'pt-BR'], 'pt-BR'))
+        assert.doesNotThrow(() => {
+            return validateLocaleTree(dir, ['en', 'pt-BR'], 'pt-BR')
+        })
     } finally {
         rmSync(dir, { recursive: true })
     }
@@ -230,7 +234,9 @@ test('a localised tree with a matching lang passes', () => {
 
 // ── The one place the default locale's missing prefix is decided ─────────────
 
-const locale = (code: string) => ({ code, tag: code, name: code, flag: null })
+const locale = (code: string) => {
+    return { code, tag: code, name: code, flag: null }
+}
 
 test('the default locale carries no prefix and the others do', () => {
     assert.equal(localePrefix('en', 'en'), '')

@@ -17,10 +17,14 @@ export const PRESETS: Record<string, Preset> = {
         mode: 'dual',
     },
     ...Object.fromEntries(
-        themes.map((theme) => [theme.slug, { shiki: theme.shiki, theme: theme.slug, mode: theme.mode }]),
+        themes.map((theme) => {
+            return [theme.slug, { shiki: theme.shiki, theme: theme.slug, mode: theme.mode }]
+        }),
     ),
 }
 
 export const PRESET_NAMES = Object.keys(PRESETS)
 
-export const isPreset = (value: string): boolean => value in PRESETS
+export const isPreset = (value: string): boolean => {
+    return value in PRESETS
+}

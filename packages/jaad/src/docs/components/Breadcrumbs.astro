@@ -13,7 +13,11 @@ interface Props {
 const { section, chapter, locale } = Astro.props
 const t = ui(locale)
 const chapterTitle = formatChapterTitle(chapter)
-const sectionLink = section ? (await getSectionLinks(locale)).find((link) => link.key === section) : undefined
+const sectionLink = section
+    ? (await getSectionLinks(locale)).find((link) => {
+          return link.key === section
+      })
+    : undefined
 ---
 
 {(sectionLink || chapterTitle) && (

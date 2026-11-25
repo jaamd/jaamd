@@ -30,7 +30,9 @@ export interface JaamdOptions extends PluginOptions {
 
 /** Absolute path of a stylesheet of this package, as a quoted specifier: injected
  *  scripts resolve from the project, where `@jaamd/astro` may be unreachable. */
-const own = (relative: string) => JSON.stringify(fileURLToPath(new URL(relative, import.meta.url)))
+const own = (relative: string) => {
+    return JSON.stringify(fileURLToPath(new URL(relative, import.meta.url)))
+}
 
 const STYLES = {
     variables: own('../dist/default.css'),

@@ -6,9 +6,13 @@ export function normaliseBasePath(value: string): string {
 
 /** Apply Astro's deployment base to an application-local, root-relative href. */
 export function withDeploymentBase(href: string, deploymentBase: string): string {
-    if (!href.startsWith('/') || href.startsWith('//')) return href
+    if (!href.startsWith('/') || href.startsWith('//')) {
+        return href
+    }
 
     const prefix = normaliseBasePath(deploymentBase)
-    if (!prefix) return href
+    if (!prefix) {
+        return href
+    }
     return href === '/' ? `${prefix}/` : `${prefix}${href}`
 }

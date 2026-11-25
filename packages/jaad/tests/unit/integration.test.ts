@@ -154,7 +154,9 @@ test('a locale prefix counts toward the url a page would take', () => {
 
 test('technical routes stay inside the documentation mount', () => {
     assert.deepEqual(
-        getInjectedRoutes('/docs').map(([pattern]) => pattern),
+        getInjectedRoutes('/docs').map(([pattern]) => {
+            return pattern
+        }),
         [
             '/docs',
             '/docs/search-index.json',
@@ -165,14 +167,18 @@ test('technical routes stay inside the documentation mount', () => {
         ],
     )
     assert.deepEqual(
-        getInjectedRoutes('').map(([pattern]) => pattern),
+        getInjectedRoutes('').map(([pattern]) => {
+            return pattern
+        }),
         ['', '/search-index.json', '/llms.txt', '/llms-full.txt', '/[...slug]', '/[...slug].md'],
     )
 })
 
 test('at the root, the site may serve the llms files in place of the docs', () => {
     assert.deepEqual(
-        getInjectedRoutes('', ['it'], true, false).map(([pattern]) => pattern),
+        getInjectedRoutes('', ['it'], true, false).map(([pattern]) => {
+            return pattern
+        }),
         [
             '',
             '/search-index.json',
@@ -184,12 +190,18 @@ test('at the root, the site may serve the llms files in place of the docs', () =
         ],
     )
     // Below the root the files are the docs' own either way.
-    assert.ok(getInjectedRoutes('/docs', [], true, false).some(([pattern]) => pattern === '/docs/llms.txt'))
+    assert.ok(
+        getInjectedRoutes('/docs', [], true, false).some(([pattern]) => {
+            return pattern === '/docs/llms.txt'
+        }),
+    )
 })
 
 test('llms: false leaves out the files for language models, not the Markdown of each page', () => {
     assert.deepEqual(
-        getInjectedRoutes('/docs', ['it'], false).map(([pattern]) => pattern),
+        getInjectedRoutes('/docs', ['it'], false).map(([pattern]) => {
+            return pattern
+        }),
         [
             '/docs',
             '/docs/search-index.json',
@@ -203,7 +215,9 @@ test('llms: false leaves out the files for language models, not the Markdown of 
 // The rest param already absorbs "it/guide": only the fixed endpoints fan out.
 test('a localised site adds one route per fixed endpoint, not per locale', () => {
     assert.deepEqual(
-        getInjectedRoutes('/docs', ['it', 'fr']).map(([pattern]) => pattern),
+        getInjectedRoutes('/docs', ['it', 'fr']).map(([pattern]) => {
+            return pattern
+        }),
         [
             '/docs',
             '/docs/search-index.json',
@@ -227,7 +241,9 @@ test('tailwind: missing packages name the install command', () => {
     const root = mkdtempSync(join(tmpdir(), 'jaad-no-tailwind-'))
     try {
         writeFileSync(join(root, 'package.json'), '{}')
-        assert.throws(() => loadTailwindPlugin(root, []), /npm i -D tailwindcss @tailwindcss\/vite/)
+        assert.throws(() => {
+            return loadTailwindPlugin(root, [])
+        }, /npm i -D tailwindcss @tailwindcss\/vite/)
     } finally {
         rmSync(root, { recursive: true })
     }

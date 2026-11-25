@@ -3,10 +3,13 @@ import { test } from 'node:test'
 import { nextSwitcherMarkup } from '../../src/components/locale-switcher.ts'
 
 /** Enough of a Document for the one query the swap makes. */
-const documentWith = (switcher: { innerHTML: string } | null) =>
-    ({
-        querySelector: (selector: string) => (selector === 'jaad-locale-switcher' ? switcher : null),
-    }) as unknown as Document
+const documentWith = (switcher: { innerHTML: string } | null) => {
+    return {
+        querySelector: (selector: string) => {
+            return selector === 'jaad-locale-switcher' ? switcher : null
+        },
+    } as unknown as Document
+}
 
 // The header is transition:persist, so without this the menu keeps linking to
 // the alternates of the page the reader just left.

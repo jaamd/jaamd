@@ -3,14 +3,18 @@ import { createRequire } from 'node:module'
 import { themes } from '@jaamd/core/themes'
 
 const require = createRequire(import.meta.url)
-const read = (specifier: string) => readFileSync(require.resolve(specifier), 'utf8')
+const read = (specifier: string) => {
+    return readFileSync(require.resolve(specifier), 'utf8')
+}
 
 const PREVIEW = '.landing-preview'
 
 /** The themes the preview offers: the site's own first. */
 export const previewThemes = [
     { slug: 'default', name: 'Default', mode: 'dual' },
-    ...themes.map(({ slug, name, mode }) => ({ slug, name, mode })),
+    ...themes.map(({ slug, name, mode }) => {
+        return { slug, name, mode }
+    }),
 ]
 
 /**

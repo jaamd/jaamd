@@ -26,7 +26,9 @@ interface Props {
 
 const { page, tree, headTitle } = Astro.props
 
-const section = SECTIONS.find((known) => known.key === page.section)
+const section = SECTIONS.find((known) => {
+    return known.key === page.section
+})
 // With sections, the title names the section after the page.
 const title = headTitle && section ? `${headTitle} · ${section.label}` : headTitle
 // A section's files sit in its own directory.

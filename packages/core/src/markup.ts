@@ -66,10 +66,14 @@ export const DEFAULT_LABELS: Labels = {
     spoiler: 'Spoiler',
 }
 
-export const withLabels = (labels: Partial<Labels> = {}): Labels => ({ ...DEFAULT_LABELS, ...labels })
+export const withLabels = (labels: Partial<Labels> = {}): Labels => {
+    return { ...DEFAULT_LABELS, ...labels }
+}
 
 /** "Link to section: Setup", or the label alone for an empty detail. */
-export const labelled = (label: string, detail: string): string => (detail ? `${label}: ${detail}` : label)
+export const labelled = (label: string, detail: string): string => {
+    return detail ? `${label}: ${detail}` : label
+}
 
 const ICON_ATTRS = `xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"`
 const FILLED = `${ICON_ATTRS} fill="currentColor"`

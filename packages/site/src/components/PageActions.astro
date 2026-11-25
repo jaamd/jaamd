@@ -52,7 +52,9 @@ const t = ui(locale)
      *  a ClipboardItem starts it there and lets the Markdown arrive later. */
     async function copyMarkdown(href: string): Promise<void> {
         const text = fetch(href).then((res) => {
-            if (!res.ok) throw new Error(`${href} answered ${res.status}`)
+            if (!res.ok) {
+                throw new Error(`${href} answered ${res.status}`)
+            }
             return res.text()
         })
 
@@ -61,13 +63,17 @@ const t = ui(locale)
             return
         }
 
-        const blob = text.then((markdown) => new Blob([markdown], { type: 'text/plain' }))
+        const blob = text.then((markdown) => {
+            return new Blob([markdown], { type: 'text/plain' })
+        })
         await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })])
     }
 
     function initCopyPageButtons(): void {
         document.querySelectorAll<HTMLButtonElement>('[data-copy-page]').forEach((btn) => {
-            if (btn.dataset.copyInit) return
+            if (btn.dataset.copyInit) {
+                return
+            }
             btn.dataset.copyInit = '1'
 
             const label = btn.querySelector<HTMLElement>('[data-copy-label]')
@@ -77,7 +83,9 @@ const t = ui(locale)
 
             btn.addEventListener('click', async () => {
                 const href = btn.dataset.mdHref
-                if (!href) return
+                if (!href) {
+                    return
+                }
                 try {
                     await copyMarkdown(href)
                     if (label) {

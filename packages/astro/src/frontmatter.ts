@@ -17,9 +17,14 @@ export function frontmatterFields(z: typeof Zod) {
         ogImage: z
             .union([
                 // A root-relative path or an http(s) URL; `//host/...` is neither.
-                z.string().refine((v) => /^\/(?!\/)/.test(v) || /^https?:\/\//.test(v), {
-                    message: 'ogImage must be a public url, such as "/og/page.png"',
-                }),
+                z.string().refine(
+                    (v) => {
+                        return /^\/(?!\/)/.test(v) || /^https?:\/\//.test(v)
+                    },
+                    {
+                        message: 'ogImage must be a public url, such as "/og/page.png"',
+                    },
+                ),
                 z.literal(false),
             ])
             .optional(),

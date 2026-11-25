@@ -9,21 +9,25 @@ import { MARKDOWN_SOURCES, MOVED } from '../worker.ts'
 const DIST = fileURLToPath(new URL('../dist', import.meta.url))
 const PACKAGES = fileURLToPath(new URL('../../packages', import.meta.url))
 
-const page = (relative) => readBuilt(DIST, relative)
+const page = (relative) => {
+    return readBuilt(DIST, relative)
+}
 
 /** The url of every markdown file of a package: its section, then its clean path. */
 const urlsOf = (section, pkg) => {
     const docs = join(PACKAGES, pkg, 'docs')
-    return walk(docs).map((file) =>
-        [
+    return walk(docs).map((file) => {
+        return [
             section,
             ...file
                 .slice(docs.length + 1)
                 .replace(/\.md$/, '')
                 .split('/')
-                .map((part) => part.replace(/^\d+-/, '')),
-        ].join('/'),
-    )
+                .map((part) => {
+                    return part.replace(/^\d+-/, '')
+                }),
+        ].join('/')
+    })
 }
 
 test('the docs open on the welcome page, and each section at its own url', () => {
@@ -37,26 +41,32 @@ test('the docs open on the welcome page, and each section at its own url', () =>
 
 // The old jaamd.org/docs/<path> urls redirect to docs.jaamd.org/<path>.
 test('every page of both packages has a url, so every old /docs url has a target', () => {
-    const missing = [...urlsOf('jaamd', 'astro'), ...urlsOf('jaad', 'jaad')].filter(
-        (url) => !existsSync(join(DIST, url, 'index.html')),
-    )
+    const missing = [...urlsOf('jaamd', 'astro'), ...urlsOf('jaad', 'jaad')].filter((url) => {
+        return !existsSync(join(DIST, url, 'index.html'))
+    })
     assert.deepEqual(missing, [])
 })
 
 test('a page title names its section, the opening page the site alone', () => {
-    const title = (relative) => page(relative).match(/<title>([^<]*)<\/title>/)[1]
+    const title = (relative) => {
+        return page(relative).match(/<title>([^<]*)<\/title>/)[1]
+    }
     assert.equal(title('index.html'), 'JAAMD Docs')
     assert.equal(title('jaamd/index.html'), 'Overview · JAAMD | JAAMD Docs')
     assert.equal(title('jaad/getting-started/installation/index.html'), 'Installation · JAAD | JAAMD Docs')
 })
 
 test('the Markdown of every opening page is built where the Worker looks for it', () => {
-    const missing = Object.values(MARKDOWN_SOURCES).filter((source) => !existsSync(join(DIST, source)))
+    const missing = Object.values(MARKDOWN_SOURCES).filter((source) => {
+        return !existsSync(join(DIST, source))
+    })
     assert.deepEqual(missing, [])
 })
 
 test('every moved page has a built target', () => {
-    const missing = Object.values(MOVED).filter((target) => !existsSync(join(DIST, target, 'index.html')))
+    const missing = Object.values(MOVED).filter((target) => {
+        return !existsSync(join(DIST, target, 'index.html'))
+    })
     assert.deepEqual(missing, [])
 })
 
@@ -85,22 +95,36 @@ test('every internal link points at a built page', () => {
     assert.deepEqual(brokenLinks(DIST), [])
 })
 
-const pageFile = (href) => join(DIST, href, 'index.html')
+const pageFile = (href) => {
+    return join(DIST, href, 'index.html')
+}
 
 test('every search anchor and every table-of-contents link is an id of its page', () => {
     const index = JSON.parse(page('search-index.json'))
     const searchTargets = index.entries
-        .filter((entry) => entry.anchor)
-        .map((entry) => [pageFile(index.pages[entry.page].href), entry.anchor])
+        .filter((entry) => {
+            return entry.anchor
+        })
+        .map((entry) => {
+            return [pageFile(index.pages[entry.page].href), entry.anchor]
+        })
     const tocTargets = walk(DIST)
-        .filter((file) => file.endsWith('.html'))
-        .flatMap((file) =>
-            [...readFileSync(file, 'utf8').matchAll(/<a href="#([^"]+)" data-toc-link/g)].map((m) => [file, m[1]]),
-        )
+        .filter((file) => {
+            return file.endsWith('.html')
+        })
+        .flatMap((file) => {
+            return [...readFileSync(file, 'utf8').matchAll(/<a href="#([^"]+)" data-toc-link/g)].map((m) => {
+                return [file, m[1]]
+            })
+        })
 
     assert.ok(searchTargets.length > 0 && tocTargets.length > 0)
     const missing = [...searchTargets, ...tocTargets]
-        .filter(([file, id]) => !readFileSync(file, 'utf8').includes(`id="${id}"`))
-        .map(([file, id]) => `${file.slice(DIST.length)}#${id}`)
+        .filter(([file, id]) => {
+            return !readFileSync(file, 'utf8').includes(`id="${id}"`)
+        })
+        .map(([file, id]) => {
+            return `${file.slice(DIST.length)}#${id}`
+        })
     assert.deepEqual([...new Set(missing)], [])
 })

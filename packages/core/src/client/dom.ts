@@ -14,9 +14,13 @@ export function slugify(text: string): string {
 
 export function uniqueElementId(base: string): string {
     const seed = base || 'section'
-    if (!document.getElementById(seed)) return seed
+    if (!document.getElementById(seed)) {
+        return seed
+    }
 
     let n = 1
-    while (document.getElementById(`${seed}-${n}`)) n++
+    while (document.getElementById(`${seed}-${n}`)) {
+        n++
+    }
     return `${seed}-${n}`
 }

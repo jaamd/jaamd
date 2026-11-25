@@ -12,7 +12,9 @@ test('quality reads q values, in any case and with spaces, and defaults to 1', (
 })
 
 test('Markdown is preferred only when asked for above HTML', () => {
-    const ask = (accept: string) => prefersMarkdown(new Request('https://d.dev/', { headers: { Accept: accept } }))
+    const ask = (accept: string) => {
+        return prefersMarkdown(new Request('https://d.dev/', { headers: { Accept: accept } }))
+    }
     assert.equal(ask('text/markdown, text/html;q=0.5'), true)
     assert.equal(ask('text/html,application/xhtml+xml,*/*;q=0.8'), false)
     assert.equal(ask('*/*'), false)

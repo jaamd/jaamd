@@ -21,13 +21,18 @@ export async function getStaticPaths() {
         const prefix = localePrefix(locale)
 
         for (const page of pages) {
-            const add = (slug: string, redirect?: string) =>
-                paths.push({ params: { slug }, props: { id: page.id, locale, redirect } })
+            const add = (slug: string, redirect?: string) => {
+                return paths.push({ params: { slug }, props: { id: page.id, locale, redirect } })
+            }
 
             // Empty is the index route's; a prefixed locale has none, so /it is this page.
             const own = `${prefix}${page.canonical}`.replace(/\/$/, '')
-            if (own) add(own)
-            for (const alias of page.aliases) add(`${prefix}${alias}`, page.canonical)
+            if (own) {
+                add(own)
+            }
+            for (const alias of page.aliases) {
+                add(`${prefix}${alias}`, page.canonical)
+            }
         }
     }
 

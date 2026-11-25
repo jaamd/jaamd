@@ -138,11 +138,17 @@ export function assertSeparateBases(members: SiteMember[]): void {
     for (const [at, member] of members.entries()) {
         const earlier = members.slice(0, at)
 
-        if (earlier.some((other) => other.package === member.package)) {
+        if (
+            earlier.some((other) => {
+                return other.package === member.package
+            })
+        ) {
             throw new Error(`jaamd: ${member.package} is in the integrations twice. Keep one.`)
         }
 
-        const sharing = earlier.find((other) => other.base === member.base)
+        const sharing = earlier.find((other) => {
+            return other.base === member.base
+        })
         if (sharing) {
             throw new Error(
                 `jaamd: ${sharing.package} and ${member.package} both mount their pages at "${member.base || '/'}". ` +

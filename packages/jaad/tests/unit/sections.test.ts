@@ -14,14 +14,16 @@ import { validateDocsStructure } from '../../src/docs/model/validate.ts'
 import { buildDocsNavigation } from '../../src/docs/navigation.ts'
 
 /** Pages as the collection hands them over, section attached. */
-const inSections = (...ids: string[]): DocsSource[] =>
-    ids.map((id) => {
+const inSections = (...ids: string[]): DocsSource[] => {
+    return ids.map((id) => {
         const [section, ...rest] = id.split('/')
         return { id, path: rest.join('/'), section, data: {} }
     })
+}
 
-const treeOf = (pages: DocsSource[], sections = ['guide', 'api']) =>
-    buildDocsTree(pages, { sections, urls: { docsBase: '' } })
+const treeOf = (pages: DocsSource[], sections = ['guide', 'api']) => {
+    return buildDocsTree(pages, { sections, urls: { docsBase: '' } })
+}
 
 function withTree(files: Record<string, string>, run: (root: string) => void) {
     const root = mkdtempSync(join(tmpdir(), 'jaad-sections-'))
@@ -56,7 +58,9 @@ test('without sections the id is the path', () => {
 test('sections sort in the declared order, pages by their own inside each', () => {
     const pages = inSections('api/02-server', 'guide/02-setup/01-install', 'api/01-client', 'guide/01-intro')
     assert.deepEqual(
-        treeOf(pages).pages.map((page) => page.id),
+        treeOf(pages).pages.map((page) => {
+            return page.id
+        }),
         ['guide/01-intro', 'guide/02-setup/01-install', 'api/01-client', 'api/02-server'],
     )
 })
@@ -69,7 +73,9 @@ test('the slug of a page starts with its section', () => {
 test('the first page opens the docs, the first of a later section opens the section', () => {
     const pages = inSections('guide/01-intro', 'guide/02-next', 'api/01-client', 'api/02-server')
     assert.deepEqual(
-        treeOf(pages).pages.map((page) => page.canonical),
+        treeOf(pages).pages.map((page) => {
+            return page.canonical
+        }),
         ['', 'guide/next', 'api', 'api/server'],
     )
 })
@@ -94,25 +100,30 @@ test('one chapter level is the limit inside a section too', () => {
 
 // ── Pages outside the sections ───────────────────────────────────────────────
 
-const loose = (id: string): DocsSource => ({ id, path: id, data: {} })
+const loose = (id: string): DocsSource => {
+    return { id, path: id, data: {} }
+}
 
 test('a page outside the sections opens the docs, and every section keeps its url', () => {
     const { pages } = treeOf([...inSections('guide/01-intro', 'api/01-client'), loose('01-welcome')])
     assert.deepEqual(
-        pages.map((page) => page.canonical),
+        pages.map((page) => {
+            return page.canonical
+        }),
         ['', 'guide', 'api'],
     )
     assert.deepEqual(
-        pages.flatMap((page) => page.aliases),
+        pages.flatMap((page) => {
+            return page.aliases
+        }),
         ['welcome', 'guide/intro', 'api/client'],
     )
 })
 
 test('a page outside the sections cannot take a section url', () => {
-    assert.throws(
-        () => validateDocsStructure([...inSections('guide/01-intro'), loose('02-guide')]),
-        /02-guide resolves into section \/guide/,
-    )
+    assert.throws(() => {
+        return validateDocsStructure([...inSections('guide/01-intro'), loose('02-guide')])
+    }, /02-guide resolves into section \/guide/)
 })
 
 test('the navigation lists the pages outside the sections first', () => {
@@ -121,7 +132,9 @@ test('the navigation lists the pages outside the sections first', () => {
         { key: 'guide', label: 'Guide' },
     ])
     assert.deepEqual(
-        groups.map((group) => group.type),
+        groups.map((group) => {
+            return group.type
+        }),
         ['page', 'section'],
     )
     assert.equal(nextPage?.href, '/guide')
@@ -139,11 +152,16 @@ test('navigation puts every section at the top, with its pages and chapters belo
     const { groups } = buildDocsNavigation(treeOf(pages), 'guide/01-intro', SECTIONS)
 
     assert.deepEqual(
-        groups.map((group) =>
-            group.type === 'section'
-                ? [group.label, group.entries.map((entry) => (entry.type === 'page' ? entry.item.href : entry.chapter))]
-                : null,
-        ),
+        groups.map((group) => {
+            return group.type === 'section'
+                ? [
+                      group.label,
+                      group.entries.map((entry) => {
+                          return entry.type === 'page' ? entry.item.href : entry.chapter
+                      }),
+                  ]
+                : null
+        }),
         [
             ['Guide', ['/', 'setup']],
             ['API', ['/api', '/api/server']],
@@ -176,7 +194,9 @@ test('a section keeps its directory, and takes its label from the key', () => {
         tmpdir(),
     )
     assert.deepEqual(
-        config.docs.sections.map(({ key, label, dir }) => ({ key, label, dir })),
+        config.docs.sections.map(({ key, label, dir }) => {
+            return { key, label, dir }
+        }),
         [
             { key: 'guide', label: 'The Guide', dir: './guide' },
             { key: 'api', label: 'Api', dir: '../shared/api' },
@@ -185,11 +205,12 @@ test('a section keeps its directory, and takes its label from the key', () => {
 })
 
 test('a section inside another is refused', () => {
-    assert.throws(
-        () =>
-            resolveConfig({ title: 'T', sections: { docs: { dir: './docs' }, api: { dir: './docs/api' } } }, tmpdir()),
-        /api: docs\/api is, or is inside, another/,
-    )
+    assert.throws(() => {
+        return resolveConfig(
+            { title: 'T', sections: { docs: { dir: './docs' }, api: { dir: './docs/api' } } },
+            tmpdir(),
+        )
+    }, /api: docs\/api is, or is inside, another/)
 })
 
 test('docsDir is read alongside sections only when set, and cannot hold one', () => {
@@ -197,37 +218,33 @@ test('docsDir is read alongside sections only when set, and cannot hold one', ()
     assert.equal(resolveConfig({ title: 'T', sections }, tmpdir()).docs.dirInUse, false)
     assert.equal(resolveConfig({ title: 'T', sections, docsDir: './intro' }, tmpdir()).docs.dirInUse, true)
     assert.equal(resolveConfig({ title: 'T' }, tmpdir()).docs.dirInUse, true)
-    assert.throws(
-        () => resolveConfig({ title: 'T', docsDir: './docs', sections: { api: { dir: './docs/api' } } }, tmpdir()),
-        /api: docs\/api is, or is inside, another/,
-    )
+    assert.throws(() => {
+        return resolveConfig({ title: 'T', docsDir: './docs', sections: { api: { dir: './docs/api' } } }, tmpdir())
+    }, /api: docs\/api is, or is inside, another/)
 })
 
 test('a section cannot have the name of a language of the docs', () => {
     withTree(
         { 'guide/en/01-a.md': '# A', 'guide/it/01-a.md': '# A', 'it/en/01-b.md': '# B', 'it/it/01-b.md': '# B' },
         (root) => {
-            assert.throws(
-                () => resolveConfig({ title: 'T', sections: { guide: { dir: './guide' }, it: { dir: './it' } } }, root),
-                /section "it" has the name of a language/,
-            )
+            assert.throws(() => {
+                return resolveConfig({ title: 'T', sections: { guide: { dir: './guide' }, it: { dir: './it' } } }, root)
+            }, /section "it" has the name of a language/)
         },
     )
 })
 
 test('a section key is a url segment', () => {
-    assert.throws(
-        () => resolveConfig({ title: 'T', sections: { 'My Guide': { dir: './guide' } } }, tmpdir()),
-        /section key/,
-    )
+    assert.throws(() => {
+        return resolveConfig({ title: 'T', sections: { 'My Guide': { dir: './guide' } } }, tmpdir())
+    }, /section key/)
 })
 
 test('sections have to agree on their languages', () => {
     withTree({ 'guide/en/01-a.md': '# A', 'guide/it/01-a.md': '# A', 'api/01-b.md': '# B' }, (root) => {
-        assert.throws(
-            () => resolveConfig({ title: 'T', sections: { guide: { dir: './guide' }, api: { dir: './api' } } }, root),
-            /sections disagree on their languages/,
-        )
+        assert.throws(() => {
+            return resolveConfig({ title: 'T', sections: { guide: { dir: './guide' }, api: { dir: './api' } } }, root)
+        }, /sections disagree on their languages/)
     })
 })
 
@@ -247,7 +264,9 @@ test('every section opener, and the first section key, has a url that redirects'
                 { dir: join(root, 'api'), section: 'api' },
             ]
             assert.deepEqual(
-                findAliases(roots).map((page) => page.slug),
+                findAliases(roots).map((page) => {
+                    return page.slug
+                }),
                 ['guide/intro', 'guide', 'api/client'],
             )
         },
@@ -266,7 +285,9 @@ test('a relative link to a markdown file resolves to the page url', () => {
                     { dir: join(root, 'api'), section: 'api' },
                 ],
                 locales: [],
-                urls: () => ({ docsBase: '/docs', deploymentBase: '/repo' }),
+                urls: () => {
+                    return { docsBase: '/docs', deploymentBase: '/repo' }
+                },
             }
             const from = join(root, 'guide', '01-intro.md')
 
@@ -284,10 +305,9 @@ test('a relative link to a markdown file resolves to the page url', () => {
             assert.equal(resolveDocLink('./image.png', from, context), null)
             assert.equal(resolveDocLink('../notes.md', from, context), null)
 
-            assert.throws(
-                () => resolveDocLink('./missing.md', from, context),
-                /links to \.\/missing\.md, which does not exist/,
-            )
+            assert.throws(() => {
+                return resolveDocLink('./missing.md', from, context)
+            }, /links to \.\/missing\.md, which does not exist/)
         },
     )
 })
@@ -298,8 +318,12 @@ test('a link to a draft resolves, and is reported once per link', () => {
         const context = {
             roots: [{ dir: join(root, 'docs') }],
             locales: [],
-            urls: () => ({ docsBase: '' }),
-            onDraftLink: (_from: string, href: string) => reported.push(href),
+            urls: () => {
+                return { docsBase: '' }
+            },
+            onDraftLink: (_from: string, href: string) => {
+                return reported.push(href)
+            },
         }
         const from = join(root, 'docs', '01-intro.md')
 
@@ -314,7 +338,9 @@ test('a link in a localised tree keeps its language', () => {
         const context = {
             roots: [{ dir: join(root, 'docs') }],
             locales: ['en', 'it'],
-            urls: (locale?: string) => ({ docsBase: '', locale, defaultLocale: 'en' }),
+            urls: (locale?: string) => {
+                return { docsBase: '', locale, defaultLocale: 'en' }
+            },
         }
         assert.equal(resolveDocLink('./02-guida.md', join(root, 'docs', 'it', '01-intro.md'), context), '/it/guida')
     })
@@ -322,17 +348,27 @@ test('a link in a localised tree keeps its language', () => {
 
 test('the rehype plugin rewrites the links of a tree', () => {
     withTree({ 'docs/01-intro.md': '', 'docs/02-next.md': '' }, (root) => {
-        const link = (href: string) => ({ type: 'element', tagName: 'a', properties: { href }, children: [] })
+        const link = (href: string) => {
+            return { type: 'element', tagName: 'a', properties: { href }, children: [] }
+        }
         const tree = {
             type: 'root',
             children: [{ type: 'element', tagName: 'p', children: [link('./02-next.md'), link('#top')] }],
         }
 
-        const context = { roots: [{ dir: join(root, 'docs') }], locales: [], urls: () => ({ docsBase: '' }) }
+        const context = {
+            roots: [{ dir: join(root, 'docs') }],
+            locales: [],
+            urls: () => {
+                return { docsBase: '' }
+            },
+        }
         rehypeDocLinks(context)()(tree, { path: join(root, 'docs', '01-intro.md') })
 
         assert.deepEqual(
-            tree.children[0].children.map((node) => node.properties.href),
+            tree.children[0].children.map((node) => {
+                return node.properties.href
+            }),
             ['/next', '#top'],
         )
     })

@@ -7,7 +7,9 @@ import { fontVariables, parseConfig, siteOptionsOf, type JaadUserConfig } from '
 import { createIntegrationState } from './src/docs/integration.ts'
 import { createJaadIntegration } from './src/integration.ts'
 
-const own = (path: string) => fileURLToPath(new URL(path, import.meta.url))
+const own = (path: string) => {
+    return fileURLToPath(new URL(path, import.meta.url))
+}
 
 /** The site, then the docs on it: Astro flattens nested arrays in
  *  `integrations`. The options are checked here, so a wrong one fails as the

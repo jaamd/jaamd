@@ -12,7 +12,9 @@ const SITE = join(dirname(fileURLToPath(import.meta.url)), '../../../site/src')
 
 test('every preset resolves to a stylesheet JAAMD actually ships', () => {
     for (const name of Object.keys(PRESETS)) {
-        if (PRESETS[name].theme === null) continue
+        if (PRESETS[name].theme === null) {
+            continue
+        }
         const { theme } = resolveStylesheets(resolveConfig({ title: 'T', theme: name }, '/'), '/')
         assert.ok(theme && existsSync(theme), `${name} points at ${String(theme)}`)
     }
@@ -23,7 +25,9 @@ test('the default preset ships no stylesheet, so it changes nothing', () => {
 })
 
 test('a preset flips the bridge, so the palette travels from JAAMD', () => {
-    const config = (theme: string) => resolveConfig({ title: 'T', theme }, '/')
+    const config = (theme: string) => {
+        return resolveConfig({ title: 'T', theme }, '/')
+    }
     const withPreset = resolveStylesheets(config('dracula'), '/')
     const without = resolveStylesheets(config('default'), '/')
 
@@ -35,14 +39,19 @@ test('a preset flips the bridge, so the palette travels from JAAMD', () => {
 
 // The two directions are a cycle if both load, and CSS drops both sides of one.
 test('the two bridges never declare the same custom property', () => {
-    const declared = (name: string) =>
-        new Set(
-            [...readFileSync(join(SITE, 'styles', name), 'utf8').matchAll(/^\s*(--[a-z0-9-]+):/gm)].map((m) => m[1]),
+    const declared = (name: string) => {
+        return new Set(
+            [...readFileSync(join(SITE, 'styles', name), 'utf8').matchAll(/^\s*(--[a-z0-9-]+):/gm)].map((m) => {
+                return m[1]
+            }),
         )
+    }
 
     const forward = declared('jaamd-forward.css')
     const reverse = declared('jaamd-reverse.css')
-    const both = [...forward].filter((token) => reverse.has(token))
+    const both = [...forward].filter((token) => {
+        return reverse.has(token)
+    })
 
     assert.deepEqual(both, [], 'a token written by both bridges would cycle')
 })
@@ -83,8 +92,12 @@ test('an explicit pair bypasses the presets', () => {
 
 test('an unknown theme is a build error, not a silent fallback', () => {
     assert.throws(
-        () => resolveConfig({ title: 'T', theme: 'solarized' }, '/'),
-        (e: Error) => /unknown theme/.test(String(e)) && /dracula/.test(String(e)),
+        () => {
+            return resolveConfig({ title: 'T', theme: 'solarized' }, '/')
+        },
+        (e: Error) => {
+            return /unknown theme/.test(String(e)) && /dracula/.test(String(e))
+        },
     )
 })
 

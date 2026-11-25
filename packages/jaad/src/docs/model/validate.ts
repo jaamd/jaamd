@@ -2,7 +2,9 @@ import type { DocsSource } from './tree.ts'
 import { getCleanSlug, namedSlug } from './ids.ts'
 
 /** Within a section, like `id`; across them, the section is part of the name. */
-const inSection = (page: DocsSource, id: string) => (page.section ? `${page.section}/${id}` : id)
+const inSection = (page: DocsSource, id: string) => {
+    return page.section ? `${page.section}/${id}` : id
+}
 
 /** Fail before route generation when the file tree cannot produce one clear
  * navigation and URL for every page. */
@@ -11,10 +13,16 @@ export function validateDocsStructure(pages: DocsSource[], locale?: string): voi
     const directoriesByChapter = new Map<string, Set<string>>()
     const issues: string[] = []
     // Messages name the file on disk, locale directory included.
-    const named = (id: string) => (locale ? `${locale}/${id}` : id)
+    const named = (id: string) => {
+        return locale ? `${locale}/${id}` : id
+    }
 
-    const byId = pages.map((page) => ({ page, id: inSection(page, page.path) }))
-    for (const { page, id } of byId.toSorted((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+    const byId = pages.map((page) => {
+        return { page, id: inSection(page, page.path) }
+    })
+    for (const { page, id } of byId.toSorted((a, b) => {
+        return a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+    })) {
         const parts = page.path.split('/')
         if (parts.length > 2) {
             issues.push(`${named(id)}: only one chapter directory is supported inside docs/`)
@@ -41,7 +49,11 @@ export function validateDocsStructure(pages: DocsSource[], locale?: string): voi
     }
 
     // A page outside the sections cannot take a section's url.
-    const keys = new Set(pages.flatMap((page) => page.section ?? []))
+    const keys = new Set(
+        pages.flatMap((page) => {
+            return page.section ?? []
+        }),
+    )
     for (const page of pages) {
         const first = namedSlug(page.path, page.section).split('/')[0]
         if (!page.section && keys.has(first)) {
@@ -52,7 +64,9 @@ export function validateDocsStructure(pages: DocsSource[], locale?: string): voi
     const byKey = new Map<string, string[]>()
     for (const page of pages) {
         const key = page.data.translationKey
-        if (!key) continue
+        if (!key) {
+            continue
+        }
         const ids = byKey.get(key) ?? []
         ids.push(inSection(page, page.path))
         byKey.set(key, ids)
@@ -70,6 +84,11 @@ export function validateDocsStructure(pages: DocsSource[], locale?: string): voi
     }
 
     if (issues.length > 0) {
-        throw new Error(`jaad: invalid documentation structure\n${issues.map((issue) => `  ${issue}`).join('\n')}`)
+        const list = issues
+            .map((issue) => {
+                return `  ${issue}`
+            })
+            .join('\n')
+        throw new Error(`jaad: invalid documentation structure\n${list}`)
     }
 }

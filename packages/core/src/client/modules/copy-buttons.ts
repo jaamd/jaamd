@@ -9,8 +9,12 @@ const messages = new WeakMap<Element, Pick<Labels, 'copied' | 'copySelected'>>()
 
 export function addCopyButtons(root: ParentNode, labels: Labels): void {
     root.querySelectorAll<HTMLElement>('pre').forEach((pre) => {
-        if (pre.querySelector(`.${CLASS.copyButton}`)) return
-        if (!pre.querySelector('code')) return
+        if (pre.querySelector(`.${CLASS.copyButton}`)) {
+            return
+        }
+        if (!pre.querySelector('code')) {
+            return
+        }
 
         const btn = document.createElement('button')
         btn.type = 'button'
@@ -30,7 +34,9 @@ export async function onCopyClick(target: Element): Promise<void> {
     const btn = target.closest<HTMLElement>(`.${CLASS.copyButton}`)
     const code = btn?.parentElement?.querySelector<HTMLElement>('code')
     const labels = btn && messages.get(btn)
-    if (!btn || !code || !labels) return
+    if (!btn || !code || !labels) {
+        return
+    }
 
     let copied = true
     try {
@@ -52,7 +58,9 @@ export async function onCopyClick(target: Element): Promise<void> {
     clearTimeout(resetTimers.get(btn))
     resetTimers.set(
         btn,
-        setTimeout(() => delete btn.dataset.copied, RESET_MS),
+        setTimeout(() => {
+            return delete btn.dataset.copied
+        }, RESET_MS),
     )
 }
 
@@ -69,5 +77,7 @@ function announce(message: string): void {
     }
     // Cleared first, so the same message is announced again.
     live.textContent = ''
-    requestAnimationFrame(() => (live.textContent = message))
+    requestAnimationFrame(() => {
+        return (live.textContent = message)
+    })
 }

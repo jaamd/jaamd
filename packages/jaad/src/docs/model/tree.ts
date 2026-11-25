@@ -107,15 +107,18 @@ function sortSources<S extends DocsSource>(sources: S[], sections: string[]): S[
     }
 
     return entries
-        .toSorted(
-            (a, b) =>
+        .toSorted((a, b) => {
+            return (
                 a.section - b.section ||
                 primary(a) - primary(b) ||
                 a.directory.localeCompare(b.directory) ||
                 a.order - b.order ||
-                a.source.path.localeCompare(b.source.path),
-        )
-        .map((entry) => entry.source)
+                a.source.path.localeCompare(b.source.path)
+            )
+        })
+        .map((entry) => {
+            return entry.source
+        })
 }
 
 /** Resolves every page of one locale once. */
@@ -154,7 +157,15 @@ export function buildDocsTree<S extends DocsSource>(sources: S[], options: DocsT
 
     return {
         pages,
-        byId: new Map(pages.map((page) => [page.id, page])),
-        byKey: new Map(pages.map((page) => [page.translationKey, page])),
+        byId: new Map(
+            pages.map((page) => {
+                return [page.id, page]
+            }),
+        ),
+        byKey: new Map(
+            pages.map((page) => {
+                return [page.translationKey, page]
+            }),
+        ),
     }
 }

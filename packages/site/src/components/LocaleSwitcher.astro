@@ -8,7 +8,9 @@ interface Props {
 }
 
 const { alternates, current } = Astro.props
-const active = alternates.find((entry) => entry.locale.code === current)
+const active = alternates.find((entry) => {
+    return entry.locale.code === current
+})
 const t = ui(current)
 ---
 
@@ -51,25 +53,36 @@ const t = ui(current)
 
     class JaadLocaleSwitcher extends HTMLElement {
         #onDocumentPointerDown = (event: PointerEvent) => {
-            if (!this.contains(event.target as Node)) this.#close()
+            if (!this.contains(event.target as Node)) {
+                this.#close()
+            }
         }
 
         #onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') this.#close()
+            if (event.key === 'Escape') {
+                this.#close()
+            }
         }
 
         /** The header persists across navigations; its links must not. */
         #onBeforeSwap = (event: Event) => {
             const markup = nextSwitcherMarkup((event as Event & { newDocument: Document }).newDocument)
-            if (markup !== null) this.innerHTML = markup
+            if (markup !== null) {
+                this.innerHTML = markup
+            }
         }
 
         /** Delegated: #onBeforeSwap replaces the button this would bind to. */
         #onClick = (event: MouseEvent) => {
             const target = event.target as Element | null
-            if (!target?.closest('[data-trigger]')) return
-            if (this.#menu()?.hidden) this.#open()
-            else this.#close()
+            if (!target?.closest('[data-trigger]')) {
+                return
+            }
+            if (this.#menu()?.hidden) {
+                this.#open()
+            } else {
+                this.#close()
+            }
         }
 
         connectedCallback() {
@@ -92,16 +105,22 @@ const t = ui(current)
 
         #open() {
             const menu = this.#menu()
-            if (menu) menu.hidden = false
+            if (menu) {
+                menu.hidden = false
+            }
             this.querySelector('[data-trigger]')?.setAttribute('aria-expanded', 'true')
         }
 
         #close() {
             const menu = this.#menu()
-            if (menu) menu.hidden = true
+            if (menu) {
+                menu.hidden = true
+            }
             const trigger = this.querySelector<HTMLElement>('[data-trigger]')
             trigger?.setAttribute('aria-expanded', 'false')
-            if (this.contains(document.activeElement)) trigger?.focus()
+            if (this.contains(document.activeElement)) {
+                trigger?.focus()
+            }
         }
     }
 

@@ -33,7 +33,9 @@ function markdownContext(site: URL | undefined): Promise<MarkdownExportContext> 
         for (const locale of buildLocales()) {
             const { pages } = await getDocsTree(locale)
             for (const page of pages) {
-                if (!page.source.filePath) continue
+                if (!page.source.filePath) {
+                    continue
+                }
                 const href = docsMarkdownHref(page.slug, docsUrls(page.locale ?? locale))
                 markdownUrls.set(sourceKey(page.source.filePath), absoluteHref(href, site))
             }
@@ -41,7 +43,9 @@ function markdownContext(site: URL | undefined): Promise<MarkdownExportContext> 
         return { markdownUrls, origin: site ? site.origin : null }
     }
 
-    if (!import.meta.env.PROD) return build()
+    if (!import.meta.env.PROD) {
+        return build()
+    }
     exportContext ??= build()
     return exportContext
 }
@@ -94,9 +98,13 @@ async function llmsBlocks(site: URL | undefined, locale: string | undefined, lev
     const top = '#'.repeat(level)
     const below = '#'.repeat(level + 1)
 
-    const markdownHref = (slug: string): string => absoluteHref(docsMarkdownHref(slug, docsUrls(locale)), site)
+    const markdownHref = (slug: string): string => {
+        return absoluteHref(docsMarkdownHref(slug, docsUrls(locale)), site)
+    }
 
-    const toLine = (row: Row): string => llmsLine(row.title, markdownHref(row.slug), row.description)
+    const toLine = (row: Row): string => {
+        return llmsLine(row.title, markdownHref(row.slug), row.description)
+    }
 
     /** Standalone pages first, then one heading per chapter. */
     const outline = (pages: DocsPage[], heading: string): string[] => {
@@ -117,28 +125,34 @@ async function llmsBlocks(site: URL | undefined, locale: string | undefined, lev
             }
 
             const rows = chapters.get(chapter) ?? []
-            if (rows.length === 0) chapters.set(chapter, rows)
+            if (rows.length === 0) {
+                chapters.set(chapter, rows)
+            }
             rows.push(row)
         }
 
         return [
             ...(standalone.length > 0 ? [standalone.map(toLine).join('\n')] : []),
-            ...[...chapters].map(
-                ([chapter, rows]) => `${heading} ${slugToTitle(chapter)}\n\n${rows.map(toLine).join('\n')}`,
-            ),
+            ...[...chapters].map(([chapter, rows]) => {
+                return `${heading} ${slugToTitle(chapter)}\n\n${rows.map(toLine).join('\n')}`
+            }),
         ]
     }
 
     // With sections, the pages outside them come first; each section is a
     // heading, and its chapters sit one level below.
-    const loose = sortedPages.filter((page) => !page.section)
+    const loose = sortedPages.filter((page) => {
+        return !page.section
+    })
     const sections: string[] =
         SECTIONS.length === 0
             ? outline(sortedPages, top)
             : [
                   ...(loose.length > 0 ? outline(loose, top) : []),
                   ...SECTIONS.flatMap((section) => {
-                      const pages = sortedPages.filter((page) => page.section === section.key)
+                      const pages = sortedPages.filter((page) => {
+                          return page.section === section.key
+                      })
                       return pages.length > 0 ? [`${top} ${section.label}`, ...outline(pages, below)] : []
                   }),
               ]
@@ -151,7 +165,10 @@ async function llmsBlocks(site: URL | undefined, locale: string | undefined, lev
                   `${top} Other languages`,
                   others
                       .map((code) => {
-                          const name = LOCALES.find((known) => known.code === code)?.name ?? code
+                          const name =
+                              LOCALES.find((known) => {
+                                  return known.code === code
+                              })?.name ?? code
                           const href = absoluteHref(docsFileHref('llms.txt', docsUrls(code)), site)
                           return llmsLine(name, href)
                       })

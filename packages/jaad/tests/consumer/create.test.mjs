@@ -23,7 +23,9 @@ function useLocalJaad(project, tarball) {
 }
 
 let tarball
-const pack = () => (tarball ??= packPackage(PKG))
+const pack = () => {
+    return (tarball ??= packPackage(PKG))
+}
 
 after(cleanupTemporaryDirectories)
 
@@ -46,21 +48,31 @@ test('the scaffolder produces a project that builds', { timeout: 600_000 }, () =
     run('npm', ['install', '--no-audit', '--no-fund'], project)
     run('npx', ['astro', 'build'], project)
 
-    const built = walk(join(project, 'dist')).map((f) => f.slice(join(project, 'dist').length))
+    const built = walk(join(project, 'dist')).map((f) => {
+        return f.slice(join(project, 'dist').length)
+    })
     assert.ok(built.includes('/index.html'), 'no docs index')
     assert.ok(built.includes('/introduction/index.html'), 'no compatibility redirect for the sample page')
     const agents = readFileSync(join(project, 'AGENTS.md'), 'utf8')
-    const guides = [...agents.matchAll(/`(node_modules\/@jaamd\/jaad\/docs\/[^`]+\.md)`/g)].map((m) => m[1])
+    const guides = [...agents.matchAll(/`(node_modules\/@jaamd\/jaad\/docs\/[^`]+\.md)`/g)].map((m) => {
+        return m[1]
+    })
     assert.ok(guides.length > 0, 'AGENTS.md lists no guide in node_modules')
     assert.deepEqual(
-        guides.filter((guide) => !existsSync(join(project, guide))),
+        guides.filter((guide) => {
+            return !existsSync(join(project, guide))
+        }),
         [],
         'AGENTS.md cites a guide the package does not install',
     )
     assert.deepEqual(
         readdirSync(join(PKG, 'docs'), { recursive: true })
-            .filter((file) => file.endsWith('.md'))
-            .filter((file) => !existsSync(join(project, 'node_modules', '@jaamd', 'jaad', 'docs', file))),
+            .filter((file) => {
+                return file.endsWith('.md')
+            })
+            .filter((file) => {
+                return !existsSync(join(project, 'node_modules', '@jaamd', 'jaad', 'docs', file))
+            }),
         [],
         'a documentation page is missing from the tarball',
     )
@@ -70,7 +82,12 @@ test('the scaffolder produces a project that builds', { timeout: 600_000 }, () =
         /AGENTS\.md/,
         'CLAUDE.md does not defer to AGENTS.md',
     )
-    assert.ok(!built.some((file) => /agents|claude/i.test(file)), 'an agent guide was published as a page')
+    assert.ok(
+        !built.some((file) => {
+            return /agents|claude/i.test(file)
+        }),
+        'an agent guide was published as a page',
+    )
 
     const home = readFileSync(join(project, 'dist', 'index.html'), 'utf8')
     assert.match(home, /<title>Scaffolded<\/title>/, 'title missing')
@@ -102,7 +119,9 @@ test('the site template keeps the landing page separate from the docs', { timeou
     run('npm', ['install', '--no-audit', '--no-fund'], project)
     run('npx', ['astro', 'build'], project)
 
-    const built = walk(join(project, 'dist')).map((f) => f.slice(join(project, 'dist').length))
+    const built = walk(join(project, 'dist')).map((f) => {
+        return f.slice(join(project, 'dist').length)
+    })
     assert.ok(built.includes('/index.html'), 'no landing page')
     assert.ok(built.includes('/docs/index.html'), 'no docs index')
     assert.ok(built.includes('/docs/introduction/index.html'), 'no compatibility redirect for the sample page')
@@ -186,7 +205,9 @@ test('--here adds jaad to an existing repository without taking it over', { time
     run('npm', ['install', '--no-audit', '--no-fund'], project)
     run('npx', ['astro', 'build'], project)
 
-    const built = walk(join(project, 'dist')).map((f) => f.slice(join(project, 'dist').length))
+    const built = walk(join(project, 'dist')).map((f) => {
+        return f.slice(join(project, 'dist').length)
+    })
     assert.match(
         readFileSync(join(project, 'dist', 'index.html'), 'utf8'),
         /data-existing/,
@@ -200,8 +221,12 @@ test('every guide the agent files cite is a page of the docs', () => {
     for (const template of ['docs', 'site']) {
         const agents = readFileSync(join(CREATE_PKG, 'templates', template, 'AGENTS.md'), 'utf8')
         const missing = [...agents.matchAll(/`node_modules\/@jaamd\/jaad\/(docs\/[^`]+\.md)`/g)]
-            .map((m) => m[1])
-            .filter((guide) => !existsSync(join(PKG, guide)))
+            .map((m) => {
+                return m[1]
+            })
+            .filter((guide) => {
+                return !existsSync(join(PKG, guide))
+            })
         assert.deepEqual(missing, [], `templates/${template}/AGENTS.md`)
     }
 })

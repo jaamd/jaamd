@@ -3,7 +3,9 @@ import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { page, distFiles } from '../dist.mjs'
 
-const meta = (html, key) => html.match(new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`))?.[1] ?? null
+const meta = (html, key) => {
+    return html.match(new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`))?.[1] ?? null
+}
 
 // Facebook, LinkedIn and Slack do not resolve relative image paths: a relative
 // og:image means no preview anywhere.
@@ -12,7 +14,9 @@ test('social card images are absolute urls', () => {
         const html = readFileSync(file, 'utf8')
         for (const key of ['og:image', 'twitter:image']) {
             const value = meta(html, key)
-            if (value === null) continue
+            if (value === null) {
+                continue
+            }
             assert.match(value, /^https?:\/\//, `${key} in ${file}`)
         }
     }
@@ -47,7 +51,9 @@ test('a page description is not just its own title', () => {
 test('every page declares a language', () => {
     for (const file of distFiles('.html')) {
         const html = readFileSync(file, 'utf8')
-        if (/<meta http-equiv="refresh"/.test(html)) continue
+        if (/<meta http-equiv="refresh"/.test(html)) {
+            continue
+        }
         assert.match(html, /<html lang="[^"]+"/, file)
     }
 })
@@ -64,13 +70,17 @@ test('docs pages carry parseable structured data with absolute urls', () => {
     const crumbs = data.breadcrumb.itemListElement
     assert.ok(crumbs.length >= 2, 'breadcrumb has no trail')
     for (const crumb of crumbs) {
-        if (crumb.item) assert.match(crumb.item, /^https?:\/\//, crumb.name)
+        if (crumb.item) {
+            assert.match(crumb.item, /^https?:\/\//, crumb.name)
+        }
     }
 })
 
 test('the opening page redirect is not listed as canonical content', () => {
     const sitemap = distFiles('.xml')
-        .map((file) => readFileSync(file, 'utf8'))
+        .map((file) => {
+            return readFileSync(file, 'utf8')
+        })
         .join('\n')
     assert.doesNotMatch(sitemap, /\/docs\/overview\/?<\/loc>/)
 })
@@ -84,7 +94,9 @@ test("a page's canonical, its sidebar link and the sitemap agree on the slash", 
     assert.ok(html.includes('href="/docs/getting-started/installation/"'), 'the sidebar links to another url')
 
     const sitemap = distFiles('.xml')
-        .map((file) => readFileSync(file, 'utf8'))
+        .map((file) => {
+            return readFileSync(file, 'utf8')
+        })
         .join('\n')
     assert.match(sitemap, /<loc>https:\/\/docs\.example\.com\/docs\/getting-started\/installation\/<\/loc>/)
 })

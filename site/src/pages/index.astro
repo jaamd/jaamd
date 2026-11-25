@@ -139,11 +139,16 @@ const ARROW_ICON =
     theme.addEventListener('change', () => {
         const option = theme.selectedOptions[0]
         preview.dataset.jaamdTheme = theme.value
-        if (option.dataset.mode === 'dark') preview.dataset.mode = 'dark'
-        else delete preview.dataset.mode
+        if (option.dataset.mode === 'dark') {
+            preview.dataset.mode = 'dark'
+        } else {
+            delete preview.dataset.mode
+        }
     })
 
     for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
-        button.addEventListener('click', () => navigator.clipboard?.writeText(button.dataset.copy ?? ''))
+        button.addEventListener('click', () => {
+            return navigator.clipboard?.writeText(button.dataset.copy ?? '')
+        })
     }
 </script>

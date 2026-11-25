@@ -6,19 +6,24 @@ import { registerPlugins, satteriPlugins, unifiedPlugins } from '../src/processo
 
 type Processor = AstroConfig['markdown']['processor']
 
-const satteri = (options: object = {}) =>
-    ({ name: 'satteri', options: { mdastPlugins: [], hastPlugins: [], features: {}, ...options } }) as Processor & {
+const satteri = (options: object = {}) => {
+    return {
+        name: 'satteri',
+        options: { mdastPlugins: [], hastPlugins: [], features: {}, ...options },
+    } as Processor & {
         options: { mdastPlugins: { name?: string }[]; hastPlugins: unknown[]; features: Record<string, unknown> }
     }
+}
 
-const unified = (options: object = {}) =>
-    ({ name: 'unified', options: { remarkPlugins: [], rehypePlugins: [], ...options } }) as Processor & {
+const unified = (options: object = {}) => {
+    return { name: 'unified', options: { remarkPlugins: [], rehypePlugins: [], ...options } } as Processor & {
         options: { remarkPlugins: unknown[]; rehypePlugins: unknown[] }
     }
+}
 
-const names = (entries: unknown[]): string[] =>
-    entries.flatMap((entry) =>
-        Array.isArray(entry)
+const names = (entries: unknown[]): string[] => {
+    return entries.flatMap((entry) => {
+        return Array.isArray(entry)
             ? names(entry)
             : typeof entry === 'function'
               ? [entry.name]
@@ -26,8 +31,9 @@ const names = (entries: unknown[]): string[] =>
                 ? [entry.split('/').pop()!]
                 : entry && typeof entry === 'object' && 'name' in entry
                   ? [String(entry.name)]
-                  : [],
-    )
+                  : []
+    })
+}
 
 test('Sätteri: blocks ahead of the user, the directive fallback last, the hast plugins after the user', () => {
     const user = { name: 'user' }
@@ -82,8 +88,18 @@ test('unified: plugins the user registered are not added again, ids included', (
     const processor = unified({ remarkPlugins: [remarkAlert, [remarkToc, {}]], rehypePlugins: [rehypeHeadingLinks] })
     const registration = registerPlugins(processor)
 
-    assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkJaamdAlert').length, 1)
-    assert.equal(names(processor.options.remarkPlugins).filter((name) => name === 'remarkJaamdToc').length, 1)
+    assert.equal(
+        names(processor.options.remarkPlugins).filter((name) => {
+            return name === 'remarkJaamdAlert'
+        }).length,
+        1,
+    )
+    assert.equal(
+        names(processor.options.remarkPlugins).filter((name) => {
+            return name === 'remarkJaamdToc'
+        }).length,
+        1,
+    )
     assert.deepEqual(names(processor.options.rehypePlugins), ['rehypeJaamdHeadingLinks', 'rehypeJaamdTableWrapper'])
     assert.deepEqual(registration, { added: 5, total: 9 })
 })

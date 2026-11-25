@@ -30,8 +30,9 @@ const env = {
     },
 }
 
-const get = (path: string, accept = 'text/html', method = 'GET') =>
-    worker.fetch(new Request(`https://docs.jaamd.org${path}`, { method, headers: { Accept: accept } }), env)
+const get = (path: string, accept = 'text/html', method = 'GET') => {
+    return worker.fetch(new Request(`https://docs.jaamd.org${path}`, { method, headers: { Accept: accept } }), env)
+}
 
 test('a browser gets the HTML page, varying on Accept as well', async () => {
     const response = await get('/jaad/getting-started/installation/', 'text/html,application/xhtml+xml,*/*;q=0.8')
@@ -62,7 +63,9 @@ test('a path that starts with // is looked up on this site, not on another host'
 
     assert.ok(fetched.length > 0)
     assert.deepEqual(
-        fetched.filter((url) => new URL(url).host !== 'docs.jaamd.org'),
+        fetched.filter((url) => {
+            return new URL(url).host !== 'docs.jaamd.org'
+        }),
         [],
     )
 })
@@ -99,5 +102,7 @@ test('the Markdown of a moved page redirects to the new Markdown', () => {
 })
 
 test('no moved page points at another moved page', () => {
-    for (const target of Object.values(MOVED)) assert.equal(MOVED[target], undefined, target)
+    for (const target of Object.values(MOVED)) {
+        assert.equal(MOVED[target], undefined, target)
+    }
 })

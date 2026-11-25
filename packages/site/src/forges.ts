@@ -50,7 +50,9 @@ export const FORGES: Record<string, Forge> = {
 /** Matches a repository URL to a bundled forge icon, if we recognise the host. */
 export function forgeForUrl(url: string): string | null {
     const host = url.match(/^https?:\/\/([^/]+)/)?.[1]
-    if (!host) return null
+    if (!host) {
+        return null
+    }
     for (const [name, forge] of Object.entries(FORGES)) {
         if (forge.host && (host === forge.host || host.endsWith('.' + forge.host))) {
             return name

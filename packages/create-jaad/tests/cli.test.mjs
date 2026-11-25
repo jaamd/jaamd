@@ -47,10 +47,14 @@ function snapshotFiles(directory) {
             const file = join(entry.parentPath, entry.name)
             return [file.slice(directory.length), readFileSync(file).toString('base64')]
         })
-        .toSorted(([a], [b]) => a.localeCompare(b))
+        .toSorted(([a], [b]) => {
+            return a.localeCompare(b)
+        })
 }
 
-const versionOf = (dir) => JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version
+const versionOf = (dir) => {
+    return JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version
+}
 
 function runScaffolderHere(project, template = 'site') {
     return spawnSync('node', [CLI, '--here', '--template', template, '--title', 'Existing Project', '--no-install'], {
@@ -128,7 +132,9 @@ test('the scaffolder installs JAAD at its own version', () => {
 // forgets them, and everything fails once published.
 test('the published scaffolder carries its templates', () => {
     const output = run('npm', ['pack', '--dry-run', '--json'], CREATE_PKG)
-    const packed = JSON.parse(output)[0].files.map((entry) => entry.path)
+    const packed = JSON.parse(output)[0].files.map((entry) => {
+        return entry.path
+    })
 
     for (const file of [
         'templates/_shared/CLAUDE.md',
@@ -149,7 +155,12 @@ test('the published scaffolder carries its templates', () => {
 
     // npm drops every `.gitignore` from a tarball, so it ships renamed.
     assert.ok(packed.includes('templates/_shared/_gitignore'), 'the templates ship no gitignore')
-    assert.ok(!packed.some((file) => file.endsWith('/.gitignore')), 'a template ships a .gitignore npm would strip')
+    assert.ok(
+        !packed.some((file) => {
+            return file.endsWith('/.gitignore')
+        }),
+        'a template ships a .gitignore npm would strip',
+    )
 })
 
 test('a scaffolded project ignores what it should not commit', () => {

@@ -43,7 +43,9 @@ function groupByChapter(items: DocsNavItem[]): DocsNavEntry[] {
 /** Each section with pages, under its label, in the order of `sections`. */
 function groupBySection(items: DocsNavItem[], sections: { key: string; label: string }[]): DocsNavGroup[] {
     return sections.flatMap(({ key, label }) => {
-        const own = items.filter((item) => item.section === key)
+        const own = items.filter((item) => {
+            return item.section === key
+        })
         return own.length > 0 ? [{ type: 'section' as const, section: key, label, entries: groupByChapter(own) }] : []
     })
 }
@@ -56,18 +58,27 @@ export function buildDocsNavigation(
     sections: { key: string; label: string }[] = [],
 ): DocsNavigation {
     const position = tree.byId.get(currentId)?.index ?? -1
-    const items = tree.pages.map((page): DocsNavItem => ({
-        title: page.label,
-        section: page.section,
-        chapter: page.chapter,
-        href: page.href,
-        isActive: page.index === position,
-    }))
+    const items = tree.pages.map((page): DocsNavItem => {
+        return {
+            title: page.label,
+            section: page.section,
+            chapter: page.chapter,
+            href: page.href,
+            isActive: page.index === position,
+        }
+    })
 
     return {
         groups:
             sections.length > 0
-                ? [...groupByChapter(items.filter((item) => !item.section)), ...groupBySection(items, sections)]
+                ? [
+                      ...groupByChapter(
+                          items.filter((item) => {
+                              return !item.section
+                          }),
+                      ),
+                      ...groupBySection(items, sections),
+                  ]
                 : groupByChapter(items),
         previousPage: position > 0 ? items[position - 1] : null,
         nextPage: position >= 0 && position < items.length - 1 ? items[position + 1] : null,

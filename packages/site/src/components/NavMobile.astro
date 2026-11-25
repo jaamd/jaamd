@@ -64,10 +64,14 @@ const t = ui(Astro.props.locale)
         #bound = false
 
         #onPointer = (e: PointerEvent) => {
-            if (!this.contains(e.target as Node)) this.#setOpen(false)
+            if (!this.contains(e.target as Node)) {
+                this.#setOpen(false)
+            }
         }
         #onKey = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') this.#setOpen(false)
+            if (e.key === 'Escape') {
+                this.#setOpen(false)
+            }
         }
 
         #setOpen(open: boolean) {
@@ -84,7 +88,9 @@ const t = ui(Astro.props.locale)
         }
 
         connectedCallback() {
-            if (this.#bound) return
+            if (this.#bound) {
+                return
+            }
             this.#bound = true
 
             this.#button = this.querySelector('button')!
@@ -94,7 +100,9 @@ const t = ui(Astro.props.locale)
                 this.#setOpen(Boolean(this.#menu.hidden))
             })
             this.#menu.addEventListener('click', (e) => {
-                if ((e.target as HTMLElement).closest('a')) this.#setOpen(false)
+                if ((e.target as HTMLElement).closest('a')) {
+                    this.#setOpen(false)
+                }
             })
         }
 

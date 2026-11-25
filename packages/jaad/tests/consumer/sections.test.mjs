@@ -13,7 +13,9 @@ describe('a project whose docs are split into sections', () => {
     let dist
     let localised
 
-    const page = (path) => readFileSync(join(dist, path), 'utf8')
+    const page = (path) => {
+        return readFileSync(join(dist, path), 'utf8')
+    }
     const write = (file, content) => {
         mkdirSync(dirname(file), { recursive: true })
         writeFileSync(file, content)
@@ -106,7 +108,9 @@ export default defineJaadConfig({
     })
 
     test('the sidebar lists every section, each with its own pages', () => {
-        const sidebar = (html) => html.slice(html.indexOf('docs-sidebar-left'), html.indexOf('</aside>'))
+        const sidebar = (html) => {
+            return html.slice(html.indexOf('docs-sidebar-left'), html.indexOf('</aside>'))
+        }
         const home = sidebar(page('index.html'))
         assert.match(
             home,
@@ -157,7 +161,9 @@ export default defineJaadConfig({
         assert.ok(existsSync(join(dist, 'api/server.md')))
         const index = JSON.parse(page('search-index.json'))
         assert.deepEqual(
-            index.pages.map((entry) => [entry.href, entry.section]),
+            index.pages.map((entry) => {
+                return [entry.href, entry.section]
+            }),
             [
                 ['/', 'guide'],
                 ['/guide/setup/install/', 'guide'],
@@ -166,13 +172,17 @@ export default defineJaadConfig({
             ],
         )
         assert.deepEqual(
-            index.sections.map((section) => section.label),
+            index.sections.map((section) => {
+                return section.label
+            }),
             ['The Guide', 'Api'],
         )
     })
 
     describe('localised, on unified, with a section that has no pages', () => {
-        const built = (path) => readFileSync(join(localised, path), 'utf8')
+        const built = (path) => {
+            return readFileSync(join(localised, path), 'utf8')
+        }
 
         test('each language opens on its own first page', () => {
             assert.match(built('index.html'), /<h1[^>]*>Intro en/)

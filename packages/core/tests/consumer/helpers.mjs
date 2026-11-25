@@ -12,7 +12,9 @@ export function temporaryDirectory(prefix) {
 }
 
 export function cleanupTemporaryDirectories() {
-    for (const dir of temporaryDirectories) rmSync(dir, { recursive: true })
+    for (const dir of temporaryDirectories) {
+        rmSync(dir, { recursive: true })
+    }
     temporaryDirectories.clear()
 }
 

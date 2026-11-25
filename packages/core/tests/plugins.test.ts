@@ -52,14 +52,24 @@ Kept.
 | 1 | 2 |
 `
 
-const slug = (text: string) => text.toLowerCase().replace(/ /g, '-')
+const slug = (text: string) => {
+    return text.toLowerCase().replace(/ /g, '-')
+}
 
 /** Stand-ins for the id plugin an adapter supplies. */
-const rehypeIds: Plugin<[], Root> = () => (tree) => {
-    for (const node of tree.children) {
-        if (node.type !== 'element' || !/^h[1-6]$/.test(node.tagName)) continue
-        const text = (node as Element).children.map((child) => ('value' in child ? child.value : '')).join('')
-        node.properties.id = slug(text)
+const rehypeIds: Plugin<[], Root> = () => {
+    return (tree) => {
+        for (const node of tree.children) {
+            if (node.type !== 'element' || !/^h[1-6]$/.test(node.tagName)) {
+                continue
+            }
+            const text = (node as Element).children
+                .map((child) => {
+                    return 'value' in child ? child.value : ''
+                })
+                .join('')
+            node.properties.id = slug(text)
+        }
     }
 }
 
@@ -94,7 +104,9 @@ const processors = {
     },
 }
 
-const count = (html: string, pattern: RegExp) => (html.match(pattern) ?? []).length
+const count = (html: string, pattern: RegExp) => {
+    return (html.match(pattern) ?? []).length
+}
 
 for (const [name, render] of Object.entries(processors)) {
     describe(name, () => {
@@ -213,7 +225,9 @@ for (const [name, render] of Object.entries(processors)) {
 
         test('two code-tabs groups get two ids', async () => {
             const html = await render({}, `${SOURCE}\n${SOURCE.replace('## Setup', '## Again')}`)
-            const ids = [...html.matchAll(/class="jaamd-code-tabs" id="(jaamd-tabs-[a-z0-9]+)"/g)].map((m) => m[1])
+            const ids = [...html.matchAll(/class="jaamd-code-tabs" id="(jaamd-tabs-[a-z0-9]+)"/g)].map((m) => {
+                return m[1]
+            })
             assert.equal(ids.length, 2)
             assert.notEqual(ids[0], ids[1])
         })
@@ -242,8 +256,11 @@ for (const [name, render] of Object.entries(processors)) {
 
 test('both processors give code-tabs groups the same ids', async () => {
     const source = `${SOURCE}\n${SOURCE.replace('## Setup', '## Again')}`
-    const ids = (html: string) =>
-        [...html.matchAll(/class="jaamd-code-tabs" id="(jaamd-tabs-[a-z0-9]+)"/g)].map((m) => m[1])
+    const ids = (html: string) => {
+        return [...html.matchAll(/class="jaamd-code-tabs" id="(jaamd-tabs-[a-z0-9]+)"/g)].map((m) => {
+            return m[1]
+        })
+    }
     const [a, b] = await Promise.all([processors.unified({}, source), processors.satteri({}, source)])
     assert.equal(ids(a).length, 2)
     assert.deepEqual(ids(a), ids(b))

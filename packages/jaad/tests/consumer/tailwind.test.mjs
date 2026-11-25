@@ -28,7 +28,9 @@ describe('`tailwind: true` in a pnpm project', () => {
                 dependencies: { astro: '7.3.1', '@jaamd/jaad': tarball },
             }),
         )
-        const overrides = Object.entries(jaamdOverride()).map(([name, spec]) => `  '${name}': '${spec}'\n`)
+        const overrides = Object.entries(jaamdOverride()).map(([name, spec]) => {
+            return `  '${name}': '${spec}'\n`
+        })
         writeFileSync(
             join(project, 'pnpm-workspace.yaml'),
             `allowBuilds:\n  esbuild: true\noverrides:\n${overrides.join('')}`,
@@ -63,8 +65,12 @@ import Page from "@jaamd/jaad/layouts/Page.astro";
         run('pnpm', ['add', '-D', '--config.minimum-release-age=0', 'tailwindcss@^4', '@tailwindcss/vite@^4'], project)
         run('pnpm', ['exec', 'astro', 'build'], project)
         css = walk(join(project, 'dist'))
-            .filter((f) => f.endsWith('.css'))
-            .map((f) => readFileSync(f, 'utf8'))
+            .filter((f) => {
+                return f.endsWith('.css')
+            })
+            .map((f) => {
+                return readFileSync(f, 'utf8')
+            })
             .join('\n')
     })
 

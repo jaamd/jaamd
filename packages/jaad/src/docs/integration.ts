@@ -25,9 +25,12 @@ const RESOLVED_DOCS_FRAME = '\0' + DOCS_FRAME_ID
 function docsFrameVirtualPlugin(docsFrame: () => string) {
     return {
         name: 'jaad:docs-frame',
-        resolveId: (source: string) => (source === DOCS_FRAME_ID ? RESOLVED_DOCS_FRAME : null),
-        load: (id: string) =>
-            id === RESOLVED_DOCS_FRAME ? `export { default } from ${JSON.stringify(docsFrame())};` : null,
+        resolveId: (source: string) => {
+            return source === DOCS_FRAME_ID ? RESOLVED_DOCS_FRAME : null
+        },
+        load: (id: string) => {
+            return id === RESOLVED_DOCS_FRAME ? `export { default } from ${JSON.stringify(docsFrame())};` : null
+        },
     }
 }
 
@@ -46,11 +49,16 @@ export interface IntegrationState {
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
 
 /** A plugin this integration registered on an earlier setup run. */
-const isDocLinks = (plugin: unknown): boolean =>
-    (typeof plugin === 'function' || (typeof plugin === 'object' && plugin !== null)) &&
-    ['jaad-doc-links', 'jaadDocLinks'].includes((plugin as { name?: string }).name ?? '')
+const isDocLinks = (plugin: unknown): boolean => {
+    return (
+        (typeof plugin === 'function' || (typeof plugin === 'object' && plugin !== null)) &&
+        ['jaad-doc-links', 'jaadDocLinks'].includes((plugin as { name?: string }).name ?? '')
+    )
+}
 
-const routeEntrypoint = (file: string) => fileURLToPath(new URL(`./routes/${file}`, import.meta.url))
+const routeEntrypoint = (file: string) => {
+    return fileURLToPath(new URL(`./routes/${file}`, import.meta.url))
+}
 
 /** A page read from disk, with the file it was read from. */
 interface DiskSource extends DocsSource {
@@ -66,14 +74,17 @@ function readDocsTrees(
     const sources: DiskSource[] = []
 
     const visit = (root: DocsRoot, current: string) => {
-        for (const entry of readdirSync(current, { withFileTypes: true }).toSorted((a, b) =>
-            a.name.localeCompare(b.name),
-        )) {
+        for (const entry of readdirSync(current, { withFileTypes: true }).toSorted((a, b) => {
+            return a.name.localeCompare(b.name)
+        })) {
             const file = join(current, entry.name)
-            if (entry.isDirectory()) visit(root, file)
-            else if (entry.isFile() && entry.name.endsWith('.md')) {
+            if (entry.isDirectory()) {
+                visit(root, file)
+            } else if (entry.isFile() && entry.name.endsWith('.md')) {
                 const front = readFrontmatter(readFileSync(file, 'utf8'))
-                if (front.draft) continue
+                if (front.draft) {
+                    continue
+                }
 
                 const { locale, id } = splitDocLocale(getDocCollectionId(relative(root.dir, file)), locales)
                 sources.push({
@@ -88,14 +99,20 @@ function readDocsTrees(
         }
     }
     for (const root of roots) {
-        if (existsSync(root.dir)) visit(root, root.dir)
+        if (existsSync(root.dir)) {
+            visit(root, root.dir)
+        }
     }
 
-    const sections = roots.flatMap((root) => root.section ?? [])
+    const sections = roots.flatMap((root) => {
+        return root.section ?? []
+    })
     return (locales.length > 0 ? locales : [undefined]).map((locale) => {
         // The slugs are all that is read: the urls need no mount.
         const tree = buildDocsTree(
-            sources.filter((source) => source.locale === locale),
+            sources.filter((source) => {
+                return source.locale === locale
+            }),
             { sections, urls: { docsBase: '' } },
         )
         return { locale, pages: tree.pages }
@@ -217,7 +234,15 @@ export function setupDocs(
     state: IntegrationState,
     { discoverAliases, rootLlms, reserved }: DocsSetupOptions,
 ): string[] {
-    updateConfig({ vite: { plugins: [docsFrameVirtualPlugin(() => state.docsFrame)] } })
+    updateConfig({
+        vite: {
+            plugins: [
+                docsFrameVirtualPlugin(() => {
+                    return state.docsFrame
+                }),
+            ],
+        },
+    })
 
     const routes = getInjectedRoutes(
         config.docs.base,
@@ -241,9 +266,13 @@ export function setupDocs(
 
     const root = fileURLToPath(astroConfig.root)
     const roots = docsRoots(config.docs, root)
-    const locales = config.locales.map((locale) => locale.code)
+    const locales = config.locales.map((locale) => {
+        return locale.code
+    })
 
-    const missing = roots.filter(({ dir }) => !existsSync(dir))
+    const missing = roots.filter(({ dir }) => {
+        return !existsSync(dir)
+    })
     for (const { dir } of missing) {
         logger.warn(
             `${relative(root, dir)} does not exist, so it adds no pages. ` +
@@ -265,7 +294,9 @@ export function setupDocs(
                 'Rename the file or its directory, or mount the docs elsewhere with routeBase.',
         )
     }
-    for (const { dir } of roots) addWatchFile(pathToFileURL(dir))
+    for (const { dir } of roots) {
+        addWatchFile(pathToFileURL(dir))
+    }
 
     const warnedDrafts = new Set<string>()
     const links: DocLinkContext = {
@@ -273,17 +304,21 @@ export function setupDocs(
         locales,
         onDraftLink(from, href) {
             const key = `${from}\0${href}`
-            if (warnedDrafts.has(key)) return
+            if (warnedDrafts.has(key)) {
+                return
+            }
             warnedDrafts.add(key)
             logger.warn(`${relative(root, from)} links to ${href}, a draft: a production build leaves it out.`)
         },
-        urls: (locale?: string): DocsUrlOptions => ({
-            docsBase: config.docs.base,
-            deploymentBase: normaliseBasePath(astroConfig.base),
-            locale,
-            defaultLocale: config.defaultLocale,
-            trailingSlash: config.docs.trailingSlash,
-        }),
+        urls: (locale?: string): DocsUrlOptions => {
+            return {
+                docsBase: config.docs.base,
+                deploymentBase: normaliseBasePath(astroConfig.base),
+                locale,
+                defaultLocale: config.defaultLocale,
+                trailingSlash: config.docs.trailingSlash,
+            }
+        },
     }
     // New arrays: a shared processor would stack duplicates across setup runs.
     const processor = astroConfig.markdown.processor as {
@@ -292,18 +327,24 @@ export function setupDocs(
     }
     if (processor.name === 'satteri') {
         processor.options.hastPlugins = [
-            ...(processor.options.hastPlugins ?? []).filter((plugin) => !isDocLinks(plugin)),
+            ...(processor.options.hastPlugins ?? []).filter((plugin) => {
+                return !isDocLinks(plugin)
+            }),
             satteriDocLinks(links),
         ]
     } else if (processor.name === 'unified') {
         processor.options.rehypePlugins = [
-            ...(processor.options.rehypePlugins ?? []).filter((plugin) => !isDocLinks(plugin)),
+            ...(processor.options.rehypePlugins ?? []).filter((plugin) => {
+                return !isDocLinks(plugin)
+            }),
             rehypeDocLinks(links),
         ]
     }
 
     if (config.docs.base === '') {
-        const ownIndex = INDEX_PAGE_NAMES.find((name) => existsSync(new URL(`pages/${name}`, astroConfig.srcDir)))
+        const ownIndex = INDEX_PAGE_NAMES.find((name) => {
+            return existsSync(new URL(`pages/${name}`, astroConfig.srcDir))
+        })
         if (ownIndex) {
             logger.warn(
                 `${ownIndex} owns the site root while JAAD docs are mounted there. ` +
@@ -319,7 +360,9 @@ export function setupDocs(
     })
 }
 
-const withoutTrailingSlash = (value: string) => (value.length > 1 ? value.replace(/\/$/, '') : value)
+const withoutTrailingSlash = (value: string) => {
+    return value.length > 1 ? value.replace(/\/$/, '') : value
+}
 
 export function createSitemapFilter(
     docsBase: string,
@@ -327,7 +370,9 @@ export function createSitemapFilter(
     defaultLocale?: string,
 ): (page: string) => boolean {
     return (page) => {
-        if (state.aliases.length === 0) return true
+        if (state.aliases.length === 0) {
+            return true
+        }
 
         const pathname = withoutTrailingSlash(new URL(page).pathname)
         return !state.aliases.some((alias) => {

@@ -135,7 +135,9 @@ export function isLocale(segment: string): boolean {
 /** "pt-br" becomes "pt-BR", "zh-hans" becomes "zh-Hans". */
 export function localeTag(code: string): string {
     const match = LOCALE_RE.exec(code.toLowerCase())
-    if (!match) return code
+    if (!match) {
+        return code
+    }
     const [, language, script, region] = match
     return [language, script && ucfirst(script), region && region.toUpperCase()].filter(Boolean).join('-')
 }
@@ -152,19 +154,29 @@ function localeName(tag: string): string {
 /** Regional indicators, A at U+1F1E6. */
 function localeFlag(code: string): string | null {
     const match = LOCALE_RE.exec(code.toLowerCase())
-    if (!match) return null
+    if (!match) {
+        return null
+    }
     // A group that did not participate is undefined, whatever the type says.
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const region = match[3]?.toUpperCase() ?? LANGUAGE_REGION[match[1]]
-    if (!region) return null
-    return String.fromCodePoint(...Array.from(region, (letter) => 0x1f1e6 + letter.charCodeAt(0) - 65))
+    if (!region) {
+        return null
+    }
+    return String.fromCodePoint(
+        ...Array.from(region, (letter) => {
+            return 0x1f1e6 + letter.charCodeAt(0) - 65
+        }),
+    )
 }
 
 /** Open Graph wants language_TERRITORY, not a BCP-47 tag. The territory comes
  *  from the code when it names one, and from LANGUAGE_REGION otherwise. */
 export function openGraphLocale(code: string): string {
     const match = LOCALE_RE.exec(code.toLowerCase())
-    if (!match) return code
+    if (!match) {
+        return code
+    }
 
     const language = match[1]
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -190,10 +202,20 @@ export function localePrefix(locale?: string, defaultLocale?: string): string {
 
 /** What to iterate when building: every locale, or one unlocalised pass. */
 export function routedLocales(locales: Locale[]): (string | undefined)[] {
-    return locales.length > 0 ? locales.map((l) => l.code) : [undefined]
+    return locales.length > 0
+        ? locales.map((l) => {
+              return l.code
+          })
+        : [undefined]
 }
 
 /** The locale codes whose urls carry a prefix. */
 export function prefixedLocales(locales: Locale[], defaultLocale: string): string[] {
-    return locales.map((locale) => locale.code).filter((code) => localeSegment(code, defaultLocale) !== '')
+    return locales
+        .map((locale) => {
+            return locale.code
+        })
+        .filter((code) => {
+            return localeSegment(code, defaultLocale) !== ''
+        })
 }

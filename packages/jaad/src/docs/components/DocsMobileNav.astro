@@ -21,8 +21,12 @@ function trail(): string[] {
         const section = group.type === 'section' ? [group.label] : []
         for (const entry of entries) {
             const items: DocsNavItem[] = entry.type === 'page' ? [entry.item] : entry.items
-            const current = items.find((item) => item.isActive)
-            if (!current) continue
+            const current = items.find((item) => {
+                return item.isActive
+            })
+            if (!current) {
+                continue
+            }
             const chapter = entry.type === 'chapter' ? [slugToTitle(entry.chapter)] : []
             return [...section, ...chapter, current.title]
         }
@@ -77,10 +81,14 @@ const path = trail()
     // A chosen entry closes its menu, so the page it opens is not covered.
     function closeOnChoice(): void {
         for (const menu of document.querySelectorAll<HTMLDetailsElement>('.docs-mobile-menu')) {
-            if (menu.dataset.navInit) continue
+            if (menu.dataset.navInit) {
+                continue
+            }
             menu.dataset.navInit = '1'
             menu.addEventListener('click', (event) => {
-                if ((event.target as Element).closest('a')) menu.open = false
+                if ((event.target as Element).closest('a')) {
+                    menu.open = false
+                }
             })
         }
     }

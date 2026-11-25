@@ -34,9 +34,15 @@ test('dual-theme code colours reach the built CSS', () => {
 
 test('no page title names the framework instead of the site', () => {
     const offenders = distFiles('.html')
-        .map((f) => [f.split('/dist/')[1], readFileSync(f, 'utf8')])
-        .filter(([, html]) => /<title>[^<]*\bJAAD\b[^<]*\bJAAD\b/.test(html))
-        .map(([name]) => name)
+        .map((f) => {
+            return [f.split('/dist/')[1], readFileSync(f, 'utf8')]
+        })
+        .filter(([, html]) => {
+            return /<title>[^<]*\bJAAD\b[^<]*\bJAAD\b/.test(html)
+        })
+        .map(([name]) => {
+            return name
+        })
     assert.deepEqual(offenders, [])
 })
 
@@ -47,7 +53,11 @@ test('no third-party host on the critical path', () => {
     const offenders = distFiles('.html')
         .flatMap((f) => {
             const html = readFileSync(f, 'utf8')
-            return HOSTS.filter((h) => html.includes(h)).map((h) => `${f.split('/dist/')[1]}: ${h}`)
+            return HOSTS.filter((h) => {
+                return html.includes(h)
+            }).map((h) => {
+                return `${f.split('/dist/')[1]}: ${h}`
+            })
         })
         .toSorted()
     assert.deepEqual(offenders, [])
@@ -55,7 +65,9 @@ test('no third-party host on the critical path', () => {
 
 test('the fonts are served from the site itself', () => {
     const faces = page('docs/index.html').match(/@font-face\{[^}]*\}/g) ?? []
-    const withFile = faces.filter((f) => f.includes('url('))
+    const withFile = faces.filter((f) => {
+        return f.includes('url(')
+    })
     assert.ok(withFile.length > 0, 'no font-face carries a file')
     for (const face of withFile) {
         assert.match(face, /url\("?\/[^")]*\.woff2/, 'font is not self-hosted')
@@ -104,8 +116,12 @@ test('the Markdown of a page reads on its own: a title, no directives, no links 
 
 // llms.txt lists loose pages before the chapters; llms-full.txt reads in the site's order.
 test('llms-full.txt holds every page of llms.txt', () => {
-    const listed = [...page('docs/llms.txt').matchAll(/^- \[[^\]]+\]\(([^)]+)\)/gm)].map((match) => match[1])
-    const sources = [...page('docs/llms-full.txt').matchAll(/^Source: (\S+)$/gm)].map((match) => match[1])
+    const listed = [...page('docs/llms.txt').matchAll(/^- \[[^\]]+\]\(([^)]+)\)/gm)].map((match) => {
+        return match[1]
+    })
+    const sources = [...page('docs/llms-full.txt').matchAll(/^Source: (\S+)$/gm)].map((match) => {
+        return match[1]
+    })
     assert.ok(listed.length > 0)
     assert.deepEqual(sources.toSorted(), listed.toSorted())
 })
@@ -120,21 +136,29 @@ test('a docs page announces its Markdown to agents', () => {
 test('every heading in the search index is an id on its page', () => {
     const index = JSON.parse(page('docs/search-index.json'))
     const missing = index.entries
-        .filter((entry) => entry.anchor)
-        .map((entry) => `${index.pages[entry.page].href.slice(1)}/index.html#${entry.anchor}`)
+        .filter((entry) => {
+            return entry.anchor
+        })
+        .map((entry) => {
+            return `${index.pages[entry.page].href.slice(1)}/index.html#${entry.anchor}`
+        })
         .filter((target) => {
             const [file, anchor] = target.split('#')
             return !page(file).includes(`id="${anchor}"`)
         })
     assert.ok(
-        index.entries.some((entry) => entry.anchor),
+        index.entries.some((entry) => {
+            return entry.anchor
+        }),
         'no heading reached the index',
     )
     assert.deepEqual(missing, [])
 })
 
 test('the sidebar follows the numeric prefixes', () => {
-    const links = [...page('docs/index.html').matchAll(/<a\b[^>]*\bhref="(\/docs(?:\/[^"#]*)?)"/g)].map((m) => m[1])
+    const links = [...page('docs/index.html').matchAll(/<a\b[^>]*\bhref="(\/docs(?:\/[^"#]*)?)"/g)].map((m) => {
+        return m[1]
+    })
 
     const at = (href) => {
         const index = links.indexOf(href)
@@ -219,7 +243,9 @@ test('docs and the page layout share one padding token', () => {
     // The page nav takes its width from the main it sits in, not its own number.
     const nav = page('docs/getting-started/installation/index.html')
         .match(/<nav[^>]*>/g)
-        ?.find((tag) => tag.includes('class="docs-page-nav"'))
+        ?.find((tag) => {
+            return tag.includes('class="docs-page-nav"')
+        })
 
     assert.ok(nav, 'the page navigation is missing from the built page')
     assert.doesNotMatch(nav, /max-w-/, 'the page nav pins itself to an absolute width again')

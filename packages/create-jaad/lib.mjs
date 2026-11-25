@@ -23,14 +23,20 @@ export function fail(message) {
 
 function takeValue(argv, index, option) {
     const value = argv[index + 1]
-    if (!value || value.startsWith('-')) fail(`${option} needs a value.`)
+    if (!value || value.startsWith('-')) {
+        fail(`${option} needs a value.`)
+    }
     return value
 }
 
 /** A prompt answer reaches no shell, so `~` is expanded here. */
 function expandHome(dir) {
-    if (dir === '~') return homedir()
-    if (dir.startsWith('~/')) return join(homedir(), dir.slice(2))
+    if (dir === '~') {
+        return homedir()
+    }
+    if (dir.startsWith('~/')) {
+        return join(homedir(), dir.slice(2))
+    }
     return dir
 }
 
@@ -60,11 +66,16 @@ export function parseArgs(argv) {
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
         // What npm leaves behind when it hands the options on.
-        if (arg === '--') continue
-        if (arg === '--here') args.here = true
-        else if (arg === '--template') args.template = takeValue(argv, i++, arg)
-        else if (arg === '--title') args.title = takeValue(argv, i++, arg)
-        else if (arg === '--install') {
+        if (arg === '--') {
+            continue
+        }
+        if (arg === '--here') {
+            args.here = true
+        } else if (arg === '--template') {
+            args.template = takeValue(argv, i++, arg)
+        } else if (arg === '--title') {
+            args.title = takeValue(argv, i++, arg)
+        } else if (arg === '--install') {
             if (args.install === false) {
                 fail('--install and --no-install cannot be used together.')
             }
@@ -74,10 +85,15 @@ export function parseArgs(argv) {
                 fail('--install and --no-install cannot be used together.')
             }
             args.install = false
-        } else if (arg === '-h' || arg === '--help') args.help = true
-        else if (arg.startsWith('-')) fail(`unknown option ${arg}.`)
-        else if (args.dir) fail('only one directory can be provided.')
-        else args.dir = arg
+        } else if (arg === '-h' || arg === '--help') {
+            args.help = true
+        } else if (arg.startsWith('-')) {
+            fail(`unknown option ${arg}.`)
+        } else if (args.dir) {
+            fail('only one directory can be provided.')
+        } else {
+            args.dir = arg
+        }
     }
 
     if (args.here && args.dir) {
@@ -92,21 +108,30 @@ export function parseArgs(argv) {
 }
 
 /** Quotes a path for the commands we print. */
-export const quoteArg = (value) => (/^[\w./@-]+$/.test(value) ? value : `"${value.replace(/(["\\$`])/g, '\\$1')}"`)
+export const quoteArg = (value) => {
+    return /^[\w./@-]+$/.test(value) ? value : `"${value.replace(/(["\\$`])/g, '\\$1')}"`
+}
 
 /** "my-docs" becomes "My Docs", which is right often enough to offer. */
-export const titleFrom = (name) =>
-    name
-        .replace(/^@[^/]+\//, '')
-        .split(/[-_.\s]+/)
-        .filter(Boolean)
-        .map((word) => word[0].toUpperCase() + word.slice(1))
-        .join(' ') || 'Documentation'
+export const titleFrom = (name) => {
+    return (
+        name
+            .replace(/^@[^/]+\//, '')
+            .split(/[-_.\s]+/)
+            .filter(Boolean)
+            .map((word) => {
+                return word[0].toUpperCase() + word.slice(1)
+            })
+            .join(' ') || 'Documentation'
+    )
+}
 
 export function packageManager() {
     const agent = process.env.npm_config_user_agent ?? ''
     for (const name of ['pnpm', 'yarn', 'bun']) {
-        if (agent.startsWith(name)) return name
+        if (agent.startsWith(name)) {
+            return name
+        }
     }
     return 'npm'
 }
@@ -121,7 +146,9 @@ const PACKAGE_RUNNERS = {
 /** How to start Astro: the `dev` script, unless the project uses that name for something else. */
 export function devCommand(pm, scripts = {}) {
     const dev = scripts.dev
-    if (typeof dev !== 'string' || /\bastro\b/.test(dev)) return `${pm} run dev`
+    if (typeof dev !== 'string' || /\bastro\b/.test(dev)) {
+        return `${pm} run dev`
+    }
     return `${PACKAGE_RUNNERS[pm]} astro dev`
 }
 
@@ -142,7 +169,9 @@ export function completeManifest(existing, { name, dependencies }) {
 
     const scripts = { ...manifest.scripts }
     for (const [script, command] of Object.entries(SCRIPTS)) {
-        if (!(script in scripts)) scripts[script] = command
+        if (!(script in scripts)) {
+            scripts[script] = command
+        }
     }
     manifest.scripts = scripts
 
@@ -165,8 +194,12 @@ export function formatManifest(manifest, source = null) {
 
 export function missingAnswers(args) {
     const missing = []
-    if (!args.here && !args.dir) missing.push('directory ([directory] or --here)')
-    if (!args.title) missing.push('title (--title <title>)')
+    if (!args.here && !args.dir) {
+        missing.push('directory ([directory] or --here)')
+    }
+    if (!args.title) {
+        missing.push('title (--title <title>)')
+    }
     if (args.install === null) {
         missing.push('installation (--install or --no-install)')
     }

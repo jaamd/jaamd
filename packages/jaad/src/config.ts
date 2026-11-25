@@ -33,11 +33,15 @@ const FORWARDED = ['site', 'base', 'astro']
  *  silence. Both messages are read in a terminal, not parsed. */
 export function parseConfig(options: JaadUserConfig): JaadConfig {
     const known = new Set([...OPTIONS, ...FORWARDED])
-    const unknown = Object.keys(options).filter((key) => !known.has(key))
+    const unknown = Object.keys(options).filter((key) => {
+        return !known.has(key)
+    })
 
     if (unknown.length > 0) {
         const named = unknown.map((key) => {
-            const close = OPTIONS.find((o) => o.toLowerCase() === key.toLowerCase())
+            const close = OPTIONS.find((o) => {
+                return o.toLowerCase() === key.toLowerCase()
+            })
             return close ? `${key} (did you mean ${close}?)` : key
         })
         throw new Error(
@@ -47,11 +51,17 @@ export function parseConfig(options: JaadUserConfig): JaadConfig {
     }
 
     const parsed = jaadConfigSchema.safeParse(options)
-    if (parsed.success) return parsed.data
+    if (parsed.success) {
+        return parsed.data
+    }
 
     throw new Error(
         'jaad: invalid configuration\n' +
-            parsed.error.issues.map((issue) => `  ${issue.path.join('.') || 'config'}: ${issue.message}`).join('\n'),
+            parsed.error.issues
+                .map((issue) => {
+                    return `  ${issue.path.join('.') || 'config'}: ${issue.message}`
+                })
+                .join('\n'),
     )
 }
 

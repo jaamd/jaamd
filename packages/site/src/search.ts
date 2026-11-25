@@ -77,13 +77,19 @@ const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(unde
 
 /** The folded words of a text. */
 function words(text: string | undefined): string[] {
-    if (!text) return []
+    if (!text) {
+        return []
+    }
     const folded = fold(text)
-    if (!segmenter) return folded.match(WORD) ?? []
+    if (!segmenter) {
+        return folded.match(WORD) ?? []
+    }
 
     const found: string[] = []
     for (const segment of segmenter.segment(folded)) {
-        if (segment.isWordLike) found.push(segment.segment)
+        if (segment.isWordLike) {
+            found.push(segment.segment)
+        }
     }
     return found
 }
@@ -127,14 +133,22 @@ const TYPO_MIN_LENGTH = 5
 /** Whether `a` becomes `b` with at most one edit: a letter added, removed,
  *  replaced, or two neighbours swapped. */
 export function withinOneEdit(a: string, b: string): boolean {
-    if (a === b) return true
-    if (Math.abs(a.length - b.length) > 1) return false
+    if (a === b) {
+        return true
+    }
+    if (Math.abs(a.length - b.length) > 1) {
+        return false
+    }
 
     let start = 0
-    while (start < a.length && start < b.length && a[start] === b[start]) start++
+    while (start < a.length && start < b.length && a[start] === b[start]) {
+        start++
+    }
 
     if (a.length === b.length) {
-        const rest = (from: number) => a.slice(from) === b.slice(from)
+        const rest = (from: number) => {
+            return a.slice(from) === b.slice(from)
+        }
         const swapped = a[start] === b[start + 1] && a[start + 1] === b[start] && rest(start + 2)
         return rest(start + 1) || swapped
     }
@@ -148,9 +162,14 @@ export function withinOneEdit(a: string, b: string): boolean {
 function match(fieldWords: string[], term: string): number {
     let best = 0
     for (const word of fieldWords) {
-        if (word === term) return 2
-        if (word.startsWith(term)) best = 1
-        else if (best === 0 && term.length >= TYPO_MIN_LENGTH && withinOneEdit(word, term)) best = 0.5
+        if (word === term) {
+            return 2
+        }
+        if (word.startsWith(term)) {
+            best = 1
+        } else if (best === 0 && term.length >= TYPO_MIN_LENGTH && withinOneEdit(word, term)) {
+            best = 0.5
+        }
     }
     return best
 }
@@ -173,33 +192,47 @@ function scoreEntry(fields: Prepared, terms: string[], intro: boolean): { score:
         ]
         let best = 0
         for (const [quality, weight, isOwn] of candidates) {
-            if (quality === 0) continue
+            if (quality === 0) {
+                continue
+            }
             best = Math.max(best, quality * weight)
-            if (isOwn) own = true
+            if (isOwn) {
+                own = true
+            }
         }
-        if (best === 0) return null
+        if (best === 0) {
+            return null
+        }
         score += best
     }
 
     return { score, own }
 }
 
-const entryHref = (page: SearchPage, entry: SearchEntry) => (entry.anchor ? `${page.href}#${entry.anchor}` : page.href)
+const entryHref = (page: SearchPage, entry: SearchEntry) => {
+    return entry.anchor ? `${page.href}#${entry.anchor}` : page.href
+}
 
 /** Pages ranked by their best entry, each with the headings that matched.
  *  Every word must appear; a word also matches the words it starts. */
 export function search(index: SearchIndex, query: string, section?: string): SearchGroup[] {
     const terms = queryTerms(query)
-    if (terms.length === 0) return []
+    if (terms.length === 0) {
+        return []
+    }
 
     const groups = new Map<number, SearchGroup>()
     for (const entry of index.entries) {
         const page = index.pages[entry.page]
-        if (section && page.section !== section) continue
+        if (section && page.section !== section) {
+            continue
+        }
 
         const intro = entry.heading === undefined
         const scored = scoreEntry(prepare(entry, page), terms, intro)
-        if (!scored) continue
+        if (!scored) {
+            continue
+        }
 
         let group = groups.get(entry.page)
         if (!group) {
@@ -207,40 +240,78 @@ export function search(index: SearchIndex, query: string, section?: string): Sea
             groups.set(entry.page, group)
         }
         group.score = Math.max(group.score, scored.score)
-        if (!scored.own) continue
-        if (intro) group.intro = entry
-        else group.hits.push({ entry, href: entryHref(page, entry), score: scored.score })
+        if (!scored.own) {
+            continue
+        }
+        if (intro) {
+            group.intro = entry
+        } else {
+            group.hits.push({ entry, href: entryHref(page, entry), score: scored.score })
+        }
     }
 
     return [...groups.values()]
-        .toSorted((a, b) => b.score - a.score)
+        .toSorted((a, b) => {
+            return b.score - a.score
+        })
         .slice(0, MAX_GROUPS)
-        .map((group) => ({ ...group, hits: group.hits.toSorted((a, b) => b.score - a.score).slice(0, MAX_HITS) }))
+        .map((group) => {
+            return {
+                ...group,
+                hits: group.hits
+                    .toSorted((a, b) => {
+                        return b.score - a.score
+                    })
+                    .slice(0, MAX_HITS),
+            }
+        })
 }
 
 /** What an empty query shows: the pages outside the sections, then the first
  *  pages of each section; without sections, the first pages of the docs. */
 export function openingPages(index: SearchIndex, section?: string): { label?: string; pages: SearchPage[] }[] {
-    if (index.sections.length === 0) return [{ pages: index.pages.slice(0, MAX_GROUPS) }]
+    if (index.sections.length === 0) {
+        return [{ pages: index.pages.slice(0, MAX_GROUPS) }]
+    }
 
-    const loose = section ? [] : index.pages.filter((page) => !page.section).slice(0, PAGES_PER_SECTION)
+    const loose = section
+        ? []
+        : index.pages
+              .filter((page) => {
+                  return !page.section
+              })
+              .slice(0, PAGES_PER_SECTION)
     return [
         { pages: loose },
         ...index.sections
-            .filter(({ key }) => !section || key === section)
-            .map(({ key, label }) => ({
-                label,
-                pages: index.pages.filter((page) => page.section === key).slice(0, PAGES_PER_SECTION),
-            })),
-    ].filter((group) => group.pages.length > 0)
+            .filter(({ key }) => {
+                return !section || key === section
+            })
+            .map(({ key, label }) => {
+                return {
+                    label,
+                    pages: index.pages
+                        .filter((page) => {
+                            return page.section === key
+                        })
+                        .slice(0, PAGES_PER_SECTION),
+                }
+            }),
+    ].filter((group) => {
+        return group.pages.length > 0
+    })
 }
 
 /** The text around the first matching word, or its start when none matches,
  *  ellipsised where cut. */
 export function getSnippet(text: string, terms: string[], before = 40, after = 100): string {
     const parts = markWords(text, terms)
-    const first = parts.findIndex((part) => part.match)
-    const start = parts.slice(0, Math.max(first, 0)).reduce((length, part) => length + part.text.length, 0)
+    const first = parts.findIndex((part) => {
+        return part.match
+    })
+    const start = parts.slice(0, Math.max(first, 0)).reduce((length, part) => {
+        return length + part.text.length
+    }, 0)
     const from = Math.max(0, start - before)
     const to = Math.min(text.length, start + after)
     return (from > 0 ? '…' : '') + text.slice(from, to).trim() + (to < text.length ? '…' : '')
@@ -253,7 +324,9 @@ function foldedPrefix(word: string, length: number): number {
     let at = 0
     for (const char of word) {
         const size = fold(char).length
-        if (folded >= length && size > 0) break
+        if (folded >= length && size > 0) {
+            break
+        }
         folded += size
         at += char.length
     }
@@ -267,14 +340,22 @@ export function markWords(text: string, terms: string[]): { text: string; match:
     let last = 0
     for (const word of text.matchAll(WORD)) {
         const folded = fold(word[0])
-        const term = terms.find((candidate) => folded.startsWith(candidate))
-        if (!term) continue
+        const term = terms.find((candidate) => {
+            return folded.startsWith(candidate)
+        })
+        if (!term) {
+            continue
+        }
 
         const end = word.index + foldedPrefix(word[0], term.length)
-        if (word.index > last) parts.push({ text: text.slice(last, word.index), match: false })
+        if (word.index > last) {
+            parts.push({ text: text.slice(last, word.index), match: false })
+        }
         parts.push({ text: text.slice(word.index, end), match: true })
         last = end
     }
-    if (last < text.length) parts.push({ text: text.slice(last), match: false })
+    if (last < text.length) {
+        parts.push({ text: text.slice(last), match: false })
+    }
     return parts
 }

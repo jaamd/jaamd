@@ -12,7 +12,9 @@ import { spoilerData } from '../render.ts'
 export const remarkSpoiler: Plugin<[], Root> = function remarkJaamdSpoiler() {
     return (tree) => {
         visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
-            if (!('name' in node) || node.name !== 'spoiler') return
+            if (!('name' in node) || node.name !== 'spoiler') {
+                return
+            }
             node.data = { ...node.data, ...spoilerData(node.type === 'textDirective' ? 'span' : 'div') }
         })
     }

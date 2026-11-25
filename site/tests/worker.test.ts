@@ -10,7 +10,9 @@ const env = {
     },
 }
 
-const get = (path: string) => worker.fetch(new Request(`https://jaamd.org${path}`), env)
+const get = (path: string) => {
+    return worker.fetch(new Request(`https://jaamd.org${path}`), env)
+}
 
 test('the old documentation urls move to docs.jaamd.org', () => {
     assert.equal(movedTo('/docs'), 'https://docs.jaamd.org/jaamd')

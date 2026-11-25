@@ -34,7 +34,9 @@ test('the edit base points at the docs directory from the repository root', () =
 })
 
 test('each forge gets the editor url it serves', () => {
-    const base = (url: string) => editBaseFrom({ url, branch: 'main', prefix: '' }, 'docs')
+    const base = (url: string) => {
+        return editBaseFrom({ url, branch: 'main', prefix: '' }, 'docs')
+    }
     assert.equal(base('https://gitlab.com/g/r'), 'https://gitlab.com/g/r/-/edit/main/docs/')
     assert.equal(base('https://codeberg.org/o/r'), 'https://codeberg.org/o/r/_edit/main/docs/')
     assert.equal(base('https://gitea.com/o/r'), 'https://gitea.com/o/r/_edit/main/docs/')
@@ -43,7 +45,9 @@ test('each forge gets the editor url it serves', () => {
 })
 
 test('no edit base where the editor url is unknown or there is none', () => {
-    const base = (url: string) => editBaseFrom({ url, branch: 'main', prefix: '' }, 'docs')
+    const base = (url: string) => {
+        return editBaseFrom({ url, branch: 'main', prefix: '' }, 'docs')
+    }
     assert.equal(base('https://git.sr.ht/~o/r'), null)
     assert.equal(base('https://git.example.dev/o/r'), null)
 })
@@ -54,7 +58,9 @@ test('no edit base without a branch, as on a detached checkout', () => {
 
 test('a detached checkout takes the branch CI names, never "HEAD"', () => {
     const dir = mkdtempSync(join(tmpdir(), 'jaad-detached-'))
-    const git = (...args: string[]) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' })
+    const git = (...args: string[]) => {
+        return execFileSync('git', args, { cwd: dir, stdio: 'ignore' })
+    }
     try {
         git('init', '-q', '-b', 'main')
         git('remote', 'add', 'origin', 'git@github.com:o/r.git')

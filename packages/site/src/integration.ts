@@ -43,7 +43,13 @@ export function loadTailwindPlugin(root: string, registered: VitePlugins | undef
     const plugins = ([registered] as unknown[]).flat(Infinity) as ({
         name?: string
     } | null)[]
-    if (plugins.some((p) => p?.name?.startsWith('@tailwindcss/vite'))) return []
+    if (
+        plugins.some((p) => {
+            return p?.name?.startsWith('@tailwindcss/vite')
+        })
+    ) {
+        return []
+    }
 
     const load = createRequire(join(root, 'package.json'))
     let tailwindcss: () => VitePlugins
@@ -53,7 +59,9 @@ export function loadTailwindPlugin(root: string, registered: VitePlugins | undef
             default: () => VitePlugins
         })
     } catch (error) {
-        if (!NOT_INSTALLED.has((error as { code?: string }).code ?? '')) throw error
+        if (!NOT_INSTALLED.has((error as { code?: string }).code ?? '')) {
+            throw error
+        }
         throw new Error(
             'jaad: `tailwind: true` needs Tailwind in your project:\n  npm i -D tailwindcss @tailwindcss/vite',
             { cause: error },
@@ -346,9 +354,15 @@ export function siteIntegration(entry: SiteEntry): SiteIntegration {
                     return
                 }
 
+                const list = clashes
+                    .map((clash) => {
+                        return `  ${clash}`
+                    })
+                    .join('\n')
                 const message =
-                    `a project page takes a route of the site\n${clashes.map((clash) => `  ${clash}`).join('\n')}\n` +
+                    `a project page takes a route of the site\n${list}\n` +
                     'Rename the page, or move the package with its base option.'
+
                 // A dev server stays up while the page is renamed.
                 if (command === 'dev') {
                     logger.error(message)

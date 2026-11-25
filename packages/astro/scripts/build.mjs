@@ -17,10 +17,12 @@ const stylesheets = [
     ['default.css', '@jaamd/core/default.css'],
     ['styles.css', '@jaamd/core/styles.css'],
     ['shiki-dual.css', '@jaamd/core/shiki-dual.css'],
-    ...themes.flatMap(({ slug, mode }) => [
-        [`themes/${slug}/index.css`, `@jaamd/core/themes/${slug}.css`],
-        ...(mode === 'dual' ? [] : [[`themes/${slug}/dark.css`, `@jaamd/core/themes/${slug}/dark.css`]]),
-    ]),
+    ...themes.flatMap(({ slug, mode }) => {
+        return [
+            [`themes/${slug}/index.css`, `@jaamd/core/themes/${slug}.css`],
+            ...(mode === 'dual' ? [] : [[`themes/${slug}/dark.css`, `@jaamd/core/themes/${slug}/dark.css`]]),
+        ]
+    }),
 ]
 
 rmSync(DIST, { recursive: true, force: true })

@@ -37,12 +37,14 @@ const data = Astro.site && {
     isPartOf: { '@type': 'WebSite', name: config.title },
     breadcrumb: {
         '@type': 'BreadcrumbList',
-        itemListElement: crumbs.map((crumb, i) => ({
-            '@type': 'ListItem',
-            position: i + 1,
-            name: crumb.name,
-            ...(crumb.url ? { item: crumb.url } : {}),
-        })),
+        itemListElement: crumbs.map((crumb, i) => {
+            return {
+                '@type': 'ListItem',
+                position: i + 1,
+                name: crumb.name,
+                ...(crumb.url ? { item: crumb.url } : {}),
+            }
+        }),
     },
 }
 

@@ -41,7 +41,13 @@ export function createJaadIntegration(
                 }
 
                 updateConfig({
-                    vite: { plugins: [serialisedModule('jaad:config', 'virtual:jaad/config', () => config)] },
+                    vite: {
+                        plugins: [
+                            serialisedModule('jaad:config', 'virtual:jaad/config', () => {
+                                return config
+                            }),
+                        ],
+                    },
                 })
 
                 const member = siteMember(site)

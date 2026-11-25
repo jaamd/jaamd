@@ -21,7 +21,9 @@ const NAMED: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', a
 
 function decodeEntities(text: string): string {
     return text.replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, name: string) => {
-        if (name[0] !== '#') return NAMED[name.toLowerCase()] ?? entity
+        if (name[0] !== '#') {
+            return NAMED[name.toLowerCase()] ?? entity
+        }
         const code = name[1] === 'x' || name[1] === 'X' ? parseInt(name.slice(2), 16) : parseInt(name.slice(1), 10)
         return Number.isNaN(code) ? entity : String.fromCodePoint(code)
     })
@@ -101,13 +103,17 @@ function headingTags(html: string): HeadingTag[] {
 
         if (ignored && tag === ignored.tag && !selfClosing) {
             ignored.depth += closing ? -1 : 1
-            if (ignored.depth === 0) ignored = null
+            if (ignored.depth === 0) {
+                ignored = null
+            }
         } else if (!ignored && !closing && !selfClosing && /\sdata-toc-ignore\b/i.test(attrs)) {
             ignored = { tag, depth: 1 }
         }
 
         const heading = /^h([1-6])$/.exec(tag)
-        if (!heading) continue
+        if (!heading) {
+            continue
+        }
         if (!closing) {
             open = {
                 depth: Number(heading[1]),
@@ -128,13 +134,21 @@ function headingTags(html: string): HeadingTag[] {
 
 /** The first h1, as the renderer read it. */
 export function renderedTitle(rendered: RenderedMarkdown | undefined): string | null {
-    return rendered?.metadata?.headings?.find((heading) => heading.depth === 1)?.text ?? null
+    return (
+        rendered?.metadata?.headings?.find((heading) => {
+            return heading.depth === 1
+        })?.text ?? null
+    )
 }
 
-const isOutline = (heading: HeadingTag) => !heading.ignored && (heading.depth === 2 || heading.depth === 3)
+const isOutline = (heading: HeadingTag) => {
+    return !heading.ignored && (heading.depth === 2 || heading.depth === 3)
+}
 
 function headingOf(tag: HeadingTag, rendered: RenderedMarkdown): PageHeading {
-    const known = rendered.metadata?.headings?.find((heading) => heading.slug === tag.id)
+    const known = rendered.metadata?.headings?.find((heading) => {
+        return heading.slug === tag.id
+    })
     return {
         depth: tag.depth as 2 | 3,
         slug: tag.id,
@@ -144,10 +158,14 @@ function headingOf(tag: HeadingTag, rendered: RenderedMarkdown): PageHeading {
 
 /** The h2 and h3 of the page outside `data-toc-ignore`: its table of contents. */
 export function pageHeadings(rendered: RenderedMarkdown | undefined): PageHeading[] {
-    if (!rendered) return []
+    if (!rendered) {
+        return []
+    }
     return headingTags(rendered.html)
         .filter(isOutline)
-        .map((tag) => headingOf(tag, rendered))
+        .map((tag) => {
+            return headingOf(tag, rendered)
+        })
 }
 
 /** A stretch of a page: the text under one h2 or h3, or before the first. */
@@ -161,10 +179,14 @@ export interface PageChunk {
 /** The page cut at the headings of its table of contents. The h1 is left out;
  *  any other heading stays in the text of the stretch it sits in. */
 export function pageChunks(rendered: RenderedMarkdown | undefined): PageChunk[] {
-    if (!rendered) return [{ heading: null, text: '', code: '' }]
+    if (!rendered) {
+        return [{ heading: null, text: '', code: '' }]
+    }
     const { html } = rendered
     const tags = headingTags(html)
-    const titles = tags.filter((tag) => tag.depth === 1)
+    const titles = tags.filter((tag) => {
+        return tag.depth === 1
+    })
     const cuts = tags.filter(isOutline)
 
     /** The text from `from` to `to`, without the h1. */
@@ -172,7 +194,9 @@ export function pageChunks(rendered: RenderedMarkdown | undefined): PageChunk[] 
         let text = ''
         let at = from
         for (const title of titles) {
-            if (title.end <= from || title.start >= to) continue
+            if (title.end <= from || title.start >= to) {
+                continue
+            }
             text += html.slice(at, title.start) + ' '
             at = title.end
         }
@@ -198,16 +222,28 @@ export function pageDescription(
     title: string,
     maxLength: number = 155,
 ): string | null {
-    if (!rendered) return null
+    if (!rendered) {
+        return null
+    }
     const prose = rendered.html.replace(DROPPED, ' ')
     const paragraphs = [...prose.matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)]
-        .filter(([, attrs]) => !/markdown-alert-title/.test(attrs))
-        .map(([, , inner]) => htmlText(inner))
+        .filter(([, attrs]) => {
+            return !/markdown-alert-title/.test(attrs)
+        })
+        .map(([, , inner]) => {
+            return htmlText(inner)
+        })
 
-    const first = paragraphs.find((text) => text && text.toLowerCase() !== title.trim().toLowerCase())
-    if (!first) return null
+    const first = paragraphs.find((text) => {
+        return text && text.toLowerCase() !== title.trim().toLowerCase()
+    })
+    if (!first) {
+        return null
+    }
 
-    if (first.length <= maxLength) return first
+    if (first.length <= maxLength) {
+        return first
+    }
     const truncated = first.slice(0, maxLength)
     const lastSpace = truncated.lastIndexOf(' ')
     return `${truncated.slice(0, lastSpace > 0 ? lastSpace : maxLength)}…`

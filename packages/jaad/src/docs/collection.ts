@@ -15,9 +15,13 @@ export type DocsSourceEntry = DocsEntry & DocsSource
 
 const cached = new Map<string, DocsTree<DocsSourceEntry>>()
 
-const CODES = LOCALES.map((locale) => locale.code)
+const CODES = LOCALES.map((locale) => {
+    return locale.code
+})
 
-const KEYS = SECTIONS.map((section) => section.key)
+const KEYS = SECTIONS.map((section) => {
+    return section.key
+})
 
 /** Attaches the locale, the section and the path, leaving `id` the collection id. */
 function place(entry: DocsEntry, section?: string): DocsSourceEntry {
@@ -35,25 +39,40 @@ function place(entry: DocsEntry, section?: string): DocsSourceEntry {
 export async function getDocsTree(locale: string = DEFAULT_LOCALE): Promise<DocsTree<DocsSourceEntry>> {
     const key = CODES.length > 0 ? locale : ''
     const hit = cached.get(key)
-    if (import.meta.env.PROD && hit) return hit
+    if (import.meta.env.PROD && hit) {
+        return hit
+    }
 
     // `docsDir` when in use, then one collection per section.
     const sections = [...(config.docs.dirInUse ? [undefined] : []), ...KEYS]
     const collections = await Promise.all(
         sections.map(async (section) => {
             const entries = await getCollection(collectionName(section) as 'docsPages')
-            return (entries as unknown as DocsEntry[]).map((entry) => place(entry, section))
+            return (entries as unknown as DocsEntry[]).map((entry) => {
+                return place(entry, section)
+            })
         }),
     )
-    const sources = collections.flat().filter((source) => key === '' || source.locale === key)
+    const sources = collections.flat().filter((source) => {
+        return key === '' || source.locale === key
+    })
 
     // Validated before drafts are dropped, so a draft's slug conflict is an error.
     validateDocsStructure(sources, key || undefined)
-    const tree = buildDocsTree(import.meta.env.PROD ? sources.filter((source) => !source.data.draft) : sources, {
-        sections: KEYS,
-        urls: docsUrls(locale),
-    })
-    if (import.meta.env.PROD) cached.set(key, tree)
+    const tree = buildDocsTree(
+        import.meta.env.PROD
+            ? sources.filter((source) => {
+                  return !source.data.draft
+              })
+            : sources,
+        {
+            sections: KEYS,
+            urls: docsUrls(locale),
+        },
+    )
+    if (import.meta.env.PROD) {
+        cached.set(key, tree)
+    }
     return tree
 }
 
@@ -69,7 +88,9 @@ export async function getSectionLinks(locale: string = DEFAULT_LOCALE): Promise<
     const { pages } = await getDocsTree(locale)
 
     return SECTIONS.flatMap(({ key, label }) => {
-        const first = pages.find((page) => page.section === key)
+        const first = pages.find((page) => {
+            return page.section === key
+        })
         return first ? [{ key, label, href: first.href }] : []
     })
 }
@@ -83,7 +104,9 @@ export async function getLocaleAlternates(key: string): Promise<LocaleAlternate[
     for (const locale of LOCALES) {
         const tree = await getDocsTree(locale.code)
         // Every page drafted leaves a locale with nothing to link to.
-        if (tree.pages.length === 0) continue
+        if (tree.pages.length === 0) {
+            continue
+        }
 
         const match = key ? tree.byKey.get(key) : tree.pages[0]
         alternates.push({
@@ -102,7 +125,9 @@ export async function getServedLocales(): Promise<string[]> {
 
     for (const code of prefixedCodes()) {
         const { pages } = await getDocsTree(code)
-        if (pages.length > 0) served.push(code)
+        if (pages.length > 0) {
+            served.push(code)
+        }
     }
 
     return served

@@ -6,8 +6,12 @@ import { slugify, uniqueElementId } from '../dom.ts'
 export function addHeadingLinks(root: ParentNode, labels: Labels): void {
     // All six levels: a TOC can link an h5.
     root.querySelectorAll<HTMLElement>('h1, h2, h3, h4, h5, h6').forEach((header) => {
-        if (!header.id) header.id = uniqueElementId(slugify(header.textContent ?? ''))
-        if (header.querySelector(`.${CLASS.headingLink}`)) return
+        if (!header.id) {
+            header.id = uniqueElementId(slugify(header.textContent ?? ''))
+        }
+        if (header.querySelector(`.${CLASS.headingLink}`)) {
+            return
+        }
 
         const a = document.createElement('a')
         a.className = CLASS.headingLink

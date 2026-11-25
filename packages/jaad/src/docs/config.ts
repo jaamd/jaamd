@@ -16,7 +16,9 @@ export const docsConfigShape = {
         .record(z.string(), z.strictObject({ dir: z.string(), label: z.string().optional() }))
         .superRefine((sections, context) => {
             for (const key of Object.keys(sections)) {
-                if (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(key)) continue
+                if (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(key)) {
+                    continue
+                }
                 context.addIssue({
                     code: 'custom',
                     path: [key],
@@ -75,30 +77,46 @@ export interface DocsRoot {
 
 /** Empty at the root, otherwise one leading slash and no trailing one. */
 function resolveEditBase(editLink: DocsConfig['editLink'], repo: RepoInfo | null, docsDir: string): string | null {
-    if (typeof editLink === 'string') return editLink
-    if (!editLink || !repo) return null
+    if (typeof editLink === 'string') {
+        return editLink
+    }
+    if (!editLink || !repo) {
+        return null
+    }
     return editBaseFrom(repo, docsDir)
 }
 
 function resolveSections(config: DocsConfig, repo: RepoInfo | null): DocsSection[] {
-    return Object.entries(config.sections ?? {}).map(([key, section]) => ({
-        key,
-        label: section.label ?? slugToTitle(key),
-        dir: section.dir,
-        editBase: resolveEditBase(config.editLink, repo, section.dir),
-    }))
+    return Object.entries(config.sections ?? {}).map(([key, section]) => {
+        return {
+            key,
+            label: section.label ?? slugToTitle(key),
+            dir: section.dir,
+            editBase: resolveEditBase(config.editLink, repo, section.dir),
+        }
+    })
 }
 
 /** No directory may be, or be inside, another. */
 function assertSeparateRoots(roots: DocsRoot[], cwd: string): void {
-    const paths = roots.map((root) => root.dir + sep)
-    const nested = roots.filter((_, at) => paths.some((other, from) => from !== at && paths[at].startsWith(other)))
-    if (nested.length === 0) return
+    const paths = roots.map((root) => {
+        return root.dir + sep
+    })
+    const nested = roots.filter((_, at) => {
+        return paths.some((other, from) => {
+            return from !== at && paths[at].startsWith(other)
+        })
+    })
+    if (nested.length === 0) {
+        return
+    }
 
     throw new Error(
         'jaad: sections overlap\n' +
             nested
-                .map((root) => `  ${root.section ?? 'docsDir'}: ${relative(cwd, root.dir)} is, or is inside, another`)
+                .map((root) => {
+                    return `  ${root.section ?? 'docsDir'}: ${relative(cwd, root.dir)} is, or is inside, another`
+                })
                 .join('\n') +
             '\nGive every section, and docsDir, a directory of its own.',
     )
@@ -132,7 +150,9 @@ export function resolveDocsConfig(
     assertSeparateRoots(roots, cwd)
     const locales = resolveLocales(config, lang, roots)
 
-    const ambiguous = sections.find((section) => locales.includes(section.key))
+    const ambiguous = sections.find((section) => {
+        return locales.includes(section.key)
+    })
     if (ambiguous) {
         throw new Error(`jaad: section "${ambiguous.key}" has the name of a language the docs are written in`)
     }
@@ -144,17 +164,25 @@ export function resolveDocsConfig(
 export function docsRoots(docs: Pick<DocsResolvedConfig, 'dir' | 'dirInUse' | 'sections'>, cwd: string): DocsRoot[] {
     return [
         ...(docs.dirInUse ? [{ dir: resolve(cwd, docs.dir) }] : []),
-        ...docs.sections.map((section) => ({ dir: resolve(cwd, section.dir), section: section.key })),
+        ...docs.sections.map((section) => {
+            return { dir: resolve(cwd, section.dir), section: section.key }
+        }),
     ]
 }
 
 /** Directory names win; `locales` only overrides what detection found. */
 function resolveLocales(config: DocsConfig, lang: string, roots: DocsRoot[]): string[] {
-    if (config.locales === false) return []
+    if (config.locales === false) {
+        return []
+    }
 
-    const perRoot = roots.map((root) => resolveLocalesIn(root.dir, config, lang))
+    const perRoot = roots.map((root) => {
+        return resolveLocalesIn(root.dir, config, lang)
+    })
     const [first, ...rest] = perRoot
-    const differing = rest.find((locales) => locales.join() !== first.join())
+    const differing = rest.find((locales) => {
+        return locales.join() !== first.join()
+    })
     if (differing) {
         throw new Error(
             'jaad: sections disagree on their languages\n' +
@@ -169,8 +197,14 @@ function resolveLocalesIn(docsDir: string, config: DocsConfig, lang: string): st
     const locales = Array.isArray(config.locales) ? config.locales : detectLocales(docsDir, lang)
     // A pinned list skips detection, and with it the missing-directory guard;
     // the integration warns about that case with better words than readdir does.
-    if (locales.length === 0 || !existsSync(docsDir)) return []
+    if (locales.length === 0 || !existsSync(docsDir)) {
+        return []
+    }
 
     validateLocaleTree(docsDir, locales, lang)
-    return locales.map((locale) => locale.toLowerCase()).toSorted()
+    return locales
+        .map((locale) => {
+            return locale.toLowerCase()
+        })
+        .toSorted()
 }

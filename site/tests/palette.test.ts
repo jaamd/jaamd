@@ -38,7 +38,9 @@ for (const [mode, selectors] of [
             .filter(([name, value]) => {
                 return jaad.get(name) !== value
             })
-            .map(([name, value]) => `${name}: ${value} (JAAD: ${jaad.get(name) ?? 'none'})`)
+            .map(([name, value]) => {
+                return `${name}: ${value} (JAAD: ${jaad.get(name) ?? 'none'})`
+            })
         assert.deepEqual(differing, [])
     })
 }

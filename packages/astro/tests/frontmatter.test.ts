@@ -4,7 +4,9 @@ import { z } from 'astro/zod'
 import { frontmatterFields } from '../src/frontmatter.ts'
 
 const schema = z.object(frontmatterFields(z))
-const ogImage = (value: unknown) => schema.safeParse({ ogImage: value }).success
+const ogImage = (value: unknown) => {
+    return schema.safeParse({ ogImage: value }).success
+}
 
 test('ogImage takes a root-relative path, an http(s) URL or false', () => {
     assert.equal(ogImage('/og/page.png'), true)

@@ -71,27 +71,37 @@ const GROUPS = [
         ['spoiler-revealed-bg', 'surface'],
         ['spoiler-revealed-fg', 'text'],
     ],
-    ['note', 'tip', 'important', 'warning', 'caution'].flatMap((kind) => [
-        [`alert-${kind}-color`, `alert.${kind}`],
-        [`alert-${kind}-bg`, `alert.${kind}@0.1`],
-    ]),
+    ['note', 'tip', 'important', 'warning', 'caution'].flatMap((kind) => {
+        return [
+            [`alert-${kind}-color`, `alert.${kind}`],
+            [`alert-${kind}-bg`, `alert.${kind}@0.1`],
+        ]
+    }),
 ]
 
-export const TOKENS = GROUPS.flat().map(([token]) => token)
+export const TOKENS = GROUPS.flat().map(([token]) => {
+    return token
+})
 
 const COLUMN = 32
 
 function rgba(hex, alpha) {
     const n = hex.replace('#', '')
-    const [r, g, b] = [0, 2, 4].map((i) => parseInt(n.slice(i, i + 2), 16))
+    const [r, g, b] = [0, 2, 4].map((i) => {
+        return parseInt(n.slice(i, i + 2), 16)
+    })
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
 /** "surface", "alert.tip", "primary@0.3". */
 function resolve(palette, role) {
     const [path, alpha] = role.split('@')
-    const value = path.split('.').reduce((o, k) => o?.[k], palette)
-    if (value === undefined) throw new Error(`palette is missing "${path}"`)
+    const value = path.split('.').reduce((o, k) => {
+        return o?.[k]
+    }, palette)
+    if (value === undefined) {
+        throw new Error(`palette is missing "${path}"`)
+    }
     return alpha ? rgba(value, alpha) : value
 }
 
@@ -99,7 +109,9 @@ function block(palette, selector) {
     const lines = [`${selector} {`]
 
     GROUPS.forEach((group, i) => {
-        if (i > 0) lines.push('')
+        if (i > 0) {
+            lines.push('')
+        }
         for (const [token, role] of group) {
             const value = palette.overrides?.[token] ?? resolve(palette, role)
             lines.push(`  --jaamd-${token}:`.padEnd(COLUMN) + value + ';')
@@ -112,15 +124,21 @@ function block(palette, selector) {
 /** The CSS a theme's palette produces. `dark` is null for a dual theme. */
 export async function render(slug) {
     const path = join(THEMES, slug, 'palette.js')
-    if (!existsSync(path)) throw new Error(`${slug}: no palette.js`)
+    if (!existsSync(path)) {
+        throw new Error(`${slug}: no palette.js`)
+    }
 
     const { light, dark } = (await import(pathToFileURL(path).href)).default
-    const theme = themes.find((t) => t.slug === slug)
+    const theme = themes.find((t) => {
+        return t.slug === slug
+    })
     const name = theme?.name ?? slug
     const shiki =
         typeof theme?.shiki === 'string' ? `"${theme.shiki}"` : `"${theme?.shiki.light}" and "${theme?.shiki.dark}"`
 
-    const header = (suffix) => `/* JAAMD theme: ${name}${suffix}. Pairs with Shiki theme ${shiki}. */\n\n`
+    const header = (suffix) => {
+        return `/* JAAMD theme: ${name}${suffix}. Pairs with Shiki theme ${shiki}. */\n\n`
+    }
 
     if (light && dark) {
         return {

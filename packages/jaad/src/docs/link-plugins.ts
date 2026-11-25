@@ -14,13 +14,17 @@ export function rehypeDocLinks(context: DocLinkContext) {
     return function jaadDocLinks() {
         return (tree: HastNode, file: { path?: string }) => {
             const from = file.path
-            if (!from) return
+            if (!from) {
+                return
+            }
 
             const visit = (node: HastNode) => {
                 const href = node.tagName === 'a' ? node.properties?.href : undefined
                 if (typeof href === 'string') {
                     const resolved = resolveDocLink(href, from, context)
-                    if (resolved) node.properties!.href = resolved
+                    if (resolved) {
+                        node.properties!.href = resolved
+                    }
                 }
                 node.children?.forEach(visit)
             }
@@ -42,10 +46,14 @@ export function satteriDocLinks(context: DocLinkContext) {
             filter: ['a'],
             visit(node: HastNode, ctx: SatteriContext) {
                 const href = node.properties?.href
-                if (typeof href !== 'string' || !ctx.fileURL) return
+                if (typeof href !== 'string' || !ctx.fileURL) {
+                    return
+                }
 
                 const resolved = resolveDocLink(href, fileURLToPath(ctx.fileURL), context)
-                if (resolved) ctx.setProperty(node, 'href', resolved)
+                if (resolved) {
+                    ctx.setProperty(node, 'href', resolved)
+                }
             },
         },
     }

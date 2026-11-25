@@ -39,12 +39,12 @@ const FAVICON_NAMES = ['favicon.svg', 'favicon.ico', 'favicon.png']
 const DEFAULT_DIR = 'my-docs'
 
 function markdownUnder(dir) {
-    if (!existsSync(dir)) return 0
-    return readdirSync(dir, { withFileTypes: true }).reduce(
-        (count, entry) =>
-            count + (entry.isDirectory() ? markdownUnder(join(dir, entry.name)) : entry.name.endsWith('.md') ? 1 : 0),
-        0,
-    )
+    if (!existsSync(dir)) {
+        return 0
+    }
+    return readdirSync(dir, { withFileTypes: true }).reduce((count, entry) => {
+        return count + (entry.isDirectory() ? markdownUnder(join(dir, entry.name)) : entry.name.endsWith('.md') ? 1 : 0)
+    }, 0)
 }
 
 /** Never overwrites: an existing file is the user's, not ours. `wx` also
@@ -56,7 +56,9 @@ function write(target, relative, contents, written, skipped) {
     try {
         writeFileSync(file, contents, { flag: 'wx' })
     } catch (error) {
-        if (error.code !== 'EEXIST') throw error
+        if (error.code !== 'EEXIST') {
+            throw error
+        }
         skipped.push(relative)
         return
     }
@@ -64,7 +66,9 @@ function write(target, relative, contents, written, skipped) {
 }
 
 // Resolved against this file: `npm create` runs the bin from a cache.
-const templateRoot = (template) => join(import.meta.dirname, 'templates', template)
+const templateRoot = (template) => {
+    return join(import.meta.dirname, 'templates', template)
+}
 
 // npm strips `.gitignore` from published tarballs, so it ships renamed.
 const TEMPLATE_RENAMES = {
@@ -72,9 +76,9 @@ const TEMPLATE_RENAMES = {
 }
 
 function templateFiles(root, prefix = '') {
-    const entries = readdirSync(join(root, prefix), { withFileTypes: true }).toSorted((a, b) =>
-        a.name.localeCompare(b.name),
-    )
+    const entries = readdirSync(join(root, prefix), { withFileTypes: true }).toSorted((a, b) => {
+        return a.name.localeCompare(b.name)
+    })
     return entries.flatMap((entry) => {
         const relative = prefix ? `${prefix}/${entry.name}` : entry.name
         return entry.isDirectory() ? templateFiles(root, relative) : [relative]
@@ -82,13 +86,19 @@ function templateFiles(root, prefix = '') {
 }
 
 /** Replaces the whole literal, so the title keeps its JSON escaping. */
-const withTitle = (source, title) => source.replaceAll('"__JAAD_TITLE__"', JSON.stringify(title))
+const withTitle = (source, title) => {
+    return source.replaceAll('"__JAAD_TITLE__"', JSON.stringify(title))
+}
 
-const manifestPath = (target) => join(target, 'package.json')
+const manifestPath = (target) => {
+    return join(target, 'package.json')
+}
 
 function readManifest(target) {
     const file = manifestPath(target)
-    if (!existsSync(file)) return { manifest: null, issue: null }
+    if (!existsSync(file)) {
+        return { manifest: null, issue: null }
+    }
 
     const source = readFileSync(file, 'utf8').replace(/^\uFEFF/, '')
     let manifest
@@ -120,12 +130,18 @@ function readManifest(target) {
     return { manifest, source, issue: null }
 }
 
-const isRecord = (value) => typeof value === 'object' && value !== null && !Array.isArray(value)
+const isRecord = (value) => {
+    return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
-const normaliseSource = (source) => source.replace(/\r\n/g, '\n').trim()
+const normaliseSource = (source) => {
+    return source.replace(/\r\n/g, '\n').trim()
+}
 
 function existingFiles(target, names) {
-    return names.filter((name) => existsSync(join(target, name)))
+    return names.filter((name) => {
+        return existsSync(join(target, name))
+    })
 }
 
 function inspectConfig(target, names, canonical, label, issues) {
@@ -147,8 +163,14 @@ function inspectConfig(target, names, canonical, label, issues) {
 }
 
 function failSetup(issues) {
+    const list = issues
+        .map((item) => {
+            return `  - ${item}`
+        })
+        .join('\n')
+
     fail(
-        `cannot safely update this project:\n${issues.map((item) => `  - ${item}`).join('\n')}\n` +
+        `cannot safely update this project:\n${list}\n` +
             `No files were changed. Integrate JAAD manually: ${MANUAL_SETUP_URL}`,
     )
 }
@@ -157,13 +179,17 @@ function failSetup(issues) {
 function inspectExistingProject(target) {
     const issues = []
     const { manifest, source, issue: manifestIssue } = readManifest(target)
-    if (manifestIssue) issues.push(manifestIssue)
+    if (manifestIssue) {
+        issues.push(manifestIssue)
+    }
 
     const astroConfig = inspectConfig(target, ASTRO_CONFIG_NAMES, ASTRO_CONFIG, 'Astro configuration', issues)
     const contentConfig = inspectConfig(target, CONTENT_CONFIG_NAMES, CONTENT_CONFIG, 'content configuration', issues)
     const jaadConfig = inspectConfig(target, JAAD_CONFIG_NAMES, null, 'JAAD configuration', issues)
 
-    if (issues.length > 0) failSetup(issues)
+    if (issues.length > 0) {
+        failSetup(issues)
+    }
 
     return { manifest, manifestSource: source ?? null, astroConfig, contentConfig, jaadConfig }
 }
@@ -174,7 +200,9 @@ function writeManifest(target, existing, source, name) {
         name,
         dependencies: { astro: ASTRO, '@jaamd/jaad': JAAD },
     })
-    if (existing && JSON.stringify(manifest) === JSON.stringify(existing)) return null
+    if (existing && JSON.stringify(manifest) === JSON.stringify(existing)) {
+        return null
+    }
 
     writeFileSync(manifestPath(target), formatManifest(manifest, source))
     return existing ? 'updated' : 'created'
@@ -192,15 +220,23 @@ const IGNORED_WHEN_EMPTY = ['.git', '.gitignore', '.DS_Store', 'Thumbs.db']
 
 /** Missing, or holding nothing but repository and system files. A file is not empty. */
 function isEmptyDirectory(target) {
-    if (!existsSync(target)) return true
-    if (!statSync(target).isDirectory()) return false
+    if (!existsSync(target)) {
+        return true
+    }
+    if (!statSync(target).isDirectory()) {
+        return false
+    }
 
-    const entries = readdirSync(target).filter((entry) => !IGNORED_WHEN_EMPTY.includes(entry))
+    const entries = readdirSync(target).filter((entry) => {
+        return !IGNORED_WHEN_EMPTY.includes(entry)
+    })
     return entries.length === 0
 }
 
 function assertTargetAvailable(args, target) {
-    if (args.here || isEmptyDirectory(target)) return
+    if (args.here || isEmptyDirectory(target)) {
+        return
+    }
     fail(`${args.dir} exists and is not empty. Use --here to add JAAD to it.`)
 }
 
@@ -220,11 +256,15 @@ async function askDirectory(args) {
             },
         }),
     )
-    if (dir === null) return false
+    if (dir === null) {
+        return false
+    }
 
     args.dir = dir
     normaliseDir(args)
-    if (!args.here || isEmptyDirectory(resolve('.'))) return true
+    if (!args.here || isEmptyDirectory(resolve('.'))) {
+        return true
+    }
 
     const confirmed = answer(
         await p.confirm({
@@ -232,7 +272,9 @@ async function askDirectory(args) {
             initialValue: false,
         }),
     )
-    if (confirmed === false) p.cancel('Setup cancelled.')
+    if (confirmed === false) {
+        p.cancel('Setup cancelled.')
+    }
     return confirmed === true
 }
 
@@ -252,7 +294,9 @@ async function collectAnswers(args) {
         )
     }
 
-    if (!args.here && !args.dir && !(await askDirectory(args))) return null
+    if (!args.here && !args.dir && !(await askDirectory(args))) {
+        return null
+    }
 
     const target = resolve(args.here ? '.' : args.dir)
     assertTargetAvailable(args, target)
@@ -268,7 +312,9 @@ async function collectAnswers(args) {
           }
     const manifest = existing.manifest
 
-    if (!args.template && !interactive) args.template = DEFAULT_TEMPLATE
+    if (!args.template && !interactive) {
+        args.template = DEFAULT_TEMPLATE
+    }
 
     if (!args.template) {
         const template = answer(
@@ -289,7 +335,9 @@ async function collectAnswers(args) {
                 ],
             }),
         )
-        if (template === null) return null
+        if (template === null) {
+            return null
+        }
         args.template = template
     }
 
@@ -311,7 +359,9 @@ async function collectAnswers(args) {
                 defaultValue: suggested,
             }),
         )
-        if (title === null) return null
+        if (title === null) {
+            return null
+        }
         args.title = title
     }
 
@@ -322,7 +372,9 @@ async function collectAnswers(args) {
                 initialValue: true,
             }),
         )
-        if (install === null) return null
+        if (install === null) {
+            return null
+        }
         args.install = install
     }
 
@@ -336,24 +388,34 @@ function scaffold(request) {
     const written = []
     const skipped = []
 
-    if (existing.astroConfig) skipped.push(existing.astroConfig)
-    else write(target, 'astro.config.mjs', ASTRO_CONFIG, written, skipped)
+    if (existing.astroConfig) {
+        skipped.push(existing.astroConfig)
+    } else {
+        write(target, 'astro.config.mjs', ASTRO_CONFIG, written, skipped)
+    }
 
-    if (existing.contentConfig) skipped.push(existing.contentConfig)
-    else {
+    if (existing.contentConfig) {
+        skipped.push(existing.contentConfig)
+    } else {
         write(target, 'src/content.config.ts', CONTENT_CONFIG, written, skipped)
     }
 
-    const ownsRoot = INDEX_PAGE_NAMES.some((name) => existsSync(join(target, 'src', 'pages', name)))
+    const ownsRoot = INDEX_PAGE_NAMES.some((name) => {
+        return existsSync(join(target, 'src', 'pages', name))
+    })
     const found = markdownUnder(join(target, 'docs'))
     // JAAD prefers the .svg, so ours would quietly outrank an existing icon.
-    const hasFavicon = FAVICON_NAMES.some((name) => existsSync(join(target, 'public', name)))
+    const hasFavicon = FAVICON_NAMES.some((name) => {
+        return existsSync(join(target, 'public', name))
+    })
 
     // The shared layer first; a template that repeats a file wins over it.
     const roots = [templateRoot('_shared'), templateRoot(template)]
     const sources = new Map()
     for (const root of roots) {
-        for (const relative of templateFiles(root)) sources.set(relative, root)
+        for (const relative of templateFiles(root)) {
+            sources.set(relative, root)
+        }
     }
 
     for (const [relative, root] of sources) {
@@ -361,9 +423,15 @@ function scaffold(request) {
             skipped.push(existing.jaadConfig)
             continue
         }
-        if (relative.startsWith('src/') && ownsRoot) continue
-        if (relative.startsWith('docs/') && found > 0) continue
-        if (relative === 'public/favicon.svg' && hasFavicon) continue
+        if (relative.startsWith('src/') && ownsRoot) {
+            continue
+        }
+        if (relative.startsWith('docs/') && found > 0) {
+            continue
+        }
+        if (relative === 'public/favicon.svg' && hasFavicon) {
+            continue
+        }
 
         const source = readFileSync(join(root, relative), 'utf8')
         const destination = TEMPLATE_RENAMES[relative] ?? relative
@@ -378,7 +446,9 @@ async function main() {
     let args
     try {
         args = parseArgs(process.argv.slice(2))
-        if (args.help) return console.log(HELP)
+        if (args.help) {
+            return console.log(HELP)
+        }
     } catch (error) {
         console.error(error.message)
         process.exitCode = 1
@@ -410,16 +480,26 @@ async function main() {
     const { written, skipped, found, manifestChange } = result
     p.log.success(request.title)
 
-    const changed = written.map((file) => `created  ${file}`)
-    if (manifestChange) changed.push(`${manifestChange}  package.json`)
-    if (changed.length > 0) p.log.step(changed.join('\n'))
+    const changed = written.map((file) => {
+        return `created  ${file}`
+    })
+    if (manifestChange) {
+        changed.push(`${manifestChange}  package.json`)
+    }
+    if (changed.length > 0) {
+        p.log.step(changed.join('\n'))
+    }
 
     const kept = [
-        ...skipped.map((file) => `kept     ${file}`),
+        ...skipped.map((file) => {
+            return `kept     ${file}`
+        }),
         ...(manifestChange ? [] : ['kept     package.json']),
         ...(found > 0 ? [`found    ${found} markdown file(s) in docs/`] : []),
     ]
-    if (kept.length > 0) p.log.info(kept.join('\n'))
+    if (kept.length > 0) {
+        p.log.info(kept.join('\n'))
+    }
 
     const pm = packageManager()
     if (request.install) {
@@ -438,8 +518,12 @@ async function main() {
     }
 
     const next = []
-    if (!request.here) next.push(`cd ${quoteArg(request.dir)}`)
-    if (!request.install) next.push(`${pm} install`)
+    if (!request.here) {
+        next.push(`cd ${quoteArg(request.dir)}`)
+    }
+    if (!request.install) {
+        next.push(`${pm} install`)
+    }
     next.push(devCommand(pm, request.manifest?.scripts))
 
     const start = written.includes('docs/01-introduction.md') ? 'docs/01-introduction.md' : 'docs/'

@@ -8,7 +8,9 @@ import jaad from './index.ts'
 
 const CANDIDATES = ['jaad.config.ts', 'jaad.config.mjs', 'jaad.config.js']
 
-const file = CANDIDATES.map((n) => join(process.cwd(), n)).find(existsSync)
+const file = CANDIDATES.map((n) => {
+    return join(process.cwd(), n)
+}).find(existsSync)
 if (!file) {
     throw new Error(`jaad: no config found. Create one of ${CANDIDATES.join(', ')} in the project root.`)
 }

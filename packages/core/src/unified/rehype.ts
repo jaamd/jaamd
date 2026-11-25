@@ -10,7 +10,9 @@ import { headingLinkHtml } from '../render.ts'
 export const rehypeTableWrapper: Plugin<[], Root> = function rehypeJaamdTableWrapper() {
     return (tree) => {
         visit(tree, 'element', (node, index, parent) => {
-            if (node.tagName !== 'table' || index === undefined || !parent) return
+            if (node.tagName !== 'table' || index === undefined || !parent) {
+                return
+            }
 
             const wrapper: Element = {
                 type: 'element',
@@ -26,12 +28,16 @@ export const rehypeTableWrapper: Plugin<[], Root> = function rehypeJaamdTableWra
 
 /** Text of a heading: text nodes, raw HTML tags left out. */
 function textOf(node: ElementContent): string {
-    if (node.type === 'text') return node.value
+    if (node.type === 'text') {
+        return node.value
+    }
     return 'children' in node ? node.children.map(textOf).join('') : ''
 }
 
 function hasExpression(node: ElementContent): boolean {
-    if ((node.type as string) === 'mdxTextExpression') return true
+    if ((node.type as string) === 'mdxTextExpression') {
+        return true
+    }
     return 'children' in node && node.children.some(hasExpression)
 }
 
@@ -51,10 +57,14 @@ export const rehypeHeadingLinks: Plugin<[RehypeHeadingLinksOptions?], Root> = fu
 
     return (tree) => {
         visit(tree, 'element', (node) => {
-            if (!/^h[1-6]$/.test(node.tagName)) return
+            if (!/^h[1-6]$/.test(node.tagName)) {
+                return
+            }
             const id = node.properties.id
             // An MDX expression has no text yet: left to the client.
-            if (typeof id !== 'string' || hasExpression(node)) return
+            if (typeof id !== 'string' || hasExpression(node)) {
+                return
+            }
 
             node.children.push({
                 type: 'raw',

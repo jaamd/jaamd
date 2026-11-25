@@ -22,7 +22,9 @@ const headingText: HeadingText = (node, ctx) => {
     return raw.includes('frontmatter') ? satteriCollectHastText(node, ctx.data.astro?.frontmatter ?? {}) : raw
 }
 
-const isHeadingLinks = (plugin: unknown) => (Array.isArray(plugin) ? plugin[0] : plugin) === rehypeHeadingLinks
+const isHeadingLinks = (plugin: unknown) => {
+    return (Array.isArray(plugin) ? plugin[0] : plugin) === rehypeHeadingLinks
+}
 
 /** JAAMD's plugins for Astro's `unified()`, Astro's heading ids included. */
 export function unifiedPlugins(options: PluginOptions = {}): {
@@ -33,9 +35,9 @@ export function unifiedPlugins(options: PluginOptions = {}): {
     return {
         // unified's `[plugin, ...options]` is Astro's `[plugin, options]`.
         remarkPlugins: preset.remarkPlugins as RemarkPlugins,
-        rehypePlugins: preset.rehypePlugins.flatMap((plugin) =>
-            isHeadingLinks(plugin) ? [REHYPE_HEADING_IDS, plugin] : [plugin],
-        ) as RehypePlugins,
+        rehypePlugins: preset.rehypePlugins.flatMap((plugin) => {
+            return isHeadingLinks(plugin) ? [REHYPE_HEADING_IDS, plugin] : [plugin]
+        }) as RehypePlugins,
     }
 }
 
@@ -65,29 +67,40 @@ export interface Registration {
 }
 
 /** Names of a Sätteri entry: definitions carry `name`, groups nest, factories have none. */
-const satteriNames = (entry: unknown): string[] =>
-    Array.isArray(entry)
+const satteriNames = (entry: unknown): string[] => {
+    return Array.isArray(entry)
         ? entry.flatMap(satteriNames)
         : entry && typeof entry === 'object' && 'name' in entry
           ? [String(entry.name)]
           : []
+}
 
 /** Name of a unified entry: the plugin function or module, alone or as `[plugin, options]`.
  *  JAAMD's own functions carry a `Jaamd` name, so a third-party `remarkToc` is not taken for one. */
 const unifiedNames = (entry: unknown): string[] => {
     const plugin = Array.isArray(entry) ? entry[0] : entry
-    if (typeof plugin === 'string') return [plugin]
+    if (typeof plugin === 'string') {
+        return [plugin]
+    }
     return typeof plugin === 'function' && plugin.name ? [plugin.name] : []
 }
 
 /** Plugins whose names are not registered yet. Registering one twice would run it twice. */
 function missing<T>(existing: readonly unknown[], plugins: readonly T[], names: (entry: unknown) => string[]): T[] {
     const taken = new Set(existing.flatMap(names))
-    return plugins.filter((plugin) => !names(plugin).some((name) => taken.has(name)))
+    return plugins.filter((plugin) => {
+        return !names(plugin).some((name) => {
+            return taken.has(name)
+        })
+    })
 }
 
-const isFallback = (plugin: { name: string }) => plugin.name === 'jaamd-directive-fallback'
-const isUnifiedFallback = (plugin: unknown) => plugin === remarkDirectiveFallback
+const isFallback = (plugin: { name: string }) => {
+    return plugin.name === 'jaamd-directive-fallback'
+}
+const isUnifiedFallback = (plugin: unknown) => {
+    return plugin === remarkDirectiveFallback
+}
 
 /** Ahead of the user's mdast plugins, the directive fallback after them; hast plugins after the user's. */
 function registerSatteri(processor: SatteriProcessorOptions, options: PluginOptions): Registration {
@@ -96,12 +109,16 @@ function registerSatteri(processor: SatteriProcessorOptions, options: PluginOpti
     const hast = missing(processor.hastPlugins, preset.hastPlugins, satteriNames)
 
     processor.mdastPlugins = [
-        ...mdast.filter((plugin) => !isFallback(plugin)),
+        ...mdast.filter((plugin) => {
+            return !isFallback(plugin)
+        }),
         ...processor.mdastPlugins,
         ...mdast.filter(isFallback),
     ]
     processor.hastPlugins = [...processor.hastPlugins, ...hast]
-    if (preset.features.directive) processor.features = { ...processor.features, directive: true }
+    if (preset.features.directive) {
+        processor.features = { ...processor.features, directive: true }
+    }
 
     return { added: mdast.length + hast.length, total: preset.mdastPlugins.length + preset.hastPlugins.length }
 }
@@ -113,10 +130,14 @@ function registerUnified(processor: UnifiedProcessorOptions, options: PluginOpti
     const missingRehype = missing(processor.rehypePlugins, preset.rehypePlugins, unifiedNames)
     // Astro's ids come along only with the links that read them.
     const links = missingRehype.some(isHeadingLinks)
-    const rehype = missingRehype.filter((plugin) => links || plugin !== REHYPE_HEADING_IDS)
+    const rehype = missingRehype.filter((plugin) => {
+        return links || plugin !== REHYPE_HEADING_IDS
+    })
 
     processor.remarkPlugins = [
-        ...remark.filter((plugin) => !isUnifiedFallback(plugin)),
+        ...remark.filter((plugin) => {
+            return !isUnifiedFallback(plugin)
+        }),
         ...processor.remarkPlugins,
         ...remark.filter(isUnifiedFallback),
     ]

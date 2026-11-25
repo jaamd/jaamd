@@ -1,6 +1,6 @@
 /** Where the documentation for language models is. */
-export const GET = () =>
-    new Response(
+export const GET = () => {
+    return new Response(
         [
             '# JAAMD',
             '',
@@ -11,3 +11,4 @@ export const GET = () =>
         ].join('\n'),
         { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
     )
+}

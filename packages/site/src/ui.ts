@@ -22,7 +22,9 @@ function localeCandidates(locale: string): string[] {
 
 /** Locale keys in config are BCP-47 and therefore case-insensitive. */
 function localeEntry<T>(entries: Record<string, T>, locale: string) {
-    return Object.entries(entries).find(([candidate]) => candidate.toLowerCase() === locale)?.[1]
+    return Object.entries(entries).find(([candidate]) => {
+        return candidate.toLowerCase() === locale
+    })?.[1]
 }
 
 /** User overrides win, from the exact locale to its base language. Bundled
@@ -32,12 +34,16 @@ export function uiString(overrides: UiOverrides, locale: string, key: UiKey): st
 
     for (const candidate of candidates) {
         const value = localeEntry(overrides, candidate)?.[key]
-        if (value !== undefined) return value
+        if (value !== undefined) {
+            return value
+        }
     }
 
     for (const candidate of candidates) {
         const catalogue = localeEntry<UiCatalog>(UI_CATALOGS, candidate)
-        if (catalogue) return catalogue[key]
+        if (catalogue) {
+            return catalogue[key]
+        }
     }
 
     return UI_DEFAULTS[key]

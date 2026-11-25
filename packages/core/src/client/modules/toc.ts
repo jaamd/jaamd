@@ -39,35 +39,52 @@ export function initToc(root: ParentNode, options: TocOptions = {}): () => void 
 
         nav.querySelectorAll<HTMLAnchorElement>('a[href*="#"]').forEach((link) => {
             const id = link.hash.slice(1)
-            if (!id) return
+            if (!id) {
+                return
+            }
 
             // A hand-written anchor can be wrong: the link just never lights up.
             const target = document.getElementById(decodeId(id))
-            if (target) links.set(target, link)
+            if (target) {
+                links.set(target, link)
+            }
         })
 
-        if (links.size === 0) continue
+        if (links.size === 0) {
+            continue
+        }
 
         const visible = new Set<Element>()
         const order = [...links.keys()]
 
         const setCurrent = (target: Element | null) => {
             links.forEach((link, key) => {
-                if (key === target) link.setAttribute('aria-current', 'location')
-                else link.removeAttribute('aria-current')
+                if (key === target) {
+                    link.setAttribute('aria-current', 'location')
+                } else {
+                    link.removeAttribute('aria-current')
+                }
             })
         }
 
         const observer = new IntersectionObserver(
             (entries) => {
                 for (const entry of entries) {
-                    if (entry.isIntersecting) visible.add(entry.target)
-                    else visible.delete(entry.target)
+                    if (entry.isIntersecting) {
+                        visible.add(entry.target)
+                    } else {
+                        visible.delete(entry.target)
+                    }
                 }
 
                 // Several headings can share the band; the topmost one wins.
-                const current = order.find((el) => visible.has(el)) ?? null
-                if (current) setCurrent(current)
+                const current =
+                    order.find((el) => {
+                        return visible.has(el)
+                    }) ?? null
+                if (current) {
+                    setCurrent(current)
+                }
             },
             {
                 // Band from where an anchored heading rests down to 30% of the viewport.
@@ -75,7 +92,9 @@ export function initToc(root: ParentNode, options: TocOptions = {}): () => void 
             },
         )
 
-        links.forEach((_link, target) => observer.observe(target))
+        links.forEach((_link, target) => {
+            return observer.observe(target)
+        })
         observers.set(nav, observer)
         created.set(nav, observer)
     }

@@ -28,7 +28,9 @@ export const MOVED: Record<string, string> = {
 export function movedTo(path: string): string | null {
     const markdown = path.endsWith('.md')
     const target = MOVED[markdown ? path.slice(0, -'.md'.length) : path]
-    if (!target) return null
+    if (!target) {
+        return null
+    }
     return markdown ? `${target}.md` : `${target}/`
 }
 
@@ -40,13 +42,17 @@ export function markdownSource(path: string): string | null {
 /** The response, varying on Accept besides whatever it already varies on. */
 function withHeaders(response: Response, headers: Record<string, string> = {}): Response {
     const copy = new Response(response.body, response)
-    for (const [name, value] of Object.entries(headers)) copy.headers.set(name, value)
+    for (const [name, value] of Object.entries(headers)) {
+        copy.headers.set(name, value)
+    }
 
     const vary = copy.headers.get('Vary')
     const varies = vary?.split(',').some((name) => {
         return ['accept', '*'].includes(name.trim().toLowerCase())
     })
-    if (!varies) copy.headers.append('Vary', 'Accept')
+    if (!varies) {
+        copy.headers.append('Vary', 'Accept')
+    }
 
     return copy
 }
@@ -72,13 +78,17 @@ export default {
         const path = url.pathname.replace(/\/+$/, '') || '/'
 
         const moved = movedTo(path)
-        if (moved) return Response.redirect(new URL(`${moved}${url.search}`, url).href, 301)
+        if (moved) {
+            return Response.redirect(new URL(`${moved}${url.search}`, url).href, 301)
+        }
 
         if (prefersMarkdown(request)) {
             const source = markdownSource(path)
             if (source) {
                 const markdown = await env.ASSETS.fetch(requestFor(request, source))
-                if (markdown.ok) return withHeaders(markdown, { 'Content-Type': MARKDOWN })
+                if (markdown.ok) {
+                    return withHeaders(markdown, { 'Content-Type': MARKDOWN })
+                }
             }
             const response = await env.ASSETS.fetch(request)
             return response.status === 404 ? markdownNotFound(url) : withHeaders(response)

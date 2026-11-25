@@ -8,7 +8,9 @@ import { fontProviders } from 'astro/config'
 import { defineJaadConfig, resolveConfig } from '../../src/config.ts'
 
 // Resolved outside a repository, so nothing is inferred and the defaults show.
-const bare = (over = {}) => resolveConfig({ title: 'T', ...over }, '/')
+const bare = (over = {}) => {
+    return resolveConfig({ title: 'T', ...over }, '/')
+}
 
 test('title is the only thing you must supply', () => {
     const config = bare()
@@ -22,12 +24,16 @@ test('title is the only thing you must supply', () => {
 
 test('lang has to be a language tag', () => {
     assert.equal(bare({ lang: 'pt-BR' }).lang, 'pt-BR')
-    assert.throws(() => bare({ lang: 'en_US' }), /lang must be a language tag/)
+    assert.throws(() => {
+        return bare({ lang: 'en_US' })
+    }, /lang must be a language tag/)
 })
 
 test('a public url is root-relative or http(s), never protocol-relative', () => {
     assert.equal(bare({ logo: '/logo.svg' }).logo, '/logo.svg')
-    assert.throws(() => bare({ logo: '//evil.example/logo.svg' }), /logo must be a public url/)
+    assert.throws(() => {
+        return bare({ logo: '//evil.example/logo.svg' })
+    }, /logo must be a public url/)
 })
 
 test("astro passthrough keeps Astro's option types", () => {
@@ -48,7 +54,9 @@ test("astro passthrough keeps Astro's option types", () => {
 })
 
 test('a missing title is rejected rather than defaulted', () => {
-    assert.throws(() => resolveConfig({} as never, '/'))
+    assert.throws(() => {
+        return resolveConfig({} as never, '/')
+    })
 })
 
 test('the appearance follows the reader unless it is pinned', () => {
@@ -58,7 +66,9 @@ test('the appearance follows the reader unless it is pinned', () => {
 
 test('an appearance that is not a mode lists the ones that are', () => {
     assert.throws(
-        () => bare({ appearance: 'system' }),
+        () => {
+            return bare({ appearance: 'system' })
+        },
         (error: Error) => {
             assert.match(error.message, /\n {2}appearance: /)
             assert.match(error.message, /auto, light, dark/)
@@ -71,7 +81,9 @@ test('an appearance that is not a mode lists the ones that are', () => {
 
 test('a misspelt option is an error naming the real one', () => {
     assert.throws(
-        () => bare({ routebase: '/manual' }),
+        () => {
+            return bare({ routebase: '/manual' })
+        },
         (error: Error) => {
             assert.match(error.message, /unknown option routebase/)
             assert.match(error.message, /did you mean routeBase\?/)
@@ -81,12 +93,16 @@ test('a misspelt option is an error naming the real one', () => {
 })
 
 test('an option that does not exist lists the ones that do', () => {
-    assert.throws(() => bare({ sidebar: [] }), /unknown option sidebar[\s\S]*available: title/)
+    assert.throws(() => {
+        return bare({ sidebar: [] })
+    }, /unknown option sidebar[\s\S]*available: title/)
 })
 
 test('every problem is reported at once, one per line', () => {
     assert.throws(
-        () => resolveConfig({ title: 1, logo: './x.svg' } as never, '/'),
+        () => {
+            return resolveConfig({ title: 1, logo: './x.svg' } as never, '/')
+        },
         (error: Error) => {
             assert.match(error.message, /^jaad: invalid configuration\n/)
             assert.match(error.message, /\n {2}title: /)
@@ -155,7 +171,9 @@ test('footer false survives the parse, so the component can act on it', () => {
 // A footer written as an object is refused, and the error says how to write it.
 test('a footer object is refused with its replacement spelled out', () => {
     assert.throws(
-        () => bare({ footer: { message: 'MIT', copyright: '© 2026' } }),
+        () => {
+            return bare({ footer: { message: 'MIT', copyright: '© 2026' } })
+        },
         (error: Error) => {
             assert.match(error.message, /\n {2}footer: /)
             assert.match(error.message, /single string/)
@@ -177,10 +195,14 @@ test("astro's own options never reach the resolved config", () => {
     })
 
     assert.deepEqual(
-        Object.keys(config).filter((k) => ['site', 'base', 'astro'].includes(k)),
+        Object.keys(config).filter((k) => {
+            return ['site', 'base', 'astro'].includes(k)
+        }),
         [],
     )
-    assert.doesNotThrow(() => JSON.stringify(config))
+    assert.doesNotThrow(() => {
+        return JSON.stringify(config)
+    })
 })
 
 test('fonts set in astro.fonts reach the resolved config by css variable', () => {
@@ -203,7 +225,9 @@ test('fonts set in astro.fonts reach the resolved config by css variable', () =>
 // ── The mount point, which every internal link is built from ─────────────────
 
 test('the mount point gets one leading slash and no trailing one', () => {
-    const at = (routeBase: string) => bare({ routeBase }).docs.base
+    const at = (routeBase: string) => {
+        return bare({ routeBase }).docs.base
+    }
     assert.equal(at('/docs'), '/docs')
     assert.equal(at('docs'), '/docs', 'a missing slash made every link relative')
     assert.equal(at('/docs/'), '/docs')
@@ -217,7 +241,9 @@ test('the root mount point is empty, so links stay single-slashed', () => {
 test('a logo has to be a public url, not a source path', () => {
     assert.equal(bare({ logo: '/logo.svg' }).logo, '/logo.svg')
     assert.equal(bare({ logo: 'https://cdn.dev/l.svg' }).logo, 'https://cdn.dev/l.svg')
-    assert.throws(() => bare({ logo: './src/logo.svg' }), /public url/)
+    assert.throws(() => {
+        return bare({ logo: './src/logo.svg' })
+    }, /public url/)
 })
 
 test('the site name leads to the site root unless told otherwise', () => {
@@ -256,16 +282,28 @@ test("public assets and jaad.css are found in Astro's directories, not below the
 })
 
 test('a misspelt key inside an option is an error, not a silent no-op', () => {
-    assert.throws(() => bare({ head: [{ tag: 'meta', attributes: { name: 'x' } }] }), /head\.0/)
-    assert.throws(() => bare({ nav: [{ label: 'Blog', url: '/blog' }] }), /nav\.0/)
-    assert.throws(() => bare({ theme: { light: 'a', drak: 'b' } }), /theme/)
-    assert.throws(() => bare({ sections: { api: { dir: './api', lable: 'API' } } }), /sections\.api/)
+    assert.throws(() => {
+        return bare({ head: [{ tag: 'meta', attributes: { name: 'x' } }] })
+    }, /head\.0/)
+    assert.throws(() => {
+        return bare({ nav: [{ label: 'Blog', url: '/blog' }] })
+    }, /nav\.0/)
+    assert.throws(() => {
+        return bare({ theme: { light: 'a', drak: 'b' } })
+    }, /theme/)
+    assert.throws(() => {
+        return bare({ sections: { api: { dir: './api', lable: 'API' } } })
+    }, /sections\.api/)
 })
 
 test('ui overrides name strings JAAD has, in a locale code', () => {
     assert.equal(bare({ ui: { it: { 'search.placeholder': 'Cerca' } } }).ui.it['search.placeholder'], 'Cerca')
-    assert.throws(() => bare({ ui: { it: { 'search.placeholer': 'Cerca' } } }), /ui\.it/)
-    assert.throws(() => bare({ ui: { italiano: {} } }), /ui\.italiano/)
+    assert.throws(() => {
+        return bare({ ui: { it: { 'search.placeholer': 'Cerca' } } })
+    }, /ui\.it/)
+    assert.throws(() => {
+        return bare({ ui: { italiano: {} } })
+    }, /ui\.italiano/)
 })
 
 test('a link is a path or an http(s), mailto or tel URL', () => {
@@ -273,15 +311,23 @@ test('a link is a path or an http(s), mailto or tel URL', () => {
         bare({ nav: [{ label: 'Mail', href: 'mailto:me@example.dev' }] }).nav[0].href,
         'mailto:me@example.dev',
     )
-    assert.throws(() => bare({ nav: [{ label: 'x', href: 'javascript:alert(1)' }] }), /nav link must be a path/)
-    assert.throws(() => bare({ social: { x: 'javascript:alert(1)' } }), /social link must be a path/)
-    assert.throws(() => bare({ homeLink: 'data:text/html,x' }), /homeLink must be a path/)
+    assert.throws(() => {
+        return bare({ nav: [{ label: 'x', href: 'javascript:alert(1)' }] })
+    }, /nav link must be a path/)
+    assert.throws(() => {
+        return bare({ social: { x: 'javascript:alert(1)' } })
+    }, /social link must be a path/)
+    assert.throws(() => {
+        return bare({ homeLink: 'data:text/html,x' })
+    }, /homeLink must be a path/)
 })
 
 test('an explicit social image has to be a public url', () => {
     assert.equal(bare({ ogImage: '/social.png' }).ogImage, '/social.png')
     assert.equal(bare({ ogImage: 'https://cdn.example.dev/social.png' }).ogImage, 'https://cdn.example.dev/social.png')
-    assert.throws(() => bare({ ogImage: './src/social.png' }), /public url/)
+    assert.throws(() => {
+        return bare({ ogImage: './src/social.png' })
+    }, /public url/)
 })
 
 // ── Locales ──────────────────────────────────────────────────────────────────
@@ -303,7 +349,9 @@ test('locale directories reach the resolved config', (t) => {
     const config = resolveConfig({ title: 'T' }, cwd)
 
     assert.deepEqual(
-        config.locales.map((locale) => locale.code),
+        config.locales.map((locale) => {
+            return locale.code
+        }),
         ['en', 'it'],
     )
     assert.equal(config.defaultLocale, 'en')
@@ -322,7 +370,9 @@ test('an explicit list is taken over what detection would find', (t) => {
     const config = resolveConfig({ title: 'T', locales: ['en', 'it'] }, cwd)
 
     assert.deepEqual(
-        config.locales.map((locale) => locale.code),
+        config.locales.map((locale) => {
+            return locale.code
+        }),
         ['en', 'it'],
     )
 })
@@ -340,10 +390,14 @@ test('two empty locale directories leave the docs unlocalised', (t) => {
 
 // A pinned list skips detection, which is what guards against a missing docsDir.
 test('a pinned list does not crash when there is no docs directory', () => {
-    assert.doesNotThrow(() => bare({ locales: ['en'] }))
+    assert.doesNotThrow(() => {
+        return bare({ locales: ['en'] })
+    })
     assert.deepEqual(bare({ locales: ['en'] }).locales, [])
 })
 
 test('a locale code the config pins has to be a real one', () => {
-    assert.throws(() => bare({ locales: ['nope'] }), /not a locale code/)
+    assert.throws(() => {
+        return bare({ locales: ['nope'] })
+    }, /not a locale code/)
 })

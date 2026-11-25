@@ -9,10 +9,14 @@ interface Props {
 const { groups } = Astro.props
 
 /** The pages outside every section, then each section with all its pages. */
-const loose = groups.filter((group): group is DocsNavEntry => group.type !== 'section')
+const loose = groups.filter((group): group is DocsNavEntry => {
+    return group.type !== 'section'
+})
 const blocks = [
     ...(loose.length > 0 ? [{ entries: loose, label: null }] : []),
-    ...groups.flatMap((group) => (group.type === 'section' ? [{ entries: group.entries, label: group.label }] : [])),
+    ...groups.flatMap((group) => {
+        return group.type === 'section' ? [{ entries: group.entries, label: group.label }] : []
+    }),
 ]
 ---
 

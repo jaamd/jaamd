@@ -42,11 +42,17 @@ function codeTabLabel(meta: string | null | undefined, lang: string | null | und
 
 /** Where a link of the page leads once it is read away from the docs folder. */
 function rewriteUrl(url: string, page: ExportablePage, context: MarkdownExportContext): string {
-    if (/^[a-z][a-z\d+.-]*:/i.test(url) || url.startsWith('#') || url.startsWith('//')) return url
-    if (url.startsWith('/')) return context.origin ? `${context.origin}${url}` : url
+    if (/^[a-z][a-z\d+.-]*:/i.test(url) || url.startsWith('#') || url.startsWith('//')) {
+        return url
+    }
+    if (url.startsWith('/')) {
+        return context.origin ? `${context.origin}${url}` : url
+    }
 
     const [path, hash] = url.split('#', 2)
-    if (!path.endsWith('.md') || !page.filePath) return url
+    if (!path.endsWith('.md') || !page.filePath) {
+        return url
+    }
 
     let decoded: string
     try {
@@ -56,7 +62,9 @@ function rewriteUrl(url: string, page: ExportablePage, context: MarkdownExportCo
     }
 
     const target = context.markdownUrls.get(sourceKey(posix.join(posix.dirname(sourceKey(page.filePath)), decoded)))
-    if (!target) return url
+    if (!target) {
+        return url
+    }
     return hash ? `${target}#${hash}` : target
 }
 
@@ -66,12 +74,16 @@ function flattenDirective(node: Nodes, body: string): RootContent[] | null {
         return null
     }
 
-    if (node.name === 'toc') return []
+    if (node.name === 'toc') {
+        return []
+    }
 
     if (node.name === 'code-tabs' && node.type === 'containerDirective') {
         let tab = 0
         return node.children.flatMap((child): RootContent[] => {
-            if (child.type !== 'code') return [child]
+            if (child.type !== 'code') {
+                return [child]
+            }
 
             const label = codeTabLabel(child.meta, child.lang, tab++)
             const heading: RootContent = {
@@ -82,15 +94,21 @@ function flattenDirective(node: Nodes, body: string): RootContent[] | null {
         })
     }
 
-    if (node.name === 'spoiler') return node.children as RootContent[]
+    if (node.name === 'spoiler') {
+        return node.children as RootContent[]
+    }
 
     // Like JAAMD's fallback: a block keeps its content, an inline or leaf
     // directive its source, as in a time such as `10:30`.
-    if (node.type === 'containerDirective') return node.children as RootContent[]
+    if (node.type === 'containerDirective') {
+        return node.children as RootContent[]
+    }
 
     const start = node.position?.start.offset
     const end = node.position?.end.offset
-    if (start === undefined || end === undefined) return null
+    if (start === undefined || end === undefined) {
+        return null
+    }
     const text: Text = { type: 'text', value: body.slice(start, end) }
     return [text]
 }
@@ -117,18 +135,23 @@ export function exportMarkdown(page: ExportablePage, context: MarkdownExportCont
     const tree = parse.parse(page.body) as Root
 
     visit(tree, (node, index, parent) => {
-        if (index === undefined || !parent) return undefined
+        if (index === undefined || !parent) {
+            return undefined
+        }
 
         const replacement = flattenDirective(node as Nodes, page.body)
-        if (!replacement) return undefined
-
+        if (!replacement) {
+            return undefined
+        }
         ;(parent as Parent).children.splice(index, 1, ...replacement)
         // The replacement can hold directives of its own: visit it next.
         return [SKIP, index]
     })
 
     visit(tree, ['link', 'definition', 'image'], (node) => {
-        if ('url' in node && typeof node.url === 'string') node.url = rewriteUrl(node.url, page, context)
+        if ('url' in node && typeof node.url === 'string') {
+            node.url = rewriteUrl(node.url, page, context)
+        }
     })
 
     const intro: RootContent[] = []

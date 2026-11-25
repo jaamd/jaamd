@@ -8,13 +8,17 @@ export function quality(accept: string, type: string): number {
         const [media, ...params] = part.split(';').map((piece) => {
             return piece.trim()
         })
-        if (media.toLowerCase() !== type) continue
+        if (media.toLowerCase() !== type) {
+            continue
+        }
 
         // Parameter names are case-insensitive, and may have spaces around `=`.
         const q = params.find((param) => {
             return /^q\s*=/i.test(param)
         })
-        if (!q) return 1
+        if (!q) {
+            return 1
+        }
 
         const value = Number(q.slice(q.indexOf('=') + 1).trim())
         return Number.isFinite(value) ? value : 0
@@ -36,7 +40,9 @@ export function prefersMarkdown(request: Request): boolean {
  */
 export function markdownPathFor(pathname: string, openers: Record<string, string> = {}): string | null {
     const path = pathname.replace(/\/+$/, '') || '/'
-    if (path in openers) return openers[path]
+    if (path in openers) {
+        return openers[path]
+    }
 
     const last = path.slice(path.lastIndexOf('/'))
     return last.includes('.') ? null : `${path}.md`

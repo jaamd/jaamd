@@ -10,6 +10,9 @@ export default defineConfig({
     rules: {
         'no-shadow': 'off',
         eqeqeq: ['error', 'always'],
+        // Every body in braces, one statement per line: guards and callbacks included.
+        curly: ['error', 'all'],
+        'arrow-body-style': ['error', 'always'],
         'typescript/consistent-type-imports': 'error',
         'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', fix: { imports: 'safe-fix' } }],
         'import/no-unassigned-import': ['error', { allow: ['**/*.css'] }],

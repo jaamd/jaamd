@@ -28,7 +28,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const GET: APIRoute = async ({ props, site }) => {
     const { id, locale } = props as { id: string; locale?: string }
     const page = (await getDocsTree(locale)).byId.get(id)
-    if (!page) return new Response('Not found', { status: 404 })
+    if (!page) {
+        return new Response('Not found', { status: 404 })
+    }
 
     return new Response(await pageMarkdown(page, site), {
         headers: { 'Content-Type': 'text/markdown; charset=utf-8' },

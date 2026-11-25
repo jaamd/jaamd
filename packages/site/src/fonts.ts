@@ -1,6 +1,8 @@
 import { fontProviders } from 'astro/config'
 
-const file = (name: string) => new URL(`./fonts/${name}.woff2`, import.meta.url)
+const file = (name: string) => {
+    return new URL(`./fonts/${name}.woff2`, import.meta.url)
+}
 
 export const fonts = [
     {

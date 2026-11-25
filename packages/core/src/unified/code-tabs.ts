@@ -21,25 +21,31 @@ export const remarkCodeTabs: Plugin<[], Root> = function remarkJaamdCodeTabs() {
                 return
             }
 
-            const { leading, tabs } = groupCodeTabs(node.children, (child): child is Code => child.type === 'code')
+            const { leading, tabs } = groupCodeTabs(node.children, (child): child is Code => {
+                return child.type === 'code'
+            })
             if (tabs.length === 0) {
                 return
             }
 
             const html = codeTabsHtml(
                 codeTabsGroupId(source, groupIndex++),
-                tabs.map(({ code }, i) => codeTabLabel(code, i)),
+                tabs.map(({ code }, i) => {
+                    return codeTabLabel(code, i)
+                }),
             )
 
             const replacement: RootContent[] = [
                 ...leading,
                 { type: 'html', value: html.open },
-                ...tabs.flatMap(({ code, after }, i): RootContent[] => [
-                    { type: 'html', value: html.panelOpen(i) },
-                    { ...code, meta: splitCodeTabMeta(code.meta).annotations },
-                    ...after,
-                    { type: 'html', value: html.panelClose },
-                ]),
+                ...tabs.flatMap(({ code, after }, i): RootContent[] => {
+                    return [
+                        { type: 'html', value: html.panelOpen(i) },
+                        { ...code, meta: splitCodeTabMeta(code.meta).annotations },
+                        ...after,
+                        { type: 'html', value: html.panelClose },
+                    ]
+                }),
                 { type: 'html', value: html.close },
             ]
 

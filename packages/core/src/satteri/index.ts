@@ -74,7 +74,9 @@ export function satteriCodeTabs(): MdastPluginDefinition {
                 return
             }
 
-            const { leading, tabs } = groupCodeTabs(node.children, (child) => child.type === 'code')
+            const { leading, tabs } = groupCodeTabs(node.children, (child) => {
+                return child.type === 'code'
+            })
             if (tabs.length === 0) {
                 return
             }
@@ -84,18 +86,22 @@ export function satteriCodeTabs(): MdastPluginDefinition {
 
             const html = codeTabsHtml(
                 codeTabsGroupId(ctx.source, groupIndex),
-                tabs.map(({ code }, i) => codeTabLabel(code, i)),
+                tabs.map(({ code }, i) => {
+                    return codeTabLabel(code, i)
+                }),
             )
 
             ctx.replaceNode(node, [
                 ...leading,
                 { type: 'html', value: html.open },
-                ...tabs.flatMap(({ code, after }, i) => [
-                    { type: 'html' as const, value: html.panelOpen(i) },
-                    { ...code, meta: splitCodeTabMeta(code.meta).annotations },
-                    ...after,
-                    { type: 'html' as const, value: html.panelClose },
-                ]),
+                ...tabs.flatMap(({ code, after }, i) => {
+                    return [
+                        { type: 'html' as const, value: html.panelOpen(i) },
+                        { ...code, meta: splitCodeTabMeta(code.meta).annotations },
+                        ...after,
+                        { type: 'html' as const, value: html.panelClose },
+                    ]
+                }),
                 { type: 'html', value: html.close },
             ])
         },
@@ -114,7 +120,9 @@ export function satteriToc(options: SatteriTocOptions = {}): MdastPluginDefiniti
     return {
         name: 'jaamd-toc',
         containerDirective(node, ctx) {
-            if (node.name !== 'toc') return
+            if (node.name !== 'toc') {
+                return
+            }
 
             const children = [...node.children]
 
@@ -125,7 +133,9 @@ export function satteriToc(options: SatteriTocOptions = {}): MdastPluginDefiniti
                     ? ctx.textContent(children.shift()!).trim()
                     : ''
 
-            if (children.length === 0) return
+            if (children.length === 0) {
+                return
+            }
 
             ctx.replaceNode(node, [
                 { type: 'html', value: tocOpenHtml(title, fallback) },
@@ -141,12 +151,14 @@ type Directive = Parameters<
     NonNullable<MdastPluginDefinition['containerDirective' | 'leafDirective' | 'textDirective']>
 >[0]
 
-const markSpoiler =
-    (tagName: 'span' | 'div') =>
-    (node: Directive, ctx: MdastVisitorContext): void => {
-        if (node.name !== 'spoiler') return
+const markSpoiler = (tagName: 'span' | 'div') => {
+    return (node: Directive, ctx: MdastVisitorContext): void => {
+        if (node.name !== 'spoiler') {
+            return
+        }
         ctx.setProperty(node, 'data', { ...node.data, ...spoilerData(tagName) })
     }
+}
 
 /** Spoilers: `:spoiler[text]` inline, or a `:::spoiler` block. */
 export function satteriSpoiler(): MdastPluginDefinition {
@@ -163,7 +175,9 @@ function isClaimed(node: { data?: object | null }): boolean {
 }
 
 function keepAsDiv(node: Directive, ctx: MdastVisitorContext): void {
-    if (isClaimed(node)) return
+    if (isClaimed(node)) {
+        return
+    }
     ctx.setProperty(node, 'data', { ...node.data, hName: 'div' })
 }
 
@@ -178,9 +192,13 @@ export function satteriDirectiveFallback(): MdastPluginDefinition {
         containerDirective: keepAsDiv,
         leafDirective: keepAsDiv,
         textDirective(node, ctx) {
-            if (isClaimed(node)) return
+            if (isClaimed(node)) {
+                return
+            }
             const { start, end } = node.position ?? {}
-            if (start?.offset === undefined || end?.offset === undefined) return
+            if (start?.offset === undefined || end?.offset === undefined) {
+                return
+            }
             ctx.replaceNode(node, { type: 'text', value: ctx.source.slice(start.offset, end.offset) })
         },
     }
@@ -218,7 +236,13 @@ export interface SatteriHeadingLinksOptions {
 
 /** Appends the anchor to headings that have an id. */
 export function satteriHeadingLinks(options: SatteriHeadingLinksOptions = {}): HastPluginEntry {
-    const { ids, text = (node, ctx) => ctx.textContent(node), label = DEFAULT_LABELS.headingLink } = options
+    const {
+        ids,
+        text = (node, ctx) => {
+            return ctx.textContent(node)
+        },
+        label = DEFAULT_LABELS.headingLink,
+    } = options
 
     const headingLinks: HastPluginDefinition = {
         name: 'jaamd-heading-links',
@@ -226,7 +250,9 @@ export function satteriHeadingLinks(options: SatteriHeadingLinksOptions = {}): H
             filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
             visit(node, ctx) {
                 const id = node.properties?.id
-                if (typeof id !== 'string') return
+                if (typeof id !== 'string') {
+                    return
+                }
                 ctx.appendChild(node, { type: 'raw', value: headingLinkHtml(id, text(node, ctx), label) })
             },
         },

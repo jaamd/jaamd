@@ -3,7 +3,9 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { buildSocialLinks } from '@jaamd/site/social.ts'
 
-const config = (over: Partial<JaadResolvedConfig>) => ({ social: {}, repoUrl: null, ...over }) as JaadResolvedConfig
+const config = (over: Partial<JaadResolvedConfig>) => {
+    return { social: {}, repoUrl: null, ...over } as JaadResolvedConfig
+}
 
 test('a known key gets the forge label and icon', () => {
     const [link] = buildSocialLinks(config({ social: { github: 'https://github.com/o/r' } }))
@@ -39,7 +41,9 @@ test('the inferred repository is appended alongside links that are not forges', 
         }),
     )
     assert.deepEqual(
-        links.map((l) => l.label),
+        links.map((l) => {
+            return l.label
+        }),
         ['discord', 'GitHub'],
     )
 })
@@ -62,7 +66,9 @@ test('naming a forge stops the inference, even at another url', () => {
         }),
     )
     assert.deepEqual(
-        links.map((l) => l.href),
+        links.map((l) => {
+            return l.href
+        }),
         ['https://github.com/o/product'],
     )
 })
@@ -75,7 +81,9 @@ test('naming one forge stops the inference of another', () => {
         }),
     )
     assert.deepEqual(
-        links.map((l) => l.label),
+        links.map((l) => {
+            return l.label
+        }),
         ['GitLab'],
     )
 })

@@ -13,19 +13,29 @@ const PKG = ROOT
 /** A built directory, frozen so the later rebuilds can be compared to it. */
 function snapshot(dist) {
     const files = walk(dist)
-    const contents = new Map(files.map((f) => [f.slice(dist.length), readFileSync(f, 'utf8')]))
+    const contents = new Map(
+        files.map((f) => {
+            return [f.slice(dist.length), readFileSync(f, 'utf8')]
+        }),
+    )
 
     return {
         files: [...contents.keys()],
-        pages: [...contents.keys()].filter((f) => f.endsWith('.html')),
+        pages: [...contents.keys()].filter((f) => {
+            return f.endsWith('.html')
+        }),
         read: (relative) => {
             const file = contents.get('/' + relative)
             assert.ok(file !== undefined, `${relative} was not built`)
             return file
         },
         css: [...contents]
-            .filter(([f]) => f.endsWith('.css') || f.endsWith('.html'))
-            .map(([, body]) => body)
+            .filter(([f]) => {
+                return f.endsWith('.css') || f.endsWith('.html')
+            })
+            .map(([, body]) => {
+                return body
+            })
             .join('\n'),
         /** Only the stylesheets one page links, so a layout's set is testable. */
         cssOf: (relative) => {
@@ -34,8 +44,12 @@ function snapshot(dist) {
             const linked = [
                 ...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g),
                 // The href carries Astro's base; dist keys do not.
-            ].map((m) => contents.get(m[1].slice(m[1].indexOf('/_astro/'))) ?? '')
-            const inline = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => m[1])
+            ].map((m) => {
+                return contents.get(m[1].slice(m[1].indexOf('/_astro/'))) ?? ''
+            })
+            const inline = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => {
+                return m[1]
+            })
             return [...linked, ...inline].join('\n')
         },
     }
@@ -195,10 +209,20 @@ export default defineJaadConfig({
     })
 
     test('a draft is left out of the production build entirely', () => {
-        assert.ok(!built.pages.some((file) => file.includes('draft')), 'a draft page was routed')
+        assert.ok(
+            !built.pages.some((file) => {
+                return file.includes('draft')
+            }),
+            'a draft page was routed',
+        )
 
         const index = JSON.parse(built.read('search-index.json'))
-        assert.ok(!index.pages.some((page) => page.href.includes('draft')), 'a draft page reached the search index')
+        assert.ok(
+            !index.pages.some((page) => {
+                return page.href.includes('draft')
+            }),
+            'a draft page reached the search index',
+        )
         assert.doesNotMatch(built.read('llms.txt'), /\/draft/)
     })
 
@@ -217,11 +241,18 @@ export default defineJaadConfig({
             'an untranslated page was built anyway',
         )
 
-        assert.ok(!localised.files.some((file) => file.startsWith('/fr')), 'an empty locale directory was built anyway')
+        assert.ok(
+            !localised.files.some((file) => {
+                return file.startsWith('/fr')
+            }),
+            'an empty locale directory was built anyway',
+        )
 
         const italian = JSON.parse(localised.read('it/search-index.json'))
         assert.deepEqual(
-            italian.pages.map((page) => page.href),
+            italian.pages.map((page) => {
+                return page.href
+            }),
             ['/it/', '/it/guides/deep-dive/', '/it/guides/solo-italiano/', '/it/guida/installazione/'],
             'the italian index is not scoped to italian',
         )
@@ -308,7 +339,9 @@ export default defineJaadConfig({
     })
 
     test("structured data roots the breadcrumb in the page's own locale", () => {
-        const ld = (html) => JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])
+        const ld = (html) => {
+            return JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])
+        }
 
         const italian = ld(localised.read('it/index.html'))
         assert.equal(italian.breadcrumb.itemListElement[0].item, 'https://example.dev/it/')

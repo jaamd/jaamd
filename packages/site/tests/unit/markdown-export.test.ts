@@ -12,8 +12,9 @@ const CONTEXT: MarkdownExportContext = {
 
 const PAGE = { title: 'Guide', filePath: 'docs/guides/03-guide.md' }
 
-const exported = (body: string, context: MarkdownExportContext = CONTEXT, page: object = {}) =>
-    exportMarkdown({ ...PAGE, body, ...page }, context)
+const exported = (body: string, context: MarkdownExportContext = CONTEXT, page: object = {}) => {
+    return exportMarkdown({ ...PAGE, body, ...page }, context)
+}
 
 test('a page without an h1 opens with its title, then its frontmatter description', () => {
     assert.match(

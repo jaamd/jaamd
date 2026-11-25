@@ -19,10 +19,14 @@ const git = (args: string[], cwd: string): string | null => {
  *  `https://host/owner/repo`. */
 export function normaliseRemote(remote: string): string | null {
     const ssh = remote.match(/^[\w.-]+@([\w.-]+):(.+?)(?:\.git)?$/)
-    if (ssh) return `https://${ssh[1]}/${ssh[2]}`
+    if (ssh) {
+        return `https://${ssh[1]}/${ssh[2]}`
+    }
 
     const https = remote.match(/^https?:\/\/(?:[^@/]+@)?([\w.-]+)\/(.+?)(?:\.git)?$/)
-    if (https) return `https://${https[1]}/${https[2]}`
+    if (https) {
+        return `https://${https[1]}/${https[2]}`
+    }
 
     return null
 }
@@ -47,16 +51,24 @@ function ciBranch(env: NodeJS.ProcessEnv): string | null {
         env.VERCEL_GIT_COMMIT_REF, // Vercel
         env.BRANCH, // Netlify
     ]
-    return candidates.find((branch) => branch) ?? null
+    return (
+        candidates.find((branch) => {
+            return branch
+        }) ?? null
+    )
 }
 
 /** Returns null outside a repository, in a tarball, or without an origin. */
 export function inferRepo(cwd: string = process.cwd(), env: NodeJS.ProcessEnv = process.env): RepoInfo | null {
     const remote = git(['remote', 'get-url', 'origin'], cwd)
-    if (!remote) return null
+    if (!remote) {
+        return null
+    }
 
     const url = normaliseRemote(remote)
-    if (!url) return null
+    if (!url) {
+        return null
+    }
 
     // `rev-parse --abbrev-ref` would answer "HEAD" on a detached checkout.
     const branch = git(['symbolic-ref', '--short', '-q', 'HEAD'], cwd) || ciBranch(env)
@@ -72,10 +84,18 @@ type EditPattern = (url: string, branch: string, path: string) => string
 
 /** How each forge spells the editor of a file; `path` is the directory, with no slashes around it. */
 const EDIT_PATTERNS: Record<string, EditPattern> = {
-    github: (url, branch, path) => `${url}/edit/${branch}/${path}/`,
-    gitlab: (url, branch, path) => `${url}/-/edit/${branch}/${path}/`,
-    gitea: (url, branch, path) => `${url}/_edit/${branch}/${path}/`,
-    bitbucket: (url, branch, path) => `${url}/src/${branch}/${path}/:path?mode=edit`,
+    github: (url, branch, path) => {
+        return `${url}/edit/${branch}/${path}/`
+    },
+    gitlab: (url, branch, path) => {
+        return `${url}/-/edit/${branch}/${path}/`
+    },
+    gitea: (url, branch, path) => {
+        return `${url}/_edit/${branch}/${path}/`
+    },
+    bitbucket: (url, branch, path) => {
+        return `${url}/src/${branch}/${path}/:path?mode=edit`
+    },
 }
 
 /** Forges that share another's editor urls. SourceHut has no web editor. */
@@ -97,7 +117,9 @@ function editForge(url: string): string | null {
     }
 
     const host = url.match(/^https?:\/\/([^/]+)/)?.[1] ?? ''
-    const named = Object.keys(EDIT_PATTERN_OF).find((forge) => host.startsWith(`${forge}.`))
+    const named = Object.keys(EDIT_PATTERN_OF).find((forge) => {
+        return host.startsWith(`${forge}.`)
+    })
     return named ? EDIT_PATTERN_OF[named] : null
 }
 

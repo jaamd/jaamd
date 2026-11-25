@@ -6,9 +6,13 @@ import { fileURLToPath } from 'node:url'
 import { allCss, brokenLinks, readBuilt } from '../../tests/dist.mjs'
 
 const DIST = fileURLToPath(new URL('../dist', import.meta.url))
-const page = (relative) => readBuilt(DIST, relative)
+const page = (relative) => {
+    return readBuilt(DIST, relative)
+}
 
-const home = () => page('index.html')
+const home = () => {
+    return page('index.html')
+}
 
 test('the home page opens on the wordmark and the tagline', () => {
     assert.match(home(), /<title>JAAMD<\/title>/)
@@ -28,7 +32,9 @@ test('the preview is rendered at build by JAAMD, so it shows without scripts', (
 
 test('every JAAMD theme can dress the preview, and only the preview', () => {
     const css = allCss(DIST)
-    const options = [...home().matchAll(/<option value="([^"]+)"/g)].map((m) => m[1])
+    const options = [...home().matchAll(/<option value="([^"]+)"/g)].map((m) => {
+        return m[1]
+    })
     assert.equal(options[0], 'default')
     for (const slug of options.slice(1)) {
         assert.match(css, new RegExp(`\\.landing-preview\\[data-jaamd-theme='${slug}'\\]`), slug)
@@ -38,7 +44,9 @@ test('every JAAMD theme can dress the preview, and only the preview', () => {
 
 test('the related projects link to the documentation', () => {
     const related = home().match(/<section class="related"[\s\S]*?<\/section>/)?.[0] ?? ''
-    for (const name of ['@jaamd/astro', 'JAAD', 'JAAB', '@jaamd/react']) assert.match(related, new RegExp(`>${name}<`))
+    for (const name of ['@jaamd/astro', 'JAAD', 'JAAB', '@jaamd/react']) {
+        assert.match(related, new RegExp(`>${name}<`))
+    }
     assert.match(related, /href="https:\/\/docs\.jaamd\.org\/jaamd"/)
     assert.match(related, /href="https:\/\/docs\.jaamd\.org\/jaad"/)
 })

@@ -20,6 +20,10 @@ export type ResolvedFeatures = Record<Feature, boolean>
 
 /** Every feature, with `directives` forced on while a block written in it is. */
 export function resolveFeatures(features: Features = {}): ResolvedFeatures {
-    const resolved = Object.fromEntries(FEATURES.map((name) => [name, features[name] ?? true])) as ResolvedFeatures
+    const resolved = Object.fromEntries(
+        FEATURES.map((name) => {
+            return [name, features[name] ?? true]
+        }),
+    ) as ResolvedFeatures
     return { ...resolved, directives: resolved.directives || resolved.codeTabs || resolved.toc || resolved.spoilers }
 }

@@ -29,9 +29,17 @@ export function buildSocialLinks(config: SiteResolvedConfig): SocialLink[] {
         })
     }
 
-    const namedAForge = Object.keys(config.social).some((key) => key in FORGES)
+    const namedAForge = Object.keys(config.social).some((key) => {
+        return key in FORGES
+    })
 
-    if (config.repoUrl && !namedAForge && !links.some((l) => l.href === config.repoUrl)) {
+    if (
+        config.repoUrl &&
+        !namedAForge &&
+        !links.some((l) => {
+            return l.href === config.repoUrl
+        })
+    ) {
         const forge = forgeForUrl(config.repoUrl)
         links.push({
             href: config.repoUrl,

@@ -23,9 +23,9 @@ execFileSync(process.execPath, [tsc, '-p', join(ROOT, 'tsconfig.build.json')], {
 
 /** A stylesheet with its `@import './…'` lines replaced by the files they name. */
 function inlined(file) {
-    return readFileSync(file, 'utf8').replace(/^@import '(\.[^']+)';\n/gm, (_, path) =>
-        inlined(join(dirname(file), path)),
-    )
+    return readFileSync(file, 'utf8').replace(/^@import '(\.[^']+)';\n/gm, (_, path) => {
+        return inlined(join(dirname(file), path))
+    })
 }
 
 writeFileSync(join(DIST, 'styles.css'), inlined(join(STYLES, 'index.css')))
@@ -37,5 +37,7 @@ for (const { slug } of themes) {
     const dir = join(DIST, 'themes', slug)
     mkdirSync(dir, { recursive: true })
     writeFileSync(join(dir, 'index.css'), index)
-    if (dark !== null) writeFileSync(join(dir, 'dark.css'), dark)
+    if (dark !== null) {
+        writeFileSync(join(dir, 'dark.css'), dark)
+    }
 }

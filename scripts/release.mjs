@@ -18,34 +18,60 @@ const fail = (message) => {
     console.error(`release: ${message}`)
     process.exit(1)
 }
-const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim()
+const git = (...args) => {
+    return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim()
+}
 
-if (!version) fail('usage: node scripts/release.mjs <version>')
-if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(version)) fail(`${version} is not a version`)
-if (git('status', '--porcelain')) fail('the working tree has uncommitted changes')
+if (!version) {
+    fail('usage: node scripts/release.mjs <version>')
+}
+if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(version)) {
+    fail(`${version} is not a version`)
+}
+if (git('status', '--porcelain')) {
+    fail('the working tree has uncommitted changes')
+}
 
 // A release is cut from main as it is on origin: the tag is pushed with HEAD.
-if (git('rev-parse', '--abbrev-ref', 'HEAD') !== 'main') fail('releases are cut from main')
+if (git('rev-parse', '--abbrev-ref', 'HEAD') !== 'main') {
+    fail('releases are cut from main')
+}
 git('fetch', '--quiet', 'origin', 'main')
 if (git('rev-parse', 'HEAD') !== git('rev-parse', 'origin/main')) {
     fail('main differs from origin/main: pull or push first')
 }
 
 const tag = `v${version}`
-if (git('tag', '--list', tag)) fail(`${tag} already exists`)
-if (git('ls-remote', '--tags', 'origin', `refs/tags/${tag}`)) fail(`${tag} already exists on origin`)
+if (git('tag', '--list', tag)) {
+    fail(`${tag} already exists`)
+}
+if (git('ls-remote', '--tags', 'origin', `refs/tags/${tag}`)) {
+    fail(`${tag} already exists on origin`)
+}
 
 const manifests = readdirSync(join(ROOT, 'packages'))
-    .map((dir) => join('packages', dir, 'package.json'))
-    .filter((path) => existsSync(join(ROOT, path)))
+    .map((dir) => {
+        return join('packages', dir, 'package.json')
+    })
+    .filter((path) => {
+        return existsSync(join(ROOT, path))
+    })
 
-const current = new Set(manifests.map((path) => JSON.parse(readFileSync(join(ROOT, path), 'utf8')).version))
-if (current.size === 1 && current.has(version)) fail(`every package is already ${version}`)
+const current = new Set(
+    manifests.map((path) => {
+        return JSON.parse(readFileSync(join(ROOT, path), 'utf8')).version
+    }),
+)
+if (current.size === 1 && current.has(version)) {
+    fail(`every package is already ${version}`)
+}
 
 for (const path of manifests) {
     const source = readFileSync(join(ROOT, path), 'utf8')
     const matches = source.match(/"version": "[^"]+"/g) ?? []
-    if (matches.length !== 1) fail(`expected one "version" in ${path}, found ${matches.length}`)
+    if (matches.length !== 1) {
+        fail(`expected one "version" in ${path}, found ${matches.length}`)
+    }
     writeFileSync(join(ROOT, path), source.replace(/"version": "[^"]+"/, `"version": "${version}"`))
 }
 

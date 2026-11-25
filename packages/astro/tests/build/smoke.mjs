@@ -20,17 +20,25 @@ const html = readFileSync(PAGE, 'utf8')
 
 // Stylesheets the page actually links, concatenated.
 const css = [...html.matchAll(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/g)]
-    .map((m) => join(DIST, m[1].replace(/^\//, '')))
+    .map((m) => {
+        return join(DIST, m[1].replace(/^\//, ''))
+    })
     .filter(existsSync)
-    .map((f) => readFileSync(f, 'utf8'))
+    .map((f) => {
+        return readFileSync(f, 'utf8')
+    })
     .join('\n')
 
 /** @type {{ name: string, ok: boolean, hint: string }[]} */
 const results = []
 
-const check = (name, condition, hint) => results.push({ name, ok: Boolean(condition), hint })
+const check = (name, condition, hint) => {
+    return results.push({ name, ok: Boolean(condition), hint })
+}
 
-const countOf = (re) => (html.match(re) ?? []).length
+const countOf = (re) => {
+    return (html.match(re) ?? []).length
+}
 
 // ─── remark plugins actually ran ─────────────────────────────────────────────
 
@@ -109,8 +117,12 @@ check(
 )
 
 // Every entry has to land somewhere.
-const tocTargets = [...tocNav.matchAll(/href="#([^"]+)"/g)].map((m) => m[1])
-const dangling = tocTargets.filter((id) => !html.includes(`id="${id}"`))
+const tocTargets = [...tocNav.matchAll(/href="#([^"]+)"/g)].map((m) => {
+    return m[1]
+})
+const dangling = tocTargets.filter((id) => {
+    return !html.includes(`id="${id}"`)
+})
 
 check(
     `toc: all ${tocTargets.length} anchors resolve`,
@@ -123,7 +135,10 @@ const article = html.match(/<article class="jaamd-content"[^>]*>[\s\S]*<\/articl
 
 check(
     'every markdown heading carries an id',
-    article !== '' && [...article.matchAll(/<h[1-6](\s[^>]*)?>/g)].every((m) => /\sid="/.test(m[0])),
+    article !== '' &&
+        [...article.matchAll(/<h[1-6](\s[^>]*)?>/g)].every((m) => {
+            return /\sid="/.test(m[0])
+        }),
     'a heading without an id cannot be linked from a TOC',
 )
 
@@ -152,9 +167,9 @@ check(
 check(
     'heading links: one per markdown heading, pointing at its id',
     article !== '' &&
-        [...article.matchAll(/<h[1-6][^>]*\sid="([^"]+)"[^>]*>[\s\S]*?<\/h[1-6]>/g)].every((m) =>
-            m[0].includes(`class="jaamd-heading-link" href="#${m[1]}"`),
-        ),
+        [...article.matchAll(/<h[1-6][^>]*\sid="([^"]+)"[^>]*>[\s\S]*?<\/h[1-6]>/g)].every((m) => {
+            return m[0].includes(`class="jaamd-heading-link" href="#${m[1]}"`)
+        }),
     "the heading link plugin did not run, or its id disagrees with Astro's",
 )
 
@@ -216,7 +231,9 @@ check(
 
 // ─── report ──────────────────────────────────────────────────────────────────
 
-const failed = results.filter((r) => !r.ok)
+const failed = results.filter((r) => {
+    return !r.ok
+})
 
 for (const r of results) {
     console.log(`${r.ok ? '✓' : '✗'} ${r.name}${r.ok ? '' : `\n    → ${r.hint}`}`)

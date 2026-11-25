@@ -93,7 +93,9 @@ test('files never take the slash of pages', () => {
 })
 
 test("the slash follows Astro's trailingSlash and build format", () => {
-    const astro = (trailingSlash: string, format: string) => ({ trailingSlash, build: { format } })
+    const astro = (trailingSlash: string, format: string) => {
+        return { trailingSlash, build: { format } }
+    }
     assert.equal(pageUrlsEndWithSlash(astro('ignore', 'directory')), true)
     assert.equal(pageUrlsEndWithSlash(astro('ignore', 'file')), false)
     assert.equal(pageUrlsEndWithSlash(astro('always', 'file')), true)

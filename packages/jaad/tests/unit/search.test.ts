@@ -36,8 +36,11 @@ function indexOf(
     return index
 }
 
-const titles = (index: SearchIndex, query: string, section?: string) =>
-    search(index, query, section).map((group) => group.page.title)
+const titles = (index: SearchIndex, query: string, section?: string) => {
+    return search(index, query, section).map((group) => {
+        return group.page.title
+    })
+}
 
 // ── Splitting a page at its headings ─────────────────────────────────────────
 
@@ -46,7 +49,9 @@ test('a page is cut at its h2 and h3, the title left out', () => {
         html: '<h1 id="title">Title</h1><p>Intro.</p><h2 id="one">One</h2><p>First.</p><h3 id="two">Two</h3><p>Second.</p><h4 id="deep">Deep</h4><p>Still second.</p>',
     })
     assert.deepEqual(
-        chunks.map((chunk) => [chunk.heading?.slug ?? null, chunk.text]),
+        chunks.map((chunk) => {
+            return [chunk.heading?.slug ?? null, chunk.text]
+        }),
         [
             [null, 'Intro.'],
             ['one', 'First.'],
@@ -71,22 +76,26 @@ test('a heading takes the text and the id the renderer gave it', () => {
 
 // ── Building the index ───────────────────────────────────────────────────────
 
-const page = (id: string, html: string, more: Partial<DocsSource> = {}): DocsSource => ({
-    id,
-    path: id,
-    data: {},
-    rendered: {
-        html,
-        metadata: {
-            headings: [...html.matchAll(/<h([1-6]) id="([^"]*)">([^<]*)/g)].map(([, depth, slug, text]) => ({
-                depth: Number(depth),
-                slug,
-                text,
-            })),
+const page = (id: string, html: string, more: Partial<DocsSource> = {}): DocsSource => {
+    return {
+        id,
+        path: id,
+        data: {},
+        rendered: {
+            html,
+            metadata: {
+                headings: [...html.matchAll(/<h([1-6]) id="([^"]*)">([^<]*)/g)].map(([, depth, slug, text]) => {
+                    return {
+                        depth: Number(depth),
+                        slug,
+                        text,
+                    }
+                }),
+            },
         },
-    },
-    ...more,
-})
+        ...more,
+    }
+}
 
 test('the index has one entry per heading, each with its anchor and text', () => {
     const tree = buildDocsTree(
@@ -121,7 +130,9 @@ test('the index lists only the sections with pages, at the pages own urls', () =
     ])
     assert.deepEqual(index.sections, [{ key: 'guide', label: 'Guide' }])
     assert.deepEqual(
-        index.pages.map((page) => [page.href, page.section]),
+        index.pages.map((page) => {
+            return [page.href, page.section]
+        }),
         [
             ['/', 'guide'],
             ['/guide/next', 'guide'],
@@ -193,7 +204,9 @@ test('a page lists the headings that matched, each at its anchor', () => {
     const [group] = search(index, 'deploy')
     assert.equal(group.intro, undefined)
     assert.deepEqual(
-        group.hits.map((hit) => hit.href),
+        group.hits.map((hit) => {
+            return hit.href
+        }),
         ['/p0#deploy', '/p0#notes'],
     )
 })
@@ -215,20 +228,24 @@ test('the section filter keeps one section', () => {
 
 test('results are capped at eight pages', () => {
     const index = indexOf(
-        ...Array.from({ length: 20 }, () => ({
-            page: { title: 'Match' },
-            entries: [[undefined, ''] as [undefined, string]],
-        })),
+        ...Array.from({ length: 20 }, () => {
+            return {
+                page: { title: 'Match' },
+                entries: [[undefined, ''] as [undefined, string]],
+            }
+        }),
     )
     assert.equal(search(index, 'match').length, 8)
 })
 
 test('an empty query shows the first pages of each section', () => {
     const index = indexOf(
-        ...['guide', 'guide', 'api'].map((section, at) => ({
-            page: { title: `P${at}`, section },
-            entries: [] as [undefined, string][],
-        })),
+        ...['guide', 'guide', 'api'].map((section, at) => {
+            return {
+                page: { title: `P${at}`, section },
+                entries: [] as [undefined, string][],
+            }
+        }),
     )
     index.sections = [
         { key: 'guide', label: 'Guide' },
@@ -236,14 +253,23 @@ test('an empty query shows the first pages of each section', () => {
     ]
     assert.deepEqual(search(index, '  '), [])
     assert.deepEqual(
-        openingPages(index).map((group) => [group.label, group.pages.map((page) => page.title)]),
+        openingPages(index).map((group) => {
+            return [
+                group.label,
+                group.pages.map((page) => {
+                    return page.title
+                }),
+            ]
+        }),
         [
             ['Guide', ['P0', 'P1']],
             ['API', ['P2']],
         ],
     )
     assert.deepEqual(
-        openingPages(index, 'api').map((group) => group.label),
+        openingPages(index, 'api').map((group) => {
+            return group.label
+        }),
         ['API'],
     )
 })
@@ -255,14 +281,23 @@ test('an empty query starts with the pages outside the sections', () => {
     )
     index.sections = [{ key: 'guide', label: 'Guide' }]
     assert.deepEqual(
-        openingPages(index).map((group) => [group.label, group.pages.map((page) => page.title)]),
+        openingPages(index).map((group) => {
+            return [
+                group.label,
+                group.pages.map((page) => {
+                    return page.title
+                }),
+            ]
+        }),
         [
             [undefined, ['Welcome']],
             ['Guide', ['Intro']],
         ],
     )
     assert.deepEqual(
-        openingPages(index, 'guide').map((group) => group.label),
+        openingPages(index, 'guide').map((group) => {
+            return group.label
+        }),
         ['Guide'],
     )
 })
@@ -342,7 +377,9 @@ test('one edit is a letter added, removed, replaced, or two neighbours swapped',
 
 test('the index carries its version and the Markdown of each page', () => {
     const tree = buildDocsTree([{ id: 'guide', path: 'guide', data: {} } as DocsSource], { urls: { docsBase: '' } })
-    const index = buildSearchIndex(tree, [], (page) => `/${page.slug}.md`)
+    const index = buildSearchIndex(tree, [], (page) => {
+        return `/${page.slug}.md`
+    })
     assert.equal(index.version, SEARCH_INDEX_VERSION)
     assert.equal(index.pages[0].markdown, '/guide.md')
 })
