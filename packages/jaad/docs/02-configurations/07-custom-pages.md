@@ -62,6 +62,11 @@ import SiteLayout from '../layouts/SiteLayout.astro'
 JAAD still generates documentation pages, search, `llms.txt`, raw Markdown
 routes and the sitemap without controlling the rest of the application.
 
+A page of yours on one of those routes, such as `src/pages/docs/[...slug].astro`
+with `routeBase: "/docs"`, would replace the documentation in silence, so the
+build stops and names it. The landing page is the exception: an `index` page
+may take the root from documentation mounted there, with a warning.
+
 ## Keeping JAAD's header and footer
 
 A site with a landing page of its own wants its own identity, and a local

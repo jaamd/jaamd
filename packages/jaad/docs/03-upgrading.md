@@ -64,8 +64,17 @@ should read the file in the repository instead.
 ### New files for language models
 
 The build also writes `llms-full.txt`, and each page announces its Markdown in
-its head. `llms: false` turns these and `llms.txt` off; see
+its head. With `routeBase` below the root, `llms.txt` and `llms-full.txt` are
+also written at the site root. `llms: false` turns all of these off; see
 [LLMs and agents](02-configurations/09-llms.md).
+
+### Pages that take a documentation route
+
+A page in `src/pages/` on a route JAAD serves, such as
+`src/pages/docs/search-index.json.ts` or `src/pages/docs/[...slug].astro` with
+`routeBase: "/docs"`, now stops the build instead of replacing JAAD's in
+silence. Rename the page, or move the documentation with `routeBase`. An
+`index` page over documentation at the root still only warns.
 
 ## From 1.0
 

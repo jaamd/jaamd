@@ -290,9 +290,6 @@ importers:
 
   packages/jaad:
     dependencies:
-      '@astrojs/sitemap':
-        specifier: ^3.7.4
-        version: 3.7.4
       '@jaamd/astro':
         specifier: workspace:^
         version: link:../astro
@@ -343,6 +340,9 @@ importers:
 
   packages/site:
     dependencies:
+      '@astrojs/sitemap':
+        specifier: ^3.7.4
+        version: 3.7.4
       '@jaamd/astro':
         specifier: workspace:^
         version: link:../astro

@@ -1,17 +1,21 @@
 import type { JaadUserConfig } from './config.ts'
 import type { IntegrationState } from './docs/integration.ts'
+import type { SiteIntegration } from '@jaamd/site/integration.ts'
 import type { AstroIntegration } from 'astro'
 import { fileURLToPath } from 'node:url'
-import sitemap from '@astrojs/sitemap'
-import { resolveStylesheets } from '@jaamd/site/config.ts'
-import { setupSite } from '@jaamd/site/integration.ts'
+import { siteCoordinator, siteMember } from '@jaamd/site/integration.ts'
 import { normaliseBasePath } from '@jaamd/site/urls.ts'
+import { serialisedModule } from '@jaamd/site/virtual.ts'
 import { resolveConfig } from './config.ts'
 import { createSitemapFilter, setupDocs } from './docs/integration.ts'
 import { pageUrlsEndWithSlash } from './docs/urls.ts'
 
-/** The site, then the docs on it, resolved against the project Astro loaded. */
-export function createJaadIntegration(options: JaadUserConfig, state: IntegrationState): AstroIntegration {
+/** The docs, on the site `site` sets up, resolved against the project Astro loaded. */
+export function createJaadIntegration(
+    options: JaadUserConfig,
+    state: IntegrationState,
+    site: SiteIntegration,
+): AstroIntegration {
     return {
         name: 'jaad',
         hooks: {
@@ -36,14 +40,23 @@ export function createJaadIntegration(options: JaadUserConfig, state: Integratio
                     )
                 }
 
-                setupSite(params, config, resolveStylesheets(config, paths))
-                setupDocs(params, config, state, hasSite)
+                updateConfig({
+                    vite: { plugins: [serialisedModule('jaad:config', 'virtual:jaad/config', () => config)] },
+                })
 
-                // `site` may come from Astro's own config: read once it is merged.
-                if (hasSite) {
-                    const filter = createSitemapFilter(config.docs.base, state, config.defaultLocale)
-                    updateConfig({ integrations: [sitemap({ filter })] })
-                }
+                const member = siteMember(site)
+                const coordinator = siteCoordinator(site)
+                const routes = setupDocs(params, config, state, {
+                    discoverAliases: hasSite,
+                    rootLlms: coordinator.servesRootLlms(member),
+                    reserved: coordinator.reservedInside(member),
+                })
+
+                coordinator.register(member, {
+                    locales: config.locales,
+                    routes,
+                    sitemapFilter: createSitemapFilter(config.docs.base, state, config.defaultLocale),
+                })
             },
 
             'astro:config:done': ({ config: astroConfig }) => {

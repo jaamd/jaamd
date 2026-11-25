@@ -97,7 +97,8 @@ In addition to the pages, the build writes:
 - `sitemap-index.xml` when `site` is set;
 - `<routeBase>/search-index.json` for search;
 - `<routeBase>/llms.txt`, an index of the pages for language models, and
-  `<routeBase>/llms-full.txt`, every page in one file;
+  `<routeBase>/llms-full.txt`, every page in one file, both also at the site
+  root when `routeBase` is below it;
 - `<routeBase>/**.md`, each page as Markdown.
 
 See [LLMs and agents](../02-configurations/09-llms.md).

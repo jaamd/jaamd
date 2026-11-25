@@ -1,5 +1,5 @@
 import type { AstroUserConfig, FontProvider, Locales, SessionDriverConfig } from 'astro'
-import { resolveSiteConfig, siteConfigShape, type SiteResolvedConfig } from '@jaamd/site/config.ts'
+import { resolveSiteConfig, siteConfigShape, type SiteConfig, type SiteResolvedConfig } from '@jaamd/site/config.ts'
 import { inferRepo } from '@jaamd/site/infer.ts'
 import { describeLocale } from '@jaamd/site/locales.ts'
 import { toProjectPaths, type ProjectPaths } from '@jaamd/site/paths.ts'
@@ -55,6 +55,27 @@ export function parseConfig(options: JaadUserConfig): JaadConfig {
     )
 }
 
+/** The options that are the site's, shared with every package on it. */
+export function siteOptionsOf(config: JaadConfig): SiteConfig {
+    const {
+        docsDir: _docsDir,
+        routeBase: _routeBase,
+        sections: _sections,
+        editLink: _editLink,
+        llms: _llms,
+        locales: _locales,
+        ...siteOptions
+    } = config
+    return siteOptions
+}
+
+/** CSS variables of the fonts set in `astro.fonts`. */
+export function fontVariables(options: JaadUserConfig): string[] {
+    return (options.astro?.fonts ?? []).map((font) => {
+        return font.cssVariable
+    })
+}
+
 /** The config with what the project tells: repository, locales, public assets.
  *  `project` is a root, or the directories Astro resolved. */
 export function resolveConfig(
@@ -65,22 +86,14 @@ export function resolveConfig(
     const config = parseConfig(options)
     const repo = inferRepo(paths.root)
     const { docs, locales } = resolveDocsConfig(config, config.lang, options.docsDir !== undefined, repo, paths.root)
-    const {
-        docsDir: _docsDir,
-        routeBase: _routeBase,
-        sections: _sections,
-        editLink: _editLink,
-        llms: _llms,
-        locales: _locales,
-        ...siteOptions
-    } = config
+    const siteOptions = siteOptionsOf(config)
 
     return {
         ...siteOptions,
         ...resolveSiteConfig(siteOptions, repo, paths),
         locales: locales.map(describeLocale),
         defaultLocale: locales.length > 0 ? config.lang.toLowerCase() : config.lang,
-        fonts: (options.astro?.fonts ?? []).map((font) => font.cssVariable),
+        fonts: fontVariables(options),
         docs,
     }
 }

@@ -488,7 +488,13 @@ export default defineJaadConfig({
             /https:\/\/example\.dev\/repo\/docs\/getting-started\.md/,
             'llms.txt missed the deployment base',
         )
-        assert.doesNotMatch(remounted.files.join('\n'), /^\/(?:llms\.txt|search-index\.json)$/m)
+        assert.doesNotMatch(remounted.files.join('\n'), /^\/search-index\.json$/m)
+        // The convention looks for llms.txt at the root: the site writes one there.
+        assert.match(
+            remounted.read('llms.txt'),
+            /## Docs\n\n[^]*https:\/\/example\.dev\/repo\/docs\/getting-started\.md/,
+            'the root llms.txt missed the docs or the deployment base',
+        )
         assert.ok(remounted.files.includes('/docs/search-index.json'))
         assert.equal(
             JSON.parse(remounted.read('docs/search-index.json')).pages[1].href,

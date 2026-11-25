@@ -18,6 +18,11 @@ with links it can follow. Next to the pages, JAAD writes:
 title, its `description`, then the pages. Each language has its own files below
 its prefix, as `/it/llms.txt`, and the default language's `llms.txt` lists them.
 
+The convention looks for `llms.txt` at the site root. With `routeBase` below it,
+the build writes `/llms.txt` and `/llms-full.txt` there too, with the
+documentation under a `## Docs` heading. A `src/pages/llms.txt.ts`, or a
+`public/llms.txt`, of your own takes their place.
+
 Set `site`: without it, the links in these files are relative, and an agent that
 reads them elsewhere cannot follow them. The build warns when it is missing.
 
