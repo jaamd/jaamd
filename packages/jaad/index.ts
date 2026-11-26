@@ -24,6 +24,7 @@ export default function jaad(options: JaadUserConfig): AstroIntegration[] {
         member: {
             package: '@jaamd/jaad',
             version: packageVersion(new URL('./package.json', import.meta.url)),
+            credit: { name: 'JAAD', href: 'https://docs.jaamd.org/jaad' },
             label: 'Docs',
             base: normaliseBasePath(config.routeBase),
             llms: config.llms ? own('./src/docs/endpoints.ts') : null,
@@ -35,3 +36,5 @@ export default function jaad(options: JaadUserConfig): AstroIntegration[] {
 
 export { defineJaadConfig } from './src/config.ts'
 export type { JaadUserConfig } from './src/config.ts'
+export { defineSiteConfig } from '@jaamd/site/config.ts'
+export type { SiteUserConfig } from '@jaamd/site/config.ts'

@@ -1,11 +1,38 @@
 ---
 import config from 'virtual:jaamd/site'
+import { escapeHtml } from '../helpers.ts'
+import { ui } from '../runtime.ts'
+import { withDeploymentBase } from '../urls.ts'
 
-const CREDIT = 'Built with <a href="https://docs.jaamd.org/jaad" rel="noopener">JAAD</a>.'
+interface Props {
+    locale?: string
+}
 
-// Unset is the credit alone; `footer: false` removes it.
-const line = config.footer === undefined ? ':credit' : config.footer
-const html = line === false ? null : line.replaceAll(':credit', CREDIT)
+const t = ui(Astro.props.locale)
+
+const links = config.credits.map((credit) => {
+    return `<a href="${escapeHtml(credit.href)}" rel="noopener">${escapeHtml(credit.name)}</a>`
+})
+const credit = `Built with ${links.join(' and ')}`
+const feed = config.feeds[0]
+const feedLink = feed
+    ? `<a href="${escapeHtml(withDeploymentBase(feed.path, import.meta.env.BASE_URL))}">${escapeHtml(t('feed.label'))}</a>`
+    : ''
+
+/** Unset is the credit, then the feed when there is one; `footer: false`
+ *  removes it. A line of its own places them with `:credit` and `:feed`. */
+function footerHtml(line: string | false | undefined): string | null {
+    if (line === false) {
+        return null
+    }
+    if (line === undefined) {
+        // The sentence ends where the line does: before the feed, it runs on.
+        return feed ? `${credit} · ${feedLink}` : `${credit}.`
+    }
+    return line.replaceAll(':credit', `${credit}.`).replaceAll(':feed', feedLink)
+}
+
+const html = footerHtml(config.footer)
 ---
 
 {html && (

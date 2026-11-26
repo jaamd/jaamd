@@ -37,6 +37,7 @@ function stub(root, { base = '/notes', version = VERSION, options = SITE } = {})
         member: {
             package: '@jaamd/stub',
             version,
+            credit: { name: 'Stub', href: 'https://example.dev/stub' },
             label: 'Notes',
             base,
             llms: join(root, 'stub/llms.mjs'),

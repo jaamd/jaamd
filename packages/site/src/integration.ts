@@ -1,4 +1,4 @@
-import type { SiteResolvedConfig } from './config.ts'
+import type { SiteFeed, SiteModuleConfig } from './config.ts'
 import type { Locale } from './locales.ts'
 import type { ReservedPath, SiteEntry, SiteInstance, SiteMember } from './members.ts'
 import type { AstroIntegration, AstroUserConfig, IntegrationResolvedRoute } from 'astro'
@@ -76,6 +76,8 @@ export interface SiteContribution {
     locales: Locale[]
     /** Patterns of the routes it injected that a project page must not take. */
     routes: string[]
+    /** Its feed, linked from every page of the site. */
+    feed?: SiteFeed
 }
 
 /** What the site knows once every package has registered: only the instance
@@ -247,7 +249,7 @@ async function setupSite(
     await markdown.hooks['astro:config:setup']?.({ ...params, logger: logger.fork(markdown.name) })
 
     const inferred = resolveSiteConfig(options, inferRepo(paths.root), paths)
-    const siteConfig = (): SiteResolvedConfig => {
+    const siteConfig = (): SiteModuleConfig => {
         const locales = siteLocales(contributions)
         return {
             ...options,
@@ -255,6 +257,12 @@ async function setupSite(
             locales,
             defaultLocale: locales.length > 0 ? options.lang.toLowerCase() : options.lang,
             fonts: fontVariables,
+            feeds: [...contributions.values()].flatMap((contribution) => {
+                return contribution.feed ?? []
+            }),
+            credits: members.map((member) => {
+                return member.credit
+            }),
         }
     }
     const llms = members.flatMap((member) => {

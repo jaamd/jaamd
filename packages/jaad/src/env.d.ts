@@ -15,7 +15,7 @@ declare module 'virtual:jaad/docs-frame' {
 // The site's own fields, as `@jaamd/site` reads them.
 declare module 'virtual:jaamd/site' {
     // oxlint-disable-next-line typescript/consistent-type-imports
-    const config: import('@jaamd/site/config.ts').SiteResolvedConfig
+    const config: import('@jaamd/site/config.ts').SiteModuleConfig
     export default config
 }
 

@@ -121,7 +121,7 @@ const frameProps: DocsFrameProps = {
             <slot name="content" slot="content" />
             <slot name="page-navigation" slot="page-navigation" />
             <TableOfContents slot="table-of-contents" headings={headings} {locale} />
-            <Footer slot="footer" />
+            <Footer slot="footer" {locale} />
         </DocsFrame>
 
         <script>

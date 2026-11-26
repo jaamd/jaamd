@@ -2,8 +2,8 @@
 import { ui } from '../runtime.ts'
 
 interface Props {
-    /** The page's own Markdown, fetched by "Copy page". */
-    markdownHref: string
+    /** The page's own Markdown, fetched by "Copy page"; without one, the button is left out. */
+    markdownHref?: string
     /** Where the page's source is edited, or null to leave the link out. */
     editHref: string | null
     locale?: string
@@ -14,23 +14,25 @@ const t = ui(locale)
 ---
 
 <div class="docs-page-actions">
-    <button
-        type="button"
-        data-copy-page
-        data-md-href={markdownHref}
-        data-copied={t('page.copied')}
-        class="docs-page-action"
-    >
-        <svg class="docs-page-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2z"
-            ></path>
-        </svg>
-        <span data-copy-label>{t('page.copy')}</span>
-    </button>
+    {markdownHref && (
+        <button
+            type="button"
+            data-copy-page
+            data-md-href={markdownHref}
+            data-copied={t('page.copied')}
+            class="docs-page-action"
+        >
+            <svg class="docs-page-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2z"
+                ></path>
+            </svg>
+            <span data-copy-label>{t('page.copy')}</span>
+        </button>
+    )}
 
     {editHref && (
         <a href={editHref} target="_blank" rel="noopener noreferrer" class="docs-page-action">

@@ -135,6 +135,15 @@ export function siteOptionsOf(config: SiteConfig): SiteConfig {
     return options as SiteConfig
 }
 
+/** The site options as written, before defaults. */
+export type SiteUserConfig = z.input<typeof siteConfigSchema>
+
+/** The site's options in one object, which each package's config spreads:
+ *  the packages of one site must agree on them. */
+export function defineSiteConfig(config: SiteUserConfig): SiteUserConfig {
+    return config
+}
+
 /** The site options plus what the project could tell. Inferred fields are null
  *  when unavailable. */
 export interface SiteResolvedConfig extends SiteConfig {
@@ -150,6 +159,25 @@ export interface SiteResolvedConfig extends SiteConfig {
     defaultLocale: string
     /** CSS variables of the fonts set in `astro.fonts`. */
     fonts: string[]
+}
+
+/** A feed a package writes, linked from every page of the site. */
+export interface SiteFeed {
+    title: string
+    /** Below the deployment base, such as `/blog/rss.xml`. */
+    path: string
+}
+
+/** A package the footer credits. */
+export interface SiteCredit {
+    name: string
+    href: string
+}
+
+/** What `virtual:jaamd/site` serves: the config, and what the packages registered. */
+export interface SiteModuleConfig extends SiteResolvedConfig {
+    feeds: SiteFeed[]
+    credits: SiteCredit[]
 }
 
 const FAVICONS = ['favicon.svg', 'favicon.ico', 'favicon.png']
