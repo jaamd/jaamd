@@ -105,8 +105,8 @@ describe('a project that installed the published tarball', () => {
         const page = built.read('page/index.html')
         assert.match(page, /<title>Changelog \| Consumer Test<\/title>/)
         assert.match(page, /data-page-layout/)
-        assert.match(page, /<main class="jaad-main-bare">/)
-        assert.match(page, /<header[^>]*class="jaad-header"/, 'no header chrome')
+        assert.match(page, /<main class="site-main-bare jaad-main-bare">/)
+        assert.match(page, /<header[^>]*class="site-header jaad-header"/, 'no header chrome')
         assert.match(page, /aria-label="GitHub"/, 'no configured social links')
         assert.doesNotMatch(page, /<body data-docs/, 'the docs body leaked in')
     })
@@ -128,11 +128,11 @@ describe('a project that installed the published tarball', () => {
     })
 
     test("the package's own styles survive a transitive install", () => {
-        assert.deepEqual(
-            missingFrom(built.css, packageClasses(join(PKG, 'src'))),
-            [],
-            'package utilities missing from the CSS',
-        )
+        // The jaad-* classes are aliases of the site-* ones, with no rule of their own.
+        const classes = [...packageClasses(join(PKG, 'src'))].filter((name) => {
+            return !name.startsWith('jaad-')
+        })
+        assert.deepEqual(missingFrom(built.css, new Set(classes)), [], 'package utilities missing from the CSS')
         assert.ok(
             built.css.includes('var(--shiki-light)'),
             "jaamd's dual-theme CSS did not survive the transitive install",

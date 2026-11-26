@@ -5,10 +5,10 @@ import { ui } from '../runtime.ts'
 const t = ui(Astro.props.locale)
 ---
 
-<jaad-theme-toggle>
-    <button class="jaad-icon-button" aria-label={t('theme.toggle')} title={t('theme.toggle')}>
+<site-theme-toggle>
+    <button class="site-icon-button jaad-icon-button" aria-label={t('theme.toggle')} title={t('theme.toggle')}>
         <svg
-            class="jaad-theme-icon-to-dark jaad-icon"
+            class="site-theme-icon-to-dark jaad-theme-icon-to-dark site-icon jaad-icon"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -23,7 +23,7 @@ const t = ui(Astro.props.locale)
         </svg>
 
         <svg
-            class="jaad-theme-icon-to-light jaad-icon"
+            class="site-theme-icon-to-light jaad-theme-icon-to-light site-icon jaad-icon"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -37,10 +37,10 @@ const t = ui(Astro.props.locale)
             ></path>
         </svg>
     </button>
-</jaad-theme-toggle>
+</site-theme-toggle>
 
 <script>
-    class JaadThemeToggle extends HTMLElement {
+    class SiteThemeToggle extends HTMLElement {
         /** Moved with the persisted header on every navigation: bound once. */
         #bound = false
 
@@ -57,7 +57,7 @@ const t = ui(Astro.props.locale)
         }
     }
 
-    if (!customElements.get('jaad-theme-toggle')) {
-        customElements.define('jaad-theme-toggle', JaadThemeToggle)
+    if (!customElements.get('site-theme-toggle')) {
+        customElements.define('site-theme-toggle', SiteThemeToggle)
     }
 </script>

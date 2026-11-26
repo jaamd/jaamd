@@ -6,7 +6,7 @@ import { nextSwitcherMarkup } from '../../src/components/locale-switcher.ts'
 const documentWith = (switcher: { innerHTML: string } | null) => {
     return {
         querySelector: (selector: string) => {
-            return selector === 'jaad-locale-switcher' ? switcher : null
+            return selector === 'site-locale-switcher' ? switcher : null
         },
     } as unknown as Document
 }

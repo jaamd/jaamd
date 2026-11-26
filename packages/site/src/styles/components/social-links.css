@@ -1,8 +1,8 @@
 @layer components {
-    .jaad-social-icon {
+    .site-social-icon {
         @apply flex h-5 w-5 items-center justify-center;
     }
-    .jaad-social-label {
+    .site-social-label {
         @apply text-xs;
     }
 }

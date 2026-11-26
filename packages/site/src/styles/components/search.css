@@ -1,128 +1,128 @@
 @layer components {
-    .jaad-search-trigger {
+    .site-search-trigger {
         @apply border-border bg-surface hover:bg-surface-hover text-foreground-muted hidden cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition-colors md:flex;
     }
 
-    .jaad-search-trigger-icon {
+    .site-search-trigger-icon {
         @apply h-4 w-4 shrink-0;
     }
 
-    .jaad-search-trigger-label {
+    .site-search-trigger-label {
         @apply hidden lg:inline;
     }
 
-    .jaad-search-shortcut {
+    .site-search-shortcut {
         @apply bg-background-secondary text-foreground-muted rounded px-1.5 py-0.5 text-xs font-medium;
     }
 
     /* Icon trigger on a docs page, where the desktop field is shown from md. */
-    .jaad-search-trigger-compact {
+    .site-search-trigger-compact {
         @apply md:hidden;
     }
 
     /* A modal <dialog>, laid over the whole viewport: the UA's box is reset. */
-    .jaad-search-overlay {
+    .site-search-overlay {
         @apply fixed inset-0 z-50 m-0 h-full max-h-none w-full max-w-none items-start justify-center border-0 bg-transparent px-4 pt-[15vh];
     }
 
-    .jaad-search-overlay[open] {
+    .site-search-overlay[open] {
         @apply flex;
     }
 
     /* The panel draws its own backdrop. */
-    .jaad-search-overlay::backdrop {
+    .site-search-overlay::backdrop {
         background: transparent;
     }
 
-    .jaad-search-backdrop {
+    .site-search-backdrop {
         @apply absolute inset-0 bg-black/60 backdrop-blur-sm;
     }
 
-    .jaad-search-panel {
+    .site-search-panel {
         @apply bg-surface border-border relative z-10 w-full max-w-lg overflow-hidden rounded-xl border shadow-2xl;
     }
 
-    .jaad-search-bar {
+    .site-search-bar {
         @apply border-border flex items-center gap-3 border-b px-4 py-3;
     }
 
-    .jaad-search-bar-icon {
+    .site-search-bar-icon {
         @apply text-foreground-muted h-5 w-5 shrink-0;
     }
 
-    .jaad-search-input {
+    .site-search-input {
         @apply text-foreground placeholder:text-foreground-muted min-w-0 flex-1 bg-transparent text-sm outline-none;
     }
 
-    .jaad-search-close {
+    .site-search-close {
         @apply bg-background-secondary text-foreground-muted shrink-0 cursor-pointer rounded border-0 px-1.5 py-0.5 font-mono text-xs;
     }
 
-    .jaad-search-filters {
+    .site-search-filters {
         @apply border-border flex flex-wrap gap-1.5 border-b px-4 py-2;
     }
 
-    .jaad-search-filter {
+    .site-search-filter {
         @apply border-border text-foreground-muted hover:text-foreground cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors;
     }
 
-    .jaad-search-filter[aria-pressed='true'] {
+    .site-search-filter[aria-pressed='true'] {
         @apply border-primary/40 bg-primary/10 text-foreground-bright;
     }
 
-    .jaad-search-results {
+    .site-search-results {
         @apply max-h-96 overflow-y-auto p-2;
     }
 
-    .jaad-search-group {
+    .site-search-group {
         @apply text-foreground-muted px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase;
     }
 
-    .jaad-search-footer {
+    .site-search-footer {
         @apply border-border text-foreground-muted flex items-center gap-4 border-t px-4 py-2 text-xs;
     }
 
-    .jaad-search-key {
+    .site-search-key {
         @apply bg-background-secondary rounded px-1 py-0.5;
     }
 
-    .jaad-search-result {
+    .site-search-result {
         @apply text-foreground cursor-pointer rounded-lg px-3 py-2.5 text-left transition-colors;
     }
 
-    .jaad-search-result:not([aria-selected='true']) {
+    .site-search-result:not([aria-selected='true']) {
         @apply hover:bg-primary/5;
     }
 
-    .jaad-search-result[aria-selected='true'] {
+    .site-search-result[aria-selected='true'] {
         @apply bg-primary/10 text-foreground-bright;
     }
 
-    .jaad-search-result-heading {
+    .site-search-result-heading {
         @apply border-border ml-3 rounded-l-none border-l py-2;
     }
 
-    .jaad-search-result-head {
+    .site-search-result-head {
         @apply flex items-center gap-2;
     }
 
-    .jaad-search-result-title {
+    .site-search-result-title {
         @apply text-sm font-medium;
     }
 
-    .jaad-search-result-badge {
+    .site-search-result-badge {
         @apply text-foreground-muted bg-background-secondary rounded px-1.5 py-0.5 text-[0.65rem];
     }
 
-    .jaad-search-result-snippet {
+    .site-search-result-snippet {
         @apply text-foreground-secondary mt-1 line-clamp-1 text-xs;
     }
 
-    .jaad-search-mark {
+    .site-search-mark {
         @apply bg-primary/20 text-foreground-bright rounded-sm px-0.5 font-semibold not-italic;
     }
 
-    .jaad-search-message {
+    .site-search-message {
         @apply text-foreground-muted px-3 py-6 text-center text-sm;
     }
 }

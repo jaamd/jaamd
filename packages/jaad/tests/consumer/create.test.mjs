@@ -131,7 +131,7 @@ test('the site template keeps the landing page separate from the docs', { timeou
         /href="\/docs\/"[^>]*>\s*Read the documentation/,
         'the landing page does not link to the docs',
     )
-    assert.doesNotMatch(landing, /jaad-chrome|jaad-theme-toggle/)
+    assert.doesNotMatch(landing, /site-chrome|site-theme-toggle/)
     const landingSource = readFileSync(join(project, 'src', 'pages', 'index.astro'), 'utf8')
     assert.match(landingSource, /layouts\/SiteLayout\.astro/)
     assert.doesNotMatch(landingSource, /@jaamd\/jaad\/layouts/)
@@ -142,10 +142,10 @@ test('the site template keeps the landing page separate from the docs', { timeou
     const siteLayout = readFileSync(join(project, 'src', 'layouts', 'SiteLayout.astro'), 'utf8')
     assert.doesNotMatch(siteLayout, /@jaamd\/jaad/)
     assert.match(siteLayout, /import "\.\.\/styles\/site\.css"/)
-    assert.match(siteLayout, /<footer class="site-chrome site-footer">/)
+    assert.match(siteLayout, /<footer class="landing-chrome landing-footer">/)
 
     const siteCss = readFileSync(join(project, 'src', 'styles', 'site.css'), 'utf8')
-    assert.match(siteCss, /--site-content-width: 56rem/)
+    assert.match(siteCss, /--landing-content-width: 56rem/)
     assert.match(siteCss, /--color-background: #faf8f5/)
     assert.match(siteCss, /--color-background: #0d1117/)
 

@@ -24,8 +24,8 @@ const title = [pageTitle, "__JAAD_TITLE__"].filter(Boolean).join(" | ");
     <link rel="icon" href={withBase("/favicon.svg")} />
   </head>
   <body>
-    <header class="site-chrome site-header">
-      <a class="site-name" href={withBase("/")}>
+    <header class="landing-chrome landing-header">
+      <a class="landing-name" href={withBase("/")}>
         {"__JAAD_TITLE__"}
       </a>
       <nav aria-label="Main navigation">
@@ -35,6 +35,6 @@ const title = [pageTitle, "__JAAD_TITLE__"].filter(Boolean).join(" | ");
     <main>
       <slot />
     </main>
-    <footer class="site-chrome site-footer">Built with JAAD.</footer>
+    <footer class="landing-chrome landing-footer">Built with JAAD.</footer>
   </body>
 </html>

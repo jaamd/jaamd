@@ -7,8 +7,9 @@ import { fileURLToPath } from 'node:url'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
 /** The custom properties of the first block that `selector` opens, prefixes
- *  dropped: `--identity-border`, `--color-border` and `--jaad-content-width`
- *  become `border` and `content-width`. */
+ *  dropped: `--identity-border`, `--color-border` and `--site-content-width`
+ *  become `border` and `content-width`. A layout token's value is its default,
+ *  without the `--jaad-*` name it falls back to. */
 function tokens(file: string, selector: string): Map<string, string> {
     const source = readFileSync(join(ROOT, file), 'utf8')
     const start = source.indexOf(`${selector} {`)
@@ -16,8 +17,11 @@ function tokens(file: string, selector: string): Map<string, string> {
     const block = source.slice(start, source.indexOf('\n}', start))
 
     const declarations = [...block.matchAll(/(--[a-z-]+):\s*([^;]+);/g)].map((match) => {
-        const name = match[1].replace(/^--(?:identity|color|jaad)-/, '').replace(/^--/, '')
-        const value = match[2].replace(/\s+/g, ' ').replace(/--(?:identity|color)-/g, '--')
+        const name = match[1].replace(/^--(?:identity|color|site)-/, '').replace(/^--/, '')
+        const value = match[2]
+            .replace(/\s+/g, ' ')
+            .replace(/^var\(--jaad-[a-z-]+, (.*)\)$/, '$1')
+            .replace(/--(?:identity|color)-/g, '--')
         return [name, value] as const
     })
     return new Map(declarations)

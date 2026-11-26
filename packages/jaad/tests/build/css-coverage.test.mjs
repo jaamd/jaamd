@@ -14,11 +14,32 @@ const allClasses = () => {
     return new Set([...packageClasses(SRC), ...packageClasses(SITE_SRC)])
 }
 
+/** A `jaad-*` class beside its `site-*` twin, kept for the CSS of 1.x projects. */
+const isAlias = (name, classes) => {
+    return name.startsWith('jaad-') && classes.has(`site-${name.slice('jaad-'.length)}`)
+}
+
 test('every class used by the package ships in the built CSS', () => {
     const classes = allClasses()
     assert.ok(classes.size > 0, 'no classes found; did the source move?')
 
-    assert.deepEqual(missingFrom(allCss(), classes), [], 'a class used in markup has no rule in the package CSS')
+    const styled = [...classes].filter((name) => {
+        return !isAlias(name, classes)
+    })
+    assert.deepEqual(
+        missingFrom(allCss(), new Set(styled)),
+        [],
+        'a class used in markup has no rule in the package CSS',
+    )
+})
+
+// The jaad-* names stay until 2.0, each beside its site-* one; no new ones.
+test('every jaad-* class is the alias of a site-* one', () => {
+    const classes = allClasses()
+    const unpaired = [...classes].filter((name) => {
+        return name.startsWith('jaad-') && !isAlias(name, classes)
+    })
+    assert.deepEqual(unpaired.toSorted(), [])
 })
 
 const siteSource = (name) => {
@@ -51,8 +72,8 @@ test('tailwind.css names every colour and font token', () => {
 })
 
 // Components stay semantic: styling lives in CSS, not in utilities.
-test('package markup uses only jaad-* and docs-* classes', () => {
-    const allowed = /^(jaad-|docs-|font-brand$|dark$)/
+test('package markup uses only site-*, jaad-* and docs-* classes', () => {
+    const allowed = /^(site-|jaad-|docs-|font-brand$|dark$)/
     const utilities = [...allClasses()].filter((c) => {
         return !allowed.test(c)
     })

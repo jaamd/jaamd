@@ -9,10 +9,10 @@ const html = line === false ? null : line.replaceAll(':credit', CREDIT)
 ---
 
 {html && (
-    <footer class="jaad-chrome jaad-footer" aria-labelledby="footer-heading">
-        <h2 class="jaad-sr-only" id="footer-heading">
+    <footer class="site-chrome jaad-chrome site-footer jaad-footer" aria-labelledby="footer-heading">
+        <h2 class="site-sr-only jaad-sr-only" id="footer-heading">
             Site footer
         </h2>
-        <p class="jaad-footer-credit" set:html={html} />
+        <p class="site-footer-credit jaad-footer-credit" set:html={html} />
     </footer>
 )}

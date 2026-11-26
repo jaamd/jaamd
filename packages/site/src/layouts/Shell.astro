@@ -28,9 +28,9 @@ const pageDescription = description ?? config.description ?? config.title
     <head>
         <Head title={pageTitle} description={pageDescription} />
     </head>
-    <body class:list={['jaad-body', className]}>
+    <body class:list={['site-body jaad-body', className]}>
         <Header {...header} />
-        <main class={bare ? 'jaad-main-bare' : 'jaad-main'}>
+        <main class={bare ? 'site-main-bare jaad-main-bare' : 'site-main jaad-main'}>
             <slot />
         </main>
         <Footer />

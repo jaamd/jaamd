@@ -155,7 +155,7 @@ describe('locale directories under docs', () => {
 
     test('the switcher ships with two locales and falls back per page', () => {
         const onlyEnglish = site.read('guides/only-in-english/index.html')
-        assert.match(onlyEnglish, /<jaad-locale-switcher/)
+        assert.match(onlyEnglish, /<site-locale-switcher/)
         assert.match(onlyEnglish, /Italiano/)
         assert.doesNotMatch(onlyEnglish, /hreflang="fr"/, 'an empty locale was offered')
         // No Italian twin, so Italian lands on the Italian opening page.
