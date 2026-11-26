@@ -1,5 +1,4 @@
-/* The package stylesheet: Tailwind, the site's components, the docs', then the tokens. */
-@import 'tailwindcss' source(none);
-@import '@jaamd/site/styles/components.css';
+/* JAAD's own components, on the site's tokens: the site stylesheet ships
+   Tailwind's preflight, the shell and the tokens themselves. */
+@reference '@jaamd/site/styles/site.css';
 @import './docs/styles/components.css';
-@import '@jaamd/site/styles/global.css';

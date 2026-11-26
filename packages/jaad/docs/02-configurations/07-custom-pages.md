@@ -105,18 +105,21 @@ its navigation. To restructure documentation pages themselves, use
 
 ## Matching the documentation's layout
 
-- `.jaad-chrome`: the column of the header's content, shared by the footer:
-  `--jaad-chrome-width` less the side gutters.
-- `.jaad-main`: vertical margin and horizontal padding of the main landmark.
-  `bare` swaps it for `.jaad-main-bare`, which has none.
-- Layout tokens (`--jaad-content-width`, `--jaad-page-padding`, …) are listed
+- `.site-chrome`: the column of the header's content, shared by the footer:
+  `--site-chrome-width` less the side gutters.
+- `.site-main`: vertical margin and horizontal padding of the main landmark.
+  `bare` swaps it for `.site-main-bare`, which has none.
+- Layout tokens (`--site-content-width`, `--site-page-padding`, …) are listed
   in [Styles](06-styles.md).
 
 ```astro
 <Page title="Changelog">
-    <div class="jaad-chrome">…</div>
+    <div class="site-chrome">…</div>
 </Page>
 ```
+
+The shell's elements also carry their 1.0 classes, `.jaad-chrome` and the
+others, until 2.0.
 
 ## Tailwind
 

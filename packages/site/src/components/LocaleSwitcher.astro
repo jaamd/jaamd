@@ -14,44 +14,50 @@ const active = alternates.find((entry) => {
 const t = ui(current)
 ---
 
-<jaad-locale-switcher class="jaad-locale-switcher">
+<site-locale-switcher class="site-locale-switcher jaad-locale-switcher">
     <button
         type="button"
         data-trigger
         aria-expanded="false"
         aria-haspopup="true"
-        aria-controls="jaad-locale-menu"
+        aria-controls="site-locale-menu"
         aria-label={t('locale.change')}
         title={t('locale.change')}
-        class="jaad-icon-button jaad-locale-trigger"
+        class="site-icon-button jaad-icon-button site-locale-trigger jaad-locale-trigger"
     >
         {active?.locale.flag && <span aria-hidden="true">{active.locale.flag}</span>}
-        <span class="jaad-locale-code">{current}</span>
-        <svg class="jaad-locale-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <span class="site-locale-code jaad-locale-code">{current}</span>
+        <svg
+            class="site-locale-chevron jaad-locale-chevron"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
     </button>
 
-    <div id="jaad-locale-menu" data-menu hidden class="jaad-menu jaad-locale-menu">
+    <div id="site-locale-menu" data-menu hidden class="site-menu jaad-menu site-locale-menu jaad-locale-menu">
         {alternates.map((entry) => (
             <a
                 href={entry.href}
                 hreflang={entry.locale.tag}
                 lang={entry.locale.tag}
                 aria-current={entry.locale.code === current ? 'true' : undefined}
-                class="jaad-menu-item jaad-locale-item"
+                class="site-menu-item jaad-menu-item site-locale-item jaad-locale-item"
             >
                 {entry.locale.flag && <span aria-hidden="true">{entry.locale.flag}</span>}
                 <span>{entry.locale.name}</span>
             </a>
         ))}
     </div>
-</jaad-locale-switcher>
+</site-locale-switcher>
 
 <script>
     import { nextSwitcherMarkup } from './locale-switcher.ts'
 
-    class JaadLocaleSwitcher extends HTMLElement {
+    class SiteLocaleSwitcher extends HTMLElement {
         #onDocumentPointerDown = (event: PointerEvent) => {
             if (!this.contains(event.target as Node)) {
                 this.#close()
@@ -124,7 +130,7 @@ const t = ui(current)
         }
     }
 
-    if (!customElements.get('jaad-locale-switcher')) {
-        customElements.define('jaad-locale-switcher', JaadLocaleSwitcher)
+    if (!customElements.get('site-locale-switcher')) {
+        customElements.define('site-locale-switcher', SiteLocaleSwitcher)
     }
 </script>

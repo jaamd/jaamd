@@ -135,12 +135,12 @@ describe('docs at the root, with frontmatter, a draft and a header', () => {
     })
 
     test('a single-locale site renders no switcher at all', () => {
-        assert.doesNotMatch(site.read('index.html'), /<jaad-locale-switcher/)
+        assert.doesNotMatch(site.read('index.html'), /<site-locale-switcher/)
     })
 
     test('the repository is listed once, and the mobile menu does not repeat it', () => {
         const home = site.read('index.html')
-        const found = home.match(/<jaad-nav-mobile[\s\S]*?<\/jaad-nav-mobile>/)
+        const found = home.match(/<site-nav-mobile[\s\S]*?<\/site-nav-mobile>/)
         assert.ok(found, 'the mobile menu was not rendered at all')
         const menu = found[0]
 
@@ -156,7 +156,7 @@ describe('docs at the root, with frontmatter, a draft and a header', () => {
 
     test('the theme switcher and its script ship by default', () => {
         const home = site.read('index.html')
-        assert.match(home, /<jaad-theme-toggle>/, 'no theme switcher by default')
+        assert.match(home, /<site-theme-toggle>/, 'no theme switcher by default')
         assert.match(home, /prefers-color-scheme/, 'no theme script by default')
     })
 })
@@ -201,7 +201,7 @@ describe('docs below a landing page, at a deployment base, with a pinned appeara
     test('an empty nav renders no mobile menu at all', () => {
         assert.doesNotMatch(
             site.read('docs/index.html'),
-            /<jaad-nav-mobile/,
+            /<site-nav-mobile/,
             'the mobile menu is rendered with nothing to put in it',
         )
     })
@@ -267,7 +267,7 @@ describe('docs below a landing page, at a deployment base, with a pinned appeara
         for (const name of ['docs/index.html', 'docs/guides/deep-dive/index.html']) {
             const html = site.read(name)
             assert.match(html, /<html lang="en" class="dark"/, `${name} does not carry the pinned appearance`)
-            assert.doesNotMatch(html, /jaad-theme-toggle/, `${name} still renders the switcher for a pinned appearance`)
+            assert.doesNotMatch(html, /site-theme-toggle/, `${name} still renders the switcher for a pinned appearance`)
             assert.doesNotMatch(
                 html,
                 /prefers-color-scheme/,

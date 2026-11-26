@@ -1,31 +1,31 @@
 @layer components {
     /* Fixed to the top of the window: only the page scrolls below it. */
-    .jaad-header {
+    .site-header {
         position: fixed;
         inset: 0 0 auto;
         z-index: 40;
-        height: var(--jaad-header-height);
+        height: var(--site-header-height);
         background: var(--color-background);
     }
-    .jaad-header-inner {
+    .site-header-inner {
         height: 100%;
-        max-width: var(--jaad-chrome-width);
+        max-width: var(--site-chrome-width);
         margin-inline: auto;
         padding-inline: 1rem;
     }
-    .jaad-header-row {
+    .site-header-row {
         @apply flex h-full items-center gap-4;
     }
-    .jaad-brand {
+    .site-brand {
         @apply text-foreground-bright text-xl;
     }
-    .jaad-brand-link {
+    .site-brand-link {
         @apply text-primary no-underline;
     }
-    .jaad-logo {
+    .site-logo {
         @apply h-7;
     }
-    .jaad-header-actions {
+    .site-header-actions {
         @apply ml-auto flex items-center gap-2;
     }
 }

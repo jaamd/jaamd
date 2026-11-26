@@ -8,7 +8,7 @@
      to the window: only the page scrolls. */
     .docs-container {
         width: 100%;
-        max-width: var(--jaad-chrome-width);
+        max-width: var(--site-chrome-width);
         margin-inline: auto;
         padding-inline: 1rem;
     }
@@ -16,7 +16,7 @@
     .docs-main {
         width: 100%;
         min-width: 0;
-        max-width: var(--jaad-content-width);
+        max-width: var(--site-content-width);
         margin-inline: auto;
     }
 
@@ -24,16 +24,16 @@
         padding-top: 2rem;
     }
 
-    [data-jaad-default-frame] .docs-container > .jaad-footer {
+    [data-jaad-default-frame] .docs-container > .site-footer {
         width: 100%;
-        max-width: var(--jaad-content-width);
+        max-width: var(--site-content-width);
         margin-inline: auto;
     }
 
     /* Page, page actions and footer share the inset. */
     @media (48rem <= width < 64rem) {
         .docs-container {
-            padding-inline: calc(1rem + var(--jaad-page-padding));
+            padding-inline: calc(1rem + var(--site-page-padding));
         }
     }
 
@@ -44,32 +44,32 @@
 
         [data-jaad-default-frame] .docs-container {
             display: grid;
-            grid-template-columns: var(--jaad-sidebar-width) minmax(0, 1fr) var(--jaad-sidebar-width);
+            grid-template-columns: var(--site-sidebar-width) minmax(0, 1fr) var(--site-sidebar-width);
             column-gap: 3rem;
         }
 
         [data-jaad-default-frame] .docs-main,
-        [data-jaad-default-frame] .docs-container > .jaad-footer {
+        [data-jaad-default-frame] .docs-container > .site-footer {
             grid-column: 2;
         }
 
         [data-jaad-default-frame] .docs-sidebar-left,
         [data-jaad-default-frame] .docs-sidebar-right {
             position: fixed;
-            top: var(--jaad-header-height);
+            top: var(--site-header-height);
             bottom: 0;
             padding-block: 2rem;
         }
 
         /* Widened into the gutter, where the bar of the current page sits. */
         [data-jaad-default-frame] .docs-sidebar-left {
-            left: max(1rem, calc(50% - var(--jaad-chrome-width) / 2 + 1rem));
+            left: max(1rem, calc(50% - var(--site-chrome-width) / 2 + 1rem));
             margin-left: -0.75rem;
             padding-left: 0.75rem;
         }
 
         [data-jaad-default-frame] .docs-sidebar-right {
-            right: max(1rem, calc(50% - var(--jaad-chrome-width) / 2 + 1rem));
+            right: max(1rem, calc(50% - var(--site-chrome-width) / 2 + 1rem));
         }
     }
 
@@ -82,7 +82,7 @@
         /* Only the page actions are left: they follow the page column. */
         [data-jaad-default-frame] .docs-sidebar-right {
             width: 100%;
-            max-width: var(--jaad-content-width);
+            max-width: var(--site-content-width);
             margin-inline: auto;
             overflow: visible;
         }

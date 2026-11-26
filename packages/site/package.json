@@ -17,17 +17,21 @@
     },
     "files": [
         "src",
+        "dist",
         "README.md",
         "LICENSE"
     ],
     "type": "module",
     "exports": {
+        "./site.css": "./dist/site.css",
         "./*": "./src/*"
     },
     "publishConfig": {
         "access": "public"
     },
     "scripts": {
+        "build": "tailwindcss -i ./src/styles/site.css -o ./dist/site.css",
+        "prepare": "pnpm build",
         "check": "astro check && tsc --noEmit -p tests",
         "test": "node --test \"tests/unit/**/*.test.ts\""
     },
@@ -44,7 +48,9 @@
     },
     "devDependencies": {
         "@astrojs/check": "^0.9.12",
-        "shiki": "^4.5.0"
+        "@tailwindcss/cli": "^4.3.3",
+        "shiki": "^4.5.0",
+        "tailwindcss": "^4.3.3"
     },
     "peerDependencies": {
         "@tailwindcss/vite": "^4.3.0",

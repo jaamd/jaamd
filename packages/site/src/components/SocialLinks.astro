@@ -12,16 +12,16 @@ const links = buildSocialLinks(config)
         rel="noopener noreferrer"
         title={link.label}
         aria-label={link.label}
-        class="jaad-icon-button"
+        class="site-icon-button jaad-icon-button"
     >
         {link.svg ? (
-            <span class="jaad-social-icon" set:html={link.svg} />
+            <span class="site-social-icon jaad-social-icon" set:html={link.svg} />
         ) : link.path ? (
-            <svg class="jaad-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg class="site-icon jaad-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d={link.path} />
             </svg>
         ) : (
-            <span class="jaad-social-label">{link.label}</span>
+            <span class="site-social-label jaad-social-label">{link.label}</span>
         )}
     </a>
 ))}

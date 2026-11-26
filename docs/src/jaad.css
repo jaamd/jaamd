@@ -1,14 +1,14 @@
 /* The column of jaamd.org. */
 :root {
-    --jaad-chrome-width: 80rem;
-    --jaad-sidebar-width: 14rem;
+    --site-chrome-width: 80rem;
+    --site-sidebar-width: 14rem;
 }
 
-.jaad-logo {
+.site-logo {
     height: 2.1rem;
 }
 
-html.dark .jaad-logo {
+html.dark .site-logo {
     filter: invert(1);
 }
 

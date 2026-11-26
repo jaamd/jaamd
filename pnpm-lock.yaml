@@ -367,9 +367,6 @@ importers:
       remark-stringify:
         specifier: ^11.0.0
         version: 11.0.0
-      tailwindcss:
-        specifier: ^4.3.0
-        version: 4.3.5
       unified:
         specifier: ^11.0.5
         version: 11.0.5
@@ -380,9 +377,15 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.12
         version: 0.9.12(prettier@3.9.6)(typescript@6.0.3)
+      '@tailwindcss/cli':
+        specifier: ^4.3.3
+        version: 4.3.5
       shiki:
         specifier: ^4.5.0
         version: 4.5.0
+      tailwindcss:
+        specifier: ^4.3.3
+        version: 4.3.5
 
   site:
     dependencies:

@@ -81,7 +81,7 @@ test('the inferred repository is a single icon, with no menu to repeat it', { sk
     const links = home.split(`href="${repo.url}"`).length - 1
     assert.notEqual(links, 0, 'no repository link was rendered at all')
     assert.equal(links, 1, 'the repository link is listed twice')
-    assert.doesNotMatch(home, /<jaad-nav-mobile/, 'an empty mobile menu shipped')
+    assert.doesNotMatch(home, /<site-nav-mobile/, 'an empty mobile menu shipped')
 })
 
 // The docs config sets no `footer`, so the credit appears on its own.

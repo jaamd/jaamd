@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { allCss, packageClasses, missingFrom, themeTokens } from '../dist.mjs'
 
 const SRC = join(dirname(fileURLToPath(import.meta.url)), '../../src')
-// The shell's markup and tokens live in @jaamd/site; JAAD's stylesheet carries them.
+// The shell's markup and tokens live in @jaamd/site, and its stylesheet carries them.
 const SITE_SRC = join(dirname(fileURLToPath(import.meta.url)), '../../../site/src')
 
 /** Every class the markup of JAAD and of the shell uses. */
@@ -14,23 +14,41 @@ const allClasses = () => {
     return new Set([...packageClasses(SRC), ...packageClasses(SITE_SRC)])
 }
 
+/** A `jaad-*` class beside its `site-*` twin, kept for the CSS of 1.x projects. */
+const isAlias = (name, classes) => {
+    return name.startsWith('jaad-') && classes.has(`site-${name.slice('jaad-'.length)}`)
+}
+
 test('every class used by the package ships in the built CSS', () => {
     const classes = allClasses()
     assert.ok(classes.size > 0, 'no classes found; did the source move?')
 
-    assert.deepEqual(missingFrom(allCss(), classes), [], 'a class used in markup has no rule in the package CSS')
+    const styled = [...classes].filter((name) => {
+        return !isAlias(name, classes)
+    })
+    assert.deepEqual(
+        missingFrom(allCss(), new Set(styled)),
+        [],
+        'a class used in markup has no rule in the package CSS',
+    )
 })
 
-const source = (name) => {
-    return readFileSync(join(SRC, name), 'utf8')
-}
+// The jaad-* names stay until 2.0, each beside its site-* one; no new ones.
+test('every jaad-* class is the alias of a site-* one', () => {
+    const classes = allClasses()
+    const unpaired = [...classes].filter((name) => {
+        return name.startsWith('jaad-') && !isAlias(name, classes)
+    })
+    assert.deepEqual(unpaired.toSorted(), [])
+})
+
 const siteSource = (name) => {
     return readFileSync(join(SITE_SRC, name), 'utf8')
 }
 
 // Tokens are public: emitted even when no package rule uses them.
-test('every @theme token ships in the package stylesheet', () => {
-    const dist = source('../dist/jaad.css')
+test('every @theme token ships in the site stylesheet', () => {
+    const dist = siteSource('../dist/site.css')
     assert.deepEqual(
         themeTokens(siteSource('styles/global.css')).filter((t) => {
             return !dist.includes(`${t}:`)
@@ -54,8 +72,8 @@ test('tailwind.css names every colour and font token', () => {
 })
 
 // Components stay semantic: styling lives in CSS, not in utilities.
-test('package markup uses only jaad-* and docs-* classes', () => {
-    const allowed = /^(jaad-|docs-|font-brand$|dark$)/
+test('package markup uses only site-*, jaad-* and docs-* classes', () => {
+    const allowed = /^(site-|jaad-|docs-|font-brand$|dark$)/
     const utilities = [...allClasses()].filter((c) => {
         return !allowed.test(c)
     })

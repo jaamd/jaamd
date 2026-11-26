@@ -18,6 +18,7 @@ import DocsSidebarLeft from '../components/DocsSidebarLeft.astro'
 import DocsStructuredData from '../components/DocsStructuredData.astro'
 import { docsUrls } from '../runtime.ts'
 import { docsFileHref, docsMarkdownHref } from '../urls.ts'
+import '@jaamd/site/site.css'
 import '../../../dist/jaad.css'
 import '../styles/docs.css'
 import '../styles/jaamd.css'
@@ -110,7 +111,7 @@ const frameProps: DocsFrameProps = {
         />
         <ClientRouter />
     </head>
-    <body data-docs class="jaad-body">
+    <body data-docs class="site-body jaad-body">
         <DocsFrame {...frameProps}>
             <Header slot="header" {locale} alternates={switcherAlternates} search={{ indexUrl, prominent: true }} />
             <DocsSidebarLeft slot="sidebar" groups={navigation.groups} {locale} />

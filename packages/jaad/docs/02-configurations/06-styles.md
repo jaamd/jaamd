@@ -96,24 +96,27 @@ fonts are still downloaded during the build even when unused.
 
 | Token                  | Default                                           |
 | ---------------------- | ------------------------------------------------- |
-| `--jaad-chrome-width`  | content, both sidebars and their gaps             |
-| `--jaad-content-width` | `56rem`, the most the page column takes           |
-| `--jaad-sidebar-width` | `16rem`, the navigation and the table of contents |
-| `--jaad-page-padding`  | `2rem`, on each side of the page                  |
-| `--jaad-header-height` | `4.25rem`, the fixed header                       |
+| `--site-chrome-width`  | content, both sidebars and their gaps             |
+| `--site-content-width` | `56rem`, the most the page column takes           |
+| `--site-sidebar-width` | `16rem`, the navigation and the table of contents |
+| `--site-page-padding`  | `2rem`, on each side of the page                  |
+| `--site-header-height` | `4.25rem`, the fixed header                       |
 
-`--jaad-chrome-width` is the column the header, the sidebars and the page share.
+`--site-chrome-width` is the column the header, the sidebars and the page share.
 The header and the two sidebars are fixed to the window, and only the page
-scrolls; raise `--jaad-header-height` along with a logo taller than the header.
+scrolls; raise `--site-header-height` along with a logo taller than the header.
 Set it to fit the documentation to the width of the rest of a site; the page
-column takes what the sidebars leave, up to `--jaad-content-width`:
+column takes what the sidebars leave, up to `--site-content-width`:
 
 ```css
 :root {
-    --jaad-chrome-width: 80rem;
-    --jaad-sidebar-width: 14rem;
+    --site-chrome-width: 80rem;
+    --site-sidebar-width: 14rem;
 }
 ```
+
+Each token is still read under its 1.0 name, `--jaad-chrome-width` and so on,
+until 2.0.
 
 Use [Advanced layout](08-advanced-layout.md) when token changes are not
 enough.
@@ -151,6 +154,6 @@ JAAD registers the plugin, unless `astro.vite.plugins` already has it.
 - Colours and fonts follow JAAD's tokens: `bg-surface`, `border-border-light`,
   `font-mono`.
 - `dark:` follows JAAD's theme switch.
-- Layout tokens via arbitrary values: `max-w-(--jaad-chrome-width)`.
+- Layout tokens via arbitrary values: `max-w-(--site-chrome-width)`.
 - Pages on a local layout get plain Tailwind (no JAAD tokens) by adding
   `@import "tailwindcss";` to their CSS.

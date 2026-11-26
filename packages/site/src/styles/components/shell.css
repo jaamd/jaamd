@@ -1,74 +1,74 @@
 /* Shared shell classes; first in the layer so component files override them. */
 @layer components {
     /* The header's content box: the chrome width less the 1rem gutters. */
-    .jaad-chrome {
+    .site-chrome {
         width: calc(100% - 2rem);
-        max-width: calc(var(--jaad-chrome-width) - 2rem);
+        max-width: calc(var(--site-chrome-width) - 2rem);
         margin-inline: auto;
     }
 
-    .jaad-main {
+    .site-main {
         flex: 1;
         margin-block: 4rem;
-        padding-inline: var(--jaad-page-padding);
+        padding-inline: var(--site-page-padding);
     }
 
     @media (min-width: 64rem) {
-        .jaad-main {
-            padding-inline: calc(var(--jaad-page-padding) * 2);
+        .site-main {
+            padding-inline: calc(var(--site-page-padding) * 2);
         }
     }
 
     /* `bare` keeps the landmark without the spacing. */
-    .jaad-main-bare {
+    .site-main-bare {
         flex: 1;
     }
 
-    .jaad-body {
+    .site-body {
         @apply bg-background text-foreground flex min-h-screen flex-col text-[0.875rem] leading-[1.6];
-        padding-top: var(--jaad-header-height);
+        padding-top: var(--site-header-height);
     }
 
-    .jaad-icon {
+    .site-icon {
         @apply h-5 w-5;
     }
 
-    .jaad-sr-only {
+    .site-sr-only {
         @apply sr-only;
     }
 
-    .jaad-sidebar {
-        width: var(--jaad-sidebar-width);
+    .site-sidebar {
+        width: var(--site-sidebar-width);
         overflow-y: auto;
     }
 
-    .jaad-sidebar::-webkit-scrollbar {
+    .site-sidebar::-webkit-scrollbar {
         width: 6px;
     }
 
-    .jaad-sidebar::-webkit-scrollbar-track {
+    .site-sidebar::-webkit-scrollbar-track {
         background: transparent;
     }
 
-    .jaad-sidebar::-webkit-scrollbar-thumb {
+    .site-sidebar::-webkit-scrollbar-thumb {
         background: rgb(from var(--color-primary) r g b / 0.2);
         border-radius: 3px;
     }
 
-    .jaad-sidebar::-webkit-scrollbar-thumb:hover {
+    .site-sidebar::-webkit-scrollbar-thumb:hover {
         background: rgb(from var(--color-primary) r g b / 0.4);
     }
 
     /* The header controls sit in one row and have to stay identical. */
-    .jaad-icon-button {
+    .site-icon-button {
         @apply text-foreground-secondary hover:text-foreground-bright flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg no-underline transition-colors;
     }
 
-    .jaad-menu {
+    .site-menu {
         @apply bg-surface border-border absolute top-full right-0 z-40 mt-2 w-44 overflow-hidden rounded-xl border shadow-lg;
     }
 
-    .jaad-menu-item {
+    .site-menu-item {
         @apply text-foreground-secondary hover:text-foreground-bright hover:bg-primary/5 block rounded-lg px-3 py-2 text-sm no-underline transition-colors;
     }
 }

@@ -4,13 +4,13 @@ import { withDeploymentBase } from '../urls.ts'
 ---
 
 {config.nav.length > 0 && (
-    <nav class="jaad-nav">
-        <ul class="jaad-nav-list">
+    <nav class="site-nav jaad-nav">
+        <ul class="site-nav-list jaad-nav-list">
             {config.nav.map((link) => (
                 <li>
                     <a
                         href={withDeploymentBase(link.href, import.meta.env.BASE_URL)}
-                        class="jaad-nav-link"
+                        class="site-nav-link jaad-nav-link"
                         {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     >
                         {link.label}

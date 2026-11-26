@@ -33,18 +33,21 @@
     --font-serif: var(--font-merriweather), Georgia, serif;
     --font-mono: 'SF Mono', SF Mono, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 
-    /* Layout */
-    --jaad-content-width: 56rem;
+    /* Layout. Each takes its --jaad-* name too, which 1.x projects set; until 2.0. */
+    --site-content-width: var(--jaad-content-width, 56rem);
     /* Sidebar, page and table of contents, with their gaps and the gutters. */
-    --jaad-chrome-width: calc(var(--jaad-content-width) + 2 * var(--jaad-sidebar-width) + 6rem);
-    --jaad-sidebar-width: 16rem;
-    --jaad-header-height: 4.25rem;
-    --jaad-page-padding: 2rem;
+    --site-chrome-width: var(
+        --jaad-chrome-width,
+        calc(var(--site-content-width) + 2 * var(--site-sidebar-width) + 6rem)
+    );
+    --site-sidebar-width: var(--jaad-sidebar-width, 16rem);
+    --site-header-height: var(--jaad-header-height, 4.25rem);
+    --site-page-padding: var(--jaad-page-padding, 2rem);
 }
 
 @layer base {
     html {
-        scroll-padding-top: calc(var(--jaad-header-height) + 1.5rem);
+        scroll-padding-top: calc(var(--site-header-height) + 1.5rem);
         background-color: var(--color-background);
         color: var(--color-foreground);
         font-family: var(--font-sans);
@@ -82,7 +85,7 @@
     }
 }
 
-/* Utilities layer: wins over .jaad-brand's line-height. */
+/* Utilities layer: wins over .site-brand's line-height. */
 @layer utilities {
     .font-brand {
         font-family: var(--font-serif);

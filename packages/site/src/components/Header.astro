@@ -30,16 +30,16 @@ const logoSrc = config.logo ? withDeploymentBase(config.logo, import.meta.env.BA
 
 {/* Persisted between pages of one language: a switch to another brings the
      header of that language, its labels translated. */}
-<header class="jaad-header" transition:persist={`jaad-header-${locale}`}>
-    <div class="jaad-header-inner">
-        <div class="jaad-header-row">
-            <span class="jaad-brand font-brand">
-                <a href={homeHref} title={t('home')} class="jaad-brand-link">
-                    {logoSrc ? <img src={logoSrc} alt={config.title} class="jaad-logo" /> : config.title}
+<header class="site-header jaad-header" transition:persist={`site-header-${locale}`}>
+    <div class="site-header-inner jaad-header-inner">
+        <div class="site-header-row jaad-header-row">
+            <span class="site-brand jaad-brand font-brand">
+                <a href={homeHref} title={t('home')} class="site-brand-link jaad-brand-link">
+                    {logoSrc ? <img src={logoSrc} alt={config.title} class="site-logo jaad-logo" /> : config.title}
                 </a>
             </span>
 
-            <div class="jaad-header-actions">
+            <div class="site-header-actions jaad-header-actions">
                 <SearchPalette indexUrl={search.indexUrl} prominent={search.prominent} {locale} />
                 <Nav />
                 <SocialLinks />

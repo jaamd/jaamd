@@ -72,8 +72,11 @@ test('every moved page has a built target', () => {
 
 test('the header holds the J mark, leading to jaamd.org, and no text links', () => {
     const header = page('index.html').match(/<header[\s\S]*?<\/header>/)[0]
-    assert.match(header, /<a href="https:\/\/jaamd\.org"[^>]*class="jaad-brand-link">\s*<img src="\/mark\.svg"/)
-    assert.doesNotMatch(header, /jaad-nav-link/)
+    assert.match(
+        header,
+        /<a href="https:\/\/jaamd\.org"[^>]*class="site-brand-link jaad-brand-link">\s*<img src="\/mark\.svg"/,
+    )
+    assert.doesNotMatch(header, /site-nav-link/)
 })
 
 test('the sidebar starts with the welcome page, then both sections with their chapters', () => {

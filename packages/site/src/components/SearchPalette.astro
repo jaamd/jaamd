@@ -16,40 +16,54 @@ const t = ui(locale)
 const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 ---
 
-<jaad-search
+<site-search
     data-prominent={prominent ? '' : null}
     data-index-url={indexUrl}
     data-loading={t('search.loading')}
     data-empty={t('search.empty')}
 >
-    <button data-trigger-desktop hidden={!prominent} class="jaad-search-trigger" aria-label={t('search.label')}>
-        <svg class="jaad-search-trigger-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <button
+        data-trigger-desktop
+        hidden={!prominent}
+        class="site-search-trigger jaad-search-trigger"
+        aria-label={t('search.label')}
+    >
+        <svg
+            class="site-search-trigger-icon jaad-search-trigger-icon"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={MAGNIFIER}></path>
         </svg>
-        <span class="jaad-search-trigger-label">{t('search.trigger')}</span>
-        <kbd data-shortcut class="jaad-search-shortcut">
+        <span class="site-search-trigger-label jaad-search-trigger-label">{t('search.trigger')}</span>
+        <kbd data-shortcut class="site-search-shortcut jaad-search-shortcut">
             Ctrl K
         </kbd>
     </button>
 
     <button
         data-trigger-icon
-        class:list={['jaad-icon-button', prominent && 'jaad-search-trigger-compact']}
+        class:list={[
+            'site-icon-button jaad-icon-button',
+            prominent && 'site-search-trigger-compact jaad-search-trigger-compact',
+        ]}
         aria-label={t('search.label')}
     >
-        <svg class="jaad-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="site-icon jaad-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={MAGNIFIER}></path>
         </svg>
     </button>
 
     {/* Opened with showModal(): the browser keeps focus inside and the page behind inert. */}
-    <dialog data-overlay class="jaad-search-overlay" aria-label={t('search.label')}>
-        <div data-backdrop class="jaad-search-backdrop"></div>
+    <dialog data-overlay class="site-search-overlay jaad-search-overlay" aria-label={t('search.label')}>
+        <div data-backdrop class="site-search-backdrop jaad-search-backdrop"></div>
 
-        <div class="jaad-search-panel">
-            <div class="jaad-search-bar">
+        <div class="site-search-panel jaad-search-panel">
+            <div class="site-search-bar jaad-search-bar">
                 <svg
-                    class="jaad-search-bar-icon"
+                    class="site-search-bar-icon jaad-search-bar-icon"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -61,7 +75,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                     data-input
                     type="text"
                     placeholder={t('search.placeholder')}
-                    class="jaad-search-input"
+                    class="site-search-input jaad-search-input"
                     autocomplete="off"
                     spellcheck="false"
                     role="combobox"
@@ -70,13 +84,24 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                     aria-autocomplete="list"
                     aria-label={t('search.label')}
                 />
-                <button type="button" data-close class="jaad-search-close" aria-label={t('search.close')}>
+                <button
+                    type="button"
+                    data-close
+                    class="site-search-close jaad-search-close"
+                    aria-label={t('search.close')}
+                >
                     ESC
                 </button>
             </div>
 
-            <div data-filters hidden class="jaad-search-filters" role="group" aria-label={t('search.sections')}>
-                <button type="button" data-filter="" aria-pressed="true" class="jaad-search-filter">
+            <div
+                data-filters
+                hidden
+                class="site-search-filters jaad-search-filters"
+                role="group"
+                aria-label={t('search.sections')}
+            >
+                <button type="button" data-filter="" aria-pressed="true" class="site-search-filter jaad-search-filter">
                     {t('search.all')}
                 </button>
             </div>
@@ -84,28 +109,28 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             <ul
                 data-results
                 id="search-results"
-                class="jaad-search-results"
+                class="site-search-results jaad-search-results"
                 role="listbox"
                 aria-label={t('search.results')}
             ></ul>
 
-            <div class="jaad-search-footer">
+            <div class="site-search-footer jaad-search-footer">
                 <span>
-                    <kbd class="jaad-search-key">↑↓</kbd>
+                    <kbd class="site-search-key jaad-search-key">↑↓</kbd>
                     {t('search.navigate')}
                 </span>
                 <span>
-                    <kbd class="jaad-search-key">↵</kbd>
+                    <kbd class="site-search-key jaad-search-key">↵</kbd>
                     {t('search.open')}
                 </span>
                 <span>
-                    <kbd class="jaad-search-key">esc</kbd>
+                    <kbd class="site-search-key jaad-search-key">esc</kbd>
                     {t('search.close')}
                 </span>
             </div>
         </div>
     </dialog>
-</jaad-search>
+</site-search>
 
 <script>
     import { navigate } from 'astro:transitions/client'
@@ -122,7 +147,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
     const EMPTY_INDEX: SearchIndex = { version: SEARCH_INDEX_VERSION, sections: [], pages: [], entries: [] }
 
-    class JaadSearch extends HTMLElement {
+    class SiteSearch extends HTMLElement {
         #overlay!: HTMLDialogElement
         #input!: HTMLInputElement
         #filters!: HTMLElement
@@ -296,7 +321,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                 const button = document.createElement('button')
                 button.type = 'button'
                 button.dataset.filter = key
-                button.className = 'jaad-search-filter'
+                button.className = 'site-search-filter jaad-search-filter'
                 button.textContent = label
                 this.#filters.append(button)
             }
@@ -329,7 +354,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             for (const part of markWords(text, terms)) {
                 if (part.match) {
                     const mark = document.createElement('mark')
-                    mark.className = 'jaad-search-mark'
+                    mark.className = 'site-search-mark jaad-search-mark'
                     mark.textContent = part.text
                     frag.append(mark)
                 } else {
@@ -368,7 +393,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                     this.#option(group.page.href, this.#pageRow(group.page, terms, snippet))
                     for (const hit of group.hits) {
                         const li = this.#option(hit.href, this.#row(hit.entry.heading ?? '', terms))
-                        li.classList.add('jaad-search-result-heading')
+                        li.classList.add('site-search-result-heading', 'jaad-search-result-heading')
                         this.#snippet(li, getSnippet(hit.entry.text, terms), terms)
                     }
                 }
@@ -387,7 +412,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             const li = document.createElement('li')
             li.id = `search-option-${i}`
             li.setAttribute('role', 'option')
-            li.className = 'jaad-search-result'
+            li.className = 'site-search-result jaad-search-result'
             li.addEventListener('click', () => {
                 return this.#go(href)
             })
@@ -402,9 +427,9 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
 
         #row(title: string, terms: string[]): HTMLElement {
             const head = document.createElement('div')
-            head.className = 'jaad-search-result-head'
+            head.className = 'site-search-result-head jaad-search-result-head'
             const span = document.createElement('span')
-            span.className = 'jaad-search-result-title'
+            span.className = 'site-search-result-title jaad-search-result-title'
             span.append(this.#marked(title, terms))
             head.append(span)
             return head
@@ -415,7 +440,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
             const head = this.#row(page.title, terms)
             if (page.chapter) {
                 const badge = document.createElement('span')
-                badge.className = 'jaad-search-result-badge'
+                badge.className = 'site-search-result-badge jaad-search-result-badge'
                 badge.textContent = page.chapter
                 head.append(badge)
             }
@@ -429,7 +454,7 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                 return
             }
             const p = document.createElement('p')
-            p.className = 'jaad-search-result-snippet'
+            p.className = 'site-search-result-snippet jaad-search-result-snippet'
             p.append(this.#marked(text, terms))
             parent.append(p)
         }
@@ -437,20 +462,20 @@ const MAGNIFIER = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         #label(text: string): HTMLLIElement {
             const li = document.createElement('li')
             li.setAttribute('role', 'presentation')
-            li.className = 'jaad-search-group'
+            li.className = 'site-search-group jaad-search-group'
             li.textContent = text
             return li
         }
 
         #message(text: string): HTMLLIElement {
             const li = document.createElement('li')
-            li.className = 'jaad-search-message'
+            li.className = 'site-search-message jaad-search-message'
             li.textContent = text
             return li
         }
     }
 
-    if (!customElements.get('jaad-search')) {
-        customElements.define('jaad-search', JaadSearch)
+    if (!customElements.get('site-search')) {
+        customElements.define('site-search', SiteSearch)
     }
 </script>

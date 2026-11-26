@@ -57,7 +57,7 @@ jobs:
                   fi
 
                   filter="--filter=...[origin/$GITHUB_BASE_REF]"
-                  # The site checks its palette against JAAD's stylesheet.
+                  # The site checks its palette against the shell's stylesheet.
                   if echo "$changed" | grep -qE '^packages/site/src/styles/'; then
                     filter="$filter --filter=site"
                   fi

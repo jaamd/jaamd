@@ -1,0 +1,5 @@
+/* The site stylesheet, shipped once whatever packages a site has: Tailwind's
+   preflight, the shell's components, then the tokens. */
+@import 'tailwindcss' source(none);
+@import './components.css';
+@import './global.css';

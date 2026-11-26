@@ -76,6 +76,23 @@ A page in `src/pages/` on a route JAAD serves, such as
 silence. Rename the page, or move the documentation with `routeBase`. An
 `index` page over documentation at the root still only warns.
 
+### Shell names
+
+The header, the footer, the search and the other parts of the shell are named
+`site-*`, as they now serve every package of a site:
+
+- Classes: `.site-header`, `.site-chrome`, `.site-main` and the rest. Each
+  element still carries its `jaad-*` class, so CSS written for 1.1 keeps
+  working until 2.0.
+- Layout tokens: `--site-chrome-width` and the rest. The `--jaad-*` names are
+  still read until 2.0.
+- Custom elements: `<jaad-search>`, `<jaad-nav-mobile>`, `<jaad-theme-toggle>`
+  and `<jaad-locale-switcher>` are now `<site-search>`, `<site-nav-mobile>`,
+  `<site-theme-toggle>` and `<site-locale-switcher>`. CSS or scripts that
+  select them by tag need the new names.
+
+Pages on `Page` load only the shell's stylesheet, without the documentation's.
+
 ## From 1.0
 
 ### Node 22.23.4
