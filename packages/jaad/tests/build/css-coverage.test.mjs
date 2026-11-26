@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { allCss, packageClasses, missingFrom, themeTokens } from '../dist.mjs'
 
 const SRC = join(dirname(fileURLToPath(import.meta.url)), '../../src')
-// The shell's markup and tokens live in @jaamd/site; JAAD's stylesheet carries them.
+// The shell's markup and tokens live in @jaamd/site, and its stylesheet carries them.
 const SITE_SRC = join(dirname(fileURLToPath(import.meta.url)), '../../../site/src')
 
 /** Every class the markup of JAAD and of the shell uses. */
@@ -21,16 +21,13 @@ test('every class used by the package ships in the built CSS', () => {
     assert.deepEqual(missingFrom(allCss(), classes), [], 'a class used in markup has no rule in the package CSS')
 })
 
-const source = (name) => {
-    return readFileSync(join(SRC, name), 'utf8')
-}
 const siteSource = (name) => {
     return readFileSync(join(SITE_SRC, name), 'utf8')
 }
 
 // Tokens are public: emitted even when no package rule uses them.
-test('every @theme token ships in the package stylesheet', () => {
-    const dist = source('../dist/jaad.css')
+test('every @theme token ships in the site stylesheet', () => {
+    const dist = siteSource('../dist/site.css')
     assert.deepEqual(
         themeTokens(siteSource('styles/global.css')).filter((t) => {
             return !dist.includes(`${t}:`)

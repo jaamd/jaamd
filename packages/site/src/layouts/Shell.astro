@@ -4,8 +4,8 @@ import config from 'virtual:jaamd/site'
 import Footer from '../components/Footer.astro'
 import Head from '../components/Head.astro'
 import Header from '../components/Header.astro'
-// No stylesheets here: the page imports its package's, then the site's own,
-// in that order, so a project's CSS comes last.
+// No stylesheets here: the page imports the site's, then its package's, then
+// the project's, so a project's CSS comes last.
 
 interface Props {
     title?: string

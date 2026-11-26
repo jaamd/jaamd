@@ -8,3 +8,5 @@
 @import './components/locale-switcher.css';
 @import './components/not-found.css';
 @import './components/search.css';
+@import './components/toc.css';
+@import './components/page-actions.css';

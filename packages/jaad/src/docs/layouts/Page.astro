@@ -5,8 +5,8 @@ import { DEFAULT_LOCALE } from '@jaamd/site/runtime.ts'
 import { getLocaleAlternates } from '../collection.ts'
 import { docsUrls } from '../runtime.ts'
 import { docsFileHref } from '../urls.ts'
-// JAAD's stylesheet holds the shell's rules; the project's own come after it.
-import '../../../dist/jaad.css'
+// The shell's rules, then the project's own: no docs component on these pages.
+import '@jaamd/site/site.css'
 import 'virtual:jaad/theme.css'
 import 'virtual:jaad/bridge.css'
 import 'virtual:jaad/user.css'
