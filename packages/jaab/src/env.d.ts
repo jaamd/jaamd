@@ -6,6 +6,13 @@ declare module 'virtual:jaab/config' {
     export default config
 }
 
+// The project's layout, or the blog's own.
+declare module 'virtual:jaab/layout' {
+    // oxlint-disable-next-line typescript/consistent-type-imports
+    const Layout: (props: import('./layout.ts').BlogLayoutProps) => unknown
+    export default Layout
+}
+
 // The site's own fields, as `@jaamd/site` reads them.
 declare module 'virtual:jaamd/site' {
     // oxlint-disable-next-line typescript/consistent-type-imports

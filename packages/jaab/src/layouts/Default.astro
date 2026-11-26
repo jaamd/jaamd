@@ -1,0 +1,20 @@
+---
+import type { BlogLayoutProps } from '../layout.ts'
+import IndexPage from '../components/IndexPage.astro'
+import PostPage from '../components/PostPage.astro'
+
+/** The blog's own layout, on the site's shell: what `layout` replaces. */
+type Props = BlogLayoutProps
+
+const props = Astro.props
+---
+
+{props.kind === 'index' ? (
+    <IndexPage {...props}>
+        <slot />
+    </IndexPage>
+) : (
+    <PostPage {...props}>
+        <slot />
+    </PostPage>
+)}

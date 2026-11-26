@@ -10,7 +10,6 @@ import config from 'virtual:jaab/config'
 import { absoluteUrls, withoutTitle } from './model/html.ts'
 import { getPosts } from './posts.ts'
 import { blogUrls } from './runtime.ts'
-import { blogPageHref } from './urls.ts'
 
 /** Where every post's Markdown is. */
 const markdownContext = oncePerBuild(async (site: URL | undefined): Promise<MarkdownExportContext> => {
@@ -146,9 +145,4 @@ export async function rssResponse(site: URL): Promise<Response> {
         customData: `<language>${config.lang}</language>`,
         trailingSlash: blogUrls().trailingSlash,
     })
-}
-
-/** The href of the index, for the links back to it. */
-export function indexHref(): string {
-    return blogPageHref('', blogUrls())
 }

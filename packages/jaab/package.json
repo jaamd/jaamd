@@ -37,6 +37,9 @@
     "exports": {
         ".": "./index.ts",
         "./content": "./src/content.ts",
+        "./layout": "./src/layout.ts",
+        "./posts": "./src/posts.ts",
+        "./components/BlogMeta.astro": "./src/components/BlogMeta.astro",
         "./site": "./site.ts"
     },
     "publishConfig": {

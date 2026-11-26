@@ -27,7 +27,8 @@ export default function jaab(options: JaabUserConfig): AstroIntegration[] {
             label: 'Blog',
             base: normaliseBasePath(config.routeBase),
             llms: config.llms ? own('./src/endpoints.ts') : null,
-            notFound: own('./src/routes/404.astro'),
+            // A layout of the project's own leaves the 404 to the project, or to Astro.
+            notFound: config.layout ? null : own('./src/routes/404.astro'),
         },
     })
     return [site, createJaabIntegration(options, site)]

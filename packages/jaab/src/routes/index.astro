@@ -1,5 +1,8 @@
 ---
-import IndexPage from '../components/IndexPage.astro'
+import Layout from 'virtual:jaab/layout'
+import { indexPage } from '../layout.ts'
+
+const { props, Content } = await indexPage(1)
 ---
 
-<IndexPage page={1} />
+<Layout {...props}>{Content && <Content />}</Layout>
