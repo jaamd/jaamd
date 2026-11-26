@@ -3,7 +3,7 @@
 // Served by the site integration, once every package has registered.
 declare module 'virtual:jaamd/site' {
     // oxlint-disable-next-line typescript/consistent-type-imports
-    const config: import('./config.ts').SiteResolvedConfig
+    const config: import('./config.ts').SiteModuleConfig
     export default config
 }
 

@@ -4,7 +4,16 @@ import type { UiCatalog } from '../src/ui.ts'
  *  '../ui.ts' there, rename the constant, then fill every value. Registering an
  *  unfinished catalogue makes the tests fail. */
 export const UI_LOCALE = {
+    'blog.label': '',
+    'blog.minutes': '',
+    'blog.newer': '',
+    'blog.older': '',
+    'blog.page': '',
+    'blog.pages': '',
+    'blog.posts': '',
+    'blog.updated': '',
     'breadcrumb.label': '',
+    'feed.label': '',
     home: '',
     'locale.change': '',
     'nav.documentation': '',

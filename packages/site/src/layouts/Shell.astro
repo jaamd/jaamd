@@ -15,9 +15,13 @@ interface Props {
     class?: string
     /** What the header offers: translations and search. */
     header: ComponentProps<typeof Header>
+    /** The page's own metadata, past its title and description. */
+    head?: Omit<ComponentProps<typeof Head>, 'title' | 'description'>
+    /** False when the page sets the footer in its own column. */
+    footer?: boolean
 }
 
-const { title, description, bare = false, class: className, header } = Astro.props
+const { title, description, bare = false, class: className, header, head, footer = true } = Astro.props
 
 const pageTitle = title ? `${title} | ${config.title}` : config.title
 const pageDescription = description ?? config.description ?? config.title
@@ -26,13 +30,14 @@ const pageDescription = description ?? config.description ?? config.title
 <!doctype html>
 <html lang={config.lang} class={config.appearance === 'dark' ? 'dark' : undefined}>
     <head>
-        <Head title={pageTitle} description={pageDescription} />
+        <Head title={pageTitle} description={pageDescription} {...head} />
+        <slot name="head" />
     </head>
     <body class:list={['site-body jaad-body', className]}>
         <Header {...header} />
         <main class={bare ? 'site-main-bare jaad-main-bare' : 'site-main jaad-main'}>
             <slot />
         </main>
-        <Footer />
+        {footer && <Footer locale={header.locale} />}
     </body>
 </html>

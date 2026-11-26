@@ -1,7 +1,16 @@
 import type { UiCatalog } from '../ui.ts'
 
 export const ITALIAN_UI = {
+    'blog.label': 'Blog',
+    'blog.minutes': '{minutes} min di lettura',
+    'blog.newer': 'Post più recenti',
+    'blog.older': 'Post meno recenti',
+    'blog.page': 'Pagina {page} di {pages}',
+    'blog.pages': 'Pagine del blog',
+    'blog.posts': 'Altri post',
+    'blog.updated': 'Aggiornato il',
     'breadcrumb.label': 'Percorso di navigazione',
+    'feed.label': 'Feed RSS',
     home: 'Pagina iniziale',
     'locale.change': 'Cambia lingua',
     'nav.documentation': 'Navigazione della documentazione',

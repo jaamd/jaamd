@@ -1,0 +1,29 @@
+---
+import config from 'virtual:jaamd/site'
+import { ui } from '../runtime.ts'
+import { withDeploymentBase } from '../urls.ts'
+
+interface Props {
+    locale?: string
+}
+
+const t = ui(Astro.props.locale)
+
+// The site's first feed: one package writes feeds today.
+const feed = config.feeds[0]
+const href = feed ? withDeploymentBase(feed.path, import.meta.env.BASE_URL) : null
+---
+
+{href && (
+    <a href={href} class="site-icon-button" aria-label={t('feed.label')} title={t('feed.label')}>
+        <svg class="site-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 11a9 9 0 019 9M4 4a16 16 0 0116 16"
+            ></path>
+            <circle cx="5" cy="19" r="1" fill="currentColor"></circle>
+        </svg>
+    </a>
+)}

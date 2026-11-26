@@ -1,4 +1,4 @@
-import type { SiteConfig } from './config.ts'
+import type { SiteConfig, SiteCredit } from './config.ts'
 import { readFileSync } from 'node:fs'
 import { isDeepStrictEqual } from 'node:util'
 
@@ -8,6 +8,8 @@ export interface SiteMember {
     /** As installed, such as `@jaamd/jaad`. */
     package: string
     version: string
+    /** Its name and page, for the footer's credit. */
+    credit: SiteCredit
     /** Its heading in the root `llms.txt`, such as "Docs". */
     label: string
     /** Where its pages are mounted: empty at the site root. */

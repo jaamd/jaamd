@@ -155,8 +155,9 @@ The script stops unless `main` is checked out, clean and level with
 version of every package, commits, and creates the `v<version>` tag. The tag
 deploys docs.jaamd.org and runs [`publish.yml`](/.github/workflows/publish.yml),
 which tests the whole workspace and publishes with provenance, in dependency
-order: core, astro, jaad, create-jaad. A package already on npm at that version
-is skipped, so running the workflow again from the tag finishes a release that
-failed halfway. A version with a suffix, such as `1.0.0-rc.1`, is published under
+order: core, astro, site, jaad, jaab, create-jaad. A private package, as JAAB is
+until its first release, gets the version but is not published. A package already
+on npm at that version is skipped, so running the workflow again from the tag
+finishes a release that failed halfway. A version with a suffix, such as `1.0.0-rc.1`, is published under
 the `next` dist-tag, the others under `latest`. `create-jaad` installs JAAD at its
 own version.

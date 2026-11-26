@@ -102,11 +102,14 @@ the git remote. An explicit forge entry overrides that inference.
 | -------- | ----------------- | --------- | ------------------------------------ |
 | `footer` | `string \| false` | `:credit` | Footer HTML, or `false` to remove it |
 
-Use `:credit` to place the JAAD credit inside custom text:
+Use `:credit` to place the JAAD credit inside custom text, and `:feed` for
+the link to the site's feed, when a package such as JAAB writes one:
 
 ```ts
-defineJaadConfig({ title: '...', footer: '© 2026 Me · :credit' })
+defineJaadConfig({ title: '...', footer: '© 2026 Me · :credit · :feed' })
 ```
+
+Unset, the footer is the credit, followed by the feed link when there is one.
 
 ## Repository
 

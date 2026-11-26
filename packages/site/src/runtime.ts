@@ -34,3 +34,20 @@ export function ui(locale: string = DEFAULT_LOCALE) {
         return uiString(config.ui, locale, key)
     }
 }
+
+/** `read`, run once per build and shared after; in dev, where files come and
+ *  go, run on every call. The first call's arguments win: pass only what a
+ *  build holds fixed, such as `site`. */
+export function oncePerBuild<Args extends unknown[], Result>(
+    read: (...args: Args) => Promise<Result>,
+): (...args: Args) => Promise<Result> {
+    let cached: Promise<Result> | undefined
+
+    return (...args) => {
+        if (!import.meta.env.PROD) {
+            return read(...args)
+        }
+        cached ??= read(...args)
+        return cached
+    }
+}

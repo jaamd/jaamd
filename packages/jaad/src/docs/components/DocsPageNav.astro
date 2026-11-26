@@ -1,5 +1,6 @@
 ---
 import type { DocsNavItem } from '../types.ts'
+import Chevron from '@jaamd/site/components/Chevron.astro'
 import { ui } from '@jaamd/site/runtime.ts'
 
 interface Props {
@@ -17,15 +18,7 @@ const t = ui(locale)
         <div class="docs-page-nav-row">
             {previousPage && previousPage.title ? (
                 <a href={previousPage.href} rel="prev" class="docs-page-nav-link">
-                    <svg
-                        class="docs-page-nav-icon"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
+                    <Chevron direction="back" class="docs-page-nav-icon" />
                     <span class="docs-page-nav-label">{previousPage.title}</span>
                 </a>
             ) : (
@@ -35,15 +28,7 @@ const t = ui(locale)
             {nextPage && nextPage.title ? (
                 <a href={nextPage.href} rel="next" class="docs-page-nav-link">
                     <span class="docs-page-nav-label">{nextPage.title}</span>
-                    <svg
-                        class="docs-page-nav-icon"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
+                    <Chevron direction="forward" class="docs-page-nav-icon" />
                 </a>
             ) : (
                 <div />

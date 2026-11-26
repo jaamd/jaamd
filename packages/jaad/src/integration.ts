@@ -4,11 +4,10 @@ import type { SiteIntegration } from '@jaamd/site/integration.ts'
 import type { AstroIntegration } from 'astro'
 import { fileURLToPath } from 'node:url'
 import { siteCoordinator, siteMember } from '@jaamd/site/integration.ts'
-import { normaliseBasePath } from '@jaamd/site/urls.ts'
+import { pageUrlsEndWithSlash } from '@jaamd/site/urls.ts'
 import { serialisedModule } from '@jaamd/site/virtual.ts'
 import { resolveConfig } from './config.ts'
-import { createSitemapFilter, setupDocs } from './docs/integration.ts'
-import { pageUrlsEndWithSlash } from './docs/urls.ts'
+import { setupDocs } from './docs/integration.ts'
 
 /** The docs, on the site `site` sets up, resolved against the project Astro loaded. */
 export function createJaadIntegration(
@@ -53,20 +52,15 @@ export function createJaadIntegration(
                 const member = siteMember(site)
                 const coordinator = siteCoordinator(site)
                 const routes = setupDocs(params, config, state, {
-                    discoverAliases: hasSite,
                     rootLlms: coordinator.servesRootLlms(member),
                     reserved: coordinator.reservedInside(member),
                 })
 
-                coordinator.register(member, {
-                    locales: config.locales,
-                    routes,
-                    sitemapFilter: createSitemapFilter(config.docs.base, state, config.defaultLocale),
-                })
+                coordinator.register(member, { locales: config.locales, routes })
             },
 
-            'astro:config:done': ({ config: astroConfig }) => {
-                state.deploymentBase = normaliseBasePath(astroConfig.base)
+            'astro:server:setup': ({ server }) => {
+                state.watchRedirects(server)
             },
         },
     }

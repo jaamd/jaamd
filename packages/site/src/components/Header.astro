@@ -3,6 +3,7 @@ import type { LocaleAlternate } from '../locales.ts'
 import config from 'virtual:jaamd/site'
 import { DEFAULT_LOCALE, ui } from '../runtime.ts'
 import { withDeploymentBase } from '../urls.ts'
+import FeedLink from './FeedLink.astro'
 import LocaleSwitcher from './LocaleSwitcher.astro'
 import Nav from './Nav.astro'
 import NavMobile from './NavMobile.astro'
@@ -14,7 +15,8 @@ interface Props {
     locale?: string
     /** The page in every locale, for the switcher. */
     alternates: LocaleAlternate[]
-    search: {
+    /** Left out on pages no search index covers. */
+    search?: {
         /** `search-index.json` of the reader's locale. */
         indexUrl: string
         /** The full search field on wide screens, not just its icon. */
@@ -40,9 +42,10 @@ const logoSrc = config.logo ? withDeploymentBase(config.logo, import.meta.env.BA
             </span>
 
             <div class="site-header-actions jaad-header-actions">
-                <SearchPalette indexUrl={search.indexUrl} prominent={search.prominent} {locale} />
+                {search && <SearchPalette indexUrl={search.indexUrl} prominent={search.prominent} {locale} />}
                 <Nav />
                 <SocialLinks />
+                <FeedLink {locale} />
                 {config.appearance === 'auto' && <ThemeSwitcher {locale} />}
                 {alternates.length > 1 && <LocaleSwitcher {alternates} current={locale} />}
                 <NavMobile {locale} />

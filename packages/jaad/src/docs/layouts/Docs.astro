@@ -21,7 +21,7 @@ import { docsFileHref, docsMarkdownHref } from '../urls.ts'
 import '@jaamd/site/site.css'
 import '../../../dist/jaad.css'
 import '../styles/docs.css'
-import '../styles/jaamd.css'
+import '@jaamd/site/styles/jaamd-typography.css'
 import '@jaamd/astro/styles.css'
 import 'virtual:jaad/theme.css'
 import 'virtual:jaad/bridge.css'
@@ -121,7 +121,7 @@ const frameProps: DocsFrameProps = {
             <slot name="content" slot="content" />
             <slot name="page-navigation" slot="page-navigation" />
             <TableOfContents slot="table-of-contents" headings={headings} {locale} />
-            <Footer slot="footer" />
+            <Footer slot="footer" {locale} />
         </DocsFrame>
 
         <script>

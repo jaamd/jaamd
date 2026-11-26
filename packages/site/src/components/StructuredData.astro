@@ -16,13 +16,29 @@ interface Props {
     /** From the site's home to the page itself. */
     crumbs: Crumb[]
     keywords?: string[]
-    author?: string
+    /** One name, or several. */
+    author?: string | string[]
+    published?: Date
     modified?: Date
     /** BCP-47 tag of this page's locale. */
     language?: string
 }
 
-const { type, title, description, crumbs, keywords = [], author, modified, language = config.lang } = Astro.props
+const {
+    type,
+    title,
+    description,
+    crumbs,
+    keywords = [],
+    author,
+    published,
+    modified,
+    language = config.lang,
+} = Astro.props
+
+const authors = [author ?? []].flat().map((name) => {
+    return { '@type': 'Person', name }
+})
 
 // Relative ids are worthless to a crawler, so without `site` emit nothing.
 const data = Astro.site && {
@@ -32,7 +48,8 @@ const data = Astro.site && {
     description,
     inLanguage: language,
     ...(keywords.length > 0 ? { keywords } : {}),
-    ...(author ? { author: { '@type': 'Person', name: author } } : {}),
+    ...(authors.length > 0 ? { author: authors.length === 1 ? authors[0] : authors } : {}),
+    ...(published ? { datePublished: published.toISOString() } : {}),
     ...(modified ? { dateModified: modified.toISOString() } : {}),
     isPartOf: { '@type': 'WebSite', name: config.title },
     breadcrumb: {

@@ -5,7 +5,7 @@ import type { MarkdownExportContext } from '@jaamd/site/markdown-export.ts'
 import { absoluteHref, llmsDocument, llmsFullDocument, llmsLine, textResponse } from '@jaamd/site/llms.ts'
 import { exportMarkdown, sourceKey } from '@jaamd/site/markdown-export.ts'
 import { pageDescription } from '@jaamd/site/rendered.ts'
-import { DEFAULT_LOCALE, LOCALES, buildLocales } from '@jaamd/site/runtime.ts'
+import { DEFAULT_LOCALE, LOCALES, buildLocales, oncePerBuild } from '@jaamd/site/runtime.ts'
 import config from 'virtual:jaad/config'
 import { getDocsTree, getServedLocales } from './collection.ts'
 import { slugToTitle } from './model/ids.ts'
@@ -23,32 +23,21 @@ export async function searchIndexResponse(locale?: string): Promise<Response> {
     })
 }
 
-let exportContext: Promise<MarkdownExportContext> | undefined
-
-/** Where every page's Markdown is, in every locale. Built once per build: in
- *  dev, pages come and go, so it is built afresh each time. */
-function markdownContext(site: URL | undefined): Promise<MarkdownExportContext> {
-    const build = async (): Promise<MarkdownExportContext> => {
-        const markdownUrls = new Map<string, string>()
-        for (const locale of buildLocales()) {
-            const { pages } = await getDocsTree(locale)
-            for (const page of pages) {
-                if (!page.source.filePath) {
-                    continue
-                }
-                const href = docsMarkdownHref(page.slug, docsUrls(page.locale ?? locale))
-                markdownUrls.set(sourceKey(page.source.filePath), absoluteHref(href, site))
+/** Where every page's Markdown is, in every locale. */
+const markdownContext = oncePerBuild(async (site: URL | undefined): Promise<MarkdownExportContext> => {
+    const markdownUrls = new Map<string, string>()
+    for (const locale of buildLocales()) {
+        const { pages } = await getDocsTree(locale)
+        for (const page of pages) {
+            if (!page.source.filePath) {
+                continue
             }
+            const href = docsMarkdownHref(page.slug, docsUrls(page.locale ?? locale))
+            markdownUrls.set(sourceKey(page.source.filePath), absoluteHref(href, site))
         }
-        return { markdownUrls, origin: site ? site.origin : null }
     }
-
-    if (!import.meta.env.PROD) {
-        return build()
-    }
-    exportContext ??= build()
-    return exportContext
-}
+    return { markdownUrls, origin: site ? site.origin : null }
+})
 
 /** A page as Markdown that reads on its own. */
 export async function pageMarkdown(page: DocsPage<DocsSourceEntry>, site: URL | undefined): Promise<string> {

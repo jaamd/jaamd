@@ -1,0 +1,117 @@
+---
+import type { BlogPost } from '../posts.ts'
+import MarkdownContent from '@jaamd/astro/components'
+import Footer from '@jaamd/site/components/Footer.astro'
+import PageActions from '@jaamd/site/components/PageActions.astro'
+import StructuredData from '@jaamd/site/components/StructuredData.astro'
+import TableOfContents from '@jaamd/site/components/TableOfContents.astro'
+import { fill } from '@jaamd/site/helpers.ts'
+import { pageHeadings, renderedTitle } from '@jaamd/site/rendered.ts'
+import { ui } from '@jaamd/site/runtime.ts'
+import config from 'virtual:jaab/config'
+import { indexHref } from '../endpoints.ts'
+import Layout from '../layouts/Blog.astro'
+import { formatPostDay } from '../model/posts.ts'
+import { namesAuthors } from '../posts.ts'
+import PostNav from './PostNav.astro'
+
+interface Props {
+    post: BlogPost
+}
+
+const { post } = Astro.props
+const t = ui()
+const { entry } = post
+
+// A body that opens with its own title keeps it; otherwise the layout writes one.
+const ownHeading = renderedTitle(entry.rendered) !== null
+const headings = pageHeadings(entry.rendered)
+const authorNames = post.authors.map((author) => {
+    return author.name
+})
+// The authors the post names, else the free-form `author`: the same in the meta and the JSON-LD.
+const author = authorNames.length > 0 ? authorNames : entry.data.author
+const metaAuthor = Array.isArray(author) ? author.join(', ') : author
+const keywords = [...post.keywords, ...post.tags]
+const description = post.description ?? config.description ?? config.title
+
+const absolute = (href: string): string | null => {
+    return Astro.site ? new URL(href, Astro.site).href : null
+}
+const home = absolute(import.meta.env.BASE_URL)
+const index = absolute(indexHref())
+// At the site's root, the blog's index is the home itself: one crumb, not two.
+const crumbs = [
+    { name: config.title, url: home },
+    ...(index === home ? [] : [{ name: t('blog.label'), url: index }]),
+    { name: post.title, url: Astro.site ? Astro.url.href : null },
+]
+// Passed through to the element; the component's props name only `as` and `class`.
+const contentAttrs = { id: 'content' }
+---
+
+<Layout
+    title={post.title}
+    {description}
+    bare
+    footer={false}
+    head={{
+        keywords,
+        author: metaAuthor,
+        image: entry.data.ogImage,
+        modified: post.updated ?? undefined,
+        markdown: config.blog.llms ? post.markdownHref : undefined,
+        article: { published: post.date, tags: post.tags },
+    }}
+>
+    <StructuredData
+        slot="head"
+        type="BlogPosting"
+        title={post.title}
+        {description}
+        {crumbs}
+        {keywords}
+        {author}
+        published={post.date}
+        modified={post.updated ?? undefined}
+    />
+
+    <div class="blog-container blog-post-layout">
+        <div class="blog-main">
+            <article>
+                <p class="blog-post-meta">
+                    <a href={indexHref()}>{t('blog.label')}</a>
+                    <span aria-hidden="true">·</span>
+                    <time datetime={post.day}>{formatPostDay(post.day, config.lang)}</time>
+                    {config.blog.readingTime && (
+                        <>
+                            <span aria-hidden="true">·</span>
+                            <span>{fill(t('blog.minutes'), { minutes: post.readingTime })}</span>
+                        </>
+                    )}
+                </p>
+                {namesAuthors() && authorNames.length > 0 && <p class="blog-post-byline">{authorNames.join(', ')}</p>}
+
+                <MarkdownContent {...contentAttrs} class="blog-content">
+                    {!ownHeading && <h1>{post.title}</h1>}
+                    <slot />
+                </MarkdownContent>
+
+                {post.updatedDay && (
+                    <p class="blog-post-updated">
+                        {t('blog.updated')}{' '}
+                        <time datetime={post.updatedDay}>{formatPostDay(post.updatedDay, config.lang)}</time>
+                    </p>
+                )}
+            </article>
+
+            <PostNav {post} />
+        </div>
+
+        <aside class="blog-aside site-sidebar">
+            <TableOfContents {headings} />
+            <PageActions markdownHref={config.blog.llms ? post.markdownHref : undefined} editHref={post.editHref} />
+        </aside>
+        <Footer />
+    </div>
+</Layout>

@@ -1,9 +1,11 @@
 import type { AstroIntegration } from 'astro'
 import { fileURLToPath } from 'node:url'
+import { fontVariables } from '@jaamd/site/astro-config.ts'
+import { siteOptionsOf } from '@jaamd/site/config.ts'
 import { siteIntegration } from '@jaamd/site/integration.ts'
 import { packageVersion } from '@jaamd/site/members.ts'
 import { normaliseBasePath } from '@jaamd/site/urls.ts'
-import { fontVariables, parseConfig, siteOptionsOf, type JaadUserConfig } from './src/config.ts'
+import { parseConfig, type JaadUserConfig } from './src/config.ts'
 import { createIntegrationState } from './src/docs/integration.ts'
 import { createJaadIntegration } from './src/integration.ts'
 
@@ -22,6 +24,7 @@ export default function jaad(options: JaadUserConfig): AstroIntegration[] {
         member: {
             package: '@jaamd/jaad',
             version: packageVersion(new URL('./package.json', import.meta.url)),
+            credit: { name: 'JAAD', href: 'https://docs.jaamd.org/jaad' },
             label: 'Docs',
             base: normaliseBasePath(config.routeBase),
             llms: config.llms ? own('./src/docs/endpoints.ts') : null,
@@ -33,3 +36,5 @@ export default function jaad(options: JaadUserConfig): AstroIntegration[] {
 
 export { defineJaadConfig } from './src/config.ts'
 export type { JaadUserConfig } from './src/config.ts'
+export { defineSiteConfig } from '@jaamd/site/config.ts'
+export type { SiteUserConfig } from '@jaamd/site/config.ts'

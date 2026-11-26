@@ -6,16 +6,19 @@ import type { ReservedPath } from '@jaamd/site/members.ts'
 import type { AstroIntegration } from 'astro'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
+import { installLinkPlugin } from '@jaamd/site/link-plugins.ts'
 import { prefixedLocales } from '@jaamd/site/locales.ts'
+import { setupRedirects } from '@jaamd/site/redirects.ts'
 import { normaliseBasePath } from '@jaamd/site/urls.ts'
 import { docsRoots } from './config.ts'
-import { rehypeDocLinks, satteriDocLinks } from './link-plugins.ts'
+import { resolveDocLink } from './links.ts'
 import { readFrontmatter } from './model/frontmatter.ts'
 import { getDocCollectionId, splitDocLocale } from './model/ids.ts'
 import { buildDocsTree, type DocsSource } from './model/tree.ts'
 import { docsPageHref, type DocsUrlOptions } from './urls.ts'
 
+type ServerParams = Parameters<NonNullable<AstroIntegration['hooks']['astro:server:setup']>>[0]
 type SetupParams = Parameters<NonNullable<AstroIntegration['hooks']['astro:config:setup']>>[0]
 
 const DOCS_FRAME_ID = 'virtual:jaad/docs-frame'
@@ -38,23 +41,16 @@ function docsFrameVirtualPlugin(docsFrame: () => string) {
 export interface DocsAlias {
     locale?: string
     slug: string
+    canonical: string
 }
 
 export interface IntegrationState {
-    deploymentBase: string
-    aliases: DocsAlias[]
     docsFrame: string
+    /** Set up with the redirects: watches the docs on the dev server. */
+    watchRedirects: (server: ServerParams['server']) => void
 }
 
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
-
-/** A plugin this integration registered on an earlier setup run. */
-const isDocLinks = (plugin: unknown): boolean => {
-    return (
-        (typeof plugin === 'function' || (typeof plugin === 'object' && plugin !== null)) &&
-        ['jaad-doc-links', 'jaadDocLinks'].includes((plugin as { name?: string }).name ?? '')
-    )
-}
 
 const routeEntrypoint = (file: string) => {
     return fileURLToPath(new URL(`./routes/${file}`, import.meta.url))
@@ -124,7 +120,7 @@ export function findAliases(roots: DocsRoot[], locales: string[] = []): DocsAlia
     return readDocsTrees(roots, locales).flatMap(({ locale, pages }) => {
         return pages.flatMap((page) => {
             return page.aliases.map((slug) => {
-                return { locale, slug }
+                return { locale, slug, canonical: page.canonical }
             })
         })
     })
@@ -211,15 +207,12 @@ export function getInjectedRoutes(
 
 export function createIntegrationState(): IntegrationState {
     return {
-        deploymentBase: '',
-        aliases: [],
+        watchRedirects: () => {},
         docsFrame: fileURLToPath(new URL('./layouts/DefaultDocsFrame.astro', import.meta.url)),
     }
 }
 
 export interface DocsSetupOptions {
-    /** Read the aliases from disk, for the sitemap to leave out. */
-    discoverAliases: boolean
     /** Whether the root llms files are the docs' to serve. */
     rootLlms: boolean
     /** What other packages own inside the docs mount. */
@@ -229,11 +222,12 @@ export interface DocsSetupOptions {
 /** Routes, the docs frame, aliases and the link plugins. Returns the patterns
  *  of the routes a project page must not take. */
 export function setupDocs(
-    { config: astroConfig, updateConfig, injectRoute, addWatchFile, logger }: SetupParams,
+    params: SetupParams,
     config: JaadResolvedConfig,
     state: IntegrationState,
-    { discoverAliases, rootLlms, reserved }: DocsSetupOptions,
+    { rootLlms, reserved }: DocsSetupOptions,
 ): string[] {
+    const { config: astroConfig, updateConfig, injectRoute, addWatchFile, logger } = params
     updateConfig({
         vite: {
             plugins: [
@@ -279,9 +273,6 @@ export function setupDocs(
                 'Create it, or point docsDir or the section at your markdown.',
         )
     }
-    if (discoverAliases && missing.length < roots.length) {
-        state.aliases = findAliases(roots, locales)
-    }
 
     const trespasses = findTrespasses(roots, locales, config.defaultLocale, reserved)
     if (trespasses.length > 0) {
@@ -293,9 +284,6 @@ export function setupDocs(
             `jaad: docs pages inside the pages of another package\n${lines.join('\n')}\n` +
                 'Rename the file or its directory, or mount the docs elsewhere with routeBase.',
         )
-    }
-    for (const { dir } of roots) {
-        addWatchFile(pathToFileURL(dir))
     }
 
     const warnedDrafts = new Set<string>()
@@ -320,26 +308,19 @@ export function setupDocs(
             }
         },
     }
-    // New arrays: a shared processor would stack duplicates across setup runs.
-    const processor = astroConfig.markdown.processor as {
-        name: string
-        options: { hastPlugins?: unknown[]; rehypePlugins?: unknown[] }
-    }
-    if (processor.name === 'satteri') {
-        processor.options.hastPlugins = [
-            ...(processor.options.hastPlugins ?? []).filter((plugin) => {
-                return !isDocLinks(plugin)
-            }),
-            satteriDocLinks(links),
-        ]
-    } else if (processor.name === 'unified') {
-        processor.options.rehypePlugins = [
-            ...(processor.options.rehypePlugins ?? []).filter((plugin) => {
-                return !isDocLinks(plugin)
-            }),
-            rehypeDocLinks(links),
-        ]
-    }
+    installLinkPlugin(astroConfig.markdown.processor, 'jaad-doc-links', (href, from) => {
+        return resolveDocLink(href, from, links)
+    })
+
+    // The other names of a page, such as the opening page's own slug.
+    state.watchRedirects = setupRedirects(params, {
+        dirs: roots.map((docsRoot) => {
+            return docsRoot.dir
+        }),
+        read: () => {
+            return aliasRedirects(findAliases(roots, locales), links.urls)
+        },
+    })
 
     if (config.docs.base === '') {
         const ownIndex = INDEX_PAGE_NAMES.find((name) => {
@@ -360,29 +341,17 @@ export function setupDocs(
     })
 }
 
-const withoutTrailingSlash = (value: string) => {
-    return value.length > 1 ? value.replace(/\/$/, '') : value
-}
-
-export function createSitemapFilter(
-    docsBase: string,
-    state: Pick<IntegrationState, 'deploymentBase' | 'aliases'>,
-    defaultLocale?: string,
-): (page: string) => boolean {
-    return (page) => {
-        if (state.aliases.length === 0) {
-            return true
-        }
-
-        const pathname = withoutTrailingSlash(new URL(page).pathname)
-        return !state.aliases.some((alias) => {
-            const urls: DocsUrlOptions = {
-                docsBase,
-                deploymentBase: state.deploymentBase,
-                locale: alias.locale,
-                defaultLocale,
-            }
-            return pathname === withoutTrailingSlash(docsPageHref(alias.slug, urls))
-        })
-    }
+/** Each alias as one of Astro's `redirects`: the source without the
+ *  deployment base, which Astro adds to it, and the target with it. */
+export function aliasRedirects(
+    aliases: DocsAlias[],
+    urls: (locale?: string) => DocsUrlOptions,
+): Record<string, string> {
+    return Object.fromEntries(
+        aliases.map((alias) => {
+            const pageUrls = urls(alias.locale)
+            const source = docsPageHref(alias.slug, { ...pageUrls, deploymentBase: '', trailingSlash: false })
+            return [source, docsPageHref(alias.canonical, pageUrls)]
+        }),
+    )
 }

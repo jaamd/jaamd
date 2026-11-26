@@ -15,7 +15,7 @@ permissions: {}
 
 env:
     # Dependencies first: each tarball names the version of the one before.
-    PACKAGES: core astro site jaad create-jaad
+    PACKAGES: core astro site jaad jaab create-jaad
 
 jobs:
     # Installs, tests and packs with no secrets and no publishing rights: the

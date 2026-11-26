@@ -22,6 +22,7 @@ const member = (fields: Partial<SiteMember> = {}): SiteMember => {
     return {
         package: '@jaamd/jaad',
         version: '1.2.0',
+        credit: { name: 'JAAD', href: 'https://docs.jaamd.org/jaad' },
         label: 'Docs',
         base: '',
         llms: '/llms.ts',

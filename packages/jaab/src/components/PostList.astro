@@ -1,0 +1,25 @@
+---
+import type { BlogPost } from '../posts.ts'
+import config from 'virtual:jaab/config'
+import { formatPostDay } from '../model/posts.ts'
+
+interface Props {
+    posts: BlogPost[]
+}
+
+const { posts } = Astro.props
+---
+
+<ol class="blog-list">
+    {posts.map((post) => (
+        <li class="blog-list-item">
+            <time class="blog-list-date" datetime={post.day}>
+                {formatPostDay(post.day, config.lang)}
+            </time>
+            <a class="blog-list-title" href={post.href}>
+                {post.title}
+            </a>
+            {post.description && <p class="blog-list-description">{post.description}</p>}
+        </li>
+    ))}
+</ol>

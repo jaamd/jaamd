@@ -1,9 +1,8 @@
-import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { allCss as allCssIn, readBuilt, walk } from '../../../tests/dist.mjs'
 
-export { walk }
+export { escapeClass, missingFrom, packageClasses, walk } from '../../../tests/dist.mjs'
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 export const DIST = join(ROOT, 'tests', 'fixture', 'dist')
@@ -22,50 +21,6 @@ export function allCss() {
     return allCssIn(DIST)
 }
 
-export const escapeClass = (cls) => {
-    return cls.replace(/[.:/[\]%()!,#]/g, (c) => {
-        return '\\' + c
-    })
-}
-
-const QUOTED = /(["'])([^"']+)\1/g
-
-export function packageClasses(srcDir) {
-    const classes = new Set()
-    const add = (value) => {
-        for (const token of value.split(/\s+/)) {
-            if (token) {
-                classes.add(token)
-            }
-        }
-    }
-    for (const file of walk(srcDir).filter((f) => {
-        return f.endsWith('.astro')
-    })) {
-        const source = readFileSync(file, 'utf8')
-        // Either quote, in markup, expressions and scripts alike.
-        for (const m of source.matchAll(/\bclass(?:Name)?=(["'])([^"'{}]+)\1/g)) {
-            add(m[2])
-        }
-        for (const m of source.matchAll(/\bclass=\{([^}]*)\}/g)) {
-            for (const lit of m[1].matchAll(QUOTED)) {
-                add(lit[2])
-            }
-        }
-        for (const m of source.matchAll(/\bclass:list=\{\[([^\]]*)\]\}/g)) {
-            for (const lit of m[1].matchAll(QUOTED)) {
-                add(lit[2])
-            }
-        }
-        for (const m of source.matchAll(
-            /\.(?:className\s*=|classList\.(?:add|remove|toggle)\()\s*(["'`])([^"'`$]+)\1/g,
-        )) {
-            add(m[2])
-        }
-    }
-    return classes
-}
-
 /** Custom properties declared in a stylesheet's `@theme` block. */
 export function themeTokens(css) {
     const start = css.indexOf('{', css.indexOf('@theme'))
@@ -81,12 +36,4 @@ export function themeTokens(css) {
     return [...css.slice(start, end).matchAll(/^\s*(--[a-z0-9-]+)\s*:/gm)].map((m) => {
         return m[1]
     })
-}
-
-export function missingFrom(css, classes) {
-    return [...classes]
-        .filter((c) => {
-            return !css.includes('.' + escapeClass(c))
-        })
-        .toSorted()
 }

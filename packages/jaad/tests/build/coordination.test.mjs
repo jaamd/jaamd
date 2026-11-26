@@ -2,11 +2,12 @@ import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { after, describe, test } from 'node:test'
+import { siteOptionsOf } from '@jaamd/site/config.ts'
 import { siteCoordinator, siteIntegration, siteMember } from '@jaamd/site/integration.ts'
 import { packageVersion } from '@jaamd/site/members.ts'
 import { build, sync } from 'astro'
 import jaad from '../../index.ts'
-import { parseConfig, siteOptionsOf } from '../../src/config.ts'
+import { parseConfig } from '../../src/config.ts'
 import { inline, project, removeProjects } from './projects.mjs'
 
 const VERSION = packageVersion(new URL('../../package.json', import.meta.url))
@@ -36,6 +37,7 @@ function stub(root, { base = '/notes', version = VERSION, options = SITE } = {})
         member: {
             package: '@jaamd/stub',
             version,
+            credit: { name: 'Stub', href: 'https://example.dev/stub' },
             label: 'Notes',
             base,
             llms: join(root, 'stub/llms.mjs'),

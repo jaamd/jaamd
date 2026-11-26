@@ -40,6 +40,10 @@ by default. Its browser title is the site name alone, and its own slug
 redirects to it: with `routeBase: "/docs"`, `01-introduction.md` opens at
 `/docs/`, and `/docs/introduction/` redirects there.
 
+The redirect is one of Astro's `redirects`, a 301 on the hosts whose adapter
+writes them. When another page moves first, the dev server restarts on its own
+to follow it.
+
 ## Linking between pages
 
 Link to another page by its file, relative to the one you are writing:

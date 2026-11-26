@@ -1,0 +1,36 @@
+---
+import Chevron from '@jaamd/site/components/Chevron.astro'
+import { fill } from '@jaamd/site/helpers.ts'
+import { ui } from '@jaamd/site/runtime.ts'
+import { blogUrls } from '../runtime.ts'
+import { indexPageHref } from '../urls.ts'
+
+interface Props {
+    page: number
+    pages: number
+}
+
+const { page, pages } = Astro.props
+const t = ui()
+const newer = page > 1 ? indexPageHref(page - 1, blogUrls()) : null
+const older = page < pages ? indexPageHref(page + 1, blogUrls()) : null
+const label = fill(t('blog.page'), { page, pages })
+---
+
+{pages > 1 && (
+    <nav class="blog-pager" aria-label={t('blog.pages')}>
+        {newer && (
+            <a class="blog-pager-link" href={newer} rel="prev">
+                <Chevron direction="back" class="blog-icon" />
+                {t('blog.newer')}
+            </a>
+        )}
+        <span class="blog-pager-label">{label}</span>
+        {older && (
+            <a class="blog-pager-link" href={older} rel="next">
+                {t('blog.older')}
+                <Chevron direction="forward" class="blog-icon" />
+            </a>
+        )}
+    </nav>
+)}
