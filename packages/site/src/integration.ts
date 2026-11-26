@@ -76,8 +76,6 @@ export interface SiteContribution {
     locales: Locale[]
     /** Patterns of the routes it injected that a project page must not take. */
     routes: string[]
-    /** False for a page the sitemap leaves out. Read while the sitemap is written. */
-    sitemapFilter?: (page: string) => boolean
 }
 
 /** What the site knows once every package has registered: only the instance
@@ -286,12 +284,7 @@ async function setupSite(
 
     // `site` may come from Astro's own config: read once it is merged.
     if (astroConfig.site) {
-        const filter = (page: string): boolean => {
-            return [...contributions.values()].every((contribution) => {
-                return contribution.sitemapFilter?.(page) ?? true
-            })
-        }
-        updateConfig({ integrations: [sitemap({ filter })] })
+        updateConfig({ integrations: [sitemap()] })
     }
 
     return contributions

@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { loadTailwindPlugin } from '@jaamd/site/integration.ts'
-import { createSitemapFilter, findAliases, findTrespasses, getInjectedRoutes } from '../../src/docs/integration.ts'
+import { aliasRedirects, findAliases, findTrespasses, getInjectedRoutes } from '../../src/docs/integration.ts'
 
 test('opening-page discovery follows collection slugging and numeric order', () => {
     const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-'))
@@ -14,21 +14,23 @@ test('opening-page discovery follows collection slugging and numeric order', () 
         writeFileSync(join(docsDir, '01-images-&-videos.md'), '# Images')
         writeFileSync(join(docsDir, '02-guides', '01-setup.md'), '# Setup')
 
-        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'images--videos' }])
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [
+            { locale: undefined, slug: 'images--videos', canonical: '' },
+        ])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
 })
 
-// The opening page is whatever the collection sorts first, and the sitemap
-// filter has to agree with it or it drops the wrong url.
+// The opening page is whatever the collection sorts first, and its redirect
+// has to agree with it or it hides the wrong page.
 test('a draft never counts as the opening page', () => {
     const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-draft-'))
     try {
         writeFileSync(join(docsDir, '00-scratch.md'), '---\ndraft: true\n---\n\n# Scratch')
         writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
 
-        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'intro' }])
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'intro', canonical: '' }])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
@@ -40,7 +42,7 @@ test('frontmatter order moves the opening page', () => {
         writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
         writeFileSync(join(docsDir, '02-welcome.md'), '---\norder: 0\n---\n\n# Welcome')
 
-        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'welcome' }])
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'welcome', canonical: '' }])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
@@ -55,21 +57,19 @@ test('frontmatter is read as YAML, comments, booleans and BOM included', () => {
         writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
         writeFileSync(join(docsDir, '02-welcome.md'), '\uFEFF---\norder: 0 # first\n---\n\n# Welcome')
 
-        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'welcome' }])
+        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'welcome', canonical: '' }])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
 })
 
-test("the sitemap omits only the opening page's named redirect", () => {
-    const filter = createSitemapFilter('/docs', {
-        deploymentBase: '/repo',
-        aliases: [{ slug: 'images--videos' }],
+test("the opening page's named url redirects to the mount, below the deployment base", () => {
+    const urls = () => {
+        return { docsBase: '/docs', deploymentBase: '/repo', trailingSlash: true }
+    }
+    assert.deepEqual(aliasRedirects([{ slug: 'images--videos', canonical: '' }], urls), {
+        '/docs/images--videos': '/repo/docs/',
     })
-
-    assert.equal(filter('https://example.dev/repo/docs/images--videos/'), false)
-    assert.equal(filter('https://example.dev/repo/docs/'), true)
-    assert.equal(filter('https://example.dev/repo/docs/guide/'), true)
 })
 
 // ── One opening page per locale ──────────────────────────────────────────────
@@ -84,31 +84,26 @@ test('each locale gets its own opening page', () => {
         writeFileSync(join(docsDir, 'it', '01-introduzione.md'), '# Introduzione')
 
         assert.deepEqual(findAliases([{ dir: docsDir }], ['en', 'it']), [
-            { locale: 'en', slug: 'intro' },
-            { locale: 'it', slug: 'introduzione' },
+            { locale: 'en', slug: 'intro', canonical: '' },
+            { locale: 'it', slug: 'introduzione', canonical: '' },
         ])
     } finally {
         rmSync(docsDir, { recursive: true })
     }
 })
 
-test('the sitemap omits the named redirect of every locale', () => {
-    const filter = createSitemapFilter(
-        '',
-        {
-            deploymentBase: '',
-            aliases: [
-                { locale: 'en', slug: 'intro' },
-                { locale: 'it', slug: 'introduzione' },
-            ],
-        },
-        'en',
+test('each locale redirects its own opening page', () => {
+    const urls = (locale?: string) => {
+        return { docsBase: '', locale, defaultLocale: 'en' }
+    }
+    const redirects = aliasRedirects(
+        [
+            { locale: 'en', slug: 'intro', canonical: '' },
+            { locale: 'it', slug: 'introduzione', canonical: '' },
+        ],
+        urls,
     )
-
-    assert.equal(filter('https://example.dev/intro/'), false)
-    assert.equal(filter('https://example.dev/it/introduzione/'), false)
-    assert.equal(filter('https://example.dev/it/'), true)
-    assert.equal(filter('https://example.dev/guide/'), true)
+    assert.deepEqual(redirects, { '/intro': '/', '/it/introduzione': '/it' })
 })
 
 test('docs pages inside the base of another package are found, with their file', () => {

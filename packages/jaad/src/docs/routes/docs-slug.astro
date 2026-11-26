@@ -4,13 +4,10 @@ import { withDeploymentBase } from '@jaamd/site/urls.ts'
 import { render } from 'astro:content'
 import { getDocsTree } from '../collection.ts'
 import DocsPage from '../components/DocsPage.astro'
-import { docsUrls } from '../runtime.ts'
-import { docsPageHref } from '../urls.ts'
 
 interface DocsPath {
     params: { slug: string }
-    /** `redirect` is the canonical slug of a page reached by another name. */
-    props: { id: string; locale?: string; redirect?: string }
+    props: { id: string; locale?: string }
 }
 
 export async function getStaticPaths() {
@@ -20,18 +17,12 @@ export async function getStaticPaths() {
         const { pages } = await getDocsTree(locale)
         const prefix = localePrefix(locale)
 
+        // A page's other names are Astro redirects, set up by the integration.
         for (const page of pages) {
-            const add = (slug: string, redirect?: string) => {
-                return paths.push({ params: { slug }, props: { id: page.id, locale, redirect } })
-            }
-
             // Empty is the index route's; a prefixed locale has none, so /it is this page.
             const own = `${prefix}${page.canonical}`.replace(/\/$/, '')
             if (own) {
-                add(own)
-            }
-            for (const alias of page.aliases) {
-                add(`${prefix}${alias}`, page.canonical)
+                paths.push({ params: { slug: own }, props: { id: page.id, locale } })
             }
         }
     }
@@ -39,11 +30,7 @@ export async function getStaticPaths() {
     return paths
 }
 
-const { id, locale, redirect } = Astro.props
-
-if (redirect !== undefined) {
-    return Astro.redirect(docsPageHref(redirect, docsUrls(locale)), 301)
-}
+const { id, locale } = Astro.props
 
 const tree = await getDocsTree(locale)
 const page = tree.byId.get(id)
