@@ -14,7 +14,7 @@ in the folder: there are no drafts to hide and no dates to wait for.
 | `2026-11-22-introducing-jaab.md` | `/introducing-jaab/`                  |
 | `photos/index.md`                | `/photos/`, with its images beside it |
 |                                  | `/page/2/`, the older posts           |
-|                                  | `/rss.xml`, every post in full        |
+|                                  | `/rss.xml`, the newest posts in full  |
 
 - **The index**, newest first, with the date, the title and the description of
   each post, ten to a page. See [Posts](01-getting-started/02-posts.md).
@@ -25,3 +25,6 @@ in the folder: there are no drafts to hide and no dates to wait for.
 - **The shell of JAAD**: the same header, footer, themes and type. A site with
   docs and a blog installs both. See
   [Installation](01-getting-started/01-installation.md#docs-and-a-blog).
+- **Your own layout** for a blog inside a site that already has its look: JAAB
+  keeps the pages, the feed and the metadata, and your layout draws them. See
+  [Layout](02-configurations/04-layout.md).
