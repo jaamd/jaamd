@@ -60,14 +60,8 @@ overrides that. See [Languages](03-i18n.md).
 With `sections`, `docsDir` is read only when set, for pages outside every
 section. See [Sections](../01-getting-started/02-pages.md#sections).
 
-To keep a landing page at `/`, mount documentation below it:
-
-```ts
-defineJaadConfig({ title: 'My Project', routeBase: '/docs' })
-```
-
-When documentation is mounted at `/`, an existing `src/pages/index.*` creates
-a route conflict and JAAD reports the required `routeBase` setting.
+To keep a landing page at `/`, mount documentation below it with
+`routeBase: '/docs'`; see [Custom pages](07-custom-pages.md).
 
 ## Navigation
 
@@ -151,11 +145,9 @@ the file's path inside its section's directory.
 | `ogImage` | `string \| false` | detected or none | Social image path, URL or `false` |
 | `llms`    | `boolean`         | `true`           | Files for language models         |
 
-JAAD detects `public/og-image.png`, `.jpg`, `.jpeg` or `.webp`, in that order.
-Local images and canonical URLs require `site`; absolute image URLs do not.
-
-`llms: false` leaves out `llms.txt`, `llms-full.txt` and the Markdown link in
-each page's head; see [LLMs and agents](09-llms.md).
+Without `ogImage`, JAAD uses the first of `public/og-image.png`, `.jpg`, `.jpeg`
+or `.webp`. Local images and canonical URLs require `site`; absolute image URLs
+do not. For `llms`, see [LLMs and agents](09-llms.md).
 
 Each `head` entry accepts `tag`, optional `attrs`, and optional `content`. Use
 it for analytics, verification tags and preconnects:
@@ -178,16 +170,10 @@ defineJaadConfig({
 | `appearance` | `"auto" \| "light" \| "dark"`               | `"auto"`    |
 | `tailwind`   | `boolean`                                   | `false`     |
 
-A named theme styles the interface, Markdown and code blocks. A `{ light,
-dark }` object changes only the Shiki code themes. See
-[Themes](05-themes.md) for available names and custom themes.
-
-`tailwind: true` enables Tailwind utilities with JAAD's tokens on documentation
-pages, `Page` pages and a custom `DocsFrame`; see
-[Styles](06-styles.md#tailwind).
-
-`appearance: "auto"` follows the reader's preference and shows the switcher.
-`"light"` and `"dark"` pin the appearance and remove it.
+A named theme styles the interface, Markdown and code blocks; a `{ light, dark }`
+object changes only the code themes. `"light"` and `"dark"` pin the appearance
+and remove the switcher. See [Themes](05-themes.md), and
+[Styles](06-styles.md#tailwind) for `tailwind`.
 
 ## Detected project values
 
