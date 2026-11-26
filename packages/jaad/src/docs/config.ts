@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { relative, resolve, sep } from 'node:path'
-import { editBaseFrom, type RepoInfo } from '@jaamd/site/infer.ts'
+import { resolveEditBase, type RepoInfo } from '@jaamd/site/infer.ts'
 import { detectLocales, validateLocaleTree } from '@jaamd/site/locale-tree.ts'
 import { isLocale } from '@jaamd/site/locales.ts'
 import { normaliseBasePath } from '@jaamd/site/urls.ts'
@@ -73,17 +73,6 @@ export interface DocsRoot {
     /** Absolute. */
     dir: string
     section?: string
-}
-
-/** Empty at the root, otherwise one leading slash and no trailing one. */
-function resolveEditBase(editLink: DocsConfig['editLink'], repo: RepoInfo | null, docsDir: string): string | null {
-    if (typeof editLink === 'string') {
-        return editLink
-    }
-    if (!editLink || !repo) {
-        return null
-    }
-    return editBaseFrom(repo, docsDir)
 }
 
 function resolveSections(config: DocsConfig, repo: RepoInfo | null): DocsSection[] {

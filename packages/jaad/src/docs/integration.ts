@@ -6,11 +6,12 @@ import type { ReservedPath } from '@jaamd/site/members.ts'
 import type { AstroIntegration } from 'astro'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
+import { installLinkPlugin } from '@jaamd/site/link-plugins.ts'
 import { prefixedLocales } from '@jaamd/site/locales.ts'
 import { normaliseBasePath } from '@jaamd/site/urls.ts'
 import { docsRoots } from './config.ts'
-import { rehypeDocLinks, satteriDocLinks } from './link-plugins.ts'
+import { resolveDocLink } from './links.ts'
 import { readFrontmatter } from './model/frontmatter.ts'
 import { getDocCollectionId, splitDocLocale } from './model/ids.ts'
 import { buildDocsTree, type DocsSource } from './model/tree.ts'
@@ -47,14 +48,6 @@ export interface IntegrationState {
 }
 
 const INDEX_PAGE_NAMES = ['index.astro', 'index.md', 'index.mdx', 'index.html', 'index.js', 'index.ts']
-
-/** A plugin this integration registered on an earlier setup run. */
-const isDocLinks = (plugin: unknown): boolean => {
-    return (
-        (typeof plugin === 'function' || (typeof plugin === 'object' && plugin !== null)) &&
-        ['jaad-doc-links', 'jaadDocLinks'].includes((plugin as { name?: string }).name ?? '')
-    )
-}
 
 const routeEntrypoint = (file: string) => {
     return fileURLToPath(new URL(`./routes/${file}`, import.meta.url))
@@ -294,9 +287,6 @@ export function setupDocs(
                 'Rename the file or its directory, or mount the docs elsewhere with routeBase.',
         )
     }
-    for (const { dir } of roots) {
-        addWatchFile(pathToFileURL(dir))
-    }
 
     const warnedDrafts = new Set<string>()
     const links: DocLinkContext = {
@@ -320,26 +310,9 @@ export function setupDocs(
             }
         },
     }
-    // New arrays: a shared processor would stack duplicates across setup runs.
-    const processor = astroConfig.markdown.processor as {
-        name: string
-        options: { hastPlugins?: unknown[]; rehypePlugins?: unknown[] }
-    }
-    if (processor.name === 'satteri') {
-        processor.options.hastPlugins = [
-            ...(processor.options.hastPlugins ?? []).filter((plugin) => {
-                return !isDocLinks(plugin)
-            }),
-            satteriDocLinks(links),
-        ]
-    } else if (processor.name === 'unified') {
-        processor.options.rehypePlugins = [
-            ...(processor.options.rehypePlugins ?? []).filter((plugin) => {
-                return !isDocLinks(plugin)
-            }),
-            rehypeDocLinks(links),
-        ]
-    }
+    installLinkPlugin(astroConfig.markdown.processor, 'jaad-doc-links', (href, from) => {
+        return resolveDocLink(href, from, links)
+    })
 
     if (config.docs.base === '') {
         const ownIndex = INDEX_PAGE_NAMES.find((name) => {

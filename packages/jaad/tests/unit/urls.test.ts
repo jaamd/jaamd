@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { docsFileHref, docsMarkdownHref, docsPageHref, pageUrlsEndWithSlash } from '../../src/docs/urls.ts'
+import { docsFileHref, docsMarkdownHref, docsPageHref } from '../../src/docs/urls.ts'
 
 test('the opening doc uses the mount point while markdown keeps its slug', () => {
     assert.equal(docsPageHref('', { docsBase: '', deploymentBase: '/repo' }), '/repo/')
@@ -74,14 +74,4 @@ test('files never take the slash of pages', () => {
         docsFileHref('search-index.json', { docsBase: '', locale: 'it', defaultLocale: 'en' }),
         '/it/search-index.json',
     )
-})
-
-test("the slash follows Astro's trailingSlash and build format", () => {
-    const astro = (trailingSlash: string, format: string) => {
-        return { trailingSlash, build: { format } }
-    }
-    assert.equal(pageUrlsEndWithSlash(astro('ignore', 'directory')), true)
-    assert.equal(pageUrlsEndWithSlash(astro('ignore', 'file')), false)
-    assert.equal(pageUrlsEndWithSlash(astro('always', 'file')), true)
-    assert.equal(pageUrlsEndWithSlash(astro('never', 'directory')), false)
 })

@@ -4,9 +4,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
+import { rehypeLinks } from '@jaamd/site/link-plugins.ts'
 import { resolveConfig } from '../../src/config.ts'
 import { findAliases } from '../../src/docs/integration.ts'
-import { rehypeDocLinks } from '../../src/docs/link-plugins.ts'
 import { resolveDocLink } from '../../src/docs/links.ts'
 import { collectionIdFor } from '../../src/docs/model/ids.ts'
 import { buildDocsTree } from '../../src/docs/model/tree.ts'
@@ -363,7 +363,10 @@ test('the rehype plugin rewrites the links of a tree', () => {
                 return { docsBase: '' }
             },
         }
-        rehypeDocLinks(context)()(tree, { path: join(root, 'docs', '01-intro.md') })
+        const plugin = rehypeLinks('jaad-doc-links', (href, from) => {
+            return resolveDocLink(href, from, context)
+        })
+        plugin()(tree, { path: join(root, 'docs', '01-intro.md') })
 
         assert.deepEqual(
             tree.children[0].children.map((node) => {

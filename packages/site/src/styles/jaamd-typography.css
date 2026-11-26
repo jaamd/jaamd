@@ -1,4 +1,4 @@
-/* Bridge to JAAMD. */
+/* The type of the Markdown JAAMD renders, on the site's fonts. */
 
 :root {
     --jaamd-font-sans: var(--font-sans);

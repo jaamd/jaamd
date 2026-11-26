@@ -137,6 +137,18 @@ export function editBaseFrom(repo: RepoInfo, docsDir: string): string | null {
     return EDIT_PATTERNS[forge](repo.url, repo.branch, path)
 }
 
+/** Where the files of `dir` are edited: the `editLink` given as a URL, or
+ *  the one inferred from the repository; null when off or unknown. */
+export function resolveEditBase(editLink: boolean | string, repo: RepoInfo | null, dir: string): string | null {
+    if (typeof editLink === 'string') {
+        return editLink
+    }
+    if (!editLink || !repo) {
+        return null
+    }
+    return editBaseFrom(repo, dir)
+}
+
 /** `:path` is substituted when present, otherwise the file is appended. */
 export function editUrl(base: string, filePath: string): string {
     return base.includes(':path') ? base.replace(':path', filePath) : base.replace(/\/?$/, '/') + filePath

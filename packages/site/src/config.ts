@@ -123,6 +123,18 @@ const siteConfigSchema = z.object(siteConfigShape)
 
 export type SiteConfig = z.output<typeof siteConfigSchema>
 
+/** The options of a package's config that are the site's, shared with every
+ *  package on it: the keys of `siteConfigShape`, so a new one needs no other change. */
+export function siteOptionsOf(config: SiteConfig): SiteConfig {
+    const options: Record<string, unknown> = {}
+    for (const key of Object.keys(siteConfigShape)) {
+        if (key in config) {
+            options[key] = config[key as keyof SiteConfig]
+        }
+    }
+    return options as SiteConfig
+}
+
 /** The site options plus what the project could tell. Inferred fields are null
  *  when unavailable. */
 export interface SiteResolvedConfig extends SiteConfig {

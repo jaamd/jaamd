@@ -14,15 +14,6 @@ export interface DocsUrlOptions {
     trailingSlash?: boolean
 }
 
-/** Whether Astro builds page urls with a trailing slash: always with
- *  `trailingSlash: 'always'`, and with `'ignore'` when every page is a directory. */
-export function pageUrlsEndWithSlash(astro: { trailingSlash: string; build: { format: string } }): boolean {
-    if (astro.trailingSlash === 'always') {
-        return true
-    }
-    return astro.trailingSlash === 'ignore' && astro.build.format === 'directory'
-}
-
 /** Public href for a documentation page. Empty slug means the opening page. */
 export function docsPageHref(slug: string, urls: DocsUrlOptions): string {
     const mount = normaliseBasePath(urls.docsBase)

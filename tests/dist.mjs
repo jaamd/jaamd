@@ -76,3 +76,57 @@ export function brokenLinks(dist) {
         })
     return [...new Set(broken)]
 }
+
+export const escapeClass = (cls) => {
+    return cls.replace(/[.:/[\]%()!,#]/g, (c) => {
+        return '\\' + c
+    })
+}
+
+const QUOTED = /(["'])([^"']+)\1/g
+
+/** Every class the `.astro` files under `srcDir` write, in markup and scripts alike. */
+export function packageClasses(srcDir) {
+    const classes = new Set()
+    const add = (value) => {
+        for (const token of value.split(/\s+/)) {
+            if (token) {
+                classes.add(token)
+            }
+        }
+    }
+    for (const file of walk(srcDir).filter((f) => {
+        return f.endsWith('.astro')
+    })) {
+        const source = readFileSync(file, 'utf8')
+        // Either quote, in markup, expressions and scripts alike.
+        for (const m of source.matchAll(/\bclass(?:Name)?=(["'])([^"'{}]+)\1/g)) {
+            add(m[2])
+        }
+        for (const m of source.matchAll(/\bclass=\{([^}]*)\}/g)) {
+            for (const lit of m[1].matchAll(QUOTED)) {
+                add(lit[2])
+            }
+        }
+        for (const m of source.matchAll(/\bclass:list=\{\[([^\]]*)\]\}/g)) {
+            for (const lit of m[1].matchAll(QUOTED)) {
+                add(lit[2])
+            }
+        }
+        for (const m of source.matchAll(
+            /\.(?:className\s*=|classList\.(?:add|remove|toggle)\()\s*(["'`])([^"'`$]+)\1/g,
+        )) {
+            add(m[2])
+        }
+    }
+    return classes
+}
+
+/** The classes no rule of `css` selects, sorted. */
+export function missingFrom(css, classes) {
+    return [...classes]
+        .filter((c) => {
+            return !css.includes('.' + escapeClass(c))
+        })
+        .toSorted()
+}
