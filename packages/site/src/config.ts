@@ -7,7 +7,7 @@ import { z } from 'astro/zod'
 import { inferDescription, type RepoInfo } from './infer.ts'
 import { isLocale } from './locales.ts'
 import { toProjectPaths, type ProjectPaths } from './paths.ts'
-import { PRESETS, PRESET_NAMES, isPreset } from './themes.ts'
+import { PRESET_NAMES, isPreset, presetOf } from './themes.ts'
 import { UI_KEYS } from './ui.ts'
 
 /** A BCP 47 tag `Intl` accepts: "en_US" is not one, and would throw when a date is formatted. */
@@ -194,7 +194,7 @@ function findPublicAsset(publicDir: string, candidates: string[]): string | null
 
 /** What jaamd gets for code blocks: a preset's Shiki theme, or the pair given. */
 export function shikiTheme(config: Pick<SiteConfig, 'theme'>): SiteResolvedConfig['shiki'] {
-    return typeof config.theme === 'string' ? PRESETS[config.theme].shiki : config.theme
+    return typeof config.theme === 'string' ? presetOf(config.theme).shiki : config.theme
 }
 
 /** The fields the site derives from its options and the project. */
@@ -229,7 +229,7 @@ export function resolveStylesheets(
     tailwind: string | null
 } {
     const userCss = join(toProjectPaths(project).srcDir, 'jaad.css')
-    const slug = typeof config.theme === 'string' ? PRESETS[config.theme].theme : null
+    const slug = typeof config.theme === 'string' ? presetOf(config.theme).theme : null
 
     return {
         user: existsSync(userCss) ? userCss : null,

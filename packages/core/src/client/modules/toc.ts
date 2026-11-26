@@ -50,12 +50,13 @@ export function initToc(root: ParentNode, options: TocOptions = {}): () => void 
             }
         })
 
-        if (links.size === 0) {
-            continue
-        }
-
         const visible = new Set<Element>()
         const order = [...links.keys()]
+        const firstHeading = order[0]
+        // No link found its heading: nothing to light up.
+        if (firstHeading === undefined) {
+            continue
+        }
 
         const setCurrent = (target: Element | null) => {
             links.forEach((link, key) => {
@@ -88,7 +89,7 @@ export function initToc(root: ParentNode, options: TocOptions = {}): () => void 
             },
             {
                 // Band from where an anchored heading rests down to 30% of the viewport.
-                rootMargin: `-${scrollMarginTop(order[0])}px 0px -70% 0px`,
+                rootMargin: `-${scrollMarginTop(firstHeading)}px 0px -70% 0px`,
             },
         )
 

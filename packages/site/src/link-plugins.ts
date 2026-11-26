@@ -96,7 +96,7 @@ export function markdownLinkTarget(href: string, fromFile: string): { file: stri
         return null
     }
 
-    const [path, hash = ''] = href.split('#', 2)
+    const [path = '', hash = ''] = href.split('#', 2)
     if (!path.endsWith('.md')) {
         return null
     }

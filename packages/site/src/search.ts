@@ -224,7 +224,7 @@ export function search(index: SearchIndex, query: string, section?: string): Sea
     const groups = new Map<number, SearchGroup>()
     for (const entry of index.entries) {
         const page = index.pages[entry.page]
-        if (section && page.section !== section) {
+        if (page === undefined || (section && page.section !== section)) {
             continue
         }
 

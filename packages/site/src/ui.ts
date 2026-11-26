@@ -16,7 +16,7 @@ export const UI_CATALOGS = {
 
 function localeCandidates(locale: string): string[] {
     const exact = locale.toLowerCase()
-    const base = exact.split('-', 1)[0]
+    const base = exact.split('-', 1)[0] ?? exact
     return exact === base ? [exact] : [exact, base]
 }
 

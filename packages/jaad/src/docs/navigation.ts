@@ -80,7 +80,7 @@ export function buildDocsNavigation(
                       ...groupBySection(items, sections),
                   ]
                 : groupByChapter(items),
-        previousPage: position > 0 ? items[position - 1] : null,
-        nextPage: position >= 0 && position < items.length - 1 ? items[position + 1] : null,
+        previousPage: position > 0 ? (items[position - 1] ?? null) : null,
+        nextPage: position >= 0 ? (items[position + 1] ?? null) : null,
     }
 }

@@ -5,14 +5,14 @@ import { parse as parseYaml } from 'yaml'
  *  not parse: the collection reports that error when it loads the file. Dates
  *  stay as written, since YAML's core schema has no timestamps. */
 export function readFrontmatter(source: string): Record<string, unknown> {
-    const block = /^﻿?---\r?\n([\s\S]*?)\r?\n---/.exec(source)
-    if (!block) {
+    const yaml = /^﻿?---\r?\n([\s\S]*?)\r?\n---/.exec(source)?.[1]
+    if (yaml === undefined) {
         return {}
     }
 
     let data: unknown
     try {
-        data = parseYaml(block[1])
+        data = parseYaml(yaml)
     } catch {
         return {}
     }

@@ -3,10 +3,10 @@ import { ui } from '../runtime.ts'
 
 interface Props {
     /** The page's own Markdown, fetched by "Copy page"; without one, the button is left out. */
-    markdownHref?: string
+    markdownHref?: string | undefined
     /** Where the page's source is edited, or null to leave the link out. */
     editHref: string | null
-    locale?: string
+    locale?: string | undefined
 }
 
 const { markdownHref, editHref, locale } = Astro.props

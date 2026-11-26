@@ -5,9 +5,9 @@ export interface SocialLink {
     href: string
     label: string
     /** Bundled forge icon. */
-    path?: string
+    path?: string | undefined
     /** User-supplied markup, which wins over the bundled icon. */
-    svg?: string
+    svg?: string | undefined
 }
 
 /** The configured links, plus the inferred repository unless already listed. */
@@ -19,11 +19,7 @@ export function buildSocialLinks(config: SiteResolvedConfig): SocialLink[] {
         const forge = FORGES[key]
         links.push({
             href: entry.href,
-            label:
-                // FORGES has no index signature guarantee: a missing key is undefined.
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                ('label' in entry ? entry.label : undefined) ?? forge?.label ?? key,
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            label: ('label' in entry ? entry.label : undefined) ?? forge?.label ?? key,
             path: forge?.path,
             svg: 'svg' in entry ? entry.svg : undefined,
         })
@@ -40,11 +36,12 @@ export function buildSocialLinks(config: SiteResolvedConfig): SocialLink[] {
             return l.href === config.repoUrl
         })
     ) {
-        const forge = forgeForUrl(config.repoUrl)
+        const name = forgeForUrl(config.repoUrl)
+        const forge = name ? FORGES[name] : undefined
         links.push({
             href: config.repoUrl,
-            label: forge ? FORGES[forge].label : 'Repository',
-            path: forge ? FORGES[forge].path : undefined,
+            label: forge?.label ?? 'Repository',
+            path: forge?.path,
         })
     }
 

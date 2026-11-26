@@ -92,8 +92,9 @@ function assertSeparateRoots(roots: DocsRoot[], cwd: string): void {
         return root.dir + sep
     })
     const nested = roots.filter((_, at) => {
+        const own = paths[at] ?? ''
         return paths.some((other, from) => {
-            return from !== at && paths[at].startsWith(other)
+            return from !== at && own.startsWith(other)
         })
     })
     if (nested.length === 0) {
@@ -168,7 +169,7 @@ function resolveLocales(config: DocsConfig, lang: string, roots: DocsRoot[]): st
     const perRoot = roots.map((root) => {
         return resolveLocalesIn(root.dir, config, lang)
     })
-    const [first, ...rest] = perRoot
+    const [first = [], ...rest] = perRoot
     const differing = rest.find((locales) => {
         return locales.join() !== first.join()
     })

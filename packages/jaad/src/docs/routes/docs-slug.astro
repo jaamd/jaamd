@@ -7,7 +7,7 @@ import DocsPage from '../components/DocsPage.astro'
 
 interface DocsPath {
     params: { slug: string }
-    props: { id: string; locale?: string }
+    props: { id: string; locale?: string | undefined }
 }
 
 export async function getStaticPaths() {

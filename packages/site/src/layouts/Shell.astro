@@ -8,17 +8,17 @@ import Header from '../components/Header.astro'
 // the project's, so a project's CSS comes last.
 
 interface Props {
-    title?: string
-    description?: string
-    bare?: boolean
+    title?: string | undefined
+    description?: string | undefined
+    bare?: boolean | undefined
     /** Added to the body. */
-    class?: string
+    class?: string | undefined
     /** What the header offers: translations and search. */
     header: ComponentProps<typeof Header>
     /** The page's own metadata, past its title and description. */
-    head?: Omit<ComponentProps<typeof Head>, 'title' | 'description'>
+    head?: Omit<ComponentProps<typeof Head>, 'title' | 'description'> | undefined
     /** False when the page sets the footer in its own column. */
-    footer?: boolean
+    footer?: boolean | undefined
 }
 
 const { title, description, bare = false, class: className, header, head, footer = true } = Astro.props

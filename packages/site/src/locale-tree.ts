@@ -27,7 +27,7 @@ export function detectLocales(docsDir: string, lang: string): string[] {
             return a.code.localeCompare(b.code)
         })
 
-    const localised = candidates.length >= 2 || (candidates.length === 1 && candidates[0].code === lang.toLowerCase())
+    const localised = candidates.length >= 2 || (candidates.length === 1 && candidates[0]?.code === lang.toLowerCase())
     if (!localised) {
         return []
     }

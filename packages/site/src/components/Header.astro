@@ -12,7 +12,7 @@ import SocialLinks from './SocialLinks.astro'
 import ThemeSwitcher from './ThemeSwitcher.astro'
 
 interface Props {
-    locale?: string
+    locale?: string | undefined
     /** The page in every locale, for the switcher. */
     alternates: LocaleAlternate[]
     /** Left out on pages no search index covers. */

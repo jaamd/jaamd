@@ -8,13 +8,13 @@ import { docsPageHref } from '../urls.ts'
 interface Props {
     title: string
     description: string
-    chapter?: string
-    keywords?: string[]
-    author?: string
-    modified?: Date
+    chapter?: string | undefined
+    keywords?: string[] | undefined
+    author?: string | undefined
+    modified?: Date | undefined
     /** BCP-47 tag of this page's locale. */
-    language?: string
-    locale?: string
+    language?: string | undefined
+    locale?: string | undefined
 }
 
 const { chapter, locale, ...page } = Astro.props

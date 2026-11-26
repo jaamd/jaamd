@@ -13,11 +13,11 @@ import { remarkSpoiler } from './spoiler.ts'
 import { remarkToc } from './toc.ts'
 
 export interface UnifiedOptions {
-    features?: Features
-    labels?: Partial<Labels>
+    features?: Features | undefined
+    labels?: Partial<Labels> | undefined
     /** The plugin that gives headings their ids, placed before the links that
      *  read them. Without one, only headings that already have an id get a link. */
-    headingIds?: Pluggable
+    headingIds?: Pluggable | undefined
 }
 
 /** JAAMD's plugins for a unified processor, in the order they have to run. */

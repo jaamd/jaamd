@@ -5,13 +5,13 @@ export interface DocsUrlOptions {
     /** routeBase, normalised here: empty at the application root. */
     docsBase: string
     /** Astro's deployment base. */
-    deploymentBase?: string
+    deploymentBase?: string | undefined
     /** Locale of the page, when the docs are localised. */
-    locale?: string
+    locale?: string | undefined
     /** The one locale that owns the unprefixed urls. */
-    defaultLocale?: string
+    defaultLocale?: string | undefined
     /** Page urls end with a slash, as Astro builds them. */
-    trailingSlash?: boolean
+    trailingSlash?: boolean | undefined
 }
 
 /** Public href for a documentation page. Empty slug means the opening page. */

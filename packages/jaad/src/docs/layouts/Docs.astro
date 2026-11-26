@@ -30,9 +30,9 @@ import 'virtual:jaad/tailwind.css'
 
 interface Props {
     /** The `<title>` before the site name. Left out on the opening page. */
-    title?: string
+    title?: string | undefined
     page: DocsPage<DocsSourceEntry>
-    headings?: DocsHeading[]
+    headings?: DocsHeading[] | undefined
     navigation: DocsNavigation
 }
 

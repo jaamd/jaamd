@@ -16,7 +16,7 @@ const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '
 /** Text safe inside HTML, attribute values included. */
 export function escapeHtml(text: string): string {
     return text.replace(/[&<>"']/g, (character) => {
-        return HTML_ESCAPES[character]
+        return HTML_ESCAPES[character] ?? character
     })
 }
 

@@ -4,9 +4,9 @@ export interface BlogUrlOptions {
     /** routeBase, normalised here: empty at the application root. */
     base: string
     /** Astro's deployment base. */
-    deploymentBase?: string
+    deploymentBase?: string | undefined
     /** Page urls end with a slash, as Astro builds them. */
-    trailingSlash?: boolean
+    trailingSlash?: boolean | undefined
 }
 
 /** Public href for a page of the blog: a post's slug, `page/2`, or empty for the index. */

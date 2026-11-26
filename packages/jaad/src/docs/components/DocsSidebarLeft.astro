@@ -5,7 +5,7 @@ import DocsNavTree from './DocsNavTree.astro'
 
 interface Props {
     groups: DocsNavGroup[]
-    locale?: string
+    locale?: string | undefined
 }
 
 const { groups, locale } = Astro.props

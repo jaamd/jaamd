@@ -6,7 +6,7 @@ import { slugToTitle } from '../model/ids.ts'
 import DocsNavTree from './DocsNavTree.astro'
 
 interface Props {
-    locale?: string
+    locale?: string | undefined
     groups: DocsNavGroup[]
     headings: DocsHeading[]
 }

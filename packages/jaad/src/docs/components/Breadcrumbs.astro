@@ -5,9 +5,9 @@ import { formatChapterTitle } from '../model/ids.ts'
 
 interface Props {
     /** The key of the section the page belongs to. */
-    section?: string
-    chapter?: string
-    locale?: string
+    section?: string | undefined
+    chapter?: string | undefined
+    locale?: string | undefined
 }
 
 const { section, chapter, locale } = Astro.props

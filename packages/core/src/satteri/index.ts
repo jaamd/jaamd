@@ -42,14 +42,14 @@ export function satteriAlert(): MdastPluginDefinition {
                 return
             }
 
-            const [first, second] = paragraph.children
-            const alertType = found.match[1].toLowerCase()
+            const { first, second } = found
+            const alertType = found.type
 
             if (found.emptiesParagraph) {
                 ctx.removeNode(paragraph)
             } else if (found.rest === null) {
                 ctx.removeNode(first)
-                if (found.dropsBreak) {
+                if (found.dropsBreak && second) {
                     ctx.removeNode(second)
                 }
             } else if (first.type === 'text') {
@@ -170,7 +170,7 @@ export function satteriSpoiler(): MdastPluginDefinition {
     }
 }
 
-function isClaimed(node: { data?: object | null }): boolean {
+function isClaimed(node: { data?: object | null | undefined }): boolean {
     return !!node.data && 'hName' in node.data
 }
 
@@ -227,9 +227,9 @@ export type HeadingText = (node: HastNode, ctx: HastVisitorContext) => string
 
 export interface SatteriHeadingLinksOptions {
     /** The plugin that gives headings their ids, run first. */
-    ids?: HastPluginEntry
+    ids?: HastPluginEntry | undefined
     /** Reads a heading's text. The node's text content by default. */
-    text?: HeadingText
+    text?: HeadingText | undefined
     /** Prefix of the anchor's name: "Link to section: Setup". */
     label?: string
 }
@@ -262,12 +262,12 @@ export function satteriHeadingLinks(options: SatteriHeadingLinksOptions = {}): H
 }
 
 export interface SatteriOptions {
-    features?: Features
-    labels?: Partial<Labels>
+    features?: Features | undefined
+    labels?: Partial<Labels> | undefined
     /** The plugin that gives headings their ids. Without one, only headings
      *  that already have an id get a link. */
-    headingIds?: HastPluginEntry
-    headingText?: HeadingText
+    headingIds?: HastPluginEntry | undefined
+    headingText?: HeadingText | undefined
 }
 
 /** JAAMD's plugins for Sätteri, in the order they have to run, and the parser

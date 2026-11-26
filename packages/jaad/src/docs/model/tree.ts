@@ -12,11 +12,11 @@ export interface DocsSource {
     /** The id without its locale and its section. */
     path: string
     /** Set when the docs are localised. */
-    locale?: string
+    locale?: string | undefined
     /** Set when the docs are split into sections. */
-    section?: string
+    section?: string | undefined
     data: Partial<DocsPageData>
-    rendered?: RenderedMarkdown
+    rendered?: RenderedMarkdown | undefined
 }
 
 /** A page with everything its file, its frontmatter and its place in the docs decide. */
@@ -25,10 +25,10 @@ export interface DocsPage<S extends DocsSource = DocsSource> {
     source: S
     id: string
     path: string
-    locale?: string
-    section?: string
+    locale?: string | undefined
+    section?: string | undefined
     /** The chapter directory, without its order prefix. */
-    chapter?: string
+    chapter?: string | undefined
     data: S['data']
     /** The named url below the docs mount: its section, then its clean path. */
     slug: string
@@ -129,7 +129,7 @@ export function buildDocsTree<S extends DocsSource>(sources: S[], options: DocsT
         const parsed = parseDocPath(source.path)
         const slug = namedSlug(source.path, source.section)
         const canonical =
-            index === 0 ? '' : source.section && sorted[index - 1].section !== source.section ? source.section : slug
+            index === 0 ? '' : source.section && sorted[index - 1]?.section !== source.section ? source.section : slug
         const title = source.data.title ?? renderedTitle(source.rendered) ?? slugToTitle(parsed.slug)
 
         return {

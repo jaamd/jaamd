@@ -7,7 +7,7 @@ import { pageMarkdown } from '../endpoints.ts'
 export const getStaticPaths: GetStaticPaths = async () => {
     const paths: {
         params: { slug: string }
-        props: { id: string; locale?: string }
+        props: { id: string; locale?: string | undefined }
     }[] = []
 
     for (const locale of buildLocales()) {

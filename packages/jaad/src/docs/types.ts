@@ -3,8 +3,8 @@ import type { PageHeading, RenderedMarkdown } from '@jaamd/site/rendered.ts'
 export interface DocsNavItem {
     title: string
     /** Set when the docs are split into sections. */
-    section?: string
-    chapter?: string
+    section?: string | undefined
+    chapter?: string | undefined
     href: string
     isActive: boolean
 }

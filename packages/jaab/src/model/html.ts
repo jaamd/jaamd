@@ -19,7 +19,7 @@ export function absoluteUrls(html: string, origin: string): string {
         })
         .replace(/\bsrcset="([^"]*)"/g, (_, list: string) => {
             const candidates = list.split(',').map((candidate) => {
-                const [url, ...descriptor] = candidate.trim().split(/\s+/)
+                const [url = '', ...descriptor] = candidate.trim().split(/\s+/)
                 return [absolute(url), ...descriptor].join(' ')
             })
             return `srcset="${candidates.join(', ')}"`

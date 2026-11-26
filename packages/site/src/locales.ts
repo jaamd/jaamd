@@ -127,18 +127,39 @@ export interface LocaleAlternate {
     translated: boolean
 }
 
+interface LocaleParts {
+    language: string
+    script: string | undefined
+    region: string | undefined
+}
+
+/** The parts of a locale code, lower case; null when it is none. */
+function localeParts(code: string): LocaleParts | null {
+    const match = LOCALE_RE.exec(code.toLowerCase())
+    const language = match?.[1]
+    if (!match || language === undefined) {
+        return null
+    }
+    return { language, script: match[2], region: match[3] }
+}
+
+/** The region a code names, upper case, else where its language is most at home. */
+function regionOf({ language, region }: LocaleParts): string | undefined {
+    return region?.toUpperCase() ?? LANGUAGE_REGION[language]
+}
+
 export function isLocale(segment: string): boolean {
-    const match = LOCALE_RE.exec(segment.toLowerCase())
-    return match !== null && LANGUAGES.has(match[1])
+    const parts = localeParts(segment)
+    return parts !== null && LANGUAGES.has(parts.language)
 }
 
 /** "pt-br" becomes "pt-BR", "zh-hans" becomes "zh-Hans". */
 export function localeTag(code: string): string {
-    const match = LOCALE_RE.exec(code.toLowerCase())
-    if (!match) {
+    const parts = localeParts(code)
+    if (!parts) {
         return code
     }
-    const [, language, script, region] = match
+    const { language, script, region } = parts
     return [language, script && ucfirst(script), region && region.toUpperCase()].filter(Boolean).join('-')
 }
 
@@ -153,13 +174,8 @@ function localeName(tag: string): string {
 
 /** Regional indicators, A at U+1F1E6. */
 function localeFlag(code: string): string | null {
-    const match = LOCALE_RE.exec(code.toLowerCase())
-    if (!match) {
-        return null
-    }
-    // A group that did not participate is undefined, whatever the type says.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    const region = match[3]?.toUpperCase() ?? LANGUAGE_REGION[match[1]]
+    const parts = localeParts(code)
+    const region = parts ? regionOf(parts) : undefined
     if (!region) {
         return null
     }
@@ -173,15 +189,13 @@ function localeFlag(code: string): string | null {
 /** Open Graph wants language_TERRITORY, not a BCP-47 tag. The territory comes
  *  from the code when it names one, and from LANGUAGE_REGION otherwise. */
 export function openGraphLocale(code: string): string {
-    const match = LOCALE_RE.exec(code.toLowerCase())
-    if (!match) {
+    const parts = localeParts(code)
+    if (!parts) {
         return code
     }
 
-    const language = match[1]
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    const region = match[3]?.toUpperCase() ?? LANGUAGE_REGION[language]
-    return region ? `${language}_${region}` : language
+    const region = regionOf(parts)
+    return region ? `${parts.language}_${region}` : parts.language
 }
 
 export function describeLocale(code: string): Locale {
