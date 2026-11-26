@@ -14,3 +14,14 @@ export function jaamdOverride() {
     }
     return packed
 }
+
+/** A project's tsconfig as strict as Astro's presets go: the published sources
+ *  are type-checked with the project's own options, not the package's. */
+export const STRICTEST_TSCONFIG = `${JSON.stringify(
+    { extends: 'astro/tsconfigs/strictest', include: ['.astro/types.d.ts', '**/*'], exclude: ['dist'] },
+    null,
+    4,
+)}\n`
+
+/** The TypeScript a project type-checks with. */
+export const TYPESCRIPT = { typescript: '^6.0.0' }

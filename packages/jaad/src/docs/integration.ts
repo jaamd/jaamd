@@ -39,7 +39,7 @@ function docsFrameVirtualPlugin(docsFrame: () => string) {
 
 /** A named url that redirects to its page's canonical one. */
 export interface DocsAlias {
-    locale?: string
+    locale?: string | undefined
     slug: string
     canonical: string
 }
@@ -89,7 +89,7 @@ function readDocsTrees(
                     path: id,
                     locale: locale ?? undefined,
                     section: root.section,
-                    data: { order: front.order },
+                    data: front.order === undefined ? {} : { order: front.order },
                 })
             }
         }

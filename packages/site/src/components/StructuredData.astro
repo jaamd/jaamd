@@ -1,28 +1,9 @@
 ---
+import type { StructuredDataProps } from '../structured-data.ts'
 import config from 'virtual:jaamd/site'
 import { scriptJson } from '../helpers.ts'
 
-/** A step of the page's breadcrumb; one without a url is a label only. */
-export interface Crumb {
-    name: string
-    url: string | null
-}
-
-interface Props {
-    /** The schema.org type of the page, as `TechArticle`. */
-    type: string
-    title: string
-    description: string
-    /** From the site's home to the page itself. */
-    crumbs: Crumb[]
-    keywords?: string[]
-    /** One name, or several. */
-    author?: string | string[]
-    published?: Date
-    modified?: Date
-    /** BCP-47 tag of this page's locale. */
-    language?: string
-}
+type Props = StructuredDataProps
 
 const {
     type,

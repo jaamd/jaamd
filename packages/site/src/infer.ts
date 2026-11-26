@@ -120,7 +120,7 @@ function editForge(url: string): string | null {
     const named = Object.keys(EDIT_PATTERN_OF).find((forge) => {
         return host.startsWith(`${forge}.`)
     })
-    return named ? EDIT_PATTERN_OF[named] : null
+    return named ? (EDIT_PATTERN_OF[named] ?? null) : null
 }
 
 /** Ends in a slash, or holds `:path`. `docsDir` resolves against the repository
@@ -128,13 +128,14 @@ function editForge(url: string): string | null {
  *  correctly. Null when the forge or the branch is unknown. */
 export function editBaseFrom(repo: RepoInfo, docsDir: string): string | null {
     const forge = editForge(repo.url)
-    if (!forge || !repo.branch) {
+    const pattern = forge ? EDIT_PATTERNS[forge] : undefined
+    if (!pattern || !repo.branch) {
         return null
     }
 
     // Normalised: a section can sit outside the project, as `../packages/x/docs`.
     const path = posix.normalize(`${repo.prefix}${docsDir}`).replace(/^\/+|\/+$/g, '')
-    return EDIT_PATTERNS[forge](repo.url, repo.branch, path)
+    return pattern(repo.url, repo.branch, path)
 }
 
 /** Where the files of `dir` are edited: the `editLink` given as a URL, or

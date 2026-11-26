@@ -11,21 +11,22 @@ export interface ParsedDocPath {
     slug: string
     order: number
     /** The chapter directory without its order prefix. */
-    chapter?: string
-    orderChapter?: number
+    chapter?: string | undefined
+    orderChapter?: number | undefined
 }
 
 export function parseDocPath(path: string): ParsedDocPath {
     const parts = path.split('/')
-    const name = NUMBERED_PREFIX_RE.exec(parts[parts.length - 1])
-    const directory = parts.length >= 2 ? parts[parts.length - 2] : undefined
-    const chapter = directory ? NUMBERED_PREFIX_RE.exec(directory) : null
+    const file = parts.at(-1) ?? ''
+    const directory = parts.length >= 2 ? parts.at(-2) : undefined
+    const [, fileOrder, fileName] = NUMBERED_PREFIX_RE.exec(file) ?? []
+    const [, chapterOrder, chapterName] = (directory && NUMBERED_PREFIX_RE.exec(directory)) || []
 
     return {
-        slug: name ? name[2] : parts[parts.length - 1],
-        order: name ? parseInt(name[1], 10) : 999,
-        chapter: chapter ? chapter[2] : directory,
-        orderChapter: chapter ? parseInt(chapter[1], 10) : undefined,
+        slug: fileName ?? file,
+        order: fileOrder ? parseInt(fileOrder, 10) : 999,
+        chapter: chapterName ?? directory,
+        orderChapter: chapterOrder ? parseInt(chapterOrder, 10) : undefined,
     }
 }
 

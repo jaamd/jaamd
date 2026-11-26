@@ -28,3 +28,12 @@ export const PRESET_NAMES = Object.keys(PRESETS)
 export const isPreset = (value: string): boolean => {
     return value in PRESETS
 }
+
+/** The preset `name`, which the config's schema has already checked. */
+export function presetOf(name: string): Preset {
+    const preset = PRESETS[name]
+    if (preset === undefined) {
+        throw new Error(`jaamd: unknown theme "${name}"; available: ${PRESET_NAMES.join(', ')}`)
+    }
+    return preset
+}

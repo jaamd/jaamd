@@ -1,4 +1,5 @@
 ---
+import type { MetaProps } from '../meta.ts'
 import config from 'virtual:jaamd/site'
 import { openGraphLocale } from '../locales.ts'
 import { withDeploymentBase } from '../urls.ts'
@@ -7,25 +8,7 @@ import { withDeploymentBase } from '../urls.ts'
  *  description, canonical, alternates, feeds, Open Graph and Twitter. Every
  *  page of the shell has it through `Head`; a layout of a project's own can
  *  put it in its `<head>` alone. */
-interface Props {
-    title: string
-    description: string
-    /** Page frontmatter; each field overrides the site's. */
-    keywords?: string[]
-    author?: string
-    image?: string | false
-    modified?: Date
-    /** BCP-47 tag of this page's locale. */
-    language?: string
-    /** Every locale that has this page, for hreflang and og:locale:alternate. */
-    alternates?: { code: string; tag: string; href: string }[]
-    /** Where a reader with no matching language should land. */
-    xDefault?: string
-    /** The page as Markdown, announced to agents. */
-    markdown?: string
-    /** A dated piece, such as a post: the page is an Open Graph article. */
-    article?: { published: Date; tags: string[] }
-}
+type Props = MetaProps
 
 const {
     title,

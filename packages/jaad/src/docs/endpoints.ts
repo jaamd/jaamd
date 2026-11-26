@@ -1,3 +1,5 @@
+/// <reference path="../env.d.ts" />
+
 import type { DocsSourceEntry } from './collection.ts'
 import type { DocsPage } from './model/tree.ts'
 import type { FullPage } from '@jaamd/site/llms.ts'

@@ -5,7 +5,7 @@
 /** The quality of `type` in an Accept header, 0 when absent. */
 export function quality(accept: string, type: string): number {
     for (const part of accept.split(',')) {
-        const [media, ...params] = part.split(';').map((piece) => {
+        const [media = '', ...params] = part.split(';').map((piece) => {
             return piece.trim()
         })
         if (media.toLowerCase() !== type) {
@@ -40,8 +40,9 @@ export function prefersMarkdown(request: Request): boolean {
  */
 export function markdownPathFor(pathname: string, openers: Record<string, string> = {}): string | null {
     const path = pathname.replace(/\/+$/, '') || '/'
-    if (path in openers) {
-        return openers[path]
+    const opener = openers[path]
+    if (opener !== undefined) {
+        return opener
     }
 
     const last = path.slice(path.lastIndexOf('/'))

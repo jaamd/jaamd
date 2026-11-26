@@ -21,8 +21,14 @@ interface InlineNode {
     value?: string
 }
 
-export interface AlertMarker {
-    match: RegExpMatchArray
+export interface AlertMarker<Node extends InlineNode = InlineNode> {
+    /** The alert's type, lower case: `note`, `tip`, `important`, `warning`, `caution`. */
+    type: string
+    /** What a legacy marker writes after its slash, as `[!NOTE/Heads up]`; none otherwise. */
+    title: string | undefined
+    /** The text node the marker opens, and the node after it. */
+    first: Node
+    second: Node | undefined
     /** What the first text node keeps once the marker line is gone, or null
      *  when the marker was all of it. */
     rest: string | null
@@ -36,21 +42,26 @@ export interface AlertMarker {
  * The marker a blockquote's first paragraph opens with. As on GitHub, it must
  * be alone on its line: `> [!NOTE] text` stays a plain blockquote.
  */
-export function readAlertMarker(children: readonly InlineNode[], marker: RegExp = ALERT_MARKER): AlertMarker | null {
+export function readAlertMarker<Node extends InlineNode>(
+    children: readonly Node[],
+    marker: RegExp = ALERT_MARKER,
+): AlertMarker<Node> | null {
     const [first, second] = children
     if (first?.type !== 'text' || first.value === undefined) {
         return null
     }
 
     const match = first.value.match(marker)
-    if (!match) {
+    const type = match?.[1]
+    if (!match || type === undefined) {
         return null
     }
+    const found = { type: type.toLowerCase(), title: match[2], first, second }
 
     const afterMarker = first.value.slice(match[0].length)
     const lineEnd = /^[ \t]*\n/.exec(afterMarker)
     if (lineEnd) {
-        return { match, rest: afterMarker.slice(lineEnd[0].length), dropsBreak: false, emptiesParagraph: false }
+        return { ...found, rest: afterMarker.slice(lineEnd[0].length), dropsBreak: false, emptiesParagraph: false }
     }
 
     if (afterMarker.trim() !== '') {
@@ -59,10 +70,10 @@ export function readAlertMarker(children: readonly InlineNode[], marker: RegExp 
 
     // The marker filled the text node: the line ends with the paragraph or a hard break.
     if (second === undefined) {
-        return { match, rest: null, dropsBreak: false, emptiesParagraph: true }
+        return { ...found, rest: null, dropsBreak: false, emptiesParagraph: true }
     }
     if (second.type === 'break') {
-        return { match, rest: null, dropsBreak: true, emptiesParagraph: children.length === 2 }
+        return { ...found, rest: null, dropsBreak: true, emptiesParagraph: children.length === 2 }
     }
     return null
 }
@@ -137,7 +148,10 @@ export function splitCodeTabMeta(meta: string | null | undefined): { label: stri
 }
 
 /** Tab label: the meta's label, then language, then "Tab N". */
-export function codeTabLabel(code: { meta?: string | null; lang?: string | null }, i: number): string {
+export function codeTabLabel(
+    code: { meta?: string | null | undefined; lang?: string | null | undefined },
+    i: number,
+): string {
     return splitCodeTabMeta(code.meta).label || code.lang || `Tab ${i + 1}`
 }
 

@@ -119,8 +119,11 @@ class SiteSearch extends HTMLElement {
         } else if (e.key === 'ArrowUp') {
             e.preventDefault()
             this.#select(Math.max(this.#selected - 1, 0))
-        } else if (e.key === 'Enter' && this.#options[this.#selected]) {
-            this.#go(this.#options[this.#selected].href)
+        } else if (e.key === 'Enter') {
+            const option = this.#options[this.#selected]
+            if (option) {
+                this.#go(option.href)
+            }
         }
     }
 
@@ -184,7 +187,11 @@ class SiteSearch extends HTMLElement {
 
     /** One button per section, after "All"; none with fewer than two. */
     #renderFilters(index: SearchIndex) {
-        const [all] = this.#filters.querySelectorAll('[data-filter]')
+        // "All" is in the markup: the sections' buttons follow it.
+        const all = this.#filters.querySelector('[data-filter]')
+        if (!all) {
+            return
+        }
         this.#filters.replaceChildren(all)
         this.#filters.hidden = index.sections.length < 2
         for (const { key, label } of index.sections) {

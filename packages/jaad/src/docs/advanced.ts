@@ -10,8 +10,8 @@ export interface DocsFrameProps {
         slug: string
         title: string
         /** Set when the docs are split into sections. */
-        section?: string
-        chapter?: string
+        section?: string | undefined
+        chapter?: string | undefined
         /** Raw frontmatter. */
         data: DocsPageData
     }

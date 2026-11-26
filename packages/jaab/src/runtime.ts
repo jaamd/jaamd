@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import type { BlogUrlOptions } from './urls.ts'
 import config from 'virtual:jaab/config'
 

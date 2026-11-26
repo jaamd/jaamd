@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import type { BlogPost } from './posts.ts'
 import type { FullPage } from '@jaamd/site/llms.ts'
 import type { MarkdownExportContext } from '@jaamd/site/markdown-export.ts'
@@ -9,7 +11,6 @@ import { render } from 'astro:content'
 import config from 'virtual:jaab/config'
 import { absoluteUrls, withoutTitle } from './model/html.ts'
 import { getPosts } from './posts.ts'
-import { blogUrls } from './runtime.ts'
 
 /** Where every post's Markdown is. */
 const markdownContext = oncePerBuild(async (site: URL | undefined): Promise<MarkdownExportContext> => {
@@ -122,9 +123,17 @@ export async function rssResponse(site: URL): Promise<Response> {
     const limit = config.blog.feed?.limit ?? 0
     const posts = (await getPosts()).slice(0, limit)
     const renderPost = await createRenderer()
-    const contents = await Promise.all(
-        posts.map((post) => {
-            return feedHtml(post, renderPost)
+    const items = await Promise.all(
+        posts.map(async (post) => {
+            const content = await feedHtml(post, renderPost)
+            return {
+                title: post.title,
+                link: new URL(post.href, site).href,
+                pubDate: post.date,
+                ...(post.description ? { description: post.description } : {}),
+                content: absoluteUrls(content, site.origin),
+                categories: post.tags,
+            }
         }),
     )
 
@@ -132,17 +141,8 @@ export async function rssResponse(site: URL): Promise<Response> {
         title: config.title,
         description: config.description ?? config.title,
         site,
-        items: posts.map((post, at) => {
-            return {
-                title: post.title,
-                link: new URL(post.href, site).href,
-                pubDate: post.date,
-                description: post.description ?? undefined,
-                content: absoluteUrls(contents[at], site.origin),
-                categories: post.tags,
-            }
-        }),
+        items,
         customData: `<language>${config.lang}</language>`,
-        trailingSlash: blogUrls().trailingSlash,
+        trailingSlash: config.blog.trailingSlash,
     })
 }

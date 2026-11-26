@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import type { Locale } from './locales.ts'
 import config from 'virtual:jaamd/site'
 import * as locales from './locales.ts'

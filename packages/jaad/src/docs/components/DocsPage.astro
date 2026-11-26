@@ -21,7 +21,7 @@ interface Props {
     page: DocsPage<DocsSourceEntry>
     tree: DocsTree<DocsSourceEntry>
     /** Left out on the opening page, whose title is the site name alone. */
-    headTitle?: string
+    headTitle?: string | undefined
 }
 
 const { page, tree, headTitle } = Astro.props

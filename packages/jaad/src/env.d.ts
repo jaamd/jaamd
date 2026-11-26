@@ -1,4 +1,5 @@
 /// <reference types="astro/client" />
+/// <reference types="@jaamd/site/env.d.ts" />
 
 declare module 'virtual:jaad/config' {
     // oxlint-disable-next-line typescript/consistent-type-imports
@@ -10,17 +11,4 @@ declare module 'virtual:jaad/docs-frame' {
     // oxlint-disable-next-line typescript/consistent-type-imports
     const DocsFrame: typeof import('./docs/layouts/DefaultDocsFrame.astro').default
     export default DocsFrame
-}
-
-// The site's own fields, as `@jaamd/site` reads them.
-declare module 'virtual:jaamd/site' {
-    // oxlint-disable-next-line typescript/consistent-type-imports
-    const config: import('@jaamd/site/config.ts').SiteModuleConfig
-    export default config
-}
-
-declare module 'virtual:jaamd/llms' {
-    // oxlint-disable-next-line typescript/consistent-type-imports
-    const sources: import('@jaamd/site/llms-root.ts').LlmsSourceModule[]
-    export default sources
 }

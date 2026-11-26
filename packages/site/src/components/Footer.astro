@@ -5,7 +5,7 @@ import { ui } from '../runtime.ts'
 import { withDeploymentBase } from '../urls.ts'
 
 interface Props {
-    locale?: string
+    locale?: string | undefined
 }
 
 const t = ui(Astro.props.locale)

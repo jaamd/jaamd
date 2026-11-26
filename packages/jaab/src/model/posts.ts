@@ -51,7 +51,7 @@ export function writtenDay(value: unknown): string | null {
     }
 
     const day = value.trim().slice(0, 10)
-    const [year, month, date] = day.split('-').map(Number)
+    const [year = 0, month = 1, date = 1] = day.split('-').map(Number)
     const calendar = new Date(Date.UTC(year, month - 1, date))
     return isoDay(calendar) === day ? day : null
 }

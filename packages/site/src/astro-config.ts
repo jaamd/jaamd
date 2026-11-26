@@ -2,11 +2,17 @@ import type { AstroIntegration, AstroUserConfig, FontProvider, Locales, SessionD
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { defineConfig } from 'astro/config'
 
 /** Out of the packages' schemas, so `parse` strips it: the resolved config is
  *  serialised and an integration is not. */
-export type AstroPassthroughConfig = AstroUserConfig<Locales, string | SessionDriverConfig | undefined, FontProvider[]>
+export type AstroPassthroughConfig = AstroUserConfig<
+    Locales,
+    string | SessionDriverConfig | undefined,
+    // Any provider, its family's options as loose as Astro types them for it: the
+    // default would make every family's options undefined.
+    // eslint-disable-next-line typescript/no-explicit-any
+    FontProvider<any>[]
+>
 
 /** The options a package's config passes on to Astro. */
 export interface AstroOptions {
@@ -47,15 +53,15 @@ export async function loadConfigFile<Options>(product: string): Promise<Options>
 
 /** The whole Astro config of a site: `options.astro` is merged in, with its
  *  integrations appended to the package's rather than replacing them. */
-export function defineSite(options: AstroOptions, integrations: AstroIntegration[]) {
+export function defineSite(options: AstroOptions, integrations: AstroIntegration[]): AstroPassthroughConfig {
     const { site, base, astro } = options
     const extra = astro ?? {}
     const extraIntegrations = Array.isArray(extra.integrations) ? (extra.integrations as AstroIntegration[]) : []
 
-    return defineConfig({
+    return {
         ...(site ? { site } : {}),
         ...(base ? { base } : {}),
         ...extra,
         integrations: [...integrations, ...extraIntegrations],
-    })
+    }
 }

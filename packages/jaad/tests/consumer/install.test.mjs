@@ -4,7 +4,27 @@ import { join, dirname } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { walk, packageClasses, missingFrom } from '../dist.mjs'
-import { cleanupTemporaryDirectories, jaamdOverride, packPackage, run, temporaryDirectory } from './helpers.mjs'
+import {
+    STRICTEST_TSCONFIG,
+    TYPESCRIPT,
+    cleanupTemporaryDirectories,
+    jaamdOverride,
+    packPackage,
+    run,
+    temporaryDirectory,
+} from './helpers.mjs'
+
+// Every entry a project imports from TypeScript.
+const ENTRIES = [
+    "import jaad, { defineJaadConfig, defineSiteConfig } from '@jaamd/jaad'",
+    "import type { DocsFrameProps } from '@jaamd/jaad/advanced'",
+    "import { collections } from '@jaamd/jaad/content'",
+    "import { markdownPathFor } from '@jaamd/jaad/negotiation'",
+    '',
+    'export const entries = [jaad, defineJaadConfig, defineSiteConfig, collections, markdownPathFor]',
+    'export type Frame = DocsFrameProps',
+    '',
+].join('\n')
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..', '..')
@@ -61,6 +81,7 @@ describe('a project that installed the published tarball', () => {
                         astro: '7.3.1',
                         '@jaamd/jaad': tarball,
                     },
+                    devDependencies: TYPESCRIPT,
                     overrides: jaamdOverride(),
                 },
                 null,
@@ -68,12 +89,19 @@ describe('a project that installed the published tarball', () => {
             ),
         )
 
+        writeFileSync(join(project, 'tsconfig.json'), STRICTEST_TSCONFIG)
+        writeFileSync(join(project, 'src/entries.ts'), ENTRIES)
+
         run('npm', ['install', '--no-audit', '--no-fund'], project)
         run('npx', ['astro', 'build'], project)
         built = snapshot(join(project, 'dist'))
     })
 
     after(cleanupTemporaryDirectories)
+
+    test('the published sources type-check under strictest', () => {
+        run('npx', ['tsc', '--noEmit'], project)
+    })
 
     test('the config reaches the head of the page', () => {
         const home = built.read('index.html')

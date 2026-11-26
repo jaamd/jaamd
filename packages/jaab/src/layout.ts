@@ -1,8 +1,9 @@
+/// <reference path="./env.d.ts" />
+
 import type { BlogPost } from './posts.ts'
-import type Meta from '@jaamd/site/components/Meta.astro'
-import type StructuredData from '@jaamd/site/components/StructuredData.astro'
+import type { MetaProps } from '@jaamd/site/meta.ts'
+import type { StructuredDataProps } from '@jaamd/site/structured-data.ts'
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js'
-import type { ComponentProps } from 'astro/types'
 import { fill } from '@jaamd/site/helpers.ts'
 import { pageDescription, pageHeadings, renderedTitle, type PageHeading } from '@jaamd/site/rendered.ts'
 import { ui } from '@jaamd/site/runtime.ts'
@@ -18,16 +19,16 @@ export type { BlogPost } from './posts.ts'
 /** What `BlogMeta` writes in a layout's `<head>`. */
 export interface BlogMeta {
     /** For `<meta>`, `<link>` and Open Graph; `title` is the whole page title. */
-    head: ComponentProps<typeof Meta>
+    head: MetaProps
     /** JSON-LD, on a post. */
-    structuredData?: ComponentProps<typeof StructuredData>
+    structuredData?: StructuredDataProps | undefined
 }
 
 /** What every page of the blog hands its layout. */
 interface BlogPageProps {
     /** The page's own title, without the site's; none on an index with no title of its own. */
-    title?: string
-    description?: string
+    title?: string | undefined
+    description?: string | undefined
     /** The blog's index, its first page. */
     indexHref: string
     /** `rss.xml`, when the blog writes one. */

@@ -7,9 +7,9 @@ import { satteriCollectHastText, satteriHeadingIdsPlugin } from './astro-satteri
 
 export interface PluginOptions {
     /** Features to turn off. All on by default. */
-    features?: Features
+    features?: Features | undefined
     /** Text JAAMD writes into the page. English by default. */
-    labels?: Partial<Labels>
+    labels?: Partial<Labels> | undefined
 }
 
 /** Astro's heading id plugin for unified, as a module URL: `@astrojs/markdown-remark`,

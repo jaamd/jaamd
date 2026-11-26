@@ -4,7 +4,7 @@ import { ui } from '../runtime.ts'
 
 interface Props {
     headings: PageHeading[]
-    locale?: string
+    locale?: string | undefined
 }
 
 const { headings, locale } = Astro.props

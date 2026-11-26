@@ -33,9 +33,10 @@ export function validateDocsStructure(pages: DocsSource[], locale?: string): voi
         ids.push(id)
         idsBySlug.set(slug, ids)
 
+        const [top = ''] = parts
         if (parts.length === 2) {
-            const directory = inSection(page, parts[0])
-            const chapter = inSection(page, getCleanSlug(parts[0]))
+            const directory = inSection(page, top)
+            const chapter = inSection(page, getCleanSlug(top))
             const directories = directoriesByChapter.get(chapter) ?? new Set()
             directories.add(directory)
             directoriesByChapter.set(chapter, directories)
@@ -55,7 +56,7 @@ export function validateDocsStructure(pages: DocsSource[], locale?: string): voi
         }),
     )
     for (const page of pages) {
-        const first = namedSlug(page.path, page.section).split('/')[0]
+        const [first = ''] = namedSlug(page.path, page.section).split('/')
         if (!page.section && keys.has(first)) {
             issues.push(`${named(page.path)} resolves into section /${first}`)
         }

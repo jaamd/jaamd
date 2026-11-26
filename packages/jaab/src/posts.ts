@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import type { BlogAuthor } from './config.ts'
 import type { IntroEntry, PostEntry } from './types.ts'
 import { readFileSync } from 'node:fs'

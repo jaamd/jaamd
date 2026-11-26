@@ -1,7 +1,9 @@
-import type { ShikiConfig } from 'astro'
+import type { AstroConfig } from 'astro'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { withTheme } from '../src/shiki.ts'
+
+type ShikiConfig = AstroConfig['markdown']['shikiConfig']
 
 const astroDefault = { theme: 'github-dark', themes: {} } as unknown as ShikiConfig
 

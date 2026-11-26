@@ -14,11 +14,11 @@ import { SKIP, visit } from 'unist-util-visit'
 export interface ExportablePage {
     title: string
     /** The frontmatter description: one drawn from the body would repeat it. */
-    description?: string | null
+    description?: string | null | undefined
     /** The Markdown source, without frontmatter. */
     body: string
     /** The source file, relative to the project root. */
-    filePath?: string
+    filePath?: string | undefined
 }
 
 export interface MarkdownExportContext {
@@ -49,7 +49,7 @@ function rewriteUrl(url: string, page: ExportablePage, context: MarkdownExportCo
         return context.origin ? `${context.origin}${url}` : url
     }
 
-    const [path, hash] = url.split('#', 2)
+    const [path = '', hash] = url.split('#', 2)
     if (!path.endsWith('.md') || !page.filePath) {
         return url
     }

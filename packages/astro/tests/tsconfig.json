@@ -1,6 +1,9 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
+        // Strict, as the other packages' tests: strictest guards the sources projects check.
+        "noUncheckedIndexedAccess": false,
+        "exactOptionalPropertyTypes": false,
         "types": ["node", "astro/client"]
     },
     "include": ["./*.ts", "../index.ts", "../src/**/*"]

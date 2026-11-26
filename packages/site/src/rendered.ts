@@ -39,7 +39,7 @@ const PRE = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi
 export function codeText(html: string): string {
     const blocks = [...html.matchAll(PRE)].map((match) => {
         // Line breaks are kept: they separate the tokens of a listing.
-        return decodeEntities(match[1].replace(/<[^>]*>/g, ''))
+        return decodeEntities((match[1] ?? '').replace(/<[^>]*>/g, ''))
     })
     return blocks
         .join('\n')
@@ -97,7 +97,7 @@ function headingTags(html: string): HeadingTag[] {
     let open: HeadingTag | null = null
 
     for (const match of html.matchAll(TAG)) {
-        const [whole, closing, name, attrs] = match
+        const [whole, closing, name = '', attrs = ''] = match
         const tag = name.toLowerCase()
         const selfClosing = VOID.has(tag) || attrs.trimEnd().endsWith('/')
 
@@ -110,13 +110,13 @@ function headingTags(html: string): HeadingTag[] {
             ignored = { tag, depth: 1 }
         }
 
-        const heading = /^h([1-6])$/.exec(tag)
-        if (!heading) {
+        const level = /^h([1-6])$/.exec(tag)?.[1]
+        if (level === undefined) {
             continue
         }
         if (!closing) {
             open = {
-                depth: Number(heading[1]),
+                depth: Number(level),
                 id: /\sid="([^"]*)"/.exec(attrs)?.[1] ?? '',
                 ignored: ignored !== null || /\sdata-toc-ignore\b/i.test(attrs),
                 start: match.index,
@@ -227,10 +227,10 @@ export function pageDescription(
     }
     const prose = rendered.html.replace(DROPPED, ' ')
     const paragraphs = [...prose.matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)]
-        .filter(([, attrs]) => {
+        .filter(([, attrs = '']) => {
             return !/markdown-alert-title/.test(attrs)
         })
-        .map(([, , inner]) => {
+        .map(([, , inner = '']) => {
             return htmlText(inner)
         })
 
