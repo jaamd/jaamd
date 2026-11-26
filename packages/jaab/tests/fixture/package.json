@@ -1,0 +1,17 @@
+{
+    "name": "jaab-fixture",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "astro dev",
+        "build": "astro build"
+    },
+    "dependencies": {
+        "@jaamd/jaab": "workspace:*",
+        "astro": "^7.4.2"
+    },
+    "devDependencies": {
+        "@jaamd/jaad": "workspace:*"
+    }
+}

@@ -1,0 +1,80 @@
+{
+    "name": "@jaamd/jaab",
+    "version": "1.1.0",
+    "private": true,
+    "description": "Blogging, refined: a blog from a folder of markdown, as an Astro integration.",
+    "keywords": [
+        "astro",
+        "astro-integration",
+        "blog",
+        "markdown",
+        "rss",
+        "withastro"
+    ],
+    "homepage": "https://docs.jaamd.org/jaab",
+    "bugs": "https://github.com/jaamd/jaamd/issues",
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
+        "directory": "packages/jaab"
+    },
+    "bin": {
+        "jaab": "./bin/jaab.mjs"
+    },
+    "files": [
+        "index.ts",
+        "site.ts",
+        "bin",
+        "src",
+        "dist",
+        "docs",
+        "README.md",
+        "LICENSE"
+    ],
+    "type": "module",
+    "exports": {
+        ".": "./index.ts",
+        "./content": "./src/content.ts",
+        "./site": "./site.ts"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tailwindcss -i ./src/styles.css -o ./dist/jaab.css",
+        "prepare": "pnpm build",
+        "check": "astro check && tsc --noEmit -p tests",
+        "test": "node --test \"tests/unit/**/*.test.ts\" \"tests/unit/**/*.test.mjs\"",
+        "test:consumer": "pnpm --filter \"@jaamd/jaab...\" run build && node --test \"tests/consumer/**/*.test.mjs\"",
+        "test:build": "pnpm --filter jaab-fixture build && node --test \"tests/build/**/*.test.mjs\""
+    },
+    "dependencies": {
+        "@astrojs/rss": "^4.0.19",
+        "@jaamd/astro": "workspace:^",
+        "@jaamd/site": "workspace:*",
+        "github-slugger": "^2.0.0"
+    },
+    "devDependencies": {
+        "@astrojs/check": "^0.9.12",
+        "@tailwindcss/cli": "^4.3.3",
+        "tailwindcss": "^4.3.3"
+    },
+    "peerDependencies": {
+        "@tailwindcss/vite": "^4.3.0",
+        "astro": "^7.3.0",
+        "tailwindcss": "^4.3.0"
+    },
+    "peerDependenciesMeta": {
+        "tailwindcss": {
+            "optional": true
+        },
+        "@tailwindcss/vite": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=22.23.4"
+    }
+}

@@ -1,0 +1,18 @@
+---
+import config from 'virtual:jaab/config'
+import IndexPage from '../components/IndexPage.astro'
+import { pageCount } from '../model/posts.ts'
+import { getPosts } from '../posts.ts'
+
+/** The index's later pages: the first is the index itself. */
+export async function getStaticPaths() {
+    const pages = pageCount((await getPosts()).length, config.blog.perPage)
+    return Array.from({ length: pages - 1 }, (_, at) => {
+        return { params: { page: String(at + 2) } }
+    })
+}
+
+const page = Number(Astro.params.page)
+---
+
+<IndexPage {page} />

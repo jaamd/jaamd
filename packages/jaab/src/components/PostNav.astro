@@ -1,0 +1,29 @@
+---
+import type { BlogPost } from '../posts.ts'
+import Chevron from '@jaamd/site/components/Chevron.astro'
+import { ui } from '@jaamd/site/runtime.ts'
+
+interface Props {
+    post: BlogPost
+}
+
+const { older, newer } = Astro.props.post
+const t = ui()
+---
+
+{(older || newer) && (
+    <nav class="blog-post-nav" aria-label={t('blog.posts')}>
+        {older && (
+            <a class="blog-post-nav-link" href={older.href} rel="prev">
+                <Chevron direction="back" class="blog-icon" />
+                <span class="blog-post-nav-title">{older.title}</span>
+            </a>
+        )}
+        {newer && (
+            <a class="blog-post-nav-link blog-post-nav-newer" href={newer.href} rel="next">
+                <span class="blog-post-nav-title">{newer.title}</span>
+                <Chevron direction="forward" class="blog-icon" />
+            </a>
+        )}
+    </nav>
+)}
