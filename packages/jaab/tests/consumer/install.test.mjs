@@ -4,6 +4,8 @@ import { join, dirname } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import {
+    STRICTEST_TSCONFIG,
+    TYPESCRIPT,
     cleanupTemporaryDirectories,
     jaamdOverride,
     packPackage,
@@ -23,6 +25,18 @@ const FILES = {
         '',
     ].join('\n'),
     'src/content.config.ts': "export { collections } from '@jaamd/jaab/content'\n",
+    'tsconfig.json': STRICTEST_TSCONFIG,
+    // Every entry a project imports from TypeScript.
+    'src/entries.ts': [
+        "import jaab, { defineJaabConfig, defineSiteConfig } from '@jaamd/jaab'",
+        "import { collections } from '@jaamd/jaab/content'",
+        "import type { BlogLayoutProps, BlogPost } from '@jaamd/jaab/layout'",
+        "import { getPosts } from '@jaamd/jaab/posts'",
+        '',
+        'export const entries = [jaab, defineJaabConfig, defineSiteConfig, collections, getPosts]',
+        'export type Layout = BlogLayoutProps | BlogPost',
+        '',
+    ].join('\n'),
 }
 
 /**
@@ -47,6 +61,7 @@ describe('a project that installed the published tarball', () => {
             private: true,
             type: 'module',
             dependencies: { astro: '7.3.1', '@jaamd/jaab': tarball },
+            devDependencies: TYPESCRIPT,
             overrides: jaamdOverride(),
         }
         writeFileSync(join(project, 'package.json'), JSON.stringify(manifest, null, 2))
@@ -63,6 +78,10 @@ describe('a project that installed the published tarball', () => {
         const post = readFileSync(join(project, 'dist/hello-from-the-tarball/index.html'), 'utf8')
         assert.match(post, /<h1>Hello from the tarball<\/h1>/)
         assert.match(readFileSync(join(project, 'dist/rss.xml'), 'utf8'), /Hello from the tarball/)
+    })
+
+    test('the published sources type-check under strictest', () => {
+        run('npx', ['tsc', '--noEmit'], project)
     })
 
     test("the package's own styles survive a transitive install", () => {
