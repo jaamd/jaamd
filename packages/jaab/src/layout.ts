@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import type { BlogPost } from './posts.ts'
 import type Meta from '@jaamd/site/components/Meta.astro'
 import type StructuredData from '@jaamd/site/components/StructuredData.astro'

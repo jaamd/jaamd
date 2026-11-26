@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import type { FullPage } from './llms.ts'
 import llmsSources from 'virtual:jaamd/llms'
 import config from 'virtual:jaamd/site'

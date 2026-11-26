@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import type { BlogPost } from './posts.ts'
 import type { FullPage } from '@jaamd/site/llms.ts'
 import type { MarkdownExportContext } from '@jaamd/site/markdown-export.ts'

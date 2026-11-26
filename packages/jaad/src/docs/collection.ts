@@ -1,3 +1,5 @@
+/// <reference path="../env.d.ts" />
+
 import type { DocsSource, DocsTree } from './model/tree.ts'
 import type { DocsEntry } from './types.ts'
 import type { LocaleAlternate } from '@jaamd/site/locales.ts'

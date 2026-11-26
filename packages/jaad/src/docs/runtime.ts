@@ -1,3 +1,5 @@
+/// <reference path="../env.d.ts" />
+
 import type { DocsSection } from './config.ts'
 import type { DocsUrlOptions } from './urls.ts'
 import { DEFAULT_LOCALE } from '@jaamd/site/runtime.ts'

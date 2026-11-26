@@ -16,6 +16,9 @@ export default defineConfig({
         'typescript/consistent-type-imports': 'error',
         'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', fix: { imports: 'safe-fix' } }],
         'import/no-unassigned-import': ['error', { allow: ['**/*.css'] }],
+        // A module that reads a virtual module references the file declaring it, so a
+        // project that type-checks the published sources gets the declarations too.
+        'typescript/triple-slash-reference': ['error', { path: 'always', types: 'prefer-import', lib: 'always' }],
     },
     overrides: [
         {

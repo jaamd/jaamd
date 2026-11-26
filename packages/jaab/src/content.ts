@@ -1,3 +1,5 @@
+/// <reference path="./env.d.ts" />
+
 import { frontmatterFields } from '@jaamd/astro/frontmatter'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
