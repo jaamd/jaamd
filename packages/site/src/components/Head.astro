@@ -1,58 +1,14 @@
 ---
+import type { ComponentProps } from 'astro/types'
 import { Font, type CssVariable } from 'astro:assets'
 import config from 'virtual:jaamd/site'
-import { openGraphLocale } from '../locales.ts'
 import { withDeploymentBase } from '../urls.ts'
+import Meta from './Meta.astro'
 
-interface Props {
-    title: string
-    description: string
-    /** Page frontmatter; each field overrides the site's. */
-    keywords?: string[]
-    author?: string
-    image?: string | false
-    modified?: Date
-    /** BCP-47 tag of this page's locale. */
-    language?: string
-    /** Every locale that has this page, for hreflang and og:locale:alternate. */
-    alternates?: { code: string; tag: string; href: string }[]
-    /** Where a reader with no matching language should land. */
-    xDefault?: string
-    /** The page as Markdown, announced to agents. */
-    markdown?: string
-    /** A dated piece, such as a post: the page is an Open Graph article. */
-    article?: { published: Date; tags: string[] }
-}
+/** The shell's `<head>`: the document's basics, fonts and theme, then `Meta`. */
+type Props = ComponentProps<typeof Meta>
 
-const {
-    title,
-    description,
-    keywords = [],
-    author,
-    image,
-    modified,
-    language = config.lang,
-    alternates = [],
-    xDefault,
-    markdown,
-    article,
-} = Astro.props
-const canonical = Astro.site ? Astro.url.href : null
-
-// Open Graph rejects relative paths, so these have to be absolute.
-const resolvedImage = image ?? config.ogImage
-const ogImage =
-    resolvedImage === false
-        ? null
-        : /^https?:\/\//.test(resolvedImage)
-          ? resolvedImage
-          : Astro.site
-            ? new URL(withDeploymentBase(resolvedImage, import.meta.env.BASE_URL), Astro.site).href
-            : null
 const favicon = config.favicon ? withDeploymentBase(config.favicon, import.meta.env.BASE_URL) : null
-const feeds = config.feeds.map((feed) => {
-    return { title: feed.title, href: withDeploymentBase(feed.path, import.meta.env.BASE_URL) }
-})
 
 // Applied before the first paint, so the page never flashes the wrong theme.
 const themeScript = `(function () {
@@ -81,22 +37,8 @@ const themeScript = `(function () {
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width" />
-<meta name="description" content={description} />
-{keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
-{author && <meta name="author" content={author} />}
-<title>{title}</title>
-{canonical && <link rel="canonical" href={canonical} />}
-{Astro.site &&
-    alternates.map((alternate) => (
-        <link rel="alternate" hreflang={alternate.tag} href={new URL(alternate.href, Astro.site).href} />
-    ))}
-{Astro.site && xDefault && <link rel="alternate" hreflang="x-default" href={new URL(xDefault, Astro.site).href} />}
-
+<title>{Astro.props.title}</title>
 {favicon && <link rel="icon" href={favicon} />}
-{markdown && <link rel="alternate" type="text/markdown" href={markdown} />}
-{feeds.map((feed) => (
-    <link rel="alternate" type="application/rss+xml" title={feed.title} href={feed.href} />
-))}
 
 <Font cssVariable="--font-inter" preload />
 {/* The italic face sets only the site name in the header, which a logo replaces. */}
@@ -105,30 +47,7 @@ const themeScript = `(function () {
     <Font cssVariable={cssVariable as CssVariable} />
 ))}
 
-{canonical && <meta property="og:url" content={canonical} />}
-<meta property="og:type" content={article ? 'article' : 'website'} />
-<meta property="og:site_name" content={config.title} />
-<meta property="og:locale" content={openGraphLocale(language)} />
-{alternates
-    .filter((alternate) => alternate.tag !== language)
-    .map((alternate) => (
-        <meta property="og:locale:alternate" content={openGraphLocale(alternate.tag)} />
-    ))}
-<meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
-{article && <meta property="article:published_time" content={article.published.toISOString()} />}
-{modified && <meta property="article:modified_time" content={modified.toISOString()} />}
-{article?.tags.map((tag) => (
-    <meta property="article:tag" content={tag} />
-))}
-{ogImage && <meta property="og:image" content={ogImage} />}
-
-<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
-{canonical && <meta property="twitter:domain" content={Astro.url.hostname} />}
-{canonical && <meta property="twitter:url" content={canonical} />}
-<meta name="twitter:title" content={title} />
-<meta name="twitter:description" content={description} />
-{ogImage && <meta name="twitter:image" content={ogImage} />}
+<Meta {...Astro.props} />
 
 <meta name="generator" content={Astro.generator} />
 
