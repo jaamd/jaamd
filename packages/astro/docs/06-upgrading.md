@@ -161,17 +161,13 @@ see [Manual setup](./05-advanced/01-manual-setup.md). The single plugins are in
 
 ## From 0.9
 
-- jaamd no longer switches the markdown processor. With no configuration you
-  are on Sätteri.
-- Set `markdown.processor: unified()` to stay on unified.
-- `markdown.remarkPlugins` and `markdown.rehypePlugins` still work: Astro moves
-  to unified, jaamd adds its remark plugins.
-- Astro `^7.3.0` is required.
-- Heading anchors are plain links: a click navigates, nothing is copied.
+- To stay on unified, set `markdown.processor: unified()`: jaamd no longer
+  switches the processor, and Astro uses Sätteri by default. Astro `^7.3.0` is
+  required.
 - Table wrappers and heading anchors are in the built HTML. Turn them off with
   `plugins: { tables: false, headingLinks: false }`.
-- The lightbox is a `<dialog class="jaamd-lightbox">`. `.jaamd-lightbox__backdrop`,
-  `.jaamd-lightbox__content` and `.jaamd-lightbox--hidden` are gone: style
-  `::backdrop` and `[open]`.
-- `<details>` animates in CSS. `.jaamd-details-wrapper` and
+- The lightbox is a `<dialog class="jaamd-lightbox">`: style `::backdrop` and
+  `[open]` instead of `.jaamd-lightbox__backdrop`, `.jaamd-lightbox__content`
+  and `.jaamd-lightbox--hidden`.
+- `<details>` animates in CSS: `.jaamd-details-wrapper` and
   `.jaamd-details-inner` are gone.
