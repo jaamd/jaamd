@@ -1,6 +1,7 @@
 ---
 import config from 'virtual:jaab/config'
-import IndexPage from '../components/IndexPage.astro'
+import Layout from 'virtual:jaab/layout'
+import { indexPage } from '../layout.ts'
 import { pageCount } from '../model/posts.ts'
 import { getPosts } from '../posts.ts'
 
@@ -12,7 +13,7 @@ export async function getStaticPaths() {
     })
 }
 
-const page = Number(Astro.params.page)
+const { props, Content } = await indexPage(Number(Astro.params.page))
 ---
 
-<IndexPage {page} />
+<Layout {...props}>{Content && <Content />}</Layout>

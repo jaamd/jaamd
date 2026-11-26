@@ -1,0 +1,14 @@
+---
+import type { BlogMeta } from '../layout.ts'
+import Meta from '@jaamd/site/components/Meta.astro'
+import StructuredData from '@jaamd/site/components/StructuredData.astro'
+
+/** A blog page's metadata, for the `<head>` of a layout of the project's own:
+ *  `<BlogMeta {...Astro.props.meta} />`. The `<title>` stays the layout's. */
+type Props = BlogMeta
+
+const { head, structuredData } = Astro.props
+---
+
+<Meta {...head} />
+{structuredData && <StructuredData {...structuredData} />}

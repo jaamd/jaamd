@@ -1,39 +1,14 @@
 ---
+import type { BlogIndexProps } from '../layout.ts'
 import MarkdownContent from '@jaamd/astro/components'
 import Footer from '@jaamd/site/components/Footer.astro'
-import { fill } from '@jaamd/site/helpers.ts'
-import { pageDescription, renderedTitle } from '@jaamd/site/rendered.ts'
-import { ui } from '@jaamd/site/runtime.ts'
-import { render } from 'astro:content'
-import config from 'virtual:jaab/config'
 import Layout from '../layouts/Blog.astro'
-import { pageCount, pagePosts } from '../model/posts.ts'
-import { getIntro, getPosts } from '../posts.ts'
 import Pager from './Pager.astro'
 import PostList from './PostList.astro'
 
-interface Props {
-    /** Counted from 1. */
-    page: number
-}
+type Props = BlogIndexProps
 
-const { page } = Astro.props
-const t = ui()
-
-const posts = await getPosts()
-const pages = pageCount(posts.length, config.blog.perPage)
-const shown = pagePosts(posts, page, config.blog.perPage)
-
-// `blog/index.md` introduces the first page; the others carry its title only.
-const intro = await getIntro()
-const introTitle = intro ? (intro.data.title ?? renderedTitle(intro.rendered)) : null
-const heading = introTitle ?? t('blog.label')
-const Intro = intro && page === 1 ? (await render(intro as never)).Content : null
-const ownHeading = Intro !== null && renderedTitle(intro?.rendered) !== null
-
-const pageLabel = fill(t('blog.page'), { page, pages })
-const title = page === 1 ? (introTitle ?? undefined) : `${heading} · ${pageLabel}`
-const description = intro?.data.description ?? pageDescription(intro?.rendered, heading) ?? undefined
+const { title, description, posts, page, pages, newerHref, olderHref, heading, ownHeading } = Astro.props
 // Passed through to the element; the component's props name only `as` and `class`.
 const contentAttrs = { id: 'content' }
 ---
@@ -43,11 +18,11 @@ const contentAttrs = { id: 'content' }
         <div class="blog-main">
             <MarkdownContent {...contentAttrs} class="blog-content">
                 {!ownHeading && <h1>{heading}</h1>}
-                {Intro && <Intro />}
+                <slot />
             </MarkdownContent>
 
-            <PostList posts={shown} />
-            <Pager {page} {pages} />
+            <PostList {posts} />
+            <Pager {page} {pages} newer={newerHref} older={olderHref} />
         </div>
         <Footer />
     </div>

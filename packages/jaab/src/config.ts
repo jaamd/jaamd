@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { ASTRO_OPTIONS, fontVariables, type AstroOptions } from '@jaamd/site/astro-config.ts'
 import { resolveSiteConfig, siteConfigShape, siteOptionsOf, type SiteResolvedConfig } from '@jaamd/site/config.ts'
 import { inferRepo, resolveEditBase } from '@jaamd/site/infer.ts'
@@ -29,6 +30,8 @@ export const blogConfigShape = {
     editLink: z.union([z.boolean(), z.string()]).default(true),
     /** `llms.txt`, `llms-full.txt` and the Markdown of each post; false leaves them out. */
     llms: z.boolean().default(true),
+    /** A layout of the project's own, from its root, for a blog inside a site with its own look. */
+    layout: z.string().optional(),
 }
 
 /** Site options, then blog options: the order the error for an unknown one lists them. */
@@ -55,6 +58,8 @@ export interface BlogResolvedConfig {
     authors: Record<string, BlogAuthor>
     editBase: string | null
     llms: boolean
+    /** The project's layout, absolute; null for the blog's own. */
+    layout: string | null
     /** Page urls end with a slash, as Astro builds them. Set once Astro has resolved the project. */
     trailingSlash: boolean
 }
@@ -115,6 +120,7 @@ export function resolveConfig(
             authors: config.authors,
             editBase: resolveEditBase(config.editLink, repo, config.blogDir),
             llms: config.llms,
+            layout: config.layout ? resolve(paths.root, config.layout) : null,
             trailingSlash: true,
         },
     }

@@ -24,6 +24,33 @@ const routeEntrypoint = (file: string) => {
     return fileURLToPath(new URL(`./routes/${file}`, import.meta.url))
 }
 
+const LAYOUT_ID = 'virtual:jaab/layout'
+const RESOLVED_LAYOUT_ID = `\0${LAYOUT_ID}`
+const DEFAULT_LAYOUT = fileURLToPath(new URL('./layouts/Default.astro', import.meta.url))
+
+/** `virtual:jaab/layout`: the component every page of the blog renders in. */
+function layoutModule(file: string) {
+    return {
+        name: 'jaab:layout',
+        resolveId: (source: string) => {
+            return source === LAYOUT_ID ? RESOLVED_LAYOUT_ID : null
+        },
+        load: (id: string) => {
+            return id === RESOLVED_LAYOUT_ID ? `export { default } from ${JSON.stringify(file)};` : null
+        },
+    }
+}
+
+/** A `layout` that names no file stops the build, saying what to create. */
+function assertLayout(options: JaabUserConfig, file: string | null): void {
+    if (file !== null && !existsSync(file)) {
+        throw new Error(
+            `jaab: layout is "${options.layout}", which does not exist\n` +
+                "  Create it, or leave layout out for the blog's own.",
+        )
+    }
+}
+
 /** The routes of the blog, by pattern, and the file serving each. `rootLlms`
  *  false leaves the llms files out of a blog at the root, where the site
  *  serves its own; `feed` false leaves out `rss.xml`. */
@@ -119,16 +146,20 @@ export function createJaabIntegration(options: JaabUserConfig, site: SiteIntegra
                     publicDir: fileURLToPath(astroConfig.publicDir),
                     srcDir: fileURLToPath(astroConfig.srcDir),
                 })
-                const config: JaabResolvedConfig = {
-                    ...resolved,
-                    blog: { ...resolved.blog, trailingSlash: pageUrlsEndWithSlash(astroConfig) },
-                }
-
                 const hasSite = Boolean(astroConfig.site)
-                if (!hasSite && config.blog.feed) {
+                if (!hasSite && resolved.blog.feed) {
                     logger.warn('site is not set, so the blog has no rss.xml: a feed needs absolute URLs. Set site.')
                 }
-                const feed = config.blog.feed !== null && hasSite
+                const config: JaabResolvedConfig = {
+                    ...resolved,
+                    blog: {
+                        ...resolved.blog,
+                        feed: hasSite ? resolved.blog.feed : null,
+                        trailingSlash: pageUrlsEndWithSlash(astroConfig),
+                    },
+                }
+                const feed = config.blog.feed !== null
+                assertLayout(options, config.blog.layout)
 
                 updateConfig({
                     vite: {
@@ -136,6 +167,7 @@ export function createJaabIntegration(options: JaabUserConfig, site: SiteIntegra
                             serialisedModule('jaab:config', 'virtual:jaab/config', () => {
                                 return config
                             }),
+                            layoutModule(config.blog.layout ?? DEFAULT_LAYOUT),
                         ],
                     },
                 })

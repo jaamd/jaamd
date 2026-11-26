@@ -214,6 +214,25 @@ function injectRootFiles({ config: astroConfig, injectRoute, logger }: SetupPara
     }
 }
 
+/** The site sets JAAMD up itself: one added by the project too would load
+ *  its styles and scripts twice, each with its own theme. */
+export function assertNoOwnJaamd(integrations: { name: string }[], members: SiteMember[]): void {
+    const own = integrations.some((integration) => {
+        return integration.name === '@jaamd/astro'
+    })
+    if (!own) {
+        return
+    }
+
+    const packages = members.map((member) => {
+        return member.package
+    })
+    throw new Error(
+        `jaamd: the project adds jaamd() to its integrations, and ${packages.join(' and ')} already set it up.\n` +
+            "  Remove jaamd() from astro.config, and give its theme to the package's config as theme.",
+    )
+}
+
 /** What the first site integration of the project, `owner`, sets up once for every
  *  package: JAAMD, the virtual modules, Tailwind, the fonts, the root files
  *  and the sitemap. */
@@ -242,6 +261,8 @@ async function setupSite(
         publicDir: fileURLToPath(astroConfig.publicDir),
         srcDir: fileURLToPath(astroConfig.srcDir),
     })
+
+    assertNoOwnJaamd(astroConfig.integrations, members)
 
     // Run in place rather than added with updateConfig, which would run it after
     // the packages: their markdown plugins and stylesheets come after JAAMD's.
