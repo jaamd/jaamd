@@ -50,7 +50,7 @@ title: Images & Videos # otherwise the first # heading
 date: 2026-11-22 # orders the posts; a day, or a time with its offset
 description: Add accessible images. # in the index, the feed and the metadata
 tags: [markdown, media] # metadata and the feed only, never shown
-authors: [ada] # keys of the authors option
+authors: [ada] # keys of authors in jaab.config.ts, or names
 aliases: [/2026/11/media/] # old addresses, redirected here
 lastUpdated: 2026-11-30 # shown as "Updated" at the end
 ogImage: /og/media.png # social image for this post

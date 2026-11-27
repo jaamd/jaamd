@@ -41,7 +41,7 @@ only; on a post, the post. Its props are the data, told apart by `kind`:
 
 Each post, in `posts` or as `post`, has `title`, `description`, `href`, `day`
 (as written, `2026-11-22`), `date`, `updatedDay`, `readingTime` in minutes,
-`authors`, `tags`, `markdownHref`, `editHref`, and its `older` and `newer`
+`authors` (each a `name` and a `url` or null), `tags`, `markdownHref`, `editHref`, and its `older` and `newer`
 posts. The types are `BlogLayoutProps` and `BlogPost`, from `@jaamd/jaab/layout`.
 
 This layout sits inside the site's own `Layout.astro`, which gives its

@@ -71,8 +71,9 @@ Write the first post with `npx jaab new "Hello"`, then run `npx astro dev`. See
 ## Docs and a blog
 
 A site with documentation and a blog installs JAAD and JAAB. They share the
-header, the footer, the theme and the fonts, so they take the same site options:
-`defineSiteConfig` holds them once, and each config spreads them.
+header, the footer, the theme, the fonts and the `authors`, so they take the
+same site options: `defineSiteConfig` holds them once, and each config spreads
+them.
 
 `site.config.ts` holds the shared options:
 

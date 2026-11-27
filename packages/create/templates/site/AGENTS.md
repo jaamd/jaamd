@@ -61,7 +61,7 @@ label: Media # shorter name, in navigation only
 translationKey: media # pairs this page with its translations
 description: Add accessible images. # description metadata
 keywords: [markdown, media] # keyword metadata and search weight
-author: Ada Lovelace # author metadata
+authors: [Ada Lovelace] # shown above the title, and in the metadata
 ogImage: /og/media.png # social image for this page
 lastUpdated: 2026-09-12 # modification date in metadata
 order: 5 # replaces the number in the filename

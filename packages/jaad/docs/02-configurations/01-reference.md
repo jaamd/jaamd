@@ -140,6 +140,29 @@ With [sections](../01-getting-started/02-pages.md#sections), each one links
 to its own directory. A URL passed here applies to all of them, and `:path` is
 the file's path inside its section's directory.
 
+## Authors
+
+| Option    | Type                             | Default | Description                                   |
+| --------- | -------------------------------- | ------- | --------------------------------------------- |
+| `authors` | `Record<string, { name; url? }>` | `{}`    | The people who write the site, by key         |
+| `author`  | `string`                         | none    | The key of a page's author when it names none |
+
+A page names its authors in its [frontmatter](02-frontmatter.md#authors), by
+these keys or by name. `authors` is a site option: beside JAAB, the docs and
+the blog share it through `defineSiteConfig`. `author` is the docs' own, and
+has to be one of `authors`:
+
+```ts
+defineJaadConfig({
+    title: '...',
+    authors: {
+        ada: { name: 'Ada Lovelace', url: 'https://example.dev/ada' },
+        grace: { name: 'Grace Hopper' },
+    },
+    author: 'ada',
+})
+```
+
 ## SEO and head tags
 
 | Option    | Type              | Default          | Description                       |

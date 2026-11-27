@@ -93,6 +93,15 @@ The header, the footer, the search and the other parts of the shell are named
 
 Pages on `Page` load only the shell's stylesheet, without the documentation's.
 
+### Authors
+
+`authors` in the frontmatter names who wrote a page, by key of the new site
+option `authors`, by name, or with a url, and the names are shown above the
+title. `author: Ada Lovelace` still works, and now shows the name too. A page
+that sets neither shows nothing, unless the new docs option `author` names a
+default. A page with several authors has one `<meta name="author">` for each,
+where 1.1 joined them with commas. See [Authors](02-configurations/02-frontmatter.md#authors).
+
 ### The scaffolder
 
 The scaffolder is now `npm create @jaamd`: it creates docs, a blog with
