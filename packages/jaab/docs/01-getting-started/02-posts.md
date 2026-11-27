@@ -1,5 +1,5 @@
 ---
-description: Write a post: its file, its date and the fields it can set.
+description: 'Write a post: its file, its date and the fields it can set.'
 ---
 
 # Posts
@@ -16,8 +16,8 @@ npx jaab new "Introducing JAAB"
 npx jaab new "Photos from the trip" --dir
 ```
 
-It writes in `blog/` and does not read `jaab.config.ts`: with another `blogDir`,
-pass it as `--blog-dir`, as in `npx jaab new "Hello" --blog-dir posts`.
+It writes in `blog/` and does not read `jaab.config.ts`: with another
+[`blogDir`](../03-configuration/02-blogDir.md), pass it as `--blog-dir`.
 
 ## Frontmatter
 
@@ -44,9 +44,10 @@ Without a `description`, the index shows the text before a `<!-- more -->` line,
 or else the first paragraph.
 
 A post's authors are named beside its date, each with a url a link to it, and
-in its metadata, its structured data and the feed. Each is a key of the site's
-`authors`, a name, or a name with a url; a post that names none has the blog's
-default `author`, and `authors: []` names nobody.
+in its metadata and the feed. Each is a key of the site's
+[`authors`](../../../jaad/docs/03-configuration/18-authors.md), a name, or a name
+with a url; a post that names none has the blog's default
+[`author`](../03-configuration/07-author.md), and `authors: []` names nobody.
 
 A post shows the day its `date` is written on, whatever the time and its offset:
 `2026-11-23T00:30:00+01:00` is shown as Nov 23. The time orders posts of the
@@ -56,7 +57,6 @@ A link to another post's file, such as `[the move](2026-11-23-oxlint.md)`,
 becomes that post's address; a link to a file that does not exist stops the
 build.
 
-Aliases are Astro redirects: the dev server restarts on its own when one changes.
 There are no drafts: keep a post out of `blog/` until it is ready.
 
 ## The index

@@ -29,9 +29,9 @@ bunx @jaamd/create@latest --template blog
 The CLI asks for a destination, title and whether to install dependencies. The
 `blog` template puts the posts at `/`; `--template docs-blog` sets up
 [docs and a blog](#docs-and-a-blog) together, with the docs at `/` and the blog
-at `/blog`, and without `--template` the CLI asks. `--here` adds them to a repository you already
-have, without overwriting a file; the options are in the
-[scaffolder's README](https://github.com/jaamd/jaamd/tree/main/packages/create).
+at `/blog`. `--here` adds them to a repository you already have, without
+overwriting a file: see [JAAD's installation](../../../jaad/docs/01-getting-started/01-installation.md)
+for every option.
 
 ## A blog
 
@@ -48,7 +48,7 @@ export { default } from '@jaamd/jaab/site'
 ```
 
 `jaab.config.ts` holds the options, described in the
-[reference](../02-configurations/01-reference.md):
+[Options](../03-configuration/01-options.md):
 
 ```ts
 import { defineJaabConfig } from '@jaamd/jaab'

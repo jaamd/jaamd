@@ -21,10 +21,12 @@ in the folder: there are no drafts to hide and no dates to wait for.
 - **The post**, with its date, reading time and authors above the title, the
   table of contents beside it, and links to the older and newer posts below.
 - **A feed** in RSS 2.0, linked from every page. See
-  [Feed and metadata](02-configurations/02-feed.md).
+  [Feed and metadata](02-guides/01-feed.md).
 - **The shell of JAAD**: the same header, footer, themes and type. A site with
   docs and a blog installs both. See
   [Installation](01-getting-started/01-installation.md#docs-and-a-blog).
 - **Your own layout** for a blog inside a site that already has its look: JAAB
   keeps the pages, the feed and the metadata, and your layout draws them. See
-  [Layout](02-configurations/04-layout.md).
+  [Layout](02-guides/03-layout.md).
+
+Every option is in [Options](03-configuration/01-options.md).
