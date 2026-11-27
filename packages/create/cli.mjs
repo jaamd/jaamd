@@ -45,9 +45,16 @@ function markdownUnder(dir) {
     if (!existsSync(dir)) {
         return 0
     }
-    return readdirSync(dir, { withFileTypes: true }).reduce((count, entry) => {
-        return count + (entry.isDirectory() ? markdownUnder(join(dir, entry.name)) : entry.name.endsWith('.md') ? 1 : 0)
-    }, 0)
+
+    let count = 0
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (entry.isDirectory()) {
+            count += markdownUnder(join(dir, entry.name))
+        } else if (entry.name.endsWith('.md')) {
+            count += 1
+        }
+    }
+    return count
 }
 
 /** The project's page at `/`, as `src/pages/index.astro`; null when it has none. */

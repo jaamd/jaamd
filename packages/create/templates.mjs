@@ -89,7 +89,7 @@ export const TEMPLATES = {
 
 /** The entry points: `npm create @jaamd`, and `npm create @jaamd/jaad`, kept
  *  for the projects and scripts that run it, with the templates it always had. */
-export const PRESETS = {
+const PRESETS = {
     jaamd: {
         command: 'create-jaamd',
         create: '@jaamd',
