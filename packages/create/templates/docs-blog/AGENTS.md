@@ -73,16 +73,16 @@ and `node_modules/@jaamd/jaab/docs/`. Read the one for a task before working on
 it:
 
 - Pages, links and sections: `node_modules/@jaamd/jaad/docs/01-getting-started/02-pages.md`
-- Frontmatter of a page: `node_modules/@jaamd/jaad/docs/02-configurations/02-frontmatter.md`
+- Frontmatter of a page: `node_modules/@jaamd/jaad/docs/01-getting-started/03-frontmatter.md`
 - Posts and their frontmatter: `node_modules/@jaamd/jaab/docs/01-getting-started/02-posts.md`
 - Docs and a blog together: `node_modules/@jaamd/jaab/docs/01-getting-started/01-installation.md`
 - Markdown syntax: https://docs.jaamd.org/jaamd/markdown.md
-- JAAD's options: `node_modules/@jaamd/jaad/docs/02-configurations/01-reference.md`
-- JAAB's options: `node_modules/@jaamd/jaab/docs/02-configurations/01-reference.md`
-- Feed and metadata: `node_modules/@jaamd/jaab/docs/02-configurations/02-feed.md`
-- Search: `node_modules/@jaamd/jaad/docs/02-configurations/04-search.md`
-- Styles and fonts: `node_modules/@jaamd/jaad/docs/02-configurations/06-styles.md`
-- Themes: `node_modules/@jaamd/jaad/docs/02-configurations/05-themes.md`
-- Deployment: `node_modules/@jaamd/jaad/docs/01-getting-started/03-deployment.md`
+- JAAD's options and the shared ones: `node_modules/@jaamd/jaad/docs/03-configuration/01-options.md`
+- JAAB's options: `node_modules/@jaamd/jaab/docs/03-configuration/01-options.md`
+- Feed and metadata: `node_modules/@jaamd/jaab/docs/02-guides/01-feed.md`
+- Search: `node_modules/@jaamd/jaad/docs/02-guides/02-search.md`
+- Styles and fonts: `node_modules/@jaamd/jaad/docs/02-guides/04-styles.md`
+- Themes: `node_modules/@jaamd/jaad/docs/02-guides/03-themes.md`
+- Deployment: `node_modules/@jaamd/jaad/docs/01-getting-started/04-deployment.md`
 
 The same pages are published at https://docs.jaamd.org.

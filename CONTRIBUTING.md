@@ -30,11 +30,16 @@ A test goes in the cheapest tier that can see the bug:
 ## Documentation
 
 Each package's documentation is the markdown in its `docs/` folder, published
-with it: `packages/astro/docs/` for JAAMD, `packages/jaad/docs/` for JAAD. The
-`docs/` project renders both as docs.jaamd.org, one section each: preview it
-with `pnpm --filter docs dev`. Link between pages by file, relative to
-the page you are writing, even across the two packages; the build fails on a
-link to a file that does not exist.
+with it: `packages/astro/docs/` for JAAMD, `packages/jaad/docs/` for JAAD,
+`packages/jaab/docs/` for JAAB. The `docs/` project renders them as
+docs.jaamd.org, one section each: preview it with `pnpm --filter docs dev`.
+Link between pages by file, relative to the page you are writing, even across
+packages; the build fails on a link to a file that does not exist.
+
+An option has a page of its own in its package's `configuration` chapter, with
+its use cases, and a row in that chapter's index. The options JAAD and JAAB
+share are documented once, in JAAD's. A page that moves gets an entry in
+`MOVED`, in `docs/worker.ts`, so its old address redirects.
 
 The `site/` project is jaamd.org, the landing page with the live editor: preview
 it with `pnpm --filter site dev`. Its Worker sends the old `jaamd.org/docs/...`
@@ -113,8 +118,8 @@ theme lacks.
 
 ## Translating the interface
 
-JAAD bundles its own interface strings separately from the Markdown written by
-its users. English is the canonical catalogue; every other catalogue must
+The shell of JAAD and JAAB bundles its own interface strings, separately from
+the Markdown written by its users. English is the canonical catalogue; every other catalogue must
 contain exactly the same keys.
 
 To contribute another language:
@@ -126,9 +131,8 @@ To contribute another language:
    value. Do not leave empty strings.
 3. Import the catalogue in `packages/site/src/ui.ts` and add its language code
    to `UI_CATALOGS`.
-4. Update the supported-language list in
-   `packages/jaad/docs/02-configurations/03-i18n.md`. The tests check every
-   registered catalogue for missing or empty strings.
+4. Add the language to the list in `packages/jaad/docs/03-configuration/26-ui.md`.
+   The tests check every registered catalogue for missing or empty strings.
 5. Run the checks above.
 
 Translate meaning rather than individual words. Keep labels concise, preserve
@@ -150,16 +154,19 @@ node scripts/release.mjs 1.0.0
 git push origin HEAD v1.0.0
 ```
 
-The script stops unless `main` is checked out, clean and level with
-`origin/main`, and the tag exists neither locally nor on `origin`. It sets the
-version of every package, commits, and creates the `v<version>` tag. The tag
-deploys docs.jaamd.org and runs [`publish.yml`](/.github/workflows/publish.yml),
-which tests the whole workspace and publishes with provenance, in dependency
-order: core, astro, site, jaad, jaab, create, create-jaad. A
-private package, as JAAB is until its first release, gets the version but is not
-published, and a public package that depends on a private one stops the release
-before anything is published. A package already
-on npm at that version is skipped, so running the workflow again from the tag
-finishes a release that failed halfway. A version with a suffix, such as `1.0.0-rc.1`, is published under
-the `next` dist-tag, the others under `latest`. `@jaamd/create` installs JAAD and
-JAAB at its own version; `create-jaad` is its former name, kept until 2.0.
+- The script stops unless `main` is checked out, clean and level with
+  `origin/main`, and the tag exists neither locally nor on `origin`. It sets the
+  version of every package, commits, and creates the `v<version>` tag.
+- The tag deploys docs.jaamd.org and runs
+  [`publish.yml`](/.github/workflows/publish.yml), which tests the whole
+  workspace and publishes with provenance, in dependency order: core, astro,
+  site, jaad, jaab, create, create-jaad.
+- A private package gets the version but is not published, and a public
+  package that depends on a private one stops the release before anything is
+  published.
+- A package already on npm at that version is skipped, so running the workflow
+  again from the tag finishes a release that failed halfway.
+- A version with a suffix, such as `1.0.0-rc.1`, is published under the `next`
+  dist-tag, the others under `latest`.
+- `@jaamd/create` installs JAAD and JAAB at its own version; `create-jaad` is
+  its former name, kept until 2.0.
