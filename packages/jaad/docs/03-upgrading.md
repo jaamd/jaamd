@@ -113,6 +113,12 @@ where 1.1 joined them with commas. See [Authors](02-configurations/02-frontmatte
 `readingTime: true` shows the minutes to read a page above its title. It is off
 by default, so a 1.1 site looks the same.
 
+### Drafts
+
+`draft` is no longer read: a page with `draft: true` is published like the
+others, in development and in the build, and links to it no longer warn. Keep
+a page that is not ready outside the docs, or on a branch.
+
 ### The scaffolder
 
 The scaffolder is now `npm create @jaamd`: it creates docs, a blog with

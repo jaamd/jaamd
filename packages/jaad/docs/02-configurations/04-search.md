@@ -19,7 +19,7 @@ with:
 - its code blocks, up to a few thousand characters, so that a name written
   only in code still finds its page.
 
-Drafts are left out of production builds. The index is emitted at
+The index is emitted at
 `<routeBase>/search-index.json`, one per language, loaded on first use and
 cached for the session. It holds the text of every page, so its size grows with
 the documentation.

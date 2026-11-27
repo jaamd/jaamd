@@ -22,20 +22,6 @@ test('opening-page discovery follows collection slugging and numeric order', () 
     }
 })
 
-// The opening page is whatever the collection sorts first, and its redirect
-// has to agree with it or it hides the wrong page.
-test('a draft never counts as the opening page', () => {
-    const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-draft-'))
-    try {
-        writeFileSync(join(docsDir, '00-scratch.md'), '---\ndraft: true\n---\n\n# Scratch')
-        writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
-
-        assert.deepEqual(findAliases([{ dir: docsDir }]), [{ locale: undefined, slug: 'intro', canonical: '' }])
-    } finally {
-        rmSync(docsDir, { recursive: true })
-    }
-})
-
 test('frontmatter order moves the opening page', () => {
     const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-order-'))
     try {
@@ -48,12 +34,11 @@ test('frontmatter order moves the opening page', () => {
     }
 })
 
-// The collection reads frontmatter as YAML: a comment, a capitalised boolean or
-// a byte order mark mean the same to it, and so they must here.
-test('frontmatter is read as YAML, comments, booleans and BOM included', () => {
+// The collection reads frontmatter as YAML: a comment or a byte order mark
+// mean the same to it, and so they must here.
+test('frontmatter is read as YAML, comments and BOM included', () => {
     const docsDir = mkdtempSync(join(tmpdir(), 'jaad-opening-yaml-'))
     try {
-        writeFileSync(join(docsDir, '00-scratch.md'), '---\ndraft: True\n---\n\n# Scratch')
         writeFileSync(join(docsDir, '01-intro.md'), '# Intro')
         writeFileSync(join(docsDir, '02-welcome.md'), '\uFEFF---\norder: 0 # first\n---\n\n# Welcome')
 

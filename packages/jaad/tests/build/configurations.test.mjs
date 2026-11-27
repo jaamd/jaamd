@@ -38,13 +38,12 @@ const DOCS = {
         'Second page.',
         '',
     ].join('\n'),
-    'docs/03-draft.md': '---\ndraft: true\n---\n\n# Draft\n\nThis page is only served in development.\n',
     'public/logo.svg': '<svg xmlns="http://www.w3.org/2000/svg"/>\n',
 }
 
 after(removeProjects)
 
-describe('docs at the root, with frontmatter, a draft and a header', () => {
+describe('docs at the root, with frontmatter and a header', () => {
     let site
 
     before(async () => {
@@ -106,24 +105,6 @@ describe('docs at the root, with frontmatter, a draft and a header', () => {
         assert.match(home, /<meta name="keywords" content="alpha, beta"/)
         assert.match(home, /"keywords":\["alpha","beta"\]/)
         assert.deepEqual(JSON.parse(site.read('search-index.json')).pages[0].keywords, ['alpha', 'beta'])
-    })
-
-    test('a draft is left out of the production build entirely', () => {
-        assert.ok(
-            !site.pages.some((file) => {
-                return file.includes('draft')
-            }),
-            'a draft page was routed',
-        )
-
-        const index = JSON.parse(site.read('search-index.json'))
-        assert.ok(
-            !index.pages.some((page) => {
-                return page.href.includes('draft')
-            }),
-            'a draft page reached the search index',
-        )
-        assert.doesNotMatch(site.read('llms.txt'), /\/draft/)
     })
 
     // A date in frontmatter that nothing renders is a field nobody would set.

@@ -59,19 +59,11 @@ export async function getDocsTree(locale: string = DEFAULT_LOCALE): Promise<Docs
         return key === '' || source.locale === key
     })
 
-    // Validated before drafts are dropped, so a draft's slug conflict is an error.
     validateDocsStructure(sources, key || undefined)
-    const tree = buildDocsTree(
-        import.meta.env.PROD
-            ? sources.filter((source) => {
-                  return !source.data.draft
-              })
-            : sources,
-        {
-            sections: KEYS,
-            urls: docsUrls(locale),
-        },
-    )
+    const tree = buildDocsTree(sources, {
+        sections: KEYS,
+        urls: docsUrls(locale),
+    })
     if (import.meta.env.PROD) {
         cached.set(key, tree)
     }
@@ -105,7 +97,7 @@ export async function getLocaleAlternates(key: string): Promise<LocaleAlternate[
 
     for (const locale of LOCALES) {
         const tree = await getDocsTree(locale.code)
-        // Every page drafted leaves a locale with nothing to link to.
+        // A locale without pages has nothing to link to.
         if (tree.pages.length === 0) {
             continue
         }

@@ -1,11 +1,8 @@
-import { readFrontmatter as readYaml } from '@jaamd/site/frontmatter.ts'
+import { readFrontmatter } from '@jaamd/site/frontmatter.ts'
 
-/** The fields read before the content collection exists: `order` and `draft`
- *  decide the opening pages and the links to drafts. */
-export function readFrontmatter(source: string): { order: number | undefined; draft: boolean } {
-    const { order, draft } = readYaml(source)
-    return {
-        order: typeof order === 'number' ? order : undefined,
-        draft: draft === true,
-    }
+/** `order` read before the content collection exists: it decides the opening
+ *  pages. */
+export function readOrder(source: string): number | undefined {
+    const { order } = readFrontmatter(source)
+    return typeof order === 'number' ? order : undefined
 }

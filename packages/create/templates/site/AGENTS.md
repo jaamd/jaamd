@@ -65,7 +65,6 @@ authors: [Ada Lovelace] # shown above the title, and in the metadata
 ogImage: /og/media.png # social image for this page
 lastUpdated: 2026-09-12 # modification date in metadata
 order: 5 # replaces the number in the filename
-draft: false # true keeps it out of the build
 ---
 ```
 

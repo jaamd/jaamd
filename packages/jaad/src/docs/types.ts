@@ -20,7 +20,6 @@ export interface DocsPageData {
     label?: string
     translationKey?: string
     order?: number
-    draft: boolean
     keywords: string[]
     authors?: AuthorsField
     /** The older single name; `authors` is the field to write. */

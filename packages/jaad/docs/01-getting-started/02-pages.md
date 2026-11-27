@@ -88,15 +88,14 @@ each read from its package.
 
 ## Overriding the file tree
 
-[Frontmatter](../02-configurations/02-frontmatter.md) renames a page, moves it
-without renaming the file, or keeps it out of the build:
+[Frontmatter](../02-configurations/02-frontmatter.md) renames a page or moves it
+without renaming the file:
 
 ```markdown
 ---
 title: Images & Videos
 label: Media
 order: 5
-draft: true
 ---
 ```
 

@@ -17,7 +17,6 @@ translationKey: media
 description: Add accessible images and embedded videos.
 keywords: [markdown, media]
 order: 5
-draft: false
 authors: [ada, Grace Hopper]
 ogImage: /og/media.png
 lastUpdated: 2026-09-12
@@ -33,7 +32,6 @@ lastUpdated: 2026-09-12
 | `translationKey` | `string`          | Pairs this page with its translations        |
 | `description`    | `string`          | Description metadata and `llms.txt`          |
 | `order`          | `number`          | Replaces the number from the filename prefix |
-| `draft`          | `boolean`         | Kept in development, left out of the build   |
 | `keywords`       | `string[]`        | Keyword metadata, and weight in search       |
 | `authors`        | see below         | Who wrote the page, above its title          |
 | `ogImage`        | `string \| false` | Social image for this page                   |
@@ -63,7 +61,7 @@ Without `title`, JAAD uses the first `# Heading`, then the filename.
 `translationKey` pairs a page with its translations when their slugs differ.
 See [Languages](03-i18n.md).
 
-## Ordering and drafts
+## Ordering
 
 `order` replaces the number a filename prefix supplies, so a page can move
 without being renamed. Inside a chapter it moves the page within that chapter;
@@ -77,10 +75,8 @@ order: 0
 
 A page ordered ahead of every other becomes the opening page at `routeBase`.
 
-`draft` pages are served in development and left out of production builds:
-they disappear from routes, navigation, search, the sitemap and `llms.txt`.
-The file tree is still validated as a whole, so a draft that would collide
-with another page is reported while it is being written.
+There are no drafts: a page in the docs is published. Keep a page that is not
+ready outside them, or on a branch.
 
 ## Metadata
 

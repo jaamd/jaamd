@@ -13,7 +13,7 @@ import { setupRedirects } from '@jaamd/site/redirects.ts'
 import { normaliseBasePath } from '@jaamd/site/urls.ts'
 import { docsRoots } from './config.ts'
 import { resolveDocLink } from './links.ts'
-import { readFrontmatter } from './model/frontmatter.ts'
+import { readOrder } from './model/frontmatter.ts'
 import { getDocCollectionId, splitDocLocale } from './model/ids.ts'
 import { buildDocsTree, type DocsSource } from './model/tree.ts'
 import { docsPageHref, type DocsUrlOptions } from './urls.ts'
@@ -77,11 +77,7 @@ function readDocsTrees(
             if (entry.isDirectory()) {
                 visit(root, file)
             } else if (entry.isFile() && entry.name.endsWith('.md')) {
-                const front = readFrontmatter(readFileSync(file, 'utf8'))
-                if (front.draft) {
-                    continue
-                }
-
+                const order = readOrder(readFileSync(file, 'utf8'))
                 const { locale, id } = splitDocLocale(getDocCollectionId(relative(root.dir, file)), locales)
                 sources.push({
                     file,
@@ -89,7 +85,7 @@ function readDocsTrees(
                     path: id,
                     locale: locale ?? undefined,
                     section: root.section,
-                    data: front.order === undefined ? {} : { order: front.order },
+                    data: order === undefined ? {} : { order },
                 })
             }
         }
@@ -286,18 +282,9 @@ export function setupDocs(
         )
     }
 
-    const warnedDrafts = new Set<string>()
     const links: DocLinkContext = {
         roots,
         locales,
-        onDraftLink(from, href) {
-            const key = `${from}\0${href}`
-            if (warnedDrafts.has(key)) {
-                return
-            }
-            warnedDrafts.add(key)
-            logger.warn(`${relative(root, from)} links to ${href}, a draft: a production build leaves it out.`)
-        },
         urls: (locale?: string): DocsUrlOptions => {
             return {
                 docsBase: config.docs.base,

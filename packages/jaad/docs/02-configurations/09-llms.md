@@ -51,8 +51,7 @@ defineJaadConfig({ title: 'My Project', llms: false })
 ```
 
 `llms: false` leaves out `llms.txt`, `llms-full.txt` and the announcement in the
-head. The Markdown of each page stays, for the "Copy page" button. To keep a page
-out of every file, make it a [draft](02-frontmatter.md).
+head. The Markdown of each page stays, for the "Copy page" button.
 
 ## Markdown for the agents that ask for it
 
