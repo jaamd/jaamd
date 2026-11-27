@@ -1,5 +1,5 @@
 /* JAAD's palette drives JAAMD's. Used when the colours come from JAAD — its own
-   identity, or a custom theme written in src/jaad.css. */
+   identity, or a custom theme written in src/jaamd.css. */
 
 :root {
     --jaamd-bg: var(--color-background);

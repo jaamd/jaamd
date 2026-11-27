@@ -21,7 +21,7 @@ Build the site with `astro build`.
 | ----------------------- | ----------------------------------------------- |
 | `blog/`                 | The posts, and `index.md` above their list      |
 | `jaab.config.ts`        | Every JAAB option                               |
-| `src/jaad.css`          | Colours, fonts and widths (create it if absent) |
+| `src/jaamd.css`         | Colours, fonts and widths (create it if absent) |
 | `astro.config.mjs`      | Re-exports JAAB's Astro config; leave it alone  |
 | `src/content.config.ts` | Re-exports JAAB's collection; leave it alone    |
 
@@ -67,7 +67,7 @@ build warns and writes no feed.
 
 Title, logo, navigation, social links, footer and theme are options in
 `jaab.config.ts`, the same as JAAD's site options. Colours, fonts and layout
-widths are CSS custom properties in `src/jaad.css`. For a blog inside a site
+widths are CSS custom properties in `src/jaamd.css`. For a blog inside a site
 with a look of its own, `layout` hands every page to a layout of the project.
 
 ## Documentation

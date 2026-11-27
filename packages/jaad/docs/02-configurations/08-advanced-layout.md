@@ -137,4 +137,4 @@ the current page.
 `DocsHeading`, `DocsNavItem` and `DocsPageData` are exported from `@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
-[`src/jaad.css`](06-styles.md) instead.
+[`src/jaamd.css`](06-styles.md) instead.

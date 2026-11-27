@@ -1,7 +1,8 @@
 import type { Locale } from './locales.ts'
+import type { SiteStylesheets } from './virtual.ts'
 import { existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { z } from 'astro/zod'
 import { authorShape } from './authors.ts'
@@ -196,21 +197,37 @@ const styleInPackage = (name: string) => {
     return fileURLToPath(new URL(`./styles/${name}`, import.meta.url))
 }
 
+/** The project's own stylesheet: `jaamd.css` in its source directory, or
+ *  `jaad.css`, the name JAAD 1.x reads, until 2.0. */
+function projectStylesheet(paths: ProjectPaths): string | null {
+    const current = join(paths.srcDir, 'jaamd.css')
+    const legacy = join(paths.srcDir, 'jaad.css')
+    const hasCurrent = existsSync(current)
+    const hasLegacy = existsSync(legacy)
+
+    if (hasCurrent && hasLegacy) {
+        const currentName = relative(paths.root, current)
+        const legacyName = relative(paths.root, legacy)
+        throw new Error(
+            `jaamd: ${currentName} and ${legacyName} both exist, and only one is read.\n` +
+                `  Move the rules of ${legacyName} into ${currentName}, then delete ${legacyName}.`,
+        )
+    }
+    if (hasCurrent) {
+        return current
+    }
+    return hasLegacy ? legacy : null
+}
+
 /** Absolute paths, kept off the resolved config, which gets serialised. */
 export function resolveStylesheets(
     config: SiteConfig,
     project: ProjectPaths | string = process.cwd(),
-): {
-    user: string | null
-    theme: string | null
-    bridge: string
-    tailwind: string | null
-} {
-    const userCss = join(toProjectPaths(project).srcDir, 'jaad.css')
+): SiteStylesheets {
     const slug = typeof config.theme === 'string' ? presetOf(config.theme).theme : null
 
     return {
-        user: existsSync(userCss) ? userCss : null,
+        user: projectStylesheet(toProjectPaths(project)),
         // Resolved through JAAMD's export map rather than by path.
         theme: slug ? requireFrom.resolve(`@jaamd/astro/themes/${slug}.css`) : null,
         // A preset supplies the palette, so the colours travel the other way.

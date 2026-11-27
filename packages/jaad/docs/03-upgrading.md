@@ -93,6 +93,12 @@ The header, the footer, the search and the other parts of the shell are named
 
 Pages on `Page` load only the shell's stylesheet, without the documentation's.
 
+### The project stylesheet
+
+`src/jaad.css` is now `src/jaamd.css`, the name every package of a site reads.
+Rename the file; `src/jaad.css` is still read until 2.0, and a project with
+both stops the build.
+
 ### Authors
 
 `authors` in the frontmatter names who wrote a page, by key of the new site

@@ -168,12 +168,12 @@ describe('a project that installed the published tarball', () => {
         assert.ok(built.css.includes('--jaamd-'), 'jaamd markdown styles missing')
     })
 
-    test('src/jaad.css overrides colours and widths alike', () => {
+    test('src/jaamd.css overrides colours and widths alike', () => {
         // The convention is worthless unless it lands after the package's tokens.
         const tokenAt = built.css.indexOf('--color-background:')
         const overrideAt = built.css.indexOf('#3b5bdb')
-        assert.notEqual(overrideAt, -1, 'src/jaad.css was not picked up')
-        assert.ok(overrideAt > tokenAt, 'src/jaad.css loaded before the package tokens, so it cannot override them')
+        assert.notEqual(overrideAt, -1, 'src/jaamd.css was not picked up')
+        assert.ok(overrideAt > tokenAt, 'src/jaamd.css loaded before the package tokens, so it cannot override them')
 
         const width = built.css.lastIndexOf('--jaad-content-width:')
         assert.notEqual(width, -1, 'the layout tokens did not ship')

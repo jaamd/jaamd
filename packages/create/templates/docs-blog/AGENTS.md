@@ -27,7 +27,7 @@ Build the site with `astro build`.
 | `site.config.ts`        | The options both share: title, navigation, footer, theme   |
 | `astro.config.mjs`      | Each package with its own options, and Astro's, as `site`  |
 | `src/content.config.ts` | JAAD's and JAAB's collections together; leave it alone     |
-| `src/jaad.css`          | Colours, fonts and widths (create it if absent)            |
+| `src/jaamd.css`         | Colours, fonts and widths (create it if absent)            |
 
 The options of one package go in its call in `astro.config.mjs`, after the
 shared ones: `jaad({ ...site, routeBase: "/" })`. The build stops when the two

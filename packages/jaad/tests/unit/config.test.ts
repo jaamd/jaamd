@@ -285,7 +285,7 @@ test('a social image is inferred only when the public asset exists', (t) => {
     assert.equal(resolveConfig({ title: 'T', ogImage: false }, cwd).ogImage, false)
 })
 
-test("public assets and jaad.css are found in Astro's directories, not below the working one", (t) => {
+test("public assets and jaamd.css are found in Astro's directories, not below the working one", (t) => {
     const root = mkdtempSync(join(tmpdir(), 'jaad-paths-'))
     t.after(() => {
         rmSync(root, { recursive: true })
@@ -293,12 +293,31 @@ test("public assets and jaad.css are found in Astro's directories, not below the
     mkdirSync(join(root, 'static'))
     mkdirSync(join(root, 'source'))
     writeFileSync(join(root, 'static', 'favicon.svg'), '<svg/>')
-    writeFileSync(join(root, 'source', 'jaad.css'), '')
+    writeFileSync(join(root, 'source', 'jaamd.css'), '')
 
     const paths = { root, publicDir: join(root, 'static'), srcDir: join(root, 'source') }
     const config = resolveConfig({ title: 'T' }, paths)
     assert.equal(config.favicon, '/favicon.svg')
-    assert.equal(resolveStylesheets(config, paths).user, join(root, 'source', 'jaad.css'))
+    assert.equal(resolveStylesheets(config, paths).user, join(root, 'source', 'jaamd.css'))
+})
+
+test('jaad.css is still read, and is an error next to jaamd.css', (t) => {
+    const root = mkdtempSync(join(tmpdir(), 'jaad-stylesheet-'))
+    t.after(() => {
+        rmSync(root, { recursive: true })
+    })
+    mkdirSync(join(root, 'src'))
+    const config = resolveConfig({ title: 'T' }, root)
+
+    assert.equal(resolveStylesheets(config, root).user, null)
+
+    writeFileSync(join(root, 'src', 'jaad.css'), '')
+    assert.equal(resolveStylesheets(config, root).user, join(root, 'src', 'jaad.css'))
+
+    writeFileSync(join(root, 'src', 'jaamd.css'), '')
+    assert.throws(() => {
+        return resolveStylesheets(config, root)
+    }, /jaamd: src\/jaamd\.css and src\/jaad\.css both exist[\s\S]*Move the rules of src\/jaad\.css into src\/jaamd\.css/)
 })
 
 test('a misspelt key inside an option is an error, not a silent no-op', () => {

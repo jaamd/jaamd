@@ -21,7 +21,7 @@ Build the site with `astro build`.
 | ----------------------- | ----------------------------------------------- |
 | `docs/`                 | The markdown that becomes the site              |
 | `jaad.config.ts`        | Every JAAD option                               |
-| `src/jaad.css`          | Colours, fonts and widths (create it if absent) |
+| `src/jaamd.css`         | Colours, fonts and widths (create it if absent) |
 | `astro.config.mjs`      | Re-exports JAAD's Astro config; leave it alone  |
 | `src/content.config.ts` | Re-exports JAAD's collection; leave it alone    |
 
@@ -74,7 +74,7 @@ names it.
 
 Title, logo, navigation, social links, footer and theme are options in
 `jaad.config.ts`. Colours, fonts and layout widths are CSS custom properties
-in `src/jaad.css`. Reach for a custom `src/jaad/DocsFrame.astro` only when the
+in `src/jaamd.css`. Reach for a custom `src/jaad/DocsFrame.astro` only when the
 structure itself has to change.
 
 ## Documentation

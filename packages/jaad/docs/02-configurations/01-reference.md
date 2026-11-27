@@ -214,7 +214,7 @@ and remove the switcher. See [Themes](05-themes.md), and
 | Missing description                   | `package.json`                                    |
 | Favicon                               | `public/favicon.svg`, `.ico` or `.png`            |
 | Social image                          | `public/og-image.png`, `.jpg`, `.jpeg` or `.webp` |
-| Custom styles                         | `src/jaad.css`                                    |
+| Custom styles                         | `src/jaamd.css`                                   |
 | Locales                               | Directory names under `docsDir`                   |
 | Sitemap                               | Generated when `site` is set                      |
 | Search index, `llms.txt` and Markdown | Generated below `routeBase`                       |

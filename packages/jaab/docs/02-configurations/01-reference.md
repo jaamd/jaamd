@@ -24,4 +24,7 @@ blog's own:
 [JAAD's Authors](../../../jaad/docs/02-configurations/01-reference.md#authors).
 `author` has to be one of them.
 
+Colours, fonts and widths are CSS custom properties in `src/jaamd.css`, as in
+JAAD: see [JAAD's Styles](../../../jaad/docs/02-configurations/06-styles.md).
+
 `site`, `base` and `astro` reach Astro as they do from `jaad.config.ts`.

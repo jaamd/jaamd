@@ -1,12 +1,13 @@
 ---
-description: Colours, fonts and widths as CSS custom properties in src/jaad.css, and Tailwind.
+description: Colours, fonts and widths as CSS custom properties in src/jaamd.css, and Tailwind.
 ---
 
 # Styles
 
 JAAD's look is a set of CSS custom properties. Override them in
-`src/jaad.css`, which loads after the bundled stylesheet on documentation pages
-and on pages using `Page`:
+`src/jaamd.css`, which loads after the bundled stylesheet on documentation
+pages, on pages using `Page` and on [JAAB](https://docs.jaamd.org/jaab)'s
+pages. `src/jaad.css`, the name in 1.1, is still read until 2.0:
 
 ```css
 :root {

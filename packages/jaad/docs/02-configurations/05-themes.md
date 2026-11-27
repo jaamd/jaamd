@@ -55,7 +55,7 @@ defineJaadConfig({
 
 ## Custom themes
 
-Set theme seeds in `src/jaad.css`:
+Set theme seeds in `src/jaamd.css`:
 
 ```css
 :root,
