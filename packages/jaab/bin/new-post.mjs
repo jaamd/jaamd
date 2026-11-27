@@ -2,10 +2,10 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { slug } from 'github-slugger'
 
-export const USAGE = `Usage: jaab new "Title of the post" [--dir] [--blog-dir <dir>]
+const USAGE = `Usage: jaab new "Title of the post" [--dir] [--blog-dir <dir>]
 
   --dir             a directory with index.md, for images beside the post
-  --blog-dir <dir>  where the posts are, ./blog unless the config says otherwise`
+  --blog-dir <dir>  where the posts are, ./blog by default: the config is not read`
 
 /** The arguments of `jaab`, or the message to print instead. */
 export function parseArgs(args) {

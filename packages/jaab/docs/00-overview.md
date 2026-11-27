@@ -18,8 +18,8 @@ in the folder: there are no drafts to hide and no dates to wait for.
 
 - **The index**, newest first, with the date, the title and the description of
   each post, ten to a page. See [Posts](01-getting-started/02-posts.md).
-- **The post**, with its date and reading time above the title, the table of
-  contents beside it, and links to the older and newer posts below.
+- **The post**, with its date, reading time and authors above the title, the
+  table of contents beside it, and links to the older and newer posts below.
 - **A feed** in RSS 2.0, linked from every page. See
   [Feed and metadata](02-configurations/02-feed.md).
 - **The shell of JAAD**: the same header, footer, themes and type. A site with

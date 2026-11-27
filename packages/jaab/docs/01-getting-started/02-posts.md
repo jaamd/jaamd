@@ -16,6 +16,9 @@ npx jaab new "Introducing JAAB"
 npx jaab new "Photos from the trip" --dir
 ```
 
+It writes in `blog/` and does not read `jaab.config.ts`: with another `blogDir`,
+pass it as `--blog-dir`, as in `npx jaab new "Hello" --blog-dir posts`.
+
 ## Frontmatter
 
 ```yaml
