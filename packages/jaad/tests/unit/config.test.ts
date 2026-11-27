@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test, type TestContext } from 'node:test'
 import { resolveStylesheets } from '@jaamd/site/config.ts'
 import { uiString } from '@jaamd/site/ui.ts'
+import { ENGLISH_UI } from '@jaamd/site/ui/en.ts'
 import { ITALIAN_UI } from '@jaamd/site/ui/it.ts'
 import { fontProviders } from 'astro/config'
 import { defineJaadConfig, resolveConfig } from '../../src/config.ts'
@@ -343,6 +344,17 @@ test('ui overrides name strings JAAD has, in a locale code', () => {
     assert.throws(() => {
         return bare({ ui: { italiano: {} } })
     }, /ui\.italiano/)
+})
+
+test('Languages lists every key JAAD shows, with its English text', () => {
+    const page = readFileSync(new URL('../../docs/02-configurations/03-i18n.md', import.meta.url), 'utf8')
+    const listed = [...page.matchAll(/^ {4}"?([\w.]+)"?: "(.*)",$/gm)].map(([, key, text]) => {
+        return [key, text]
+    })
+    const shown = Object.entries(ENGLISH_UI).filter(([key]) => {
+        return !key.startsWith('blog.')
+    })
+    assert.deepEqual(listed, shown)
 })
 
 test('a link is a path or an http(s), mailto or tel URL', () => {

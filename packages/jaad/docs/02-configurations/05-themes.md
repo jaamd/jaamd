@@ -88,12 +88,16 @@ JAAD's. Two values keep both halves of a site in step:
 | Stored values             | `"dark"` / `"light"`          |
 | No stored value           | follow `prefers-color-scheme` |
 
-Apply the class in the `<head>`, before anything paints:
+Apply the class in the `<head>`, before anything paints. A browser that blocks
+the site's storage throws on `localStorage`; the system's choice then applies:
 
 ```astro
 <script is:inline>
     ;(function () {
-        var t = localStorage.getItem('theme')
+        var t = null
+        try {
+            t = localStorage.getItem('theme')
+        } catch (e) {}
         var dark = t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.classList.toggle('dark', dark)
     })()

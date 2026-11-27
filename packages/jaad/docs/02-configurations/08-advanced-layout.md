@@ -93,17 +93,20 @@ Wrap the slots you need to position in elements of your own, and style those.
 `DocsFrameProps` exposes the current page, headings and navigation model for
 conditional placement. JAAD's internal components are not part of this API.
 
-| Property                  | Contents                                     |
-| ------------------------- | -------------------------------------------- |
-| `page.id`                 | Content collection ID                        |
-| `page.slug`               | File-derived slug, including the opening one |
-| `page.title`              | Resolved page title                          |
-| `page.section`            | Section key, when the docs have sections     |
-| `page.chapter`            | Chapter slug, when present                   |
-| `headings`                | `{ depth, slug, text }[]` for levels 2 and 3 |
-| `navigation.groups`       | The whole tree: sections, chapters and pages |
-| `navigation.previousPage` | Previous navigation item or `null`           |
-| `navigation.nextPage`     | Next navigation item or `null`               |
+| Property                  | Contents                                               |
+| ------------------------- | ------------------------------------------------------ |
+| `page.id`                 | Content collection ID                                  |
+| `page.slug`               | File-derived slug, including the opening one           |
+| `page.title`              | Resolved page title                                    |
+| `page.section`            | Section key, when the docs have sections               |
+| `page.chapter`            | Chapter slug, when present                             |
+| `page.data`               | The page's [frontmatter](02-frontmatter.md)            |
+| `page.authors`            | `{ name, url }[]`, resolved against the site's authors |
+| `page.readingTime`        | Minutes to read the page, even without `readingTime`   |
+| `headings`                | `{ depth, slug, text }[]` for levels 2 and 3           |
+| `navigation.groups`       | The whole tree: sections, chapters and pages           |
+| `navigation.previousPage` | Previous navigation item or `null`                     |
+| `navigation.nextPage`     | Next navigation item or `null`                         |
 
 `page.chapter` and a chapter group's `chapter` are directory slugs, such as
 `getting-started`. Title-case them for display.
@@ -134,7 +137,8 @@ Groups and their items arrive in display order.
 the current page.
 
 `DocsFrameProps`, `DocsNavigation`, `DocsNavGroup`, `DocsNavEntry`,
-`DocsHeading`, `DocsNavItem` and `DocsPageData` are exported from `@jaamd/jaad/advanced`.
+`DocsHeading`, `DocsNavItem`, `DocsPageData` and `Author` are exported from
+`@jaamd/jaad/advanced`.
 
 For colours, fonts, widths and spacing, use
 [`src/jaamd.css`](06-styles.md) instead.

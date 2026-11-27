@@ -35,7 +35,7 @@ lastUpdated: 2026-09-12
 | `keywords`       | `string[]`        | Keyword metadata, and weight in search       |
 | `authors`        | see below         | Who wrote the page, above its title          |
 | `ogImage`        | `string \| false` | Social image for this page                   |
-| `lastUpdated`    | `date`            | Modification date in metadata                |
+| `lastUpdated`    | `date`            | Modification date, shown under the page      |
 
 Fields JAAD does not know are ignored, so frontmatter your own tooling
 reads can sit alongside these. A wrong type is a build error.
@@ -91,6 +91,14 @@ chapter and body. They are metadata, not a visible list: JAAD renders nothing fo
 them, though a frame of your own can, through
 [`page.data`](08-advanced-layout.md).
 
+`ogImage` overrides the site's social image for one page. It takes a public
+path or an absolute URL, and `false` removes the image from that page. Local
+paths need `site` to resolve, as elsewhere.
+
+`lastUpdated` takes a date. It becomes `article:modified_time` and
+`dateModified` in structured data, and is shown under the page, formatted for
+its language.
+
 ## Authors
 
 `authors` names who wrote the page: one author or a list. Each is a key of the
@@ -110,11 +118,3 @@ when it has a url, and a `Person` of the structured data.
 Without `authors`, the page has the docs' default [`author`](01-reference.md#authors),
 when there is one; `authors: []` names nobody, even then. The older `author`,
 a single name, still works where `authors` is not set.
-
-`ogImage` overrides the site's social image for one page. It takes a public
-path or an absolute URL, and `false` removes the image from that page. Local
-paths need `site` to resolve, as elsewhere.
-
-`lastUpdated` takes a date. It becomes `article:modified_time` and
-`dateModified` in structured data, and is shown under the page, formatted for
-its language.

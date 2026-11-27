@@ -212,7 +212,8 @@ export const collections = {
 }
 ```
 
-The collection name `docsPages` is reserved for JAAD.
+The collection names `docsPages` and, with
+[sections](02-pages.md#sections), `docsPages-<key>` are reserved for JAAD.
 
 Create `docs/`, add a Markdown page, then run the project with its existing
 development script.
