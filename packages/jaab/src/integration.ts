@@ -173,12 +173,13 @@ export function createJaabIntegration(options: JaabUserConfig, site: SiteIntegra
                 })
 
                 const dir = resolve(root, config.blog.dir)
-                const posts = existsSync(dir) ? readPostFiles(dir, root) : []
-                if (!existsSync(dir)) {
+                const hasDir = existsSync(dir)
+                if (!hasDir) {
                     logger.warn(
                         `${relative(root, dir)} does not exist, so the blog has no posts. Create it, or set blogDir.`,
                     )
                 }
+                const posts = hasDir ? readPostFiles(dir, root) : []
 
                 const linkContext: PostLinkContext = {
                     dir,

@@ -9,7 +9,7 @@ import { normaliseBasePath } from '@jaamd/site/urls.ts'
 import { z } from 'astro/zod'
 
 /** The options of the blog: where the posts are, where they are served and how. */
-export const blogConfigShape = {
+const blogConfigShape = {
     blogDir: z.string().default('./blog'),
     routeBase: z.string().default('/'),
     /** Posts on each page of the index. */
@@ -29,7 +29,7 @@ export const blogConfigShape = {
 }
 
 /** Site options, then blog options: the order the error for an unknown one lists them. */
-export const jaabConfigSchema = z.object({ ...siteConfigShape, ...blogConfigShape })
+const jaabConfigSchema = z.object({ ...siteConfigShape, ...blogConfigShape })
 
 export type JaabConfig = z.output<typeof jaabConfigSchema>
 

@@ -68,3 +68,34 @@ test('an alias redirects below both bases, and stays out of the sitemap', async 
     assert.match(site.read('sitemap-0.xml'), /<loc>https:\/\/example\.dev\/repo\/blog\/moved\/<\/loc>/)
     assert.doesNotMatch(site.read('sitemap-0.xml'), /old\/address/)
 })
+
+test('readingTime, editLink and llms false leave out the minutes, the edit link and the Markdown', async () => {
+    const defaults = (await blog({})).read('post-24/index.html')
+    assert.match(defaults, /1 min read/)
+    assert.match(defaults, /Edit this page/)
+
+    const site = await blog({ readingTime: false, editLink: false, llms: false })
+    const post = site.read('post-24/index.html')
+    assert.doesNotMatch(post, /min read/)
+    assert.doesNotMatch(post, /Edit this page|Copy page/)
+    assert.doesNotMatch(post, /type="text\/markdown"/)
+    assert.deepEqual(
+        site.files.filter((file) => {
+            return file.endsWith('.md') || file.includes('llms')
+        }),
+        [],
+    )
+})
+
+test('without site, the blog builds with no feed', async () => {
+    const site = await blog({}, { site: undefined })
+    assert.equal(site.files.includes('/rss.xml'), false)
+    assert.doesNotMatch(site.read('index.html'), /application\/rss\+xml/)
+})
+
+test('pages built as files take urls without a slash, in the pages and the feed', async () => {
+    const site = await blog({}, { build: { format: 'file' } })
+    assert.ok(site.files.includes('/post-24.html'))
+    assert.match(site.read('index.html'), /class="blog-list-title" href="\/post-24"/)
+    assert.match(site.read('rss.xml'), /<link>https:\/\/example\.dev\/post-24<\/link>/)
+})

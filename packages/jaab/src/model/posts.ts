@@ -21,11 +21,11 @@ export function postSlug(path: string): string | null {
     if (parts.at(-1) === 'index') {
         parts.pop()
     }
-    if (parts.length === 0) {
+    const name = parts.pop()
+    if (name === undefined) {
         return null
     }
 
-    const name = parts.pop()!
     const undated = DATE_PREFIX.exec(name)?.[1] ?? name
     return [...parts, undated]
         .map((part) => {

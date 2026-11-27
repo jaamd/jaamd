@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join, relative, sep } from 'node:path'
 import { readFrontmatter } from '@jaamd/site/frontmatter.ts'
 import { postSlug, type PostFile } from './posts.ts'
 
@@ -22,7 +22,7 @@ export function readPostFiles(dir: string, root: string): PostFile[] {
                 continue
             }
 
-            const slug = postSlug(relative(dir, file).split('\\').join('/'))
+            const slug = postSlug(relative(dir, file).split(sep).join('/'))
             if (slug === null) {
                 continue
             }
