@@ -45,6 +45,21 @@ test('a footer of its own places the feed with :feed', async () => {
     assert.doesNotMatch(index, /Built with/)
 })
 
+test('the footer and the 404 are in the language of the site', async () => {
+    const site = await blog({ lang: 'it' })
+    const index = site.read('index.html')
+    assert.match(index, /<h2[^>]*id="footer-heading">\s*Piè di pagina del sito\s*<\/h2>/)
+    assert.match(
+        index,
+        /Realizzato con <a href="https:\/\/docs\.jaamd\.org\/jaab" rel="noopener">JAAB<\/a> · <a href="\/rss\.xml">Feed RSS<\/a>/,
+    )
+
+    const notFound = site.read('404.html')
+    assert.match(notFound, /<meta name="description" content="La pagina che cerchi non esiste\.">/)
+    assert.match(notFound, /<p class="site-not-found-text[^"]*">La pagina che cerchi non esiste\.<\/p>/)
+    assert.match(notFound, />Torna alla pagina iniziale<\/a>/)
+})
+
 test('an alias redirects below both bases, and stays out of the sitemap', async () => {
     const moved = { 'blog/moved.md': '---\ndate: 2026-11-25\naliases: [old/address]\n---\n\n# Moved\n' }
     const site = await blog({ routeBase: '/blog' }, { base: '/repo' }, moved)

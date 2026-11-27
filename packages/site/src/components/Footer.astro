@@ -1,19 +1,27 @@
 ---
 import config from 'virtual:jaamd/site'
-import { escapeHtml } from '../helpers.ts'
-import { ui } from '../runtime.ts'
+import { escapeHtml, fill } from '../helpers.ts'
+import { languageOf, ui } from '../runtime.ts'
 import { withDeploymentBase } from '../urls.ts'
 
 interface Props {
     locale?: string | undefined
 }
 
-const t = ui(Astro.props.locale)
+const { locale } = Astro.props
+const t = ui(locale)
 
 const links = config.credits.map((credit) => {
     return `<a href="${escapeHtml(credit.href)}" rel="noopener">${escapeHtml(credit.name)}</a>`
 })
-const credit = `Built with ${links.join(' and ')}`
+// Joined in the page's language: "JAAD and JAAB", "JAAD e JAAB".
+const packages = new Intl.ListFormat(languageOf(locale), { type: 'conjunction' })
+    .formatToParts(links)
+    .map((part) => {
+        return part.type === 'literal' ? escapeHtml(part.value) : part.value
+    })
+    .join('')
+const credit = fill(escapeHtml(t('footer.credit')), { packages })
 const feed = config.feeds[0]
 const feedLink = feed
     ? `<a href="${escapeHtml(withDeploymentBase(feed.path, import.meta.env.BASE_URL))}">${escapeHtml(t('feed.label'))}</a>`
@@ -38,7 +46,7 @@ const html = footerHtml(config.footer)
 {html && (
     <footer class="site-chrome jaad-chrome site-footer jaad-footer" aria-labelledby="footer-heading">
         <h2 class="site-sr-only jaad-sr-only" id="footer-heading">
-            Site footer
+            {t('footer.label')}
         </h2>
         <p class="site-footer-credit jaad-footer-credit" set:html={html} />
     </footer>
