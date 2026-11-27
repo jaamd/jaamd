@@ -4,9 +4,38 @@ description: Add JAAB to a project, alone or beside JAAD.
 
 # Installation
 
+## Create a project
+
+:::code-tabs
+
+```bash npm
+npm create @jaamd/jaab@latest
+```
+
+```bash pnpm
+pnpm create @jaamd/jaab@latest
+```
+
+```bash yarn
+yarn create @jaamd/jaab@latest
+```
+
+```bash bun
+bun create @jaamd/jaab@latest
+```
+
+:::
+
+The CLI asks for a template, destination, title and whether to install
+dependencies. The `blog` template puts the posts at `/` and is the default;
+`docs-blog` sets up [docs and a blog](#docs-and-a-blog) together, with the docs
+at `/` and the blog at `/blog`. `--here` adds them to a repository you already
+have, without overwriting a file; the options are in the
+[scaffolder's README](https://github.com/jaamd/jaamd/tree/main/packages/create).
+
 ## A blog
 
-Install JAAB with Astro:
+To add JAAB by hand, install it with Astro:
 
 ```bash
 npm i @jaamd/jaab astro
@@ -45,35 +74,38 @@ A site with documentation and a blog installs JAAD and JAAB. They share the
 header, the footer, the theme and the fonts, so they take the same site options:
 `defineSiteConfig` holds them once, and each config spreads them.
 
+`site.config.ts` holds the shared options:
+
 ```ts
-// site.config.ts
 import { defineSiteConfig } from '@jaamd/jaab'
 
 export default defineSiteConfig({
     title: 'My project',
     nav: [
-        { label: 'Docs', href: '/docs/' },
+        { label: 'Docs', href: '/' },
         { label: 'Blog', href: '/blog/' },
     ],
 })
 ```
 
+`astro.config.mjs` gives them to both, each with its own options after them:
+
 ```js
 import jaab from '@jaamd/jaab'
-// astro.config.mjs
 import jaad from '@jaamd/jaad'
 import { defineConfig } from 'astro/config'
 import site from './site.config.ts'
 
 export default defineConfig({
     site: 'https://example.dev',
-    integrations: [jaad({ ...site, routeBase: '/docs' }), jaab({ ...site, routeBase: '/blog' })],
+    integrations: [jaad({ ...site, routeBase: '/' }), jaab({ ...site, routeBase: '/blog' })],
 })
 ```
 
+`src/content.config.ts` declares the docs and the posts:
+
 ```ts
 import { collections as blog } from '@jaamd/jaab/content'
-// src/content.config.ts
 import { collections as docs } from '@jaamd/jaad/content'
 
 export const collections = { ...docs, ...blog }

@@ -93,6 +93,13 @@ The header, the footer, the search and the other parts of the shell are named
 
 Pages on `Page` load only the shell's stylesheet, without the documentation's.
 
+### The scaffolder
+
+`npm create @jaamd` creates docs, a blog with [JAAB](https://docs.jaamd.org/jaab),
+or both. `npm create @jaamd/jaad` still works, with the same options and
+templates, plus `docs-blog`; its interactive prompts now ask for the template
+before the directory.
+
 ## From 1.0
 
 ### Node 22.23.4
