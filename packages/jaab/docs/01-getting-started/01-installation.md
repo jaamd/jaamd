@@ -9,27 +9,27 @@ description: Add JAAB to a project, alone or beside JAAD.
 :::code-tabs
 
 ```bash npm
-npm create @jaamd/jaab@latest
+npm create @jaamd@latest -- --template blog
 ```
 
 ```bash pnpm
-pnpm create @jaamd/jaab@latest
+pnpm create @jaamd@latest --template blog
 ```
 
 ```bash yarn
-yarn create @jaamd/jaab@latest
+yarn create @jaamd --template blog
 ```
 
 ```bash bun
-bun create @jaamd/jaab@latest
+bunx @jaamd/create@latest --template blog
 ```
 
 :::
 
-The CLI asks for a template, destination, title and whether to install
-dependencies. The `blog` template puts the posts at `/` and is the default;
-`docs-blog` sets up [docs and a blog](#docs-and-a-blog) together, with the docs
-at `/` and the blog at `/blog`. `--here` adds them to a repository you already
+The CLI asks for a destination, title and whether to install dependencies. The
+`blog` template puts the posts at `/`; `--template docs-blog` sets up
+[docs and a blog](#docs-and-a-blog) together, with the docs at `/` and the blog
+at `/blog`, and without `--template` the CLI asks. `--here` adds them to a repository you already
 have, without overwriting a file; the options are in the
 [scaffolder's README](https://github.com/jaamd/jaamd/tree/main/packages/create).
 

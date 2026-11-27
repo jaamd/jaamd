@@ -56,7 +56,7 @@ test('an option that needs a value says so', () => {
 test('an unknown template names the ones that exist', () => {
     assert.throws(() => {
         return parseArgs(['--template', 'wiki'])
-    }, /unknown template wiki; available: docs, site, docs-blog\./)
+    }, /unknown template wiki; available: docs, site\./)
 })
 
 test("another package's template points at the scaffolder that has them all", () => {
@@ -77,7 +77,7 @@ test('the help lists the templates of its entry point, and its default', () => {
 test('a preset that is not there says which are', () => {
     assert.throws(() => {
         return presetOf('wiki')
-    }, /available: jaamd, jaad, jaab/)
+    }, /available: jaamd, jaad$/)
 })
 
 test('--here and a directory are mutually exclusive', () => {

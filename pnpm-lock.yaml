@@ -288,12 +288,6 @@ importers:
         specifier: ^1.7.0
         version: 1.8.1
 
-  packages/create-jaab:
-    dependencies:
-      '@jaamd/create':
-        specifier: workspace:*
-        version: link:../create
-
   packages/create-jaad:
     dependencies:
       '@jaamd/create':

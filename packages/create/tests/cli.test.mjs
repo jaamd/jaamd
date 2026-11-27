@@ -21,9 +21,8 @@ import { localDay } from '../lib.mjs'
 const CREATE_PKG = fileURLToPath(new URL('..', import.meta.url))
 /** `npm create @jaamd`, which offers every template. */
 const CLI = join(CREATE_PKG, 'index.mjs')
-/** `npm create @jaamd/jaad` and `npm create @jaamd/jaab`. */
+/** `npm create @jaamd/jaad`, which has JAAD's templates only. */
 const JAAD_CLI = join(CREATE_PKG, '..', 'create-jaad', 'index.mjs')
-const JAAB_CLI = join(CREATE_PKG, '..', 'create-jaab', 'index.mjs')
 const TEMPLATE_NAMES = ['docs', 'site', 'blog', 'docs-blog']
 // The commands it prints name the package manager that ran it: npm, not the one running the tests.
 const ENV = { ...process.env, npm_config_user_agent: 'npm/11.0.0 node/v24.0.0' }
@@ -447,7 +446,7 @@ test('a file that is a symlink is kept, even one that points nowhere yet', () =>
     assert.equal(existsSync(outside), false, 'the scaffolder wrote through the symlink')
 })
 
-// ── The blog templates and the aliases ───────────────────────────────────────
+// ── The blog templates and create-jaad ───────────────────────────────────────
 
 test('the blog template installs JAAB alone, with a first post dated today', () => {
     const parent = temporaryDirectory('jaab-blog-')
@@ -539,22 +538,18 @@ test('--here keeps the posts a blog already has', () => {
     assert.equal(existsSync(join(project, 'blog', 'index.md')), false)
 })
 
-test('each alias offers the templates of its package', () => {
-    const parent = temporaryDirectory('jaamd-aliases-')
-
-    const blog = scaffold(JAAB_CLI, ['blog', '--title', 'Blog', '--no-install'], parent)
-    assert.equal(blog.status, 0, blog.output)
-    assert.equal(existsSync(join(parent, 'blog', 'jaab.config.ts')), true, 'create-jaab did not default to a blog')
+test('create-jaad offers the templates it always had', () => {
+    const parent = temporaryDirectory('jaamd-alias-')
 
     const refused = scaffold(JAAD_CLI, ['refused', '--template', 'blog', '--title', 'No', '--no-install'], parent)
     assert.equal(refused.status, 1)
     assert.match(
         refused.output,
-        /^create-jaad: blog is not a template of @jaamd\/jaad; available: docs, site, docs-blog\. npm create @jaamd offers every template\./m,
+        /^create-jaad: blog is not a template of @jaamd\/jaad; available: docs, site\. npm create @jaamd offers every template\./m,
     )
     assert.equal(existsSync(join(parent, 'refused')), false)
 
-    const help = scaffold(JAAB_CLI, ['--help'], parent)
-    assert.match(help.output, /^Usage: npm create @jaamd\/jaab@latest/)
-    assert.match(help.output, /blog +posts at \/ \(default\)\n +docs-blog +docs at \/, blog at \/blog\n/)
+    const help = scaffold(JAAD_CLI, ['--help'], parent)
+    assert.match(help.output, /^Usage: npm create @jaamd\/jaad@latest/)
+    assert.match(help.output, /docs +docs at \/ \(default\)\n +site +landing page at \/, docs at \/docs\n/)
 })

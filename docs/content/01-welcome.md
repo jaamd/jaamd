@@ -26,7 +26,7 @@ site from a folder of Markdown files: navigation, search, languages and
 metadata, with JAAMD rendering every page. This site is built with it.
 
 ```bash
-npm create @jaamd/jaad@latest
+npm create @jaamd@latest -- --template docs
 ```
 
 ## Which one

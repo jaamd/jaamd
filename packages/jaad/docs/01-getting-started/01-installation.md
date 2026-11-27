@@ -4,7 +4,7 @@ description: Create a JAAD project, or add JAAD to an existing repository or Ast
 
 # Installation
 
-`npm create @jaamd/jaad` sets up a project in one command. To add JAAD by hand, see
+`npm create @jaamd` sets up a project in one command. To add JAAD by hand, see
 [Manual installation](#manual-installation).
 
 ## Create a project
@@ -12,47 +12,46 @@ description: Create a JAAD project, or add JAAD to an existing repository or Ast
 :::code-tabs
 
 ```bash npm
-npm create @jaamd/jaad@latest
+npm create @jaamd@latest
 ```
 
 ```bash pnpm
-pnpm create @jaamd/jaad@latest
+pnpm create @jaamd@latest
 ```
 
 ```bash yarn
-yarn create @jaamd/jaad@latest
+yarn create @jaamd
 ```
 
 ```bash bun
-bun create @jaamd/jaad@latest
+bunx @jaamd/create@latest
 ```
 
 :::
 
 The CLI asks for a template, destination, title and whether to install
-dependencies. The `docs` template puts documentation at `/` and is the default;
-`site` adds a landing page at `/` and moves documentation to `/docs`;
-`docs-blog` adds a [JAAB](https://docs.jaamd.org/jaab) blog at `/blog`.
-`npm create @jaamd@latest` is the same command with JAAB's `blog` template too.
+dependencies. The `docs` template puts documentation at `/`; `site` adds a
+landing page at `/` and moves documentation to `/docs`; `docs-blog` adds a
+[JAAB](https://docs.jaamd.org/jaab) blog at `/blog`.
 
 To provide every answer as flags:
 
 :::code-tabs
 
 ```bash npm
-npm create @jaamd/jaad@latest my-docs -- --title "My Docs" --install
+npm create @jaamd@latest my-docs -- --template docs --title "My Docs" --install
 ```
 
 ```bash pnpm
-pnpm create @jaamd/jaad@latest my-docs --title "My Docs" --install
+pnpm create @jaamd@latest my-docs --template docs --title "My Docs" --install
 ```
 
 ```bash yarn
-yarn create @jaamd/jaad@latest my-docs --title "My Docs" --install
+yarn create @jaamd my-docs --template docs --title "My Docs" --install
 ```
 
 ```bash bun
-bun create @jaamd/jaad@latest my-docs --title "My Docs" --install
+bunx @jaamd/create@latest my-docs --template docs --title "My Docs" --install
 ```
 
 :::
@@ -62,19 +61,19 @@ Use `--here` inside an existing repository:
 :::code-tabs
 
 ```bash npm
-npm create @jaamd/jaad@latest -- --here
+npm create @jaamd@latest -- --here --template docs
 ```
 
 ```bash pnpm
-pnpm create @jaamd/jaad@latest --here
+pnpm create @jaamd@latest --here --template docs
 ```
 
 ```bash yarn
-yarn create @jaamd/jaad@latest --here
+yarn create @jaamd --here --template docs
 ```
 
 ```bash bun
-bun create @jaamd/jaad@latest --here
+bunx @jaamd/create@latest --here --template docs
 ```
 
 :::

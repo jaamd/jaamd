@@ -5,10 +5,11 @@
 npm create @jaamd/jaad@latest my-docs
 ```
 
-This is [`@jaamd/create`](https://github.com/jaamd/jaamd/tree/main/packages/create)
-with JAAD's templates: `docs`, the default, with the docs at `/`; `site`, with a
-landing page at `/` and the docs at `/docs`; and `docs-blog`, with a blog beside
-the docs. Its options and its `--here` mode are described there.
+The scaffolder is now [`npm create @jaamd`](https://github.com/jaamd/jaamd/tree/main/packages/create),
+which also creates blogs. This command is kept for the projects and scripts
+that run it, with the templates it always had: `docs`, the default, with the
+docs at `/`, and `site`, with a landing page at `/` and the docs at `/docs`. It
+will be retired in 2.0. Its options and its `--here` mode are described there.
 
 ## Documentation
 

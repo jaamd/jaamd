@@ -13,19 +13,19 @@ documentation at `/docs`:
 :::code-tabs
 
 ```bash npm
-npm create @jaamd/jaad@latest my-site -- --template site
+npm create @jaamd@latest my-site -- --template site
 ```
 
 ```bash pnpm
-pnpm create @jaamd/jaad@latest my-site --template site
+pnpm create @jaamd@latest my-site --template site
 ```
 
 ```bash yarn
-yarn create @jaamd/jaad@latest my-site --template site
+yarn create @jaamd my-site --template site
 ```
 
 ```bash bun
-bun create @jaamd/jaad@latest my-site --template site
+bunx @jaamd/create@latest my-site --template site
 ```
 
 :::

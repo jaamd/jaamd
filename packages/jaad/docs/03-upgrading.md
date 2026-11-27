@@ -95,10 +95,11 @@ Pages on `Page` load only the shell's stylesheet, without the documentation's.
 
 ### The scaffolder
 
-`npm create @jaamd` creates docs, a blog with [JAAB](https://docs.jaamd.org/jaab),
-or both. `npm create @jaamd/jaad` still works, with the same options and
-templates, plus `docs-blog`; its interactive prompts now ask for the template
-before the directory.
+The scaffolder is now `npm create @jaamd`: it creates docs, a blog with
+[JAAB](https://docs.jaamd.org/jaab), or both, and needs `--template` when it
+runs without a terminal. `npm create @jaamd/jaad` still works, with the same
+templates and options, for the scripts that run it; it will be retired in 2.0.
+Both now ask for the template before the directory.
 
 ## From 1.0
 

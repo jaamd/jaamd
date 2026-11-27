@@ -7,7 +7,7 @@ An [Astro](https://astro.build) integration that turns a folder of markdown into
 To start a project, alone or beside JAAD's docs:
 
 ```bash
-npm create @jaamd/jaab@latest
+npm create @jaamd@latest -- --template blog
 ```
 
 To add it to one you have, install it with Astro and write three files:

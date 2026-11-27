@@ -83,7 +83,8 @@ export const TEMPLATES = {
     },
 }
 
-/** The entry points: `npm create @jaamd` and its aliases, each with the templates of its package. */
+/** The entry points: `npm create @jaamd`, and `npm create @jaamd/jaad`, kept
+ *  for the projects and scripts that run it, with the templates it always had. */
 export const PRESETS = {
     jaamd: {
         command: 'create-jaamd',
@@ -98,22 +99,12 @@ export const PRESETS = {
     jaad: {
         command: 'create-jaad',
         create: '@jaamd/jaad',
-        templates: ['docs', 'site', 'docs-blog'],
+        templates: ['docs', 'site'],
         defaultTemplate: 'docs',
         name: 'JAAD',
         tagline: 'Just Another Astro Docs — Write markdown. Get docs.',
         icon: '📚',
         outro: 'Happy documenting! ✨',
-    },
-    jaab: {
-        command: 'create-jaab',
-        create: '@jaamd/jaab',
-        templates: ['blog', 'docs-blog'],
-        defaultTemplate: 'blog',
-        name: 'JAAB',
-        tagline: 'Just Another Astro Blog — Write markdown. Get a blog.',
-        icon: '✍️',
-        outro: 'Happy writing! ✨',
     },
 }
 

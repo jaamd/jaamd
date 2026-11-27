@@ -270,10 +270,10 @@ test('the docs-blog template builds the docs at the root and the blog at /blog',
     assert.match(readFileSync(join(project, 'dist', 'blog', 'index.html'), 'utf8'), /href="\/blog\/hello-world\/"/)
 })
 
-// An alias is a manifest and an import: only installed do they show whether
+// The alias is a manifest and an import: only installed does it show whether
 // the dependency on @jaamd/create resolves.
-test('the aliases scaffold from their packed tarballs', { timeout: 600_000 }, () => {
-    const tools = temporaryDirectory('jaamd-aliases-')
+test('create-jaad scaffolds from its packed tarball', { timeout: 600_000 }, () => {
+    const tools = temporaryDirectory('jaamd-alias-')
     writeFileSync(
         join(tools, 'package.json'),
         JSON.stringify({
@@ -281,7 +281,6 @@ test('the aliases scaffold from their packed tarballs', { timeout: 600_000 }, ()
             private: true,
             dependencies: {
                 '@jaamd/create-jaad': `file:${packPackage(join(PACKAGES, 'create-jaad'))}`,
-                '@jaamd/create-jaab': `file:${packPackage(join(PACKAGES, 'create-jaab'))}`,
             },
             overrides: { '@jaamd/create': `file:${packPackage(CREATE_PKG)}` },
         }),
@@ -289,7 +288,5 @@ test('the aliases scaffold from their packed tarballs', { timeout: 600_000 }, ()
     run('npm', ['install', '--no-audit', '--no-fund'], tools)
 
     run('npx', ['create-jaad', 'docs', '--title', 'Docs', '--no-install'], tools)
-    run('npx', ['create-jaab', 'blog', '--title', 'Blog', '--no-install'], tools)
     assert.ok(existsSync(join(tools, 'docs', 'jaad.config.ts')), 'create-jaad did not write a docs site')
-    assert.ok(existsSync(join(tools, 'blog', 'jaab.config.ts')), 'create-jaab did not write a blog')
 })

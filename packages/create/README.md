@@ -26,10 +26,9 @@ npm create @jaamd@latest my-site -- --template docs-blog
 pnpm create @jaamd my-site --template docs-blog
 ```
 
-`npm create @jaamd/jaad` and `npm create @jaamd/jaab` are the same scaffolder,
-with the templates of their package: `docs`, `site` and `docs-blog` for JAAD,
-`docs` being the default; `blog` and `docs-blog` for JAAB, `blog` being the
-default.
+`npm create @jaamd/jaad`, the command before this one, still works for the
+scripts that run it: it is the same scaffolder with `docs`, the default, and
+`site`. It will be retired in 2.0.
 
 Every template also writes `AGENTS.md`, a short guide to the project for coding
 agents, with `CLAUDE.md` deferring to it.
@@ -70,8 +69,8 @@ Interactive prompts offer useful defaults: the directory is named after the
 template, such as `my-docs` or `my-blog`, and the current directory, when it is
 not empty, is used only once you confirm. In CI and other non-interactive
 environments the rest must be provided explicitly: a directory or `--here`, a
-title, and either `--install` or `--no-install`. `npm create @jaamd` also needs
-`--template`; its aliases default to theirs.
+title, a template, and either `--install` or `--no-install`;
+`npm create @jaamd/jaad` defaults to `docs`.
 
 ## Documentation
 

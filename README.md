@@ -34,13 +34,13 @@ Site: [jaamd.org](https://jaamd.org). Documentation: [docs.jaamd.org](https://do
 
 ## Packages
 
-| Package                                       | What                                                            |
-| --------------------------------------------- | --------------------------------------------------------------- |
-| [`@jaamd/astro`](/packages/astro)             | The Astro integration: plugins, enhancements, styles, themes    |
-| [`@jaamd/core`](/packages/core)               | The framework-agnostic part `@jaamd/astro` builds on            |
-| [`@jaamd/jaad`](/packages/jaad)               | A documentation site from a folder of Markdown, built on jaamd  |
-| [`@jaamd/create`](/packages/create)           | Scaffolds docs, a blog or both: `npm create @jaamd@latest`      |
-| [`@jaamd/create-jaad`](/packages/create-jaad) | Its alias for JAAD's templates: `npm create @jaamd/jaad@latest` |
+| Package                                       | What                                                           |
+| --------------------------------------------- | -------------------------------------------------------------- |
+| [`@jaamd/astro`](/packages/astro)             | The Astro integration: plugins, enhancements, styles, themes   |
+| [`@jaamd/core`](/packages/core)               | The framework-agnostic part `@jaamd/astro` builds on           |
+| [`@jaamd/jaad`](/packages/jaad)               | A documentation site from a folder of Markdown, built on jaamd |
+| [`@jaamd/create`](/packages/create)           | Scaffolds docs, a blog or both: `npm create @jaamd@latest`     |
+| [`@jaamd/create-jaad`](/packages/create-jaad) | The former command, kept until 2.0: `npm create @jaamd/jaad`   |
 
 Each package keeps its tests in `tests/`; `astro` and `jaad` add a fixture site for the build assertions.
 

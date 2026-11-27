@@ -504,7 +504,7 @@ function startingPoints(template, written) {
     return [...samples, ...dirs].join(' and ')
 }
 
-/** Runs the scaffolder as `preset` names it: `jaamd`, `jaad` or `jaab`. */
+/** Runs the scaffolder as `preset` names it: `jaamd`, or `jaad` for `create-jaad`. */
 export async function main(argv, presetKey) {
     const preset = presetOf(presetKey)
     const withCommand = (message) => {

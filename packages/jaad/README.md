@@ -16,13 +16,13 @@
 </div>
 
 ```bash
-npm create @jaamd/jaad@latest my-docs
+npm create @jaamd@latest my-docs -- --template docs
 ```
 
 Or add it to a repository that already has a `docs/` folder:
 
 ```bash
-npm create @jaamd/jaad@latest -- --here
+npm create @jaamd@latest -- --here --template docs
 ```
 
 By hand, install it with Astro and write three files:
@@ -56,7 +56,7 @@ export { collections } from '@jaamd/jaad/content'
 The documentation ships with the package, in
 [`docs/`](https://github.com/jaamd/jaamd/tree/main/packages/jaad/docs): once
 installed, at `node_modules/@jaamd/jaad/docs/`. Point an agent's `AGENTS.md`
-there; projects made with `create-jaad` already do. It is also published at
+there; projects made with `npm create @jaamd` already do. It is also published at
 [docs.jaamd.org/jaad](https://docs.jaamd.org/jaad).
 
 ## Contributing
