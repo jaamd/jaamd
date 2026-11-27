@@ -53,6 +53,18 @@ test('an option that needs a value says so', () => {
     }, /needs a value/)
 })
 
+test('an option takes its value after = too', () => {
+    const args = parseArgs(['--template=site', '--title=Docs = guides'])
+    assert.equal(args.template, 'site')
+    assert.equal(args.title, 'Docs = guides')
+    assert.throws(() => {
+        return parseArgs(['--title='])
+    }, /--title needs a value/)
+    assert.throws(() => {
+        return parseArgs(['--here=yes'])
+    }, /unknown option --here=yes/)
+})
+
 test('an unknown template names the ones that exist', () => {
     assert.throws(() => {
         return parseArgs(['--template', 'wiki'])

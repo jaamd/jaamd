@@ -49,6 +49,20 @@ function takeValue(argv, index, option) {
     return value
 }
 
+const VALUE_OPTIONS = ['--template', '--title']
+
+/** `--title=Docs` as `--title Docs`, the one form the options are read in. */
+function splitInlineValues(argv) {
+    return argv.flatMap((arg) => {
+        const equals = arg.indexOf('=')
+        const option = arg.slice(0, equals)
+        if (equals === -1 || !VALUE_OPTIONS.includes(option)) {
+            return [arg]
+        }
+        return [option, arg.slice(equals + 1)]
+    })
+}
+
 /** A prompt answer reaches no shell, so `~` is expanded here. */
 function expandHome(dir) {
     if (dir === '~') {
@@ -73,7 +87,8 @@ export function normaliseDir(args) {
     return args
 }
 
-export function parseArgs(argv, preset) {
+export function parseArgs(rawArgv, preset) {
+    const argv = splitInlineValues(rawArgv)
     const args = {
         here: false,
         install: null,
