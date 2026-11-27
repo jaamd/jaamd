@@ -13,7 +13,7 @@ import { markdownToHtml } from 'satteri'
 import { unified } from 'unified'
 import { splitCodeTabMeta } from '../src/render.ts'
 import { satteriPlugins, type SatteriOptions } from '../src/satteri/index.ts'
-import { unifiedPlugins, type UnifiedOptions } from '../src/unified/index.ts'
+import { remarkAlert, unifiedPlugins, type RemarkAlertOptions, type UnifiedOptions } from '../src/unified/index.ts'
 
 const SOURCE = `## Setup
 
@@ -286,4 +286,31 @@ test('without an id plugin, headings that have no id get no link', async () => {
             .process('## Setup'),
     )
     assert.equal(html, '<h2>Setup</h2>')
+})
+
+/** remarkAlert on its own, as a project that imports it gets it. */
+const alertHtml = async (options: RemarkAlertOptions, source: string) => {
+    const file = await unified()
+        .use(remarkParse)
+        .use(remarkAlert, options)
+        .use(remarkRehype)
+        .use(rehypeStringify)
+        .process(source)
+    return String(file)
+}
+
+test('with legacyTitle, an alert reads its title after the slash', async () => {
+    const html = await alertHtml({ legacyTitle: true }, '> [!NOTE/Heads up]\n> Body.\n')
+    assert.match(html, /<p class="markdown-alert-title" dir="auto">.*Heads up<\/p>/)
+    assert.doesNotMatch(html, /\[!NOTE/)
+})
+
+test('with legacyTitle, a marker with nothing after the slash keeps the type as title', async () => {
+    const html = await alertHtml({ legacyTitle: true }, '> [!NOTE/]\n> Body.\n')
+    assert.match(html, /<p class="markdown-alert-title" dir="auto">.*NOTE<\/p>/)
+})
+
+test('tagName sets the element that wraps an alert', async () => {
+    const html = await alertHtml({ tagName: 'aside' }, '> [!TIP]\n> Body.\n')
+    assert.match(html, /<aside class="markdown-alert markdown-alert-tip" dir="auto">/)
 })

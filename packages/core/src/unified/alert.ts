@@ -41,7 +41,7 @@ export const remarkAlert: Plugin<[RemarkAlertOptions?], Root> = function remarkJ
             }
 
             const alertType = found.type
-            const title = (legacyTitle && found.title ? found.title : alertType.toUpperCase()).replace(/^\//, '')
+            const title = legacyTitle && found.title ? found.title : alertType.toUpperCase()
 
             if (found.emptiesParagraph) {
                 node.children.shift()

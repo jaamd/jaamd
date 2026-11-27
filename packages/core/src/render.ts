@@ -13,7 +13,7 @@ export function escapeHtml(value: string): string {
 }
 
 export const ALERT_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i
-export const ALERT_LEGACY_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)(\/.*)?]/i
+export const ALERT_LEGACY_MARKER = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)(?:\/(.*))?]/i
 
 /** An inline node as both processors give it: text has a `value`. */
 interface InlineNode {
