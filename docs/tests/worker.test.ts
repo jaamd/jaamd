@@ -98,6 +98,7 @@ test('a moved page redirects to its new url, query kept', async () => {
 
 test('the Markdown of a moved page redirects to the new Markdown', () => {
     assert.equal(movedTo('/jaad/markdown.md'), '/jaamd/markdown.md')
+    assert.equal(movedTo('/jaad/configurations/reference.md'), '/jaad/configuration/options.md')
     assert.equal(movedTo('/jaad/getting-started/installation'), null)
 })
 
