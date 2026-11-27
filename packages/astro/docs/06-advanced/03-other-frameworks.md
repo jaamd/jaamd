@@ -102,8 +102,8 @@ points also export each plugin on its own.
 ### Options
 
 Both functions, and `enhance()` below, take the
-[`features`](../01-getting-started/02-options.md#features) and
-[`labels`](../01-getting-started/02-options.md#labels) options of the Astro
+[`features`](../05-configuration/05-features.md) and
+[`labels`](../05-configuration/06-labels.md) options of the Astro
 integration: `features` turns a feature off, `labels` replaces the English
 strings JAAMD writes. Pass the same values to the build and to `enhance()`.
 

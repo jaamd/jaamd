@@ -6,9 +6,9 @@ description: What the client script adds in the browser, and how it behaves from
 
 A dependency-free ES module enhances the rendered markdown. The integration
 injects it on every page; it runs on the elements matching
-[`selector`](../01-getting-started/02-options.md#selector), with the
-[`features`](../01-getting-started/02-options.md#features) and
-[`labels`](../01-getting-started/02-options.md#labels) of the integration. Events are delegated
+[`selector`](../05-configuration/03-selector.md), with the
+[`features`](../05-configuration/05-features.md) and
+[`labels`](../05-configuration/06-labels.md) of the integration. Events are delegated
 on `document`; per-element setup re-runs on every `astro:page-load`, so it
 keeps working across View Transitions.
 

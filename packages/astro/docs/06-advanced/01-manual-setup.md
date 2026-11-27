@@ -36,7 +36,7 @@ export default defineConfig({
 })
 ```
 
-Both take the integration's [`features` and `labels`](../01-getting-started/02-options.md#features).
+Both take the integration's [`features` and `labels`](../05-configuration/05-features.md).
 To add plugins of your own, spread the preset's lists: on Sätteri, keep
 `jaamd-directive-fallback`, the last mdast plugin, after yours, since it keeps
 directives no plugin claimed. The plugins one by one are in `@jaamd/core`, see

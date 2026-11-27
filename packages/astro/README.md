@@ -56,14 +56,14 @@ there. It is also published at [docs.jaamd.org](https://docs.jaamd.org).
 | Page                                                          | What                                                          |
 | ------------------------------------------------------------- | ------------------------------------------------------------- |
 | [Installation](./docs/01-getting-started/01-installation.md)  | Requirements and setup                                        |
-| [Options](./docs/01-getting-started/02-options.md)            | `theme`, `selector`, `defaultVariables`, `features`, `labels` |
+| [Options](./docs/05-configuration/01-options.md)              | `theme`, `selector`, `defaultVariables`, `features`, `labels` |
 | [Markdown syntax](./docs/02-markdown.md)                      | Alerts, code tabs, table of contents, spoilers                |
 | [MarkdownContent](./docs/03-usage/01-markdown-content.md)     | The wrapper component                                         |
 | [Client script](./docs/03-usage/02-client.md)                 | Enhancements, keyboard, lightbox                              |
 | [Variables](./docs/04-styling/01-variables.md)                | CSS variables, font sizes, dark mode                          |
 | [Themes](./docs/04-styling/02-themes.md)                      | Presets and dual-theme Shiki                                  |
 | [Markup and classes](./docs/04-styling/03-markup.md)          | The emitted HTML                                              |
-| [Manual setup](./docs/05-advanced/01-manual-setup.md)         | Registering the plugins yourself                              |
-| [Frontmatter fields](./docs/05-advanced/02-frontmatter.md)    | `frontmatterFields(z)`                                        |
-| [Other frameworks](./docs/05-advanced/03-other-frameworks.md) | `@jaamd/core`                                                 |
-| [Upgrading](./docs/06-upgrading.md)                           | Changes between versions                                      |
+| [Manual setup](./docs/06-advanced/01-manual-setup.md)         | Registering the plugins yourself                              |
+| [Frontmatter fields](./docs/06-advanced/02-frontmatter.md)    | `frontmatterFields(z)`                                        |
+| [Other frameworks](./docs/06-advanced/03-other-frameworks.md) | `@jaamd/core`                                                 |
+| [Upgrading](./docs/07-upgrading.md)                           | Changes between versions                                      |
