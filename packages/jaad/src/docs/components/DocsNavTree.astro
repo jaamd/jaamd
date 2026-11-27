@@ -23,39 +23,37 @@ const blocks = [
 {blocks.map(({ entries, label }) => (
     <div class:list={[label && 'docs-sidebar-section']}>
         {label && <p class="docs-sidebar-section-title">{label}</p>}
-        {entries.length > 0 && (
-            <ul class="docs-sidebar-list">
-                {entries.map((entry) =>
-                    entry.type === 'page' ? (
-                        <li>
-                            <a
-                                href={entry.item.href}
-                                class="docs-sidebar-link"
-                                aria-current={entry.item.isActive ? 'page' : undefined}
-                            >
-                                {entry.item.title}
-                            </a>
-                        </li>
-                    ) : (
-                        <li class="docs-sidebar-chapter">
-                            <p class="docs-sidebar-chapter-title">{slugToTitle(entry.chapter)}</p>
-                            <ul class="docs-sidebar-list">
-                                {entry.items.map((item) => (
-                                    <li>
-                                        <a
-                                            href={item.href}
-                                            class="docs-sidebar-link"
-                                            aria-current={item.isActive ? 'page' : undefined}
-                                        >
-                                            {item.title}
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </li>
-                    ),
-                )}
-            </ul>
-        )}
+        <ul class="docs-sidebar-list">
+            {entries.map((entry) =>
+                entry.type === 'page' ? (
+                    <li>
+                        <a
+                            href={entry.item.href}
+                            class="docs-sidebar-link"
+                            aria-current={entry.item.isActive ? 'page' : undefined}
+                        >
+                            {entry.item.title}
+                        </a>
+                    </li>
+                ) : (
+                    <li class="docs-sidebar-chapter">
+                        <p class="docs-sidebar-chapter-title">{slugToTitle(entry.chapter)}</p>
+                        <ul class="docs-sidebar-list">
+                            {entry.items.map((item) => (
+                                <li>
+                                    <a
+                                        href={item.href}
+                                        class="docs-sidebar-link"
+                                        aria-current={item.isActive ? 'page' : undefined}
+                                    >
+                                        {item.title}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </li>
+                ),
+            )}
+        </ul>
     </div>
 ))}

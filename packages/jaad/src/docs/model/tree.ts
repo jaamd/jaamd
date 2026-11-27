@@ -103,7 +103,10 @@ function sortSources<S extends DocsSource>(sources: S[], sections: string[]): S[
         if (entry.parsed.orderChapter !== undefined) {
             return entry.parsed.orderChapter
         }
-        return entry.parsed.chapter ? firstOrder.get(`${entry.section}/${entry.directory}`)! : entry.order
+        if (!entry.parsed.chapter) {
+            return entry.order
+        }
+        return firstOrder.get(`${entry.section}/${entry.directory}`) ?? entry.order
     }
 
     return entries

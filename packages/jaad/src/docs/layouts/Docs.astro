@@ -4,11 +4,12 @@ import type { DocsSourceEntry } from '../collection.ts'
 import type { DocsPage } from '../model/tree.ts'
 import type { DocsNavigation } from '../navigation.ts'
 import type { DocsHeading } from '../types.ts'
+import type { Author } from '@jaamd/site/authors.ts'
 import Footer from '@jaamd/site/components/Footer.astro'
 import Head from '@jaamd/site/components/Head.astro'
 import Header from '@jaamd/site/components/Header.astro'
 import TableOfContents from '@jaamd/site/components/TableOfContents.astro'
-import { pageDescription, pageReadingMinutes } from '@jaamd/site/rendered.ts'
+import { pageDescription } from '@jaamd/site/rendered.ts'
 import { DEFAULT_LOCALE, languageOf } from '@jaamd/site/runtime.ts'
 import { ClientRouter } from 'astro:transitions'
 import config from 'virtual:jaad/config'
@@ -16,7 +17,7 @@ import DocsFrame from 'virtual:jaad/docs-frame'
 import { getLocaleAlternates } from '../collection.ts'
 import DocsSidebarLeft from '../components/DocsSidebarLeft.astro'
 import DocsStructuredData from '../components/DocsStructuredData.astro'
-import { docsPageAuthors, docsUrls } from '../runtime.ts'
+import { docsUrls } from '../runtime.ts'
 import { docsFileHref, docsMarkdownHref } from '../urls.ts'
 import '@jaamd/site/site.css'
 import '../../../dist/jaad.css'
@@ -34,16 +35,17 @@ interface Props {
     page: DocsPage<DocsSourceEntry>
     headings?: DocsHeading[] | undefined
     navigation: DocsNavigation
+    authors: Author[]
+    /** Minutes to read the page, whether or not they are shown. */
+    readingTime: number
 }
 
-const { title, page, headings = [], navigation } = Astro.props
+const { title, page, headings = [], navigation, authors, readingTime } = Astro.props
 
 const pageTitle = title ? `${title} | ${config.title}` : config.title
 
 const description =
     page.data.description ?? pageDescription(page.source.rendered, page.title) ?? config.description ?? config.title
-
-const authors = docsPageAuthors(page.data)
 
 const locale = page.locale ?? DEFAULT_LOCALE
 const language = languageOf(locale)
@@ -81,7 +83,7 @@ const frameProps: DocsFrameProps = {
         chapter: page.chapter,
         data: page.data,
         authors,
-        readingTime: pageReadingMinutes(page.source.rendered),
+        readingTime,
     },
     headings,
     navigation,
@@ -148,7 +150,8 @@ const frameProps: DocsFrameProps = {
 
             /** A wide table or code block: the arrow keys should scroll it instead. */
             function inHorizontallyScrollable(el: Element | null): boolean {
-                for (let node = el; node && node !== document.body;) {
+                let node = el
+                while (node && node !== document.body) {
                     if (node instanceof HTMLElement) {
                         const overflowX = getComputedStyle(node).overflowX
                         if ((overflowX === 'auto' || overflowX === 'scroll') && node.scrollWidth > node.clientWidth) {

@@ -2,10 +2,10 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { allCss as allCssIn, readBuilt, walk } from '../../../tests/dist.mjs'
 
-export { escapeClass, missingFrom, packageClasses, walk } from '../../../tests/dist.mjs'
+export { missingFrom, packageClasses, walk } from '../../../tests/dist.mjs'
 
-export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-export const DIST = join(ROOT, 'tests', 'fixture', 'dist')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
+const DIST = join(ROOT, 'tests', 'fixture', 'dist')
 
 export function page(relative) {
     return readBuilt(DIST, relative)

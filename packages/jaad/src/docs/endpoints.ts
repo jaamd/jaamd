@@ -115,8 +115,9 @@ async function llmsBlocks(site: URL | undefined, locale: string | undefined, lev
                 continue
             }
 
-            const rows = chapters.get(chapter) ?? []
-            if (rows.length === 0) {
+            let rows = chapters.get(chapter)
+            if (!rows) {
+                rows = []
                 chapters.set(chapter, rows)
             }
             rows.push(row)
@@ -135,7 +136,7 @@ async function llmsBlocks(site: URL | undefined, locale: string | undefined, lev
     const loose = sortedPages.filter((page) => {
         return !page.section
     })
-    const sections: string[] =
+    const pageBlocks: string[] =
         SECTIONS.length === 0
             ? outline(sortedPages, top)
             : [
@@ -167,7 +168,7 @@ async function llmsBlocks(site: URL | undefined, locale: string | undefined, lev
               ]
             : []
 
-    return [...sections, ...languages]
+    return [...pageBlocks, ...languages]
 }
 
 /** Plain-text index of every page, per the llms.txt convention. */
