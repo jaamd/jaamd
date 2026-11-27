@@ -159,7 +159,7 @@ export function codeTabLabel(
 function hash(text: string): string {
     let value = 0x811c9dc5
     for (const char of text) {
-        value ^= char.codePointAt(0)!
+        value ^= char.codePointAt(0) ?? 0
         value = Math.imul(value, 0x01000193)
     }
     return (value >>> 0).toString(36)

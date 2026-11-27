@@ -128,10 +128,11 @@ export function satteriToc(options: SatteriTocOptions = {}): MdastPluginDefiniti
 
             // `[label]` arrives as a flagged paragraph.
             const first = children[0]
-            const title =
-                first?.type === 'paragraph' && first.data?.directiveLabel === true
-                    ? ctx.textContent(children.shift()!).trim()
-                    : ''
+            let title = ''
+            if (first?.type === 'paragraph' && first.data?.directiveLabel === true) {
+                title = ctx.textContent(first).trim()
+                children.shift()
+            }
 
             if (children.length === 0) {
                 return

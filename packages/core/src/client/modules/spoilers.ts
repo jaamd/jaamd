@@ -52,7 +52,7 @@ export function onSpoilerClick(target: Element): void {
 }
 
 export function onSpoilerKeydown(target: Element, e: KeyboardEvent): void {
-    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') {
+    if (e.key !== 'Enter' && e.key !== ' ') {
         return
     }
     // The hidden spoiler itself, not a focusable child or a revealed one.

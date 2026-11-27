@@ -59,7 +59,7 @@ export async function onCopyClick(target: Element): Promise<void> {
     resetTimers.set(
         btn,
         setTimeout(() => {
-            return delete btn.dataset.copied
+            delete btn.dataset.copied
         }, RESET_MS),
     )
 }
@@ -78,6 +78,6 @@ function announce(message: string): void {
     // Cleared first, so the same message is announced again.
     live.textContent = ''
     requestAnimationFrame(() => {
-        return (live.textContent = message)
+        live.textContent = message
     })
 }

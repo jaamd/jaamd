@@ -93,9 +93,9 @@ export function initToc(root: ParentNode, options: TocOptions = {}): () => void 
             },
         )
 
-        links.forEach((_link, target) => {
-            return observer.observe(target)
-        })
+        for (const target of links.keys()) {
+            observer.observe(target)
+        }
         observers.set(nav, observer)
         created.set(nav, observer)
     }
