@@ -79,10 +79,6 @@ const GROUPS = [
     }),
 ]
 
-export const TOKENS = GROUPS.flat().map(([token]) => {
-    return token
-})
-
 const COLUMN = 32
 
 function rgba(hex, alpha) {

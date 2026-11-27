@@ -9,7 +9,7 @@ import { z } from 'astro/zod'
 import { docsConfigShape, resolveDocsConfig, type DocsResolvedConfig } from './docs/config.ts'
 
 /** Site options, then docs options: the order the error for an unknown one lists them. */
-export const jaadConfigSchema = z.object({ ...siteConfigShape, ...docsConfigShape })
+const jaadConfigSchema = z.object({ ...siteConfigShape, ...docsConfigShape })
 
 export type JaadConfig = z.output<typeof jaadConfigSchema>
 

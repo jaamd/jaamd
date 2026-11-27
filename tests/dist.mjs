@@ -49,7 +49,7 @@ export function allCss(dist) {
 
 /** Whether a static host serves a file at `path`: the file, its directory's
  *  index, or the page with `.html`. A directory alone serves nothing. */
-export function resolves(dist, path) {
+function resolves(dist, path) {
     const candidates = [join(dist, path), join(dist, path, 'index.html'), join(dist, `${path}.html`)]
     return candidates.some((file) => {
         return existsSync(file) && statSync(file).isFile()
@@ -77,7 +77,7 @@ export function brokenLinks(dist) {
     return [...new Set(broken)]
 }
 
-export const escapeClass = (cls) => {
+const escapeClass = (cls) => {
     return cls.replace(/[.:/[\]%()!,#]/g, (c) => {
         return '\\' + c
     })

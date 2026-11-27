@@ -1,5 +1,5 @@
 /** What JAAMD adds to markdown, each of which can be turned off. */
-export const FEATURES = [
+const FEATURES = [
     'alerts',
     'codeTabs',
     'toc',
