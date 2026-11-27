@@ -20,14 +20,14 @@ Build the site with `astro build`.
 
 ## Layout
 
-| Path                    | What it is                                                 |
-| ----------------------- | ---------------------------------------------------------- |
-| `docs/`                 | The markdown of the documentation                          |
-| `blog/`                 | The posts, and `index.md` above their list                 |
-| `site.config.ts`        | The options both share: title, navigation, footer, theme   |
-| `astro.config.mjs`      | Each package with its own options, and Astro's, as `site`  |
-| `src/content.config.ts` | JAAD's and JAAB's collections together; leave it alone     |
-| `src/jaamd.css`         | Colours, fonts and widths (create it if absent)            |
+| Path                    | What it is                                                        |
+| ----------------------- | ----------------------------------------------------------------- |
+| `docs/`                 | The markdown of the documentation                                 |
+| `blog/`                 | The posts, and `index.md` above their list                        |
+| `site.config.ts`        | The options both share: title, navigation, footer, theme, authors |
+| `astro.config.mjs`      | Each package with its own options, and Astro's, as `site`         |
+| `src/content.config.ts` | JAAD's and JAAB's collections together; leave it alone            |
+| `src/jaamd.css`         | Colours, fonts and widths (create it if absent)                   |
 
 The options of one package go in its call in `astro.config.mjs`, after the
 shared ones: `jaad({ ...site, routeBase: "/" })`. The build stops when the two

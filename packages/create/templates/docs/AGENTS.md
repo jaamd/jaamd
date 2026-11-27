@@ -76,6 +76,10 @@ Title, logo, navigation, social links, footer and theme are options in
 in `src/jaamd.css`. Reach for a custom `src/jaad/DocsFrame.astro` only when the
 structure itself has to change.
 
+`site` in `jaad.config.ts` is the public URL, such as `site: "https://example.com"`.
+Until it is set, the build warns: `llms.txt` and the Markdown of each page link
+with relative URLs, and there is no sitemap.
+
 ## Documentation
 
 The JAAD documentation is installed with it, in `node_modules/@jaamd/jaad/docs/`. Read the

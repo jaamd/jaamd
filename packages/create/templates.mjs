@@ -66,6 +66,8 @@ export const TEMPLATES = {
             'import site from "./site.config.ts";',
             '',
             'export default defineConfig({',
+            '  // The public URL: the feed, llms.txt and the sitemap need it.',
+            '  // site: "https://example.com",',
             '  integrations: [',
             '    jaad({ ...site, routeBase: "/" }),',
             '    jaab({ ...site, routeBase: "/blog" }),',
