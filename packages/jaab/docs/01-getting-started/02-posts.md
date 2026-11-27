@@ -26,19 +26,24 @@ tags: [jaab, release]
 ---
 ```
 
-| Field         | Required | Use                                                          |
-| ------------- | -------- | ------------------------------------------------------------ |
-| `date`        | yes      | the order of the posts; a day, or a time with its offset     |
-| `title`       | no       | otherwise the first `#` heading of the file                  |
-| `description` | no       | in the index, the feed and the page's metadata               |
-| `tags`        | no       | in the metadata and the feed only: never shown on the page   |
-| `authors`     | no       | keys of the `authors` option; the default `author` otherwise |
-| `aliases`     | no       | old addresses of the post, each redirected to it             |
-| `lastUpdated` | no       | shown as "Updated" at the end of the post                    |
-| `ogImage`     | no       | the image for social previews; the site's otherwise          |
+| Field         | Required | Use                                                        |
+| ------------- | -------- | ---------------------------------------------------------- |
+| `date`        | yes      | the order of the posts; a day, or a time with its offset   |
+| `title`       | no       | otherwise the first `#` heading of the file                |
+| `description` | no       | in the index, the feed and the page's metadata             |
+| `tags`        | no       | in the metadata and the feed only: never shown on the page |
+| `authors`     | no       | keys of the site's `authors`, names, or `{ name, url }`    |
+| `aliases`     | no       | old addresses of the post, each redirected to it           |
+| `lastUpdated` | no       | shown as "Updated" at the end of the post                  |
+| `ogImage`     | no       | the image for social previews; the site's otherwise        |
 
 Without a `description`, the index shows the text before a `<!-- more -->` line,
 or else the first paragraph.
+
+A post's authors are named beside its date, each with a url a link to it, and
+in its metadata, its structured data and the feed. Each is a key of the site's
+`authors`, a name, or a name with a url; a post that names none has the blog's
+default `author`, and `authors: []` names nobody.
 
 A post shows the day its `date` is written on, whatever the time and its offset:
 `2026-11-23T00:30:00+01:00` is shown as Nov 23. The time orders posts of the

@@ -1,4 +1,5 @@
 import { ASTRO_OPTIONS, fontVariables, type AstroOptions } from '@jaamd/site/astro-config.ts'
+import { assertDefaultAuthor } from '@jaamd/site/authors.ts'
 import { resolveSiteConfig, siteConfigShape, siteOptionsOf, type SiteResolvedConfig } from '@jaamd/site/config.ts'
 import { inferRepo } from '@jaamd/site/infer.ts'
 import { describeLocale } from '@jaamd/site/locales.ts'
@@ -21,7 +22,9 @@ export interface JaadResolvedConfig extends SiteResolvedConfig {
 
 /** The options, checked: an unknown or invalid one stops the config from loading. */
 export function parseConfig(options: JaadUserConfig): JaadConfig {
-    return parseOptions(jaadConfigSchema, options, { product: 'jaad', forwarded: ASTRO_OPTIONS })
+    const config = parseOptions(jaadConfigSchema, options, { product: 'jaad', forwarded: ASTRO_OPTIONS })
+    assertDefaultAuthor('jaad', config.author, config.authors)
+    return config
 }
 
 /** The config with what the project tells: repository, locales, public assets.

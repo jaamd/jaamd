@@ -4,9 +4,11 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { z } from 'astro/zod'
+import { authorShape } from './authors.ts'
 import { inferDescription, type RepoInfo } from './infer.ts'
 import { isLocale } from './locales.ts'
 import { toProjectPaths, type ProjectPaths } from './paths.ts'
+import { linkHref, publicUrl } from './schema.ts'
 import { PRESET_NAMES, isPreset, presetOf } from './themes.ts'
 import { UI_KEYS } from './ui.ts'
 
@@ -18,32 +20,6 @@ function isLanguageTag(tag: string): boolean {
     } catch {
         return false
     }
-}
-
-const publicUrl = (field: string, example: string) =>
-    // A root-relative path or an http(s) URL; `//host/...` is neither.
-    {
-        return z.string().refine(
-            (v) => {
-                return /^\/(?!\/)/.test(v) || /^https?:\/\//.test(v)
-            },
-            {
-                message: `${field} must be a public url, such as "${example}"`,
-            },
-        )
-    }
-
-/** A link's target: a path, or a URL in a scheme a browser opens as a page or
- *  an address. `javascript:` and `data:` are refused. */
-const linkHref = (field: string) => {
-    return z.string().refine(
-        (v) => {
-            return !/^[a-z][a-z\d+.-]*:/i.test(v) || /^(https?|mailto|tel):/i.test(v)
-        },
-        {
-            message: `${field} must be a path or an http(s), mailto or tel URL`,
-        },
-    )
 }
 
 /** The options of the site around the pages: identity, header, footer, head and theme. */
@@ -72,6 +48,8 @@ export const siteConfigShape = {
         )
         .default({}),
     nav: z.array(z.strictObject({ label: z.string(), href: linkHref('a nav link') })).default([]),
+    /** The people who write the site, by the key a page names them with. */
+    authors: z.record(z.string(), authorShape).default({}),
     footer: z
         .union([z.string(), z.literal(false)], {
             error:

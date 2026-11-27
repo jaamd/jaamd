@@ -1,6 +1,7 @@
 /// <reference path="./env.d.ts" />
 
 import { frontmatterFields } from '@jaamd/astro/frontmatter'
+import { authorsField } from '@jaamd/site/authors.ts'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 import { defineCollection } from 'astro:content'
@@ -24,8 +25,8 @@ export const collections = {
             date: z.coerce.date(),
             /** For the metadata and the feed; never shown. */
             tags: z.array(z.string()).default([]),
-            /** Keys of the `authors` option. */
-            authors: z.union([z.string(), z.array(z.string())]).optional(),
+            /** Who wrote the post: keys of the site's `authors`, names, or names with a url. */
+            authors: authorsField,
             /** Old addresses, redirected to the post. */
             aliases: z.array(z.string()).default([]),
         }),

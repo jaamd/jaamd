@@ -4,6 +4,7 @@ import type { BlogPost } from './posts.ts'
 import type { FullPage } from '@jaamd/site/llms.ts'
 import type { MarkdownExportContext } from '@jaamd/site/markdown-export.ts'
 import rss from '@astrojs/rss'
+import { escapeHtml } from '@jaamd/site/helpers.ts'
 import { absoluteHref, llmsDocument, llmsFullDocument, llmsLine, textResponse } from '@jaamd/site/llms.ts'
 import { exportMarkdown, sourceKey } from '@jaamd/site/markdown-export.ts'
 import { oncePerBuild } from '@jaamd/site/runtime.ts'
@@ -118,6 +119,18 @@ async function feedHtml(post: BlogPost, renderPost: PostRenderer): Promise<strin
     return withoutTitle(html.replace(/<img\b[^>]*__ASTRO_IMAGE_[^>]*>/g, ''))
 }
 
+const DUBLIN_CORE = 'http://purl.org/dc/elements/1.1/'
+
+/** A post's authors as the feed names them: RSS's own `<author>` is an email
+ *  address, so each is a Dublin Core `<dc:creator>`, as feeds commonly write it. */
+function creators(post: BlogPost): string {
+    return post.authors
+        .map((author) => {
+            return `<dc:creator>${escapeHtml(author.name)}</dc:creator>`
+        })
+        .join('')
+}
+
 /** `rss.xml`: the newest posts in full. Only routed when `site` is set. */
 export async function rssResponse(site: URL): Promise<Response> {
     const limit = config.blog.feed?.limit ?? 0
@@ -133,6 +146,7 @@ export async function rssResponse(site: URL): Promise<Response> {
                 ...(post.description ? { description: post.description } : {}),
                 content: absoluteUrls(content, site.origin),
                 categories: post.tags,
+                ...(post.authors.length > 0 ? { customData: creators(post) } : {}),
             }
         }),
     )
@@ -143,6 +157,7 @@ export async function rssResponse(site: URL): Promise<Response> {
         site,
         items,
         customData: `<language>${config.lang}</language>`,
+        xmlns: { dc: DUBLIN_CORE },
         trailingSlash: config.blog.trailingSlash,
     })
 }

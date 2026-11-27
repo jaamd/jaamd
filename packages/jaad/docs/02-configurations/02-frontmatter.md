@@ -18,7 +18,7 @@ description: Add accessible images and embedded videos.
 keywords: [markdown, media]
 order: 5
 draft: false
-author: Ada Lovelace
+authors: [ada, Grace Hopper]
 ogImage: /og/media.png
 lastUpdated: 2026-09-12
 ---
@@ -35,7 +35,7 @@ lastUpdated: 2026-09-12
 | `order`          | `number`          | Replaces the number from the filename prefix |
 | `draft`          | `boolean`         | Kept in development, left out of the build   |
 | `keywords`       | `string[]`        | Keyword metadata, and weight in search       |
-| `author`         | `string`          | Author metadata                              |
+| `authors`        | see below         | Who wrote the page, above its title          |
 | `ogImage`        | `string \| false` | Social image for this page                   |
 | `lastUpdated`    | `date`            | Modification date in metadata                |
 
@@ -95,7 +95,25 @@ chapter and body. They are metadata, not a visible list: JAAD renders nothing fo
 them, though a frame of your own can, through
 [`page.data`](08-advanced-layout.md).
 
-`author` becomes `<meta name="author">` and the structured-data author.
+## Authors
+
+`authors` names who wrote the page: one author or a list. Each is a key of the
+site's [`authors`](01-reference.md#authors), a name, or a name with a link:
+
+```markdown
+---
+authors: [ada, Grace Hopper, { name: Charles Babbage, url: https://example.dev/charles }]
+---
+```
+
+The names are shown above the title, joined as the page's language joins
+them, "Ada Lovelace, Grace Hopper and Charles Babbage"; each with a url is a
+link. Each author is also a `<meta name="author">`, a `<link rel="author">`
+when it has a url, and a `Person` of the structured data.
+
+Without `authors`, the page has the docs' default [`author`](01-reference.md#authors),
+when there is one; `authors: []` names nobody, even then. The older `author`,
+a single name, still works where `authors` is not set.
 
 `ogImage` overrides the site's social image for one page. It takes a public
 path or an absolute URL, and `false` removes the image from that page. Local

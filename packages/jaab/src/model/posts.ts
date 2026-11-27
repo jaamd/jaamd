@@ -113,26 +113,6 @@ export interface PostFile {
     data: Record<string, unknown>
 }
 
-export interface PostRules {
-    /** The keys of `authors`. */
-    authors: string[]
-}
-
-/** The authors a post names, as keys of `authors`. Its `author`, shared with
- *  JAAD's frontmatter, is a name for the page's metadata and is not checked. */
-function authorKeys(data: Record<string, unknown>): string[] {
-    const named = data.authors
-    if (typeof named === 'string') {
-        return [named]
-    }
-    if (Array.isArray(named)) {
-        return named.filter((key) => {
-            return typeof key === 'string'
-        })
-    }
-    return []
-}
-
 /** The old addresses of a post, as slugs below the blog's base. */
 export function aliasSlugs(data: Record<string, unknown>): string[] {
     if (!Array.isArray(data.aliases)) {
@@ -154,7 +134,7 @@ const isReserved = (slug: string): boolean => {
 }
 
 /** What is wrong with the posts, one line each with its remedy. */
-export function postErrors(posts: PostFile[], rules: PostRules): string[] {
+export function postErrors(posts: PostFile[]): string[] {
     const errors: string[] = []
     const owners = new Map<string, string>()
 
@@ -175,12 +155,6 @@ export function postErrors(posts: PostFile[], rules: PostRules): string[] {
                 `${file} sets draft, which JAAB does not read: a post is published when it is in the blog. ` +
                     'Remove the field, or keep the file out of the blog until it is ready.',
             )
-        }
-
-        for (const key of authorKeys(data)) {
-            if (!rules.authors.includes(key)) {
-                errors.push(`${file} names the author "${key}", which authors does not list. Add it there.`)
-            }
         }
 
         if (post.slug === '') {

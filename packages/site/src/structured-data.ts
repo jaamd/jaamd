@@ -1,3 +1,5 @@
+import type { Author } from './authors.ts'
+
 /** A step of the page's breadcrumb; one without a url is a label only. */
 export interface Crumb {
     name: string
@@ -13,8 +15,7 @@ export interface StructuredDataProps {
     /** From the site's home to the page itself. */
     crumbs: Crumb[]
     keywords?: string[] | undefined
-    /** One name, or several. */
-    author?: string | string[] | undefined
+    authors?: Author[] | undefined
     published?: Date | undefined
     modified?: Date | undefined
     /** BCP-47 tag of this page's locale. */

@@ -8,8 +8,9 @@ description: The feed, the sitemap, llms.txt and the metadata of each post.
 
 `/rss.xml` is an RSS 2.0 feed with the last 20 posts in full, newest first:
 readers keep the posts they have already fetched. `feed: { limit: 50 }` sets how
-many, `feed: false` leaves the feed out. Its links and images are absolute, and
-each tag is a `<category>`. The header and the footer of every page link it, and
+many, `feed: false` leaves the feed out. Its links and images are absolute,
+each tag is a `<category>`, and each author a `<dc:creator>`: RSS's own
+`<author>` takes an email address. The header and the footer of every page link it, and
 each page announces it with `<link rel="alternate">`; a `footer` of your own
 places the link with `:feed`.
 

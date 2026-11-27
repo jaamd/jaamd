@@ -15,10 +15,13 @@ blog's own:
 | `perPage`     | `10`     | posts on each page of the index                                         |
 | `feed`        | `true`   | `rss.xml`, the last 20 posts in full; `{ limit }` sets how many         |
 | `readingTime` | `true`   | the minutes to read a post, above its title                             |
-| `author`      | none     | the key in `authors` of whoever writes a post that names no one         |
-| `authors`     | `{}`     | key → `{ name, url? }`; with more than one, each post names its own     |
+| `author`      | none     | the key in the site's `authors` of a post's author when it names none   |
 | `editLink`    | `true`   | a link to edit the post, inferred from the repository, or its base      |
 | `llms`        | `true`   | `llms.txt`, `llms-full.txt` and the Markdown of each post               |
 | `layout`      | none     | a layout of your own, from the project root: see [Layout](04-layout.md) |
+
+`authors`, the people who write the site, is one of the site options: see
+[JAAD's Authors](../../../jaad/docs/02-configurations/01-reference.md#authors).
+`author` has to be one of them.
 
 `site`, `base` and `astro` reach Astro as they do from `jaad.config.ts`.

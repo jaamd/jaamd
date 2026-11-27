@@ -87,13 +87,13 @@ const post = (file: string, data: Record<string, unknown> = {}): PostFile => {
     return { file: `blog/${file}`, slug: postSlug(file)!, data: { date: '2026-11-22', ...data } }
 }
 
-const errorsOf = (posts: PostFile[], authors: string[] = []) => {
-    return postErrors(posts, { authors })
+const errorsOf = (posts: PostFile[]) => {
+    return postErrors(posts)
 }
 
 test('well-formed posts pass', () => {
     const posts = [post('a.md', { authors: ['luca'], aliases: ['/old-a/'] }), post('b.md')]
-    assert.deepEqual(errorsOf(posts, ['luca']), [])
+    assert.deepEqual(errorsOf(posts), [])
 })
 
 test('a missing or wrong date says how to write one', () => {
@@ -107,11 +107,6 @@ test('a missing or wrong date says how to write one', () => {
 test('draft is refused: a post in the blog is published', () => {
     const [error] = errorsOf([post('a.md', { draft: true })])
     assert.match(error, /blog\/a\.md sets draft, which JAAB does not read/)
-})
-
-test('an author missing from authors is named', () => {
-    const [error] = errorsOf([post('a.md', { authors: 'ghost' })], ['luca'])
-    assert.match(error, /blog\/a\.md names the author "ghost", which authors does not list/)
 })
 
 test('two posts on one slug name both files', () => {

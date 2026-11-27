@@ -1,6 +1,7 @@
 ---
 import type { StructuredDataProps } from '../structured-data.ts'
 import config from 'virtual:jaamd/site'
+import { absoluteAuthorUrl } from '../authors.ts'
 import { scriptJson } from '../helpers.ts'
 
 type Props = StructuredDataProps
@@ -11,14 +12,15 @@ const {
     description,
     crumbs,
     keywords = [],
-    author,
+    authors = [],
     published,
     modified,
     language = config.lang,
 } = Astro.props
 
-const authors = [author ?? []].flat().map((name) => {
-    return { '@type': 'Person', name }
+const people = authors.map((author) => {
+    const url = absoluteAuthorUrl(author, import.meta.env.BASE_URL, Astro.site)
+    return { '@type': 'Person', name: author.name, ...(url ? { url } : {}) }
 })
 
 // Relative ids are worthless to a crawler, so without `site` emit nothing.
@@ -29,7 +31,7 @@ const data = Astro.site && {
     description,
     inLanguage: language,
     ...(keywords.length > 0 ? { keywords } : {}),
-    ...(authors.length > 0 ? { author: authors.length === 1 ? authors[0] : authors } : {}),
+    ...(people.length > 0 ? { author: people.length === 1 ? people[0] : people } : {}),
     ...(published ? { datePublished: published.toISOString() } : {}),
     ...(modified ? { dateModified: modified.toISOString() } : {}),
     isPartOf: { '@type': 'WebSite', name: config.title },

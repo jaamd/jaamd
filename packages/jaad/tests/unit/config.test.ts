@@ -24,6 +24,13 @@ test('title is the only thing you must supply', () => {
     assert.deepEqual(config.social, {})
 })
 
+test('the default author must be in authors', () => {
+    assert.throws(() => {
+        return bare({ author: 'ada' })
+    }, /jaad: author is "ada", which authors does not list/)
+    assert.equal(bare({ author: 'ada', authors: { ada: { name: 'Ada' } } }).docs.author, 'ada')
+})
+
 test('lang has to be a language tag', () => {
     assert.equal(bare({ lang: 'pt-BR' }).lang, 'pt-BR')
     assert.throws(() => {

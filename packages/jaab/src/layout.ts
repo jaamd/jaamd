@@ -127,11 +127,6 @@ export async function postPage(post: BlogPost): Promise<BlogPage<BlogPostProps>>
     const site = import.meta.env.SITE
     const urls = blogUrls()
 
-    const authorNames = post.authors.map((author) => {
-        return author.name
-    })
-    // The authors the post names, else the free-form `author`: the same in the meta and the JSON-LD.
-    const author = authorNames.length > 0 ? authorNames : entry.data.author
     const keywords = [...post.keywords, ...post.tags]
     const description = post.description ?? config.description ?? config.title
 
@@ -164,7 +159,7 @@ export async function postPage(post: BlogPost): Promise<BlogPage<BlogPostProps>>
                 head: {
                     ...documentText(post.title, description),
                     keywords,
-                    author: Array.isArray(author) ? author.join(', ') : author,
+                    authors: post.authors,
                     image: entry.data.ogImage,
                     modified: post.updated ?? undefined,
                     markdown: config.blog.llms ? post.markdownHref : undefined,
@@ -176,7 +171,7 @@ export async function postPage(post: BlogPost): Promise<BlogPage<BlogPostProps>>
                     description,
                     crumbs,
                     keywords,
-                    author,
+                    authors: post.authors,
                     published: post.date,
                     modified: post.updated ?? undefined,
                 },
