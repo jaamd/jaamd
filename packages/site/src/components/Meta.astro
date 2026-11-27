@@ -1,8 +1,8 @@
 ---
-import type { MetaProps } from '../meta.ts'
 import config from 'virtual:jaamd/site'
 import { absoluteAuthorUrl, authorHref } from '../authors.ts'
 import { openGraphLocale } from '../locales.ts'
+import { pageImageUrl, type MetaProps } from '../meta.ts'
 import { withDeploymentBase } from '../urls.ts'
 
 /** What a page tells search engines, social previews and agents about itself:
@@ -26,22 +26,7 @@ const {
 } = Astro.props
 const canonical = Astro.site ? Astro.url.href : null
 
-/** The page's image, absolute: Open Graph rejects relative paths, so a path
- *  without `site` gives none. */
-function absoluteImage(chosen: string | false): string | null {
-    if (chosen === false) {
-        return null
-    }
-    if (/^https?:\/\//.test(chosen)) {
-        return chosen
-    }
-    if (!Astro.site) {
-        return null
-    }
-    return new URL(withDeploymentBase(chosen, import.meta.env.BASE_URL), Astro.site).href
-}
-
-const ogImage = absoluteImage(image ?? config.ogImage)
+const ogImage = pageImageUrl(image ?? config.ogImage, import.meta.env.BASE_URL, Astro.site)
 const authorLinks = authors.flatMap((author) => {
     const href = authorHref(author, import.meta.env.BASE_URL)
     return href ? [href] : []

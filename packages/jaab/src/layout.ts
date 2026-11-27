@@ -174,6 +174,7 @@ export async function postPage(post: BlogPost): Promise<BlogPage<BlogPostProps>>
                     authors: post.authors,
                     published: post.date,
                     modified: post.updated ?? undefined,
+                    image: entry.data.ogImage,
                 },
             },
         },

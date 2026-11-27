@@ -103,6 +103,7 @@ describe('docs at the root, with frontmatter and a header', () => {
             "a page-level ogImage did not override the site's",
         )
         assert.match(deepDive, /"author":\{"@type":"Person","name":"Ada Lovelace"\}/)
+        assert.match(deepDive, /"image":"https:\/\/example\.dev\/logo\.svg"/)
 
         const home = site.read('index.html')
         assert.match(home, /<meta name="keywords" content="alpha, beta"/)

@@ -3,6 +3,7 @@ import type { StructuredDataProps } from '../structured-data.ts'
 import config from 'virtual:jaamd/site'
 import { absoluteAuthorUrl } from '../authors.ts'
 import { scriptJson } from '../helpers.ts'
+import { pageImageUrl } from '../meta.ts'
 
 type Props = StructuredDataProps
 
@@ -15,6 +16,7 @@ const {
     authors = [],
     published,
     modified,
+    image,
     language = config.lang,
 } = Astro.props
 
@@ -22,6 +24,9 @@ const people = authors.map((author) => {
     const url = absoluteAuthorUrl(author, import.meta.env.BASE_URL, Astro.site)
     return { '@type': 'Person', name: author.name, ...(url ? { url } : {}) }
 })
+
+// The image Open Graph has: Google asks an article for one.
+const imageUrl = pageImageUrl(image ?? config.ogImage, import.meta.env.BASE_URL, Astro.site)
 
 // Relative ids are worthless to a crawler, so without `site` emit nothing.
 const data = Astro.site && {
@@ -34,6 +39,7 @@ const data = Astro.site && {
     ...(people.length > 0 ? { author: people.length === 1 ? people[0] : people } : {}),
     ...(published ? { datePublished: published.toISOString() } : {}),
     ...(modified ? { dateModified: modified.toISOString() } : {}),
+    ...(imageUrl ? { image: imageUrl } : {}),
     isPartOf: { '@type': 'WebSite', name: config.title },
     breadcrumb: {
         '@type': 'BreadcrumbList',

@@ -3,6 +3,7 @@
  *  page of the shell has it through `Head`; a layout of a project's own can
  *  put it in its `<head>` alone. */
 import type { Author } from './authors.ts'
+import { withDeploymentBase } from './urls.ts'
 
 export interface MetaProps {
     title: string
@@ -23,4 +24,20 @@ export interface MetaProps {
     markdown?: string | undefined
     /** A dated piece, such as a post: the page is an Open Graph article. */
     article?: { published: Date; tags: string[] } | undefined
+}
+
+/** A page's image, absolute: the page's own, else the site's. Open Graph and
+ *  structured data reject relative paths, so a path without `site` gives none,
+ *  and `false` none at all. */
+export function pageImageUrl(chosen: string | false, deploymentBase: string, site: URL | undefined): string | null {
+    if (chosen === false) {
+        return null
+    }
+    if (/^https?:\/\//.test(chosen)) {
+        return chosen
+    }
+    if (!site) {
+        return null
+    }
+    return new URL(withDeploymentBase(chosen, deploymentBase), site).href
 }

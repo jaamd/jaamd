@@ -91,9 +91,9 @@ chapter and body. They are metadata, not a visible list: JAAD renders nothing fo
 them, though a frame of your own can, through
 [`page.data`](08-advanced-layout.md).
 
-`ogImage` overrides the site's social image for one page. It takes a public
-path or an absolute URL, and `false` removes the image from that page. Local
-paths need `site` to resolve, as elsewhere.
+`ogImage` overrides the site's social image for one page, in Open Graph and in
+structured data. It takes a public path or an absolute URL, and `false` removes
+the image from that page. Local paths need `site` to resolve, as elsewhere.
 
 `lastUpdated` takes a date. It becomes `article:modified_time` and
 `dateModified` in structured data, and is shown under the page, formatted for

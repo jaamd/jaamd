@@ -99,6 +99,9 @@ test('a post is an article, with its dates and tags', () => {
     assert.match(post, /<meta property="article:tag" content="jaab">/)
     assert.match(post, /"@type":"BlogPosting"/)
     assert.match(post, /"datePublished":"2026-11-22T00:00:00.000Z"/)
+    // The site's social image, the one Open Graph has: Google asks an article for one.
+    assert.match(post, /<meta property="og:image" content="https:\/\/blog\.example\.com\/og-image\.png">/)
+    assert.match(post, /"image":"https:\/\/blog\.example\.com\/og-image\.png"/)
 })
 
 test('the description is the text before <!-- more --> when the frontmatter has none', () => {

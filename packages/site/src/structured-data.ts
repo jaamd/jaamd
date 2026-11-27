@@ -18,6 +18,8 @@ export interface StructuredDataProps {
     authors?: Author[] | undefined
     published?: Date | undefined
     modified?: Date | undefined
+    /** The page's image, as `ogImage` writes it: false drops the site's. */
+    image?: string | false | undefined
     /** BCP-47 tag of this page's locale. */
     language?: string | undefined
 }
