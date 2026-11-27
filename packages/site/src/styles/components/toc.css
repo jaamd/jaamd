@@ -1,5 +1,5 @@
 @layer components {
-    .docs-toc-title {
+    .site-toc-title {
         margin: 0 0 0.5rem;
         font-family: var(--font-sans);
         font-size: 0.75rem;
@@ -7,13 +7,13 @@
         color: var(--color-foreground-muted);
     }
 
-    .docs-toc-list {
+    .site-toc-list {
         margin: 0;
         padding: 0;
         list-style: none;
     }
 
-    .docs-toc-link {
+    .site-toc-link {
         display: block;
         padding: 0.1875rem 0 0.1875rem calc(0.625rem - 2px);
         border-left: 2px solid transparent;
@@ -23,15 +23,15 @@
         text-decoration: none;
     }
 
-    .docs-toc-link-nested {
+    .site-toc-link-nested {
         padding-left: calc(1.375rem - 2px);
     }
 
-    .docs-toc-link:hover {
+    .site-toc-link:hover {
         color: var(--color-foreground-bright);
     }
 
-    .docs-toc-link[aria-current='location'] {
+    .site-toc-link[aria-current='location'] {
         border-color: var(--color-foreground-bright);
         color: var(--color-foreground-bright);
     }

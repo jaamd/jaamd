@@ -14,9 +14,10 @@ const allClasses = () => {
     return new Set([...packageClasses(SRC), ...packageClasses(SITE_SRC)])
 }
 
-/** A `jaad-*` class beside its `site-*` twin, kept for the CSS of 1.x projects. */
+/** A `jaad-*` or `docs-*` class beside its `site-*` twin, kept for the CSS of 1.x projects. */
 const isAlias = (name, classes) => {
-    return name.startsWith('jaad-') && classes.has(`site-${name.slice('jaad-'.length)}`)
+    const [, rest] = /^(?:jaad|docs)-(.+)$/.exec(name) ?? []
+    return rest !== undefined && classes.has(`site-${rest}`)
 }
 
 test('every class used by the package ships in the built CSS', () => {

@@ -12,15 +12,18 @@ const t = ui(locale)
 ---
 
 {headings.length > 0 && (
-    <nav id="docs-toc" aria-label={t('toc.label')} class="docs-toc">
-        <h2 class="docs-toc-title">{t('toc.title')}</h2>
-        <ul class="docs-toc-list">
+    <nav id="site-toc" aria-label={t('toc.label')} class="site-toc docs-toc">
+        <h2 class="site-toc-title docs-toc-title">{t('toc.title')}</h2>
+        <ul class="site-toc-list docs-toc-list">
             {headings.map((heading) => (
                 <li>
                     <a
                         href={`#${heading.slug}`}
                         data-toc-link
-                        class:list={['docs-toc-link', heading.depth === 3 && 'docs-toc-link-nested']}
+                        class:list={[
+                            'site-toc-link docs-toc-link',
+                            heading.depth === 3 && 'site-toc-link-nested docs-toc-link-nested',
+                        ]}
                     >
                         {heading.text}
                     </a>
@@ -38,7 +41,7 @@ const t = ui(locale)
     let stop: (() => void) | undefined
     function watchToc(): void {
         stop?.()
-        stop = initToc(document, { selector: '#docs-toc' })
+        stop = initToc(document, { selector: '#site-toc' })
     }
 
     watchToc()

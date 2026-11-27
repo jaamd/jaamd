@@ -156,9 +156,12 @@ describe('a project that installed the published tarball', () => {
     })
 
     test("the package's own styles survive a transitive install", () => {
-        // The jaad-* classes are aliases of the site-* ones, with no rule of their own.
-        const classes = [...packageClasses(join(PKG, 'src'))].filter((name) => {
-            return !name.startsWith('jaad-')
+        // The jaad-* classes, and the docs-* ones beside a site-* twin, are
+        // aliases with no rule of their own.
+        const all = packageClasses(join(PKG, 'src'))
+        const classes = [...all].filter((name) => {
+            const [, rest] = /^docs-(.+)$/.exec(name) ?? []
+            return !name.startsWith('jaad-') && !(rest !== undefined && all.has(`site-${rest}`))
         })
         assert.deepEqual(missingFrom(built.css, new Set(classes)), [], 'package utilities missing from the CSS')
         assert.ok(

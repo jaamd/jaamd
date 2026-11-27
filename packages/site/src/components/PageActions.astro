@@ -13,16 +13,22 @@ const { markdownHref, editHref, locale } = Astro.props
 const t = ui(locale)
 ---
 
-<div class="docs-page-actions">
+<div class="site-page-actions docs-page-actions">
     {markdownHref && (
         <button
             type="button"
             data-copy-page
             data-md-href={markdownHref}
             data-copied={t('page.copied')}
-            class="docs-page-action"
+            class="site-page-action docs-page-action"
         >
-            <svg class="docs-page-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+                class="site-page-action-icon docs-page-action-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -35,8 +41,14 @@ const t = ui(locale)
     )}
 
     {editHref && (
-        <a href={editHref} target="_blank" rel="noopener noreferrer" class="docs-page-action">
-            <svg class="docs-page-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <a href={editHref} target="_blank" rel="noopener noreferrer" class="site-page-action docs-page-action">
+            <svg
+                class="site-page-action-icon docs-page-action-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"

@@ -60,12 +60,15 @@ const path = trail()
         <details class="docs-mobile-menu">
             <summary class="docs-mobile-summary">{t('toc.title')}</summary>
             <nav aria-label={t('toc.label')} class="docs-mobile-tree">
-                <ul class="docs-toc-list">
+                <ul class="site-toc-list docs-toc-list">
                     {headings.map((heading) => (
                         <li>
                             <a
                                 href={`#${heading.slug}`}
-                                class:list={['docs-toc-link', heading.depth === 3 && 'docs-toc-link-nested']}
+                                class:list={[
+                                    'site-toc-link docs-toc-link',
+                                    heading.depth === 3 && 'site-toc-link-nested docs-toc-link-nested',
+                                ]}
                             >
                                 {heading.text}
                             </a>

@@ -87,9 +87,9 @@ test('a post has the table of contents and the page actions beside it', () => {
     const post = built('introducing-jaab/index.html')
     assert.match(
         post,
-        /<aside class="blog-aside[^"]*">[\s\S]*class="docs-toc"[\s\S]*data-md-href="\/introducing-jaab\.md"/,
+        /<aside class="blog-aside[^"]*">[\s\S]*class="site-toc docs-toc"[\s\S]*data-md-href="\/introducing-jaab\.md"/,
     )
-    assert.match(post, /href="#three-ways-in"[^>]*class="docs-toc-link"/)
+    assert.match(post, /href="#three-ways-in"[^>]*class="site-toc-link docs-toc-link"/)
 })
 
 test('a post is an article, with its dates and tags', () => {
@@ -193,9 +193,9 @@ test('every class of the blog has a rule in the built CSS', () => {
 })
 
 // Components stay semantic: styling lives in CSS, not in utilities.
-test('the blog writes only blog-*, site-* and docs-* classes', () => {
+test('the blog writes only blog-* and site-* classes', () => {
     const utilities = [...packageClasses(join(ROOT, 'src'))].filter((name) => {
-        return !/^(blog-|site-|docs-)/.test(name)
+        return !/^(blog-|site-)/.test(name)
     })
     assert.deepEqual(utilities, [])
 })

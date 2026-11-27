@@ -4,16 +4,16 @@ const RESOLVED_SITE = '\0' + SITE_ID
 const LLMS_ID = 'virtual:jaamd/llms'
 const RESOLVED_LLMS = '\0' + LLMS_ID
 
-const USER_CSS_ID = 'virtual:jaad/user.css'
+const USER_CSS_ID = 'virtual:jaamd/user.css'
 const RESOLVED_USER_CSS = '\0' + USER_CSS_ID
 
-const THEME_CSS_ID = 'virtual:jaad/theme.css'
+const THEME_CSS_ID = 'virtual:jaamd/theme.css'
 const RESOLVED_THEME_CSS = '\0' + THEME_CSS_ID
 
 // Which way the palette travels between JAAD and JAAMD; always one of the two.
-const BRIDGE_CSS_ID = 'virtual:jaad/bridge.css'
+const BRIDGE_CSS_ID = 'virtual:jaamd/bridge.css'
 
-const TAILWIND_CSS_ID = 'virtual:jaad/tailwind.css'
+const TAILWIND_CSS_ID = 'virtual:jaamd/tailwind.css'
 const RESOLVED_TAILWIND_CSS = '\0' + TAILWIND_CSS_ID
 
 export interface SiteStylesheets {

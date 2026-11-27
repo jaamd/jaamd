@@ -85,6 +85,9 @@ The header, the footer, the search and the other parts of the shell are named
 - Classes: `.site-header`, `.site-chrome`, `.site-main` and the rest. Each
   element still carries its `jaad-*` class, so CSS written for 1.1 keeps
   working until 2.0.
+- The table of contents and the page actions: `.site-toc`, `.site-page-action`
+  and the rest, each beside its `docs-*` class until 2.0. The table of
+  contents' id is now `site-toc`, where it was `docs-toc`.
 - Layout tokens: `--site-chrome-width` and the rest. The `--jaad-*` names are
   still read until 2.0.
 - Custom elements: `<jaad-search>`, `<jaad-nav-mobile>`, `<jaad-theme-toggle>`

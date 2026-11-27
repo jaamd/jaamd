@@ -75,7 +75,7 @@
 
     @media (width < 64rem) {
         [data-jaad-default-frame] .docs-sidebar-left,
-        [data-jaad-default-frame] .docs-sidebar-right .docs-toc {
+        [data-jaad-default-frame] .docs-sidebar-right .site-toc {
             display: none;
         }
 
