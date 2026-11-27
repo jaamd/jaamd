@@ -524,6 +524,23 @@ test('--here will not add a blog to a JAAD project, and says where to read how',
     assert.deepEqual(snapshotFiles(project), before)
 })
 
+// JAAB serves its index at /, and stops the build over a page of the project there.
+test('--here will not put a blog at the root over a page of the project', () => {
+    const project = temporaryDirectory('jaab-here-root-page-')
+    writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'landing', private: true }, null, 2))
+    mkdirSync(join(project, 'src', 'pages'), { recursive: true })
+    writeFileSync(join(project, 'src', 'pages', 'index.astro'), '<h1>Landing</h1>\n')
+    const before = snapshotFiles(project)
+
+    const result = runScaffolderHere(project, 'blog')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 1, output)
+    assert.match(output, /src\/pages\/index\.astro takes \/, and the blog template serves the blog index at \//)
+    assert.match(output, /docs-blog template for a blog at \/blog/)
+    assert.match(output, /No files were changed/)
+    assert.deepEqual(snapshotFiles(project), before)
+})
+
 test('--here keeps the posts a blog already has', () => {
     const project = temporaryDirectory('jaab-here-posts-')
     mkdirSync(join(project, 'blog'))

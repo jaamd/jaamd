@@ -50,6 +50,14 @@ function markdownUnder(dir) {
     }, 0)
 }
 
+/** The project's page at `/`, as `src/pages/index.astro`; null when it has none. */
+function rootPageOf(target) {
+    const name = INDEX_PAGE_NAMES.find((candidate) => {
+        return existsSync(join(target, 'src', 'pages', candidate))
+    })
+    return name ? `src/pages/${name}` : null
+}
+
 /** Never overwrites: an existing file is the user's, not ours. `wx` also
  *  refuses a symlink, even one that points nowhere yet. */
 function write(target, relative, contents, written, skipped) {
@@ -223,6 +231,12 @@ function inspectExistingProject(target, template) {
         issues.push(
             `${ownConfig} already configures ${productOf(template)}, so the ${template} template ${configConflict}`,
         )
+    }
+
+    const { rootConflict } = TEMPLATES[template]
+    const rootPage = rootPageOf(target)
+    if (rootConflict && rootPage) {
+        issues.push(`${rootPage} takes /, and the ${template} template ${rootConflict}`)
     }
 
     if (issues.length > 0) {
@@ -435,9 +449,7 @@ function scaffold(request) {
         write(target, 'src/content.config.ts', contentConfig, written, skipped)
     }
 
-    const ownsRoot = INDEX_PAGE_NAMES.some((name) => {
-        return existsSync(join(target, 'src', 'pages', name))
-    })
+    const ownsRoot = rootPageOf(target) !== null
     const found = Object.fromEntries(
         contentDirsOf(template).map((dir) => {
             return [dir, markdownUnder(join(target, dir))]

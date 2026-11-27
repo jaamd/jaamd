@@ -49,6 +49,8 @@ export const TEMPLATES = {
         contentConfig: 'export { collections } from "@jaamd/jaab/content";\n',
         config: { name: 'jaab.config', label: 'JAAB configuration' },
         setupUrl: JAAB_SETUP_URL,
+        // The blog's index is served at /, where JAAB stops the build over a page of the project.
+        rootConflict: 'serves the blog index at /: move the page, or use the docs-blog template for a blog at /blog',
     },
     'docs-blog': {
         label: 'Docs and a blog',
