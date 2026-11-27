@@ -10,11 +10,12 @@ export default defineJaadConfig({
     logo: '/mark.svg',
     homeLink: 'https://jaamd.org',
     lang: 'en',
-    description: 'Markdown, refined: the documentation of JAAMD and JAAD.',
+    description: 'Markdown, refined: the documentation of JAAMD, JAAD and JAAB.',
     docsDir: './content',
     sections: {
         jaamd: { dir: '../packages/astro/docs', label: 'JAAMD' },
         jaad: { dir: '../packages/jaad/docs', label: 'JAAD' },
+        jaab: { dir: '../packages/jaab/docs', label: 'JAAB' },
     },
     footer: 'MIT License · <a href="https://github.com/jaamd/jaamd">GitHub</a> · <a href="https://www.npmjs.com/org/jaamd">npm</a>',
     social: {

@@ -34,89 +34,34 @@ dependencies. The `docs` template puts documentation at `/`; `site` adds a
 landing page at `/` and moves documentation to `/docs`; `docs-blog` adds a
 [JAAB](https://docs.jaamd.org/jaab) blog at `/blog`.
 
-To provide every answer as flags:
+To give every answer as an option, or to set up the current directory with
+`--here`:
 
-:::code-tabs
-
-```bash npm
+```bash
 npm create @jaamd@latest my-docs -- --template docs --title "My Docs" --install
-```
-
-```bash pnpm
-pnpm create @jaamd@latest my-docs --template docs --title "My Docs" --install
-```
-
-```bash yarn
-yarn create @jaamd my-docs --template docs --title "My Docs" --install
-```
-
-```bash bun
-bunx @jaamd/create@latest my-docs --template docs --title "My Docs" --install
-```
-
-:::
-
-Use `--here` inside an existing repository:
-
-:::code-tabs
-
-```bash npm
 npm create @jaamd@latest -- --here --template docs
 ```
 
-```bash pnpm
-pnpm create @jaamd@latest --here --template docs
-```
+npm passes the options on after `--`; pnpm, yarn and bun need no `--`. Without
+a terminal, as in CI, the command needs a directory or `--here`, `--title`, and
+`--install` or `--no-install`.
 
-```bash yarn
-yarn create @jaamd --here --template docs
-```
-
-```bash bun
-bunx @jaamd/create@latest --here --template docs
-```
-
-:::
-
-The command keeps the existing `package.json` and Markdown files. It stops
-without writing when a custom Astro or Content configuration requires a manual
-merge, and when `--template site` meets a `jaad.config.*` it did not write:
-the landing page needs `routeBase: "/docs"`, which only you can set.
-
-> [!NOTE]
-> Non-interactive environments require a destination or `--here`, `--title`,
-> and either `--install` or `--no-install`.
+`--here` keeps the existing `package.json` and Markdown files. It writes nothing
+when the project's Astro or content configuration has to be merged by hand:
+see [Existing Astro project](#existing-astro-project).
 
 ## Run locally
 
-:::code-tabs
-
-```bash npm
+```bash
 npm run dev
 ```
 
-```bash pnpm
-pnpm dev
-```
-
-```bash yarn
-yarn dev
-```
-
-```bash bun
-bun run dev
-```
-
-:::
-
-The development server starts at `http://localhost:4321`.
-
-Add pages to `docs/`, following the conventions in
-[Pages and structure](02-pages.md).
+The development server starts at `http://localhost:4321`. Add pages to
+`docs/`, following [Pages and structure](02-pages.md).
 
 ## Manual installation
 
-Install JAAD in a project on Astro 7.3 or a later 7.x, with Node.js 22.23.4 or later:
+Install JAAD in a project on Astro 7, from 7.3, with Node.js 22.23.4 or later:
 
 :::code-tabs
 
@@ -167,9 +112,8 @@ export { collections } from '@jaamd/jaad/content'
 }
 ```
 
-Only `title` is required. See the
-[configuration reference](../02-configurations/01-reference.md) for the remaining
-options.
+Only `title` is required. Every other option is in
+[Options](../03-configuration/01-options.md).
 
 ## Existing Astro project
 
@@ -192,7 +136,7 @@ export default defineConfig({
 ```
 
 `jaad()` returns integrations only. `site` and `base` are lifted above. Of the
-[`astro`](../02-configurations/01-reference.md#extending-astro) field, only
+[`astro`](../03-configuration/27-astro.md) field, only
 `astro.fonts` is read here, to load those fonts on JAAD's pages: write the
 other options, and the same fonts, in `defineConfig`.
 
@@ -213,7 +157,7 @@ export const collections = {
 ```
 
 The collection names `docsPages` and, with
-[sections](02-pages.md#sections), `docsPages-<key>` are reserved for JAAD.
+[sections](../03-configuration/11-sections.md), `docsPages-<key>` are reserved for JAAD.
 
 Create `docs/`, add a Markdown page, then run the project with its existing
 development script.

@@ -34,17 +34,18 @@ there is no sidebar to declare and no route to write.
 - **Navigation** from the file tree: sidebar, chapters, previous
   and next links. See [Pages and structure](01-getting-started/02-pages.md).
 - **Search** across every page, built at compile time, with no external
-  service. See [Search](02-configurations/04-search.md).
+  service. See [Search](02-guides/02-search.md).
 - **Languages**, one site per locale directory, with a switcher and `hreflang`.
-  See [Languages](02-configurations/03-i18n.md).
+  See [Languages](02-guides/01-languages.md).
 - **Themes** for the interface and the code, light and dark. See
-  [Themes](02-configurations/05-themes.md).
+  [Themes](03-configuration/23-theme.md).
 - **Metadata** for search engines and social cards, and a sitemap.
 - **Files for language models and agents**: `llms.txt`, `llms-full.txt` and
   every page as Markdown that reads on its own. See
-  [LLMs and agents](02-configurations/09-llms.md).
+  [LLMs and agents](02-guides/07-llms.md).
 
 Pages are rendered with [JAAMD](https://docs.jaamd.org/jaamd), so its
 Markdown syntax and enhancements come with them.
 
-Start with [Installation](01-getting-started/01-installation.md).
+Start with [Installation](01-getting-started/01-installation.md). Every option is
+in [Options](03-configuration/01-options.md).

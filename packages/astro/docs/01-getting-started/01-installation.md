@@ -71,7 +71,7 @@ export default defineConfig({
 `@jaamd/astro` is published as TypeScript and `.astro` source, which any Astro
 project compiles. It is not consumable from plain Node, a CommonJS build, or a
 TypeScript project using `"moduleResolution": "node16"`: outside Astro, use
-the compiled [`@jaamd/core`](../05-advanced/03-other-frameworks.md).
+the compiled [`@jaamd/core`](../06-advanced/03-other-frameworks.md).
 
 ## Wrapping your content
 
@@ -91,7 +91,8 @@ import MarkdownContent from '@jaamd/astro/components'
 ```
 
 The integration registers its plugins on the configured markdown processor and
-injects the stylesheet. No other configuration is required.
+injects the stylesheet. No other configuration is required: the
+[options](../05-configuration/01-options.md) change one behaviour each.
 
 The processor is extended, never replaced: Sätteri gets mdast plugins and the
 directive syntax, `unified()` gets the remark plugins. Any other processor is

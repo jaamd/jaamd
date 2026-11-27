@@ -1,12 +1,12 @@
 ---
 label: Welcome
-description: What JAAMD and JAAD are, and which one to start with.
+description: What JAAMD, JAAD and JAAB are, and which one to start with.
 ---
 
 # Welcome to JAAMD
 
-JAAMD refines Markdown. It is documented here in two parts: JAAMD itself, and
-JAAD, the documentation site built on it.
+JAAMD refines Markdown. It is documented here in three parts: JAAMD itself,
+JAAD, the documentation site built on it, and JAAB, the blog beside it.
 
 ## JAAMD
 
@@ -29,7 +29,18 @@ metadata, with JAAMD rendering every page. This site is built with it.
 npm create @jaamd@latest -- --template docs
 ```
 
+## JAAB
+
+[JAAB](../../packages/jaab/docs/00-overview.md) builds a blog from a folder of
+Markdown posts, with an index, a feed and the same shell as JAAD. A site can
+have both, the docs and the blog sharing their options.
+
+```bash
+npm create @jaamd@latest -- --template blog
+```
+
 ## Which one
 
 Start with JAAMD when you have an Astro site and want its Markdown to do more.
-Start with JAAD when what you need is documentation: it brings JAAMD with it.
+Start with JAAD when what you need is documentation, and with JAAB for a blog:
+each brings JAAMD with it.

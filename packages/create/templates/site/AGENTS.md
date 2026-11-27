@@ -93,15 +93,15 @@ The JAAD documentation is installed with it, in `node_modules/@jaamd/jaad/docs/`
 guide for a task before working on it:
 
 - Pages, links and sections: `node_modules/@jaamd/jaad/docs/01-getting-started/02-pages.md`
-- Frontmatter: `node_modules/@jaamd/jaad/docs/02-configurations/02-frontmatter.md`
+- Frontmatter: `node_modules/@jaamd/jaad/docs/01-getting-started/03-frontmatter.md`
 - Markdown syntax: https://docs.jaamd.org/jaamd/markdown.md
-- Languages: `node_modules/@jaamd/jaad/docs/02-configurations/03-i18n.md`
-- Search: `node_modules/@jaamd/jaad/docs/02-configurations/04-search.md`
-- Configuration reference: `node_modules/@jaamd/jaad/docs/02-configurations/01-reference.md`
-- Styles and fonts: `node_modules/@jaamd/jaad/docs/02-configurations/06-styles.md`
-- Themes: `node_modules/@jaamd/jaad/docs/02-configurations/05-themes.md`
-- Pages of your own: `node_modules/@jaamd/jaad/docs/02-configurations/07-custom-pages.md`
-- Advanced layout: `node_modules/@jaamd/jaad/docs/02-configurations/08-advanced-layout.md`
-- Deployment: `node_modules/@jaamd/jaad/docs/01-getting-started/03-deployment.md`
+- Languages: `node_modules/@jaamd/jaad/docs/02-guides/01-languages.md`
+- Search: `node_modules/@jaamd/jaad/docs/02-guides/02-search.md`
+- Options, one page each: `node_modules/@jaamd/jaad/docs/03-configuration/01-options.md`
+- Styles and fonts: `node_modules/@jaamd/jaad/docs/02-guides/04-styles.md`
+- Themes: `node_modules/@jaamd/jaad/docs/02-guides/03-themes.md`
+- Pages of your own: `node_modules/@jaamd/jaad/docs/02-guides/05-custom-pages.md`
+- Advanced layout: `node_modules/@jaamd/jaad/docs/02-guides/06-advanced-layout.md`
+- Deployment: `node_modules/@jaamd/jaad/docs/01-getting-started/04-deployment.md`
 
 The same pages are published at https://docs.jaamd.org/jaad.

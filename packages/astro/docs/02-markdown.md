@@ -9,7 +9,7 @@ JAAMD extends [CommonMark](https://commonmark.org/help/) and
 [GitHub Flavored Markdown](https://github.github.com/gfm/) with the blocks
 below. Each one is shown as you write it, then as it renders. Every one of them
 can be turned off with the
-[`features` option](./01-getting-started/02-options.md#features).
+[`features` option](./05-configuration/05-features.md).
 
 ## Alerts
 

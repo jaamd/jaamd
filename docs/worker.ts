@@ -11,17 +11,28 @@ export const MARKDOWN_SOURCES: Record<string, string> = {
     '/': '/welcome.md',
     '/jaamd': '/jaamd/overview.md',
     '/jaad': '/jaad/overview.md',
+    '/jaab': '/jaab/overview.md',
 }
 
 /** Pages that moved, by their old path. */
 export const MOVED: Record<string, string> = {
     '/jaad/getting-started/creating-pages': '/jaad/getting-started/pages',
     '/jaad/configurations/structure': '/jaad/getting-started/pages',
-    '/jaad/getting-started/keyboard-shortcuts': '/jaad/configurations/search',
-    '/jaad/configurations/fonts': '/jaad/configurations/styles',
+    '/jaad/getting-started/keyboard-shortcuts': '/jaad/guides/search',
+    '/jaad/configurations/fonts': '/jaad/guides/styles',
     '/jaad/markdown': '/jaamd/markdown',
     '/jaad/upgrade/upgrading': '/jaad/upgrading',
     '/jaad/upgrade/migrating': '/jaad/upgrading',
+    '/jaamd/getting-started/options': '/jaamd/configuration/options',
+    '/jaad/configurations/reference': '/jaad/configuration/options',
+    '/jaad/configurations/frontmatter': '/jaad/getting-started/frontmatter',
+    '/jaad/configurations/i18n': '/jaad/guides/languages',
+    '/jaad/configurations/search': '/jaad/guides/search',
+    '/jaad/configurations/themes': '/jaad/guides/themes',
+    '/jaad/configurations/styles': '/jaad/guides/styles',
+    '/jaad/configurations/custom-pages': '/jaad/guides/custom-pages',
+    '/jaad/configurations/advanced-layout': '/jaad/guides/advanced-layout',
+    '/jaad/configurations/llms': '/jaad/guides/llms',
 }
 
 /** The new path of a moved page or of its Markdown, or null. */

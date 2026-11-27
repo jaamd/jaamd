@@ -24,7 +24,8 @@ const urlsOf = (section, pkg) => {
                 .replace(/\.md$/, '')
                 .split('/')
                 .map((part) => {
-                    return part.replace(/^\d+-/, '')
+                    // Astro lowercases a slug: `06-homeLink.md` is `homelink`.
+                    return part.replace(/^\d+-/, '').toLowerCase()
                 }),
         ].join('/')
     })
@@ -40,8 +41,9 @@ test('the docs open on the welcome page, and each section at its own url', () =>
 })
 
 // The old jaamd.org/docs/<path> urls redirect to docs.jaamd.org/<path>.
-test('every page of both packages has a url, so every old /docs url has a target', () => {
-    const missing = [...urlsOf('jaamd', 'astro'), ...urlsOf('jaad', 'jaad')].filter((url) => {
+test('every page of every package has a url, so every old /docs url has a target', () => {
+    const urls = [...urlsOf('jaamd', 'astro'), ...urlsOf('jaad', 'jaad'), ...urlsOf('jaab', 'jaab')]
+    const missing = urls.filter((url) => {
         return !existsSync(join(DIST, url, 'index.html'))
     })
     assert.deepEqual(missing, [])
@@ -79,18 +81,18 @@ test('the header holds the J mark, leading to jaamd.org, and no text links', () 
     assert.doesNotMatch(header, /site-nav-link/)
 })
 
-test('the sidebar starts with the welcome page, then both sections with their chapters', () => {
+test('the sidebar starts with the welcome page, then every section with its chapters', () => {
     const home = page('index.html')
     const sidebar = home.slice(home.indexOf('docs-sidebar-left'), home.indexOf('</aside>'))
     assert.match(
         sidebar,
-        /href="\/"[^>]*>\s*Welcome[\s\S]*section-title">JAAMD<[\s\S]*Styling[\s\S]*section-title">JAAD<[\s\S]*Getting Started/,
+        /href="\/"[^>]*>\s*Welcome[\s\S]*section-title">JAAMD<[\s\S]*Styling[\s\S]*section-title">JAAD<[\s\S]*Getting Started[\s\S]*section-title">JAAB</,
     )
 })
 
-test('llms.txt indexes both sections at the root', () => {
+test('llms.txt indexes every section at the root', () => {
     const llms = page('llms.txt')
-    assert.match(llms, /## JAAMD[\s\S]*## JAAD/)
+    assert.match(llms, /## JAAMD[\s\S]*## JAAD[\s\S]*## JAAB/)
     assert.match(llms, /https:\/\/docs\.jaamd\.org\/jaad\/getting-started\/installation\.md/)
 })
 

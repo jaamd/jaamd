@@ -28,6 +28,6 @@ yours; JAAMD only changes how Markdown looks and behaves.
 
 `@jaamd/astro` brings `@jaamd/core` with it: an Astro project never installs
 core itself. To use JAAMD with another framework, see
-[Other frameworks](./05-advanced/03-other-frameworks.md).
+[Other frameworks](./06-advanced/03-other-frameworks.md).
 
 Start with [Installation](./01-getting-started/01-installation.md).

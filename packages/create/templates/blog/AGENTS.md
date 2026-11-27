@@ -76,11 +76,11 @@ The JAAB documentation is installed with it, in `node_modules/@jaamd/jaab/docs/`
 Read the guide for a task before working on it:
 
 - Posts and their frontmatter: `node_modules/@jaamd/jaab/docs/01-getting-started/02-posts.md`
-- Configuration reference: `node_modules/@jaamd/jaab/docs/02-configurations/01-reference.md`
-- Site options, from title to theme: https://docs.jaamd.org/jaad/configurations/reference.md
+- Options, one page each: `node_modules/@jaamd/jaab/docs/03-configuration/01-options.md`
+- Site options, from title to theme: https://docs.jaamd.org/jaad/configuration/options.md
 - Markdown syntax: https://docs.jaamd.org/jaamd/markdown.md
-- Feed and metadata: `node_modules/@jaamd/jaab/docs/02-configurations/02-feed.md`
-- Migrating posts from another blog: `node_modules/@jaamd/jaab/docs/02-configurations/03-migrating.md`
-- A layout of your own: `node_modules/@jaamd/jaab/docs/02-configurations/04-layout.md`
+- Feed and metadata: `node_modules/@jaamd/jaab/docs/02-guides/01-feed.md`
+- Migrating posts from another blog: `node_modules/@jaamd/jaab/docs/02-guides/02-migrating.md`
+- A layout of your own: `node_modules/@jaamd/jaab/docs/02-guides/03-layout.md`
 
 The same pages are published at https://docs.jaamd.org/jaab.
