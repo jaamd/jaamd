@@ -46,13 +46,14 @@ Astro's `base`.
 
 ## Content
 
-| Option      | Type                | Default    | Description                               |
-| ----------- | ------------------- | ---------- | ----------------------------------------- |
-| `docsDir`   | `string`            | `"./docs"` | Directory containing Markdown files       |
-| `routeBase` | `string`            | `"/"`      | Route where documentation is mounted      |
-| `sections`  | `object`            | none       | One directory per section, by URL segment |
-| `locales`   | `string[] \| false` | detected   | Override the detected locale directories  |
-| `ui`        | `object`            | `{}`       | Interface string overrides, per locale    |
+| Option        | Type                | Default    | Description                                 |
+| ------------- | ------------------- | ---------- | ------------------------------------------- |
+| `docsDir`     | `string`            | `"./docs"` | Directory containing Markdown files         |
+| `routeBase`   | `string`            | `"/"`      | Route where documentation is mounted        |
+| `sections`    | `object`            | none       | One directory per section, by URL segment   |
+| `locales`     | `string[] \| false` | detected   | Override the detected locale directories    |
+| `ui`          | `object`            | `{}`       | Interface string overrides, per locale      |
+| `readingTime` | `boolean`           | `false`    | The minutes to read a page, above its title |
 
 Locale directories under `docsDir` are detected on their own; `locales` only
 overrides that. See [Languages](03-i18n.md).
@@ -62,6 +63,10 @@ section. See [Sections](../01-getting-started/02-pages.md#sections).
 
 To keep a landing page at `/`, mount documentation below it with
 `routeBase: '/docs'`; see [Custom pages](07-custom-pages.md).
+
+`readingTime: true` shows, above each page's title and after its authors, the
+minutes to read it, at 200 words a minute. A [frame of your own](08-advanced-layout.md)
+gets them as `page.readingTime` either way.
 
 ## Navigation
 

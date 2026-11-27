@@ -4,8 +4,9 @@ import type { DocsPage, DocsTree } from '../model/tree.ts'
 import MarkdownContent from '@jaamd/astro/components'
 import Authors from '@jaamd/site/components/Authors.astro'
 import PageActions from '@jaamd/site/components/PageActions.astro'
+import { fill } from '@jaamd/site/helpers.ts'
 import { editUrl } from '@jaamd/site/infer.ts'
-import { pageHeadings } from '@jaamd/site/rendered.ts'
+import { pageHeadings, pageReadingMinutes } from '@jaamd/site/rendered.ts'
 import { languageOf, ui } from '@jaamd/site/runtime.ts'
 import config from 'virtual:jaad/config'
 import DocsLayout from '../layouts/Docs.astro'
@@ -45,6 +46,7 @@ const t = ui(page.locale)
 const language = languageOf(page.locale)
 const updated = page.data.lastUpdated
 const authors = docsPageAuthors(page.data)
+const minutes = config.docs.readingTime ? pageReadingMinutes(page.source.rendered) : null
 const navigation = buildDocsNavigation(tree, page.id, SECTIONS)
 const contentAttrs = { id: 'content' }
 ---
@@ -56,11 +58,15 @@ const contentAttrs = { id: 'content' }
     <PageActions slot="page-actions" {markdownHref} {editHref} locale={page.locale} />
 
     <Fragment slot="content">
-        {authors.length > 0 && (
+        {(authors.length > 0 || minutes !== null) && (
             <p class="docs-page-meta">
-                <span>
-                    <Authors {authors} {language} />
-                </span>
+                {authors.length > 0 && (
+                    <span>
+                        <Authors {authors} {language} />
+                    </span>
+                )}
+                {authors.length > 0 && minutes !== null && <span aria-hidden="true">·</span>}
+                {minutes !== null && <span>{fill(t('page.minutes'), { minutes })}</span>}
             </p>
         )}
         <MarkdownContent {...contentAttrs} class="docs-content">

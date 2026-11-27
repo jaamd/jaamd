@@ -48,6 +48,21 @@ export function codeText(html: string): string {
         .slice(0, CODE_LIMIT)
 }
 
+const WORDS_PER_MINUTE = 200
+
+/** Minutes to read `text`, at least one. */
+export function readingMinutes(text: string): number {
+    const words = text.split(/\s+/).filter((word) => {
+        return /[\p{L}\p{N}]/u.test(word)
+    })
+    return Math.max(1, Math.ceil(words.length / WORDS_PER_MINUTE))
+}
+
+/** Minutes to read a rendered page, from its text. */
+export function pageReadingMinutes(rendered: RenderedMarkdown | undefined): number {
+    return readingMinutes(htmlText(rendered?.html ?? ''))
+}
+
 /** The readable text of an HTML fragment, on one line. */
 export function htmlText(html: string): string {
     return decodeEntities(

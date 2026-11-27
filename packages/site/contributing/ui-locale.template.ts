@@ -5,7 +5,6 @@ import type { UiCatalog } from '../src/ui.ts'
  *  unfinished catalogue makes the tests fail. */
 export const UI_LOCALE = {
     'blog.label': '',
-    'blog.minutes': '',
     'blog.newer': '',
     'blog.older': '',
     'blog.page': '',
@@ -23,6 +22,7 @@ export const UI_LOCALE = {
     'page.copy': '',
     'page.edit': '',
     'page.lastUpdated': '',
+    'page.minutes': '',
     'search.all': '',
     'search.close': '',
     'search.empty': '',

@@ -1,7 +1,6 @@
 /** The canonical UI catalogue: its keys define every catalogue JAAD accepts. */
 export const ENGLISH_UI = {
     'blog.label': 'Blog',
-    'blog.minutes': '{minutes} min read',
     'blog.newer': 'Newer posts',
     'blog.older': 'Older posts',
     'blog.page': 'Page {page} of {pages}',
@@ -19,6 +18,7 @@ export const ENGLISH_UI = {
     'page.copy': 'Copy page',
     'page.edit': 'Edit this page',
     'page.lastUpdated': 'Last updated on',
+    'page.minutes': '{minutes} min read',
     'search.all': 'All',
     'search.close': 'close',
     'search.empty': 'No results for',

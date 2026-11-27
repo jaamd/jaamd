@@ -30,6 +30,8 @@ export const docsConfigShape = {
     editLink: z.union([z.boolean(), z.string()]).default(true),
     /** The key in the site's `authors` of a page's author when it names none. */
     author: z.string().optional(),
+    /** The minutes to read a page, above its title. */
+    readingTime: z.boolean().default(false),
     /** `llms.txt`, `llms-full.txt` and the Markdown alternate of each page; false leaves them out. */
     llms: z.boolean().default(true),
     /** Only when detection guesses wrong: pin the set, or false to switch it off. */
@@ -61,6 +63,8 @@ export interface DocsResolvedConfig {
     llms: boolean
     /** The key in the site's `authors` of a page's author when it names none. */
     author: string | null
+    /** Whether a page shows the minutes to read it. */
+    readingTime: boolean
 }
 
 export interface DocsSection {
@@ -139,6 +143,7 @@ export function resolveDocsConfig(
         trailingSlash: true,
         llms: config.llms,
         author: config.author ?? null,
+        readingTime: config.readingTime,
     }
 
     const roots = docsRoots(docs, cwd)

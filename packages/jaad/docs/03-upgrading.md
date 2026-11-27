@@ -102,6 +102,11 @@ that sets neither shows nothing, unless the new docs option `author` names a
 default. A page with several authors has one `<meta name="author">` for each,
 where 1.1 joined them with commas. See [Authors](02-configurations/02-frontmatter.md#authors).
 
+### Reading time
+
+`readingTime: true` shows the minutes to read a page above its title. It is off
+by default, so a 1.1 site looks the same.
+
 ### The scaffolder
 
 The scaffolder is now `npm create @jaamd`: it creates docs, a blog with

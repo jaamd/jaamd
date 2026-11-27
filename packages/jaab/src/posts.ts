@@ -7,12 +7,12 @@ import { join } from 'node:path'
 import { pageAuthors } from '@jaamd/site/authors.ts'
 import { readFrontmatter } from '@jaamd/site/frontmatter.ts'
 import { editUrl } from '@jaamd/site/infer.ts'
-import { htmlText, pageDescription, renderedTitle } from '@jaamd/site/rendered.ts'
+import { htmlText, pageDescription, pageReadingMinutes, renderedTitle } from '@jaamd/site/rendered.ts'
 import { oncePerBuild } from '@jaamd/site/runtime.ts'
 import { getCollection } from 'astro:content'
 import config from 'virtual:jaab/config'
 import { withoutTitle } from './model/html.ts'
-import { comparePosts, isoDay, readingMinutes, writtenDay } from './model/posts.ts'
+import { comparePosts, isoDay, writtenDay } from './model/posts.ts'
 import { blogUrls } from './runtime.ts'
 import { blogFileHref, blogPageHref } from './urls.ts'
 
@@ -82,7 +82,6 @@ function writtenDays(entry: PostEntry): { day: string; updatedDay: string | null
 
 function toPost(entry: PostEntry): BlogPost {
     const title = entry.data.title ?? renderedTitle(entry.rendered) ?? entry.id
-    const text = htmlText(entry.rendered?.html ?? '')
     const urls = blogUrls()
 
     return {
@@ -95,7 +94,7 @@ function toPost(entry: PostEntry): BlogPost {
         tags: entry.data.tags,
         keywords: entry.data.keywords,
         authors: pageAuthors(entry.data, config.authors, config.blog.author),
-        readingTime: readingMinutes(text),
+        readingTime: pageReadingMinutes(entry.rendered),
         href: blogPageHref(entry.id, urls),
         markdownHref: blogFileHref(`${entry.id}.md`, urls),
         editHref: editHrefOf(entry),

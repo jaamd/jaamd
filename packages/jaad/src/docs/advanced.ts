@@ -17,6 +17,8 @@ export interface DocsFrameProps {
         data: DocsPageData
         /** Who wrote the page, resolved against the site's `authors`. */
         authors: Author[]
+        /** Minutes to read the page, whether or not `readingTime` shows them. */
+        readingTime: number
     }
     headings: DocsHeading[]
     navigation: DocsNavigation
