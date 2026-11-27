@@ -51,10 +51,13 @@ export default function jaamd(options: JaamdOptions = {}): AstroIntegration {
         name: '@jaamd/astro',
         hooks: {
             'astro:config:setup': ({ config, updateConfig, injectScript, logger }) => {
-                const { shikiConfig, dual } = withTheme(config.markdown.shikiConfig, theme)
+                const { shikiConfig, dual, ignored } = withTheme(config.markdown.shikiConfig, theme)
                 const { processor } = config.markdown
                 const registration = registerPlugins(processor, { features, labels })
 
+                if (ignored) {
+                    logger.warn(ignored)
+                }
                 if (!registration) {
                     logger.warn(
                         `markdown processor "${processor.name}" is neither Sätteri nor unified: JAAMD's plugins were not added. Pass them to your processor yourself.`,

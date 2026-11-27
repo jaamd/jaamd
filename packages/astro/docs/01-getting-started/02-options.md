@@ -23,6 +23,9 @@ The Shiki theme for code blocks, or `{ light, dark }` for
 `markdown.shikiConfig` is left as configured; `"github-light"` replaces only
 Astro's own default (`"github-dark"` with no `themes`).
 
+A theme name has no effect while `markdown.shikiConfig.themes` is set, since
+Shiki reads `themes` first: the build warns and keeps your `themes`.
+
 ## `selector`
 
 Controls which element the **client-side JS enhancements** target at runtime.
