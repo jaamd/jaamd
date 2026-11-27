@@ -7,12 +7,12 @@ description: The files JAAD writes for language models and agents, and how to se
 An agent learning a product from its documentation reads it best as Markdown,
 with links it can follow. Next to the pages, JAAD writes:
 
-| File                            | What it holds                                                         |
-| ------------------------------- | --------------------------------------------------------------------- |
-| `<routeBase>/llms.txt`          | The pages, by chapter and section, each linked to its Markdown        |
-| `<routeBase>/llms-full.txt`     | Every page in one file, in the order of the site                      |
-| `<page>.md`                     | One page as Markdown                                                  |
-| `<routeBase>/search-index.json` | The [search index](04-search.md#the-index-format), in a public format |
+| File                            | What it holds                                                  |
+| ------------------------------- | -------------------------------------------------------------- |
+| `<routeBase>/llms.txt`          | The pages, by chapter and section, each linked to its Markdown |
+| `<routeBase>/llms-full.txt`     | Every page in one file, in the order of the site               |
+| `<page>.md`                     | One page as Markdown                                           |
+| `<routeBase>/search-index.json` | The [search](02-search.md) index, every page's text            |
 
 `llms.txt` follows the [llms.txt](https://llmstxt.org) convention: the site
 title, its `description`, then the pages. Each language has its own files below
@@ -23,8 +23,9 @@ the build writes `/llms.txt` and `/llms-full.txt` there too, with the
 documentation under a `## Docs` heading. A `src/pages/llms.txt.ts`, or a
 `public/llms.txt`, of your own takes their place.
 
-Set `site`: without it, the links in these files are relative, and an agent that
-reads them elsewhere cannot follow them. The build warns when it is missing.
+Set [`site`](../03-configuration/07-site.md): without it, the links in these
+files are relative, and an agent that reads them elsewhere cannot follow them.
+[`llms: false`](../03-configuration/22-llms.md) turns the files off.
 
 ## The Markdown of a page
 
@@ -43,15 +44,6 @@ its head, for the agents that look for it there:
 ```html
 <link rel="alternate" type="text/markdown" href="/guides/setup.md" />
 ```
-
-## Turning the files off
-
-```ts
-defineJaadConfig({ title: 'My Project', llms: false })
-```
-
-`llms: false` leaves out `llms.txt`, `llms-full.txt` and the announcement in the
-head. The Markdown of each page stays, for the "Copy page" button.
 
 ## Markdown for the agents that ask for it
 

@@ -6,32 +6,14 @@ description: Build JAAD as a static site and publish it on GitHub Pages or any s
 
 JAAD builds a static site in `dist/`:
 
-:::code-tabs
-
-```bash npm
+```bash
 npm run build
 npm run preview
 ```
 
-```bash pnpm
-pnpm build
-pnpm preview
-```
-
-```bash yarn
-yarn build
-yarn preview
-```
-
-```bash bun
-bun run build
-bun run preview
-```
-
-:::
-
-Set `site` to the public URL so JAAD can generate canonical links, the sitemap
-and social image URLs. Add `base` when the site is served from a subpath.
+Set [`site`](../03-configuration/07-site.md) to the public URL, for the
+canonical links, the sitemap and the social images, and
+[`base`](../03-configuration/08-base.md) when the site is served below a path:
 
 ```ts
 export default defineJaadConfig({
@@ -101,4 +83,4 @@ In addition to the pages, the build writes:
   root when `routeBase` is below it;
 - `<routeBase>/**.md`, each page as Markdown.
 
-See [LLMs and agents](../02-configurations/09-llms.md).
+See [LLMs and agents](../02-guides/07-llms.md).

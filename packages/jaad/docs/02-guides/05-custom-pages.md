@@ -59,23 +59,13 @@ import SiteLayout from '../layouts/SiteLayout.astro'
 </SiteLayout>
 ```
 
-JAAD still generates documentation pages, search, `llms.txt`, raw Markdown
-routes and the sitemap without controlling the rest of the application.
-
-A page of yours on one of those routes, such as `src/pages/docs/[...slug].astro`
-with `routeBase: "/docs"`, would replace the documentation in silence, so the
-build stops and names it. The landing page is the exception: an `index` page
-may take the root from documentation mounted there, with a warning.
+A page of yours on a route of the docs stops the build: see
+[`routeBase`](../03-configuration/10-routeBase.md#limits).
 
 ## Keeping JAAD's header and footer
 
-A site with a landing page of its own wants its own identity, and a local
-layout is the right answer for it. A documentation-first site is the other
-case: when `routeBase` is `/` and you add one page beside the documentation —
-a changelog, a pricing page — rebuilding the header and footer to match would
-be work spent on looking the same.
-
-Import the page layout instead:
+For a page beside docs at the root, such as a changelog, use JAAD's header and
+footer instead of a layout of your own:
 
 ```astro
 ---
@@ -93,15 +83,9 @@ inside. `title` and `description` set the metadata for the page; `bare` drops
 the default spacing when the content needs the full width; `class` is added to
 the body.
 
-Search comes with the header. A documentation page shows the full search field;
-a page outside the documentation shows the magnifier alone, because
-<kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd> opens the palette there too and the
-icon is what says so. Clicking it opens the same palette.
-
-This is the site chrome, not the reading layout: there is no sidebar and no
-table of contents, because a page outside the documentation has no place in
-its navigation. To restructure documentation pages themselves, use
-[Advanced layout](08-advanced-layout.md).
+Search comes with the header, as its icon. There is no sidebar and no table of
+contents: the page has no place in the documentation's navigation. To restructure documentation pages themselves, use
+[Advanced layout](06-advanced-layout.md).
 
 ## Matching the documentation's layout
 
@@ -110,7 +94,7 @@ its navigation. To restructure documentation pages themselves, use
 - `.site-main`: vertical margin and horizontal padding of the main landmark.
   `bare` swaps it for `.site-main-bare`, which has none.
 - Layout tokens (`--site-content-width`, `--site-page-padding`, …) are listed
-  in [Styles](06-styles.md).
+  in [Styles](04-styles.md#layout-tokens).
 
 ```astro
 <Page title="Changelog">
@@ -118,10 +102,7 @@ its navigation. To restructure documentation pages themselves, use
 </Page>
 ```
 
-The shell's elements also carry their 1.0 classes, `.jaad-chrome` and the
-others, until 2.0.
-
 ## Tailwind
 
-With `tailwind: true`, utilities on `Page` pages use JAAD's tokens. See
-[Styles](06-styles.md#tailwind).
+With [`tailwind: true`](../03-configuration/25-tailwind.md), utilities on
+`Page` pages use JAAD's tokens.

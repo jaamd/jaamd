@@ -35,14 +35,11 @@ files.
 
 ## The opening page
 
-The file that sorts first opens the documentation at `routeBase`, which is `/`
-by default. Its browser title is the site name alone, and its own slug
-redirects to it: with `routeBase: "/docs"`, `01-introduction.md` opens at
-`/docs/`, and `/docs/introduction/` redirects there.
-
-The redirect is one of Astro's `redirects`, a 301 on the hosts whose adapter
-writes them. When another page moves first, the dev server restarts on its own
-to follow it.
+The file that sorts first opens the documentation at
+[`routeBase`](../03-configuration/10-routeBase.md), which is `/` by default. Its
+browser title is the site name alone, and its own slug redirects to it: with
+`routeBase: "/docs"`, `01-introduction.md` opens at `/docs/`, and
+`/docs/introduction/` redirects there.
 
 ## Linking between pages
 
@@ -57,38 +54,13 @@ editor. A link to a file that does not exist stops the build.
 
 ## Sections
 
-A larger site can split its documentation into sections, each with its own
-directory, chapters and sidebar group:
-
-```ts
-defineJaadConfig({
-    title: 'My Project',
-    sections: {
-        guide: { dir: './docs/guide', label: 'Guide' },
-        api: { dir: '../packages/api/docs' },
-    },
-})
-```
-
-- The key is the URL segment: `api/01-client.md` is served at `/api/client`.
-- `label` names the section, in the sidebar and in the browser title of its
-  pages; it defaults to the key, title-cased: `api` becomes `Api`.
-- A directory can sit outside the project, such as the `docs/` of a package. No
-  section's directory can be inside another's.
-- Sections appear in the order they are declared. `docsDir` is read alongside
-  them only when you set it: its pages sit outside every section, come first,
-  and the first of them opens the docs. Its directory cannot hold a section's.
-- Previous and next links run on from one section into the next.
-- The first page of the first section opens at `routeBase`; the first page of
-  every other section opens at the section's own URL.
-- The rules above apply inside each section.
-
-This documentation is built that way: one section for JAAMD and one for JAAD,
-each read from its package.
+A larger site can split its documentation into sections, each from a directory
+of its own, with its own chapters and sidebar group. The rules above apply
+inside each one. See [`sections`](../03-configuration/11-sections.md).
 
 ## Overriding the file tree
 
-[Frontmatter](../02-configurations/02-frontmatter.md) renames a page or moves it
+[Frontmatter](03-frontmatter.md) renames a page or moves it
 without renaming the file:
 
 ```markdown
@@ -104,7 +76,7 @@ order: 5
 Directories named after language codes turn the tree into one site per
 language, and the rules above then apply inside each of them. With sections,
 every section holds the same language directories. See
-[Languages](../02-configurations/03-i18n.md).
+[Languages](../02-guides/01-languages.md).
 
 ## Markdown
 

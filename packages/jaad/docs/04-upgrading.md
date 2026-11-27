@@ -67,7 +67,7 @@ should read the file in the repository instead.
 The build also writes `llms-full.txt`, and each page announces its Markdown in
 its head. With `routeBase` below the root, `llms.txt` and `llms-full.txt` are
 also written at the site root. `llms: false` turns all of these off; see
-[LLMs and agents](02-configurations/09-llms.md).
+[LLMs and agents](02-guides/07-llms.md).
 
 ### Pages that take a documentation route
 
@@ -110,11 +110,11 @@ option `authors`, by name, or with a url, and the names are shown above the
 title. `author: Ada Lovelace` still works, and now shows the name too. A page
 that sets neither shows nothing, unless the new docs option `author` names a
 default. A page with several authors has one `<meta name="author">` for each,
-where 1.1 joined them with commas. See [Authors](02-configurations/02-frontmatter.md#authors).
+where 1.1 joined them with commas. See [Authors](01-getting-started/03-frontmatter.md#authors).
 
 ### Reading time
 
-`readingTime: true` shows the minutes to read a page above its title. It is off
+[`readingTime: true`](03-configuration/13-readingTime.md) shows the minutes to read a page above its title. It is off
 by default, so a 1.1 site looks the same.
 
 ### Drafts
@@ -135,7 +135,7 @@ Both now ask for the template before the directory.
 
 ### Node 22.23.4
 
-JAAD requires Node 22.23.4 or later, the minimum of Astro 7.4.
+JAAD requires Node 22.23.4 or later.
 
 ### Page URLs follow Astro's
 
@@ -169,131 +169,8 @@ where no CI names the branch, the link is left out instead of pointing at
 `site` set in Astro's config, and not in `jaad.config.ts`, now also produces the
 sitemap.
 
-## From 0.10 and 0.11
+## From 0.x
 
-### The package is now @jaamd/jaad
-
-`@lancher-dev/jaad` is now `@jaamd/jaad`, and `@lancher-dev/create-jaad` is
-`@jaamd/create-jaad`. The old packages are deprecated and receive no further
-releases. `@jaamd/jaad` 0.11 was 0.10 under the new scope: from it, skip to
-the next heading.
-
-:::code-tabs
-
-```bash npm
-npm uninstall @lancher-dev/jaad
-npm install @jaamd/jaad
-```
-
-```bash pnpm
-pnpm remove @lancher-dev/jaad
-pnpm add @jaamd/jaad
-```
-
-```bash yarn
-yarn remove @lancher-dev/jaad
-yarn add @jaamd/jaad
-```
-
-```bash bun
-bun remove @lancher-dev/jaad
-bun add @jaamd/jaad
-```
-
-:::
-
-Then replace `@lancher-dev/jaad` with `@jaamd/jaad` in every import:
-`astro.config.*`, `src/content.config.*`, `jaad.config.ts`, and any page using
-`@jaamd/jaad/layouts/Page.astro` or `@jaamd/jaad/advanced`.
-
-The documentation moved from `jaad.lancher.dev` to `docs.jaamd.org/jaad`: update
-the links in `AGENTS.md` if `create-jaad` generated one.
-
-### JAAMD is now @jaamd/astro
-
-JAAD installs it for you: a site that only uses `@jaamd/jaad` has nothing to do.
-A project that imports `@lancher-dev/jaamd` or `@jaamd/jaamd` directly follows
-[JAAMD's upgrade guide](../../astro/docs/06-upgrading.md#from-011).
-
-### Page titles name their section
-
-With [sections](01-getting-started/02-pages.md#sections), the browser title of
-a page is `Page · Section | Site`, so pages with the same name in two sections
-no longer share a title. Docs without sections are unchanged.
-
-### A fixed shell
-
-The header and both sidebars are fixed to the window and only the page
-scrolls. They sit in one column, `--jaad-chrome-width`, which now defaults to
-the sidebars, the page and their gaps; to fit the documentation to a site of
-your own, set it. See [Layout tokens](02-configurations/06-styles.md#layout-tokens).
-
-- The sidebar lists every section with all its pages, under the section's name.
-- Above the title, the page shows its section and chapter instead of a full
-  breadcrumb trail.
-- Copy and edit sit under the table of contents, in the right column.
-- Previous and next are a line of text, and the footer closes the page column.
-- On narrow screens, a menu named after the current page opens the navigation,
-  and another opens the table of contents. The scroll-to-top button is gone.
-
-`--jaad-sidebar-offset` and the `.docs-main-gutters` class are gone: set
-`--jaad-chrome-width` and `--jaad-sidebar-width` instead. The `ui` keys
-`breadcrumb.root`, `nav.jumpToSection`, `nav.selectPage` and `scrollTop` are no
-longer used: remove them from your overrides.
-
-### Custom docs frame: renamed navigation types
-
-"Section" now names a part of the documentation with its own directory. A
-`src/jaad/DocsFrame.astro` that reads the navigation follows these renames:
-
-| Before                          | After               |
-| ------------------------------- | ------------------- |
-| `navigation.sections`           | `navigation.groups` |
-| `NavSection`                    | `DocsNavGroup`      |
-| `DocsHeadings`                  | `DocsHeading`       |
-| `order` on a group              | removed             |
-| `primaryOrder` on `DocsNavItem` | removed             |
-
-Groups and items arrive in display order, so nothing replaces the two removed
-fields.
-
-`DocsEntry` is no longer exported: no prop of the frame carried it. The page a
-frame renders is `DocsFrameProps['page']`.
-
-### Search index
-
-`search-index.json` now holds one entry per heading, for
-[search by heading](02-configurations/04-search.md). Its format is described in
-[The index format](02-configurations/04-search.md#the-index-format).
-
-### Fewer exports
-
-`@jaamd/jaad` exports `jaad()`, `defineJaadConfig()` and the `JaadUserConfig`
-type. `defineJaadSite`, `JaadConfig` and `JaadResolvedConfig` are gone:
-`@jaamd/jaad/site` builds the Astro configuration, and the resolved
-configuration, `virtual:jaad/config` included, is internal.
-
-## From 0.9 and earlier
-
-Apply these, then the changes [from 0.10 and 0.11](#from-010-and-011):
-
-- **Tailwind on your own pages**: replace `@tailwindcss/vite` in
-  `astro.vite.plugins` with `tailwind: true`, and remove the CSS that imports
-  `tailwindcss` for pages on `Page`. Utilities read JAAD's tokens
-  (`bg-surface`, `text-primary`). Pages on a layout of your own keep their
-  `@import "tailwindcss";`. See [Styles](02-configurations/06-styles.md#tailwind).
-- **Component classes**: CSS that targeted Tailwind utilities in JAAD's markup
-  needs the new names:
-
-    | Before                           | Now                                   |
-    | -------------------------------- | ------------------------------------- |
-    | `body` utilities                 | `.jaad-body`                          |
-    | default frame wrapper `contents` | `.docs-frame`                         |
-    | `.theme-icon-to-dark` / `-light` | `.jaad-theme-icon-to-dark` / `-light` |
-    | active ToC link class            | `[aria-current="location"]`           |
-
-    Your own pages that used utilities such as `.hidden` without Tailwind need
-    `tailwind: true` or CSS of their own.
-
-- **From 0.7**: import `@jaamd/jaad/layouts/Page.astro` instead of
-  `@jaamd/jaad/layouts/Base.astro`.
+Upgrade to 1.1 first, following
+[its guide](https://github.com/jaamd/jaamd/blob/v1.1.0/packages/jaad/docs/03-upgrading.md),
+then apply the changes above.

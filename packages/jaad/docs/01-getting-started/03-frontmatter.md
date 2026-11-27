@@ -59,7 +59,7 @@ label: FAQ
 Without `title`, JAAD uses the first `# Heading`, then the filename.
 
 `translationKey` pairs a page with its translations when their slugs differ.
-See [Languages](03-i18n.md).
+See [Languages](../02-guides/01-languages.md).
 
 ## Ordering
 
@@ -89,7 +89,7 @@ the first paragraph alone.
 structured data, and they rank a page in search below its title and above its
 chapter and body. They are metadata, not a visible list: JAAD renders nothing for
 them, though a frame of your own can, through
-[`page.data`](08-advanced-layout.md).
+[`page.data`](../02-guides/06-advanced-layout.md).
 
 `ogImage` overrides the site's social image for one page, in Open Graph and in
 structured data. It takes a public path or an absolute URL, and `false` removes
@@ -102,7 +102,7 @@ its language.
 ## Authors
 
 `authors` names who wrote the page: one author or a list. Each is a key of the
-site's [`authors`](01-reference.md#authors), a name, or a name with a link:
+site's [`authors`](../03-configuration/18-authors.md), a name, or a name with a link:
 
 ```markdown
 ---
@@ -115,6 +115,6 @@ them, "Ada Lovelace, Grace Hopper and Charles Babbage"; each with a url is a
 link. Each author is also a `<meta name="author">`, a `<link rel="author">`
 when it has a url, and a `Person` of the structured data.
 
-Without `authors`, the page has the docs' default [`author`](01-reference.md#authors),
+Without `authors`, the page has the docs' default [`author`](../03-configuration/19-author.md),
 when there is one; `authors: []` names nobody, even then. The older `author`,
 a single name, still works where `authors` is not set.

@@ -346,8 +346,8 @@ test('ui overrides name strings JAAD has, in a locale code', () => {
     }, /ui\.italiano/)
 })
 
-test('Languages lists every key JAAD shows, with its English text', () => {
-    const page = readFileSync(new URL('../../docs/02-configurations/03-i18n.md', import.meta.url), 'utf8')
+test('the ui page lists every key JAAD shows, with its English text', () => {
+    const page = readFileSync(new URL('../../docs/03-configuration/26-ui.md', import.meta.url), 'utf8')
     const listed = [...page.matchAll(/^ {4}"?([\w.]+)"?: "(.*)",$/gm)].map(([, key, text]) => {
         return [key, text]
     })

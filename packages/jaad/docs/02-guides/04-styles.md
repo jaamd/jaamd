@@ -7,7 +7,7 @@ description: Colours, fonts and widths as CSS custom properties in src/jaamd.css
 JAAD's look is a set of CSS custom properties. Override them in
 `src/jaamd.css`, which loads after the bundled stylesheet on documentation
 pages, on pages using `Page` and on [JAAB](https://docs.jaamd.org/jaab)'s
-pages. `src/jaad.css`, the name in 1.1, is still read until 2.0:
+pages:
 
 ```css
 :root {
@@ -46,7 +46,7 @@ The complete groups are:
 
 The rendered Markdown follows these colours. To change it alone, set JAAMD's
 `--jaamd-*` [variables](../../../astro/docs/04-styling/01-variables.md). For a
-whole palette, see [Themes](05-themes.md).
+whole palette, see [Themes](03-themes.md).
 
 ## Fonts
 
@@ -61,8 +61,9 @@ Three tokens choose the families:
 }
 ```
 
-A token does not load the font. Add the family with Astro's font
-configuration, then point the token at its CSS variable:
+A token does not load the font. Add the family with Astro's fonts, in
+[`astro`](../03-configuration/27-astro.md), then point the token at its CSS
+variable:
 
 ```ts
 // jaad.config.ts
@@ -116,45 +117,10 @@ column takes what the sidebars leave, up to `--site-content-width`:
 }
 ```
 
-Each token is still read under its 1.0 name, `--jaad-chrome-width` and so on,
-until 2.0.
-
-Use [Advanced layout](08-advanced-layout.md) when token changes are not
+Use [Advanced layout](06-advanced-layout.md) when the tokens are not
 enough.
 
 ## Tailwind
 
-:::code-tabs
-
-```bash npm
-npm i -D tailwindcss @tailwindcss/vite
-```
-
-```bash pnpm
-pnpm add -D tailwindcss @tailwindcss/vite
-```
-
-```bash yarn
-yarn add -D tailwindcss @tailwindcss/vite
-```
-
-```bash bun
-bun add -d tailwindcss @tailwindcss/vite
-```
-
-:::
-
-```ts
-// jaad.config.ts
-defineJaadConfig({ title: 'My Project', tailwind: true })
-```
-
-JAAD registers the plugin, unless `astro.vite.plugins` already has it.
-
-- Applies to documentation pages, pages using `Page` and a custom `DocsFrame`.
-- Colours and fonts follow JAAD's tokens: `bg-surface`, `border-border-light`,
-  `font-mono`.
-- `dark:` follows JAAD's theme switch.
-- Layout tokens via arbitrary values: `max-w-(--site-chrome-width)`.
-- Pages on a local layout get plain Tailwind (no JAAD tokens) by adding
-  `@import "tailwindcss";` to their CSS.
+With [`tailwind: true`](../03-configuration/25-tailwind.md), utilities read
+these tokens: `bg-surface`, `text-primary`, `max-w-(--site-chrome-width)`.

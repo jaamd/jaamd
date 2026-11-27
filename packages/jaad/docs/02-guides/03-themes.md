@@ -4,54 +4,11 @@ description: Named themes, a fixed appearance, code themes and custom palettes.
 
 # Themes
 
-Dark mode works without configuration. The default `appearance: "auto"`
-follows the reader's system preference and shows a switcher.
-
-## Named themes
-
-```ts
-defineJaadConfig({ title: 'My Project', theme: 'dracula' })
-```
-
-| Name             | Light         | Dark         |
-| ---------------- | ------------- | ------------ |
-| `default`        | Paper         | GitHub Dark  |
-| `catppuccin`     | Latte         | Mocha        |
-| `gruvbox`        | Gruvbox Light | Gruvbox Dark |
-| `rose-pine`      | Dawn          | Rosé Pine    |
-| `rose-pine-moon` | Dawn          | Moon         |
-| `dracula`        | Dracula       | Dracula      |
-| `nord`           | Nord          | Nord         |
-| `one-dark`       | One Dark      | One Dark     |
-| `tokyo-night`    | Tokyo Night   | Tokyo Night  |
-
-Unknown names stop the build. Themes without a light palette stay dark in both
-modes; use `appearance: "dark"` for a consistently dark site.
-
-## Fixed appearance
-
-```ts
-defineJaadConfig({
-    title: 'My Project',
-    theme: 'tokyo-night',
-    appearance: 'dark',
-})
-```
-
-`"light"` and `"dark"` remove the switcher and the client-side preference
-script. The default is `"auto"`.
-
-## Code theme only
-
-Pass a [Shiki](https://shiki.style/themes) pair to change syntax highlighting
-without changing the interface colours:
-
-```ts
-defineJaadConfig({
-    title: 'My Project',
-    theme: { light: 'github-light', dark: 'github-dark' },
-})
-```
+Dark mode works without configuration: the site follows the reader's system,
+and a switcher keeps their choice. A named theme, or a code theme alone, is
+one option, [`theme`](../03-configuration/23-theme.md); a site that stays light
+or dark is [`appearance`](../03-configuration/24-appearance.md). This page is
+for colours of your own.
 
 ## Custom themes
 
@@ -78,7 +35,7 @@ seeds.
 
 ## Sharing the theme with your own pages
 
-[Pages of your own](07-custom-pages.md) use your layout, not
+[Pages of your own](05-custom-pages.md) use your layout, not
 JAAD's. Two values keep both halves of a site in step:
 
 | What                      | Value                         |
