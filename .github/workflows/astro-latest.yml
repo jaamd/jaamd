@@ -24,5 +24,5 @@ jobs:
                   node-version: '24'
                   cache: pnpm
             - run: pnpm install --frozen-lockfile
-            - run: pnpm --filter jaamd-fixture --filter jaad-fixture --filter site --filter docs add astro@latest
+            - run: pnpm --filter jaamd-fixture --filter jaad-fixture --filter jaab-fixture --filter site --filter docs add astro@latest
             - run: pnpm test:build
