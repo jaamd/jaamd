@@ -77,14 +77,19 @@ jaamd({
 })
 ```
 
-Add an inline script in `<head>` to prevent a flash of the wrong theme:
+Add an inline script in `<head>` to prevent a flash of the wrong theme. A
+browser that blocks the site's storage throws on `localStorage`; the system's
+choice then applies:
 
 ```html
 <script is:inline>
     ;(function () {
-        var t = localStorage.getItem('theme')
-        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches))
-            document.documentElement.classList.add('dark')
+        var t = null
+        try {
+            t = localStorage.getItem('theme')
+        } catch (e) {}
+        var dark = t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.classList.toggle('dark', dark)
     })()
 </script>
 ```
