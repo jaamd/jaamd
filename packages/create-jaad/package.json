@@ -23,8 +23,6 @@
     },
     "files": [
         "index.mjs",
-        "lib.mjs",
-        "templates",
         "README.md",
         "LICENSE"
     ],
@@ -32,11 +30,8 @@
     "publishConfig": {
         "access": "public"
     },
-    "scripts": {
-        "test": "node --test \"tests/**/*.test.mjs\""
-    },
     "dependencies": {
-        "@clack/prompts": "^1.7.0"
+        "@jaamd/create": "workspace:*"
     },
     "engines": {
         "node": ">=22.23.4"

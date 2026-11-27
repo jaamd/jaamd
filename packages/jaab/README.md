@@ -4,7 +4,13 @@
 
 An [Astro](https://astro.build) integration that turns a folder of markdown into a blog: an index, a page for each post, an RSS feed and a sitemap, on the same shell as [JAAD](https://docs.jaamd.org/jaad).
 
-Install it with Astro and write three files:
+To start a project, alone or beside JAAD's docs:
+
+```bash
+npm create @jaamd/jaab@latest
+```
+
+To add it to one you have, install it with Astro and write three files:
 
 ```bash
 npm install astro @jaamd/jaab

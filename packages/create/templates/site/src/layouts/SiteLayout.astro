@@ -11,7 +11,7 @@ const {
   pageTitle,
   description = "A website with its own JAAD documentation.",
 } = Astro.props;
-const title = [pageTitle, "__JAAD_TITLE__"].filter(Boolean).join(" | ");
+const title = [pageTitle, "__SITE_TITLE__"].filter(Boolean).join(" | ");
 ---
 
 <!doctype html>
@@ -26,7 +26,7 @@ const title = [pageTitle, "__JAAD_TITLE__"].filter(Boolean).join(" | ");
   <body>
     <header class="landing-chrome landing-header">
       <a class="landing-name" href={withBase("/")}>
-        {"__JAAD_TITLE__"}
+        {"__SITE_TITLE__"}
       </a>
       <nav aria-label="Main navigation">
         <a href={withBase("/docs/")}>Documentation</a>

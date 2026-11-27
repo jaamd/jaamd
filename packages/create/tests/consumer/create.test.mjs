@@ -4,33 +4,64 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync, readFileSync } from 
 import { join, dirname } from 'node:path'
 import { after, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { walk } from '../dist.mjs'
-import { cleanupTemporaryDirectories, jaamdOverride, packPackage, run, temporaryDirectory } from './helpers.mjs'
+import { walk } from '../../../../tests/dist.mjs'
+import {
+    cleanupTemporaryDirectories,
+    jaamdOverride,
+    packPackage,
+    run,
+    temporaryDirectory,
+} from '../../../jaad/tests/consumer/helpers.mjs'
 
-const HERE = dirname(fileURLToPath(import.meta.url))
-const ROOT = join(HERE, '..', '..')
-const PKG = ROOT
-const CREATE_PKG = join(ROOT, '..', 'create-jaad')
+const PACKAGES = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
+const CREATE_PKG = join(PACKAGES, 'create')
 const CLI = join(CREATE_PKG, 'index.mjs')
+const PRODUCTS = {
+    '@jaamd/jaad': join(PACKAGES, 'jaad'),
+    '@jaamd/jaab': join(PACKAGES, 'jaab'),
+}
 
-/** The generated manifest asks npm for the published jaad; point it at ours. */
-function useLocalJaad(project, tarball) {
+const tarballs = {}
+const pack = (name) => {
+    tarballs[name] ??= packPackage(PRODUCTS[name])
+    return tarballs[name]
+}
+
+/** The generated manifest asks npm for the published packages; point it at ours. */
+function useLocalPackages(project) {
     const file = join(project, 'package.json')
     const manifest = JSON.parse(readFileSync(file, 'utf8'))
-    manifest.dependencies['@jaamd/jaad'] = tarball
+    for (const name of Object.keys(PRODUCTS)) {
+        if (name in manifest.dependencies) {
+            manifest.dependencies[name] = pack(name)
+        }
+    }
     manifest.overrides = jaamdOverride()
     writeFileSync(file, JSON.stringify(manifest, null, 2))
 }
 
-let tarball
-const pack = () => {
-    return (tarball ??= packPackage(PKG))
+/** Installs and builds the project, and lists what it built. */
+function installAndBuild(project) {
+    useLocalPackages(project)
+    run('npm', ['install', '--no-audit', '--no-fund'], project)
+    run('npx', ['astro', 'build'], project)
+
+    const dist = join(project, 'dist')
+    return walk(dist).map((file) => {
+        return file.slice(dist.length)
+    })
+}
+
+/** The guides an `AGENTS.md` cites in `node_modules`, as [package, path in it]. */
+function citedGuides(agents) {
+    return [...agents.matchAll(/`node_modules\/(@jaamd\/jaa[db])\/(docs\/[^`]+\.md)`/g)].map((match) => {
+        return [match[1], match[2]]
+    })
 }
 
 after(cleanupTemporaryDirectories)
 
 test('the scaffolder produces a project that builds', { timeout: 600_000 }, () => {
-    const tarball = pack()
     const parent = temporaryDirectory('jaad-create-')
 
     const output = run(
@@ -44,29 +75,21 @@ test('the scaffolder produces a project that builds', { timeout: 600_000 }, () =
     assert.match(output, /Start writing in docs\/01-introduction\.md/)
 
     const project = join(parent, 'docs-site')
-    useLocalJaad(project, tarball)
-    run('npm', ['install', '--no-audit', '--no-fund'], project)
-    run('npx', ['astro', 'build'], project)
-
-    const built = walk(join(project, 'dist')).map((f) => {
-        return f.slice(join(project, 'dist').length)
-    })
+    const built = installAndBuild(project)
     assert.ok(built.includes('/index.html'), 'no docs index')
     assert.ok(built.includes('/introduction/index.html'), 'no compatibility redirect for the sample page')
     const agents = readFileSync(join(project, 'AGENTS.md'), 'utf8')
-    const guides = [...agents.matchAll(/`(node_modules\/@jaamd\/jaad\/docs\/[^`]+\.md)`/g)].map((m) => {
-        return m[1]
-    })
+    const guides = citedGuides(agents)
     assert.ok(guides.length > 0, 'AGENTS.md lists no guide in node_modules')
     assert.deepEqual(
-        guides.filter((guide) => {
-            return !existsSync(join(project, guide))
+        guides.filter(([name, guide]) => {
+            return !existsSync(join(project, 'node_modules', name, guide))
         }),
         [],
         'AGENTS.md cites a guide the package does not install',
     )
     assert.deepEqual(
-        readdirSync(join(PKG, 'docs'), { recursive: true })
+        readdirSync(join(PRODUCTS['@jaamd/jaad'], 'docs'), { recursive: true })
             .filter((file) => {
                 return file.endsWith('.md')
             })
@@ -109,19 +132,12 @@ test('the scaffolder produces a project that builds', { timeout: 600_000 }, () =
 })
 
 test('the site template keeps the landing page separate from the docs', { timeout: 600_000 }, () => {
-    const tarball = pack()
     const parent = temporaryDirectory('jaad-create-site-')
 
     run('node', [CLI, 'product-site', '--template', 'site', '--title', 'Product', '--no-install'], parent)
 
     const project = join(parent, 'product-site')
-    useLocalJaad(project, tarball)
-    run('npm', ['install', '--no-audit', '--no-fund'], project)
-    run('npx', ['astro', 'build'], project)
-
-    const built = walk(join(project, 'dist')).map((f) => {
-        return f.slice(join(project, 'dist').length)
-    })
+    const built = installAndBuild(project)
     assert.ok(built.includes('/index.html'), 'no landing page')
     assert.ok(built.includes('/docs/index.html'), 'no docs index')
     assert.ok(built.includes('/docs/introduction/index.html'), 'no compatibility redirect for the sample page')
@@ -163,7 +179,6 @@ test('the site template keeps the landing page separate from the docs', { timeou
  * manifest, and files that are none of the scaffolder's business.
  */
 test('--here adds jaad to an existing repository without taking it over', { timeout: 600_000 }, () => {
-    const tarball = pack()
     const project = temporaryDirectory('jaad-here-')
 
     mkdirSync(join(project, 'docs', '02-guides'), { recursive: true })
@@ -201,13 +216,7 @@ test('--here adds jaad to an existing repository without taking it over', { time
         'an unused site layout was added beside an existing landing page',
     )
 
-    useLocalJaad(project, tarball)
-    run('npm', ['install', '--no-audit', '--no-fund'], project)
-    run('npx', ['astro', 'build'], project)
-
-    const built = walk(join(project, 'dist')).map((f) => {
-        return f.slice(join(project, 'dist').length)
-    })
+    const built = installAndBuild(project)
     assert.match(
         readFileSync(join(project, 'dist', 'index.html'), 'utf8'),
         /data-existing/,
@@ -218,15 +227,69 @@ test('--here adds jaad to an existing repository without taking it over', { time
 })
 
 test('every guide the agent files cite is a page of the docs', () => {
-    for (const template of ['docs', 'site']) {
+    for (const template of ['docs', 'site', 'blog', 'docs-blog']) {
         const agents = readFileSync(join(CREATE_PKG, 'templates', template, 'AGENTS.md'), 'utf8')
-        const missing = [...agents.matchAll(/`node_modules\/@jaamd\/jaad\/(docs\/[^`]+\.md)`/g)]
-            .map((m) => {
-                return m[1]
-            })
-            .filter((guide) => {
-                return !existsSync(join(PKG, guide))
-            })
+        const missing = citedGuides(agents).filter(([name, guide]) => {
+            return !existsSync(join(PRODUCTS[name], guide))
+        })
         assert.deepEqual(missing, [], `templates/${template}/AGENTS.md`)
     }
+})
+
+test('the blog template builds a blog at the root', { timeout: 600_000 }, () => {
+    const parent = temporaryDirectory('jaab-create-')
+    run('node', [CLI, 'notes', '--template', 'blog', '--title', 'Notes', '--no-install'], parent)
+
+    const project = join(parent, 'notes')
+    const built = installAndBuild(project)
+    assert.ok(built.includes('/index.html'), 'no blog index')
+    assert.ok(built.includes('/hello-world/index.html'), 'no first post')
+    // Without `site` there are no absolute URLs, so no feed.
+    assert.ok(!built.includes('/rss.xml'), 'a feed was written without site')
+
+    const index = readFileSync(join(project, 'dist', 'index.html'), 'utf8')
+    assert.match(index, /<title>Blog \| Notes<\/title>/)
+    assert.match(index, /<code>blog\/index\.md<\/code>, the text above the list of posts/)
+    assert.match(index, /href="\/hello-world\/"[^>]*>Hello, world</)
+    assert.match(readFileSync(join(project, 'dist', 'hello-world', 'index.html'), 'utf8'), /The first post\./)
+})
+
+test('the docs-blog template builds the docs at the root and the blog at /blog', { timeout: 600_000 }, () => {
+    const parent = temporaryDirectory('jaab-create-both-')
+    run('node', [CLI, 'both', '--template', 'docs-blog', '--title', 'Both', '--no-install'], parent)
+
+    const project = join(parent, 'both')
+    const built = installAndBuild(project)
+    for (const page of ['/index.html', '/blog/index.html', '/blog/hello-world/index.html']) {
+        assert.ok(built.includes(page), `${page} was not built`)
+    }
+
+    const docs = readFileSync(join(project, 'dist', 'index.html'), 'utf8')
+    assert.match(docs, /Write markdown in <code>docs\/<\/code>/, 'the docs do not open at the root')
+    assert.match(docs, /href="\/blog\/"[^>]*>Blog</, 'the nav does not lead to the blog')
+    assert.match(readFileSync(join(project, 'dist', 'blog', 'index.html'), 'utf8'), /href="\/blog\/hello-world\/"/)
+})
+
+// An alias is a manifest and an import: only installed do they show whether
+// the dependency on @jaamd/create resolves.
+test('the aliases scaffold from their packed tarballs', { timeout: 600_000 }, () => {
+    const tools = temporaryDirectory('jaamd-aliases-')
+    writeFileSync(
+        join(tools, 'package.json'),
+        JSON.stringify({
+            name: 'tools',
+            private: true,
+            dependencies: {
+                '@jaamd/create-jaad': `file:${packPackage(join(PACKAGES, 'create-jaad'))}`,
+                '@jaamd/create-jaab': `file:${packPackage(join(PACKAGES, 'create-jaab'))}`,
+            },
+            overrides: { '@jaamd/create': `file:${packPackage(CREATE_PKG)}` },
+        }),
+    )
+    run('npm', ['install', '--no-audit', '--no-fund'], tools)
+
+    run('npx', ['create-jaad', 'docs', '--title', 'Docs', '--no-install'], tools)
+    run('npx', ['create-jaab', 'blog', '--title', 'Blog', '--no-install'], tools)
+    assert.ok(existsSync(join(tools, 'docs', 'jaad.config.ts')), 'create-jaad did not write a docs site')
+    assert.ok(existsSync(join(tools, 'blog', 'jaab.config.ts')), 'create-jaab did not write a blog')
 })

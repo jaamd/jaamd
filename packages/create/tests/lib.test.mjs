@@ -6,13 +6,24 @@ import {
     completeManifest,
     devCommand,
     formatManifest,
+    helpOf,
+    localDay,
     missingAnswers,
     normaliseDir,
     packageManager,
-    parseArgs,
+    parseArgs as parseArgsOf,
     quoteArg,
     titleFrom,
 } from '../lib.mjs'
+import { presetOf } from '../templates.mjs'
+
+const JAAD = presetOf('jaad')
+const JAAMD = presetOf('jaamd')
+
+/** The arguments as `npm create @jaamd/jaad` reads them. */
+const parseArgs = (argv) => {
+    return parseArgsOf(argv, JAAD)
+}
 
 // ── Arguments ────────────────────────────────────────────────────────────────
 
@@ -44,8 +55,29 @@ test('an option that needs a value says so', () => {
 
 test('an unknown template names the ones that exist', () => {
     assert.throws(() => {
+        return parseArgs(['--template', 'wiki'])
+    }, /unknown template wiki; available: docs, site, docs-blog\./)
+})
+
+test("another package's template points at the scaffolder that has them all", () => {
+    assert.throws(() => {
         return parseArgs(['--template', 'blog'])
-    }, /docs, site/)
+    }, /blog is not a template of @jaamd\/jaad; .* npm create @jaamd offers every template/)
+    assert.equal(parseArgsOf(['--template', 'blog'], JAAMD).template, 'blog')
+})
+
+test('the help lists the templates of its entry point, and its default', () => {
+    const help = helpOf(JAAD)
+    assert.match(help, /^Usage: npm create @jaamd\/jaad@latest/)
+    assert.match(help, /docs +docs at \/ \(default\)/)
+    assert.doesNotMatch(help, /posts at/)
+    assert.doesNotMatch(helpOf(JAAMD), /\(default\)/)
+})
+
+test('a preset that is not there says which are', () => {
+    assert.throws(() => {
+        return presetOf('wiki')
+    }, /available: jaamd, jaad, jaab/)
 })
 
 test('--here and a directory are mutually exclusive', () => {
@@ -96,7 +128,7 @@ test('a package name becomes a title worth offering', () => {
     assert.equal(titleFrom('my-docs'), 'My Docs')
     assert.equal(titleFrom('@acme/my-library'), 'My Library')
     assert.equal(titleFrom('docs.site_name'), 'Docs Site Name')
-    assert.equal(titleFrom(''), 'Documentation')
+    assert.equal(titleFrom(''), 'My Site')
 })
 
 test('a path is quoted only when a shell would need it', () => {
@@ -180,13 +212,27 @@ test('the dev command is the script, unless the script is not Astro', () => {
 // ── Non-interactive completeness ─────────────────────────────────────────────
 
 test('a non-interactive run is told everything it still needs', () => {
-    const missing = missingAnswers({
-        here: false,
-        dir: null,
-        title: null,
-        install: null,
-    })
+    const missing = missingAnswers(
+        {
+            here: false,
+            dir: null,
+            template: null,
+            title: null,
+            install: null,
+        },
+        JAAD,
+    )
     assert.equal(missing.length, 3)
 
-    assert.deepEqual(missingAnswers({ here: true, dir: null, title: 'T', install: false }), [])
+    assert.deepEqual(missingAnswers({ here: true, dir: null, template: null, title: 'T', install: false }, JAAD), [])
+})
+
+test('without a default template, a non-interactive run must name one', () => {
+    const answers = { here: true, dir: null, template: null, title: 'T', install: false }
+    assert.deepEqual(missingAnswers(answers, JAAMD), ['template (--template <name>)'])
+    assert.deepEqual(missingAnswers({ ...answers, template: 'blog' }, JAAMD), [])
+})
+
+test('a post is dated by the day where it is written', () => {
+    assert.equal(localDay(new Date(2026, 0, 5, 0, 30)), '2026-01-05')
 })

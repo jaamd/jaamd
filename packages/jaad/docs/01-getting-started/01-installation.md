@@ -4,7 +4,7 @@ description: Create a JAAD project, or add JAAD to an existing repository or Ast
 
 # Installation
 
-`create-jaad` sets up a project in one command. To add JAAD by hand, see
+`npm create @jaamd/jaad` sets up a project in one command. To add JAAD by hand, see
 [Manual installation](#manual-installation).
 
 ## Create a project
@@ -29,9 +29,11 @@ bun create @jaamd/jaad@latest
 
 :::
 
-The CLI asks for a destination, template, title and whether to install
+The CLI asks for a template, destination, title and whether to install
 dependencies. The `docs` template puts documentation at `/` and is the default;
-`site` adds a landing page at `/` and moves documentation to `/docs`.
+`site` adds a landing page at `/` and moves documentation to `/docs`;
+`docs-blog` adds a [JAAB](https://docs.jaamd.org/jaab) blog at `/blog`.
+`npm create @jaamd@latest` is the same command with JAAB's `blog` template too.
 
 To provide every answer as flags:
 

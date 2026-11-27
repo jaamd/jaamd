@@ -14,6 +14,6 @@ export default defineConfig({
     astro: {},
     ignorePatterns: [
         // Copied verbatim into scaffolded projects.
-        'packages/create-jaad/templates/**',
+        'packages/create/templates/**',
     ],
 })
