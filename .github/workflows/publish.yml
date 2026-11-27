@@ -15,7 +15,7 @@ permissions: {}
 
 env:
     # Dependencies first: each tarball names the version of the one before.
-    PACKAGES: core astro site jaad jaab create-jaad
+    PACKAGES: core astro site jaad jaab create create-jaad create-jaab
 
 jobs:
     # Installs, tests and packs with no secrets and no publishing rights: the
@@ -67,6 +67,9 @@ jobs:
                     exit 1
                   fi
 
+                  # A public package would be published naming one that is not.
+                  node scripts/check-private-dependencies.mjs
+
                   # A prerelease must not become what `npm install` picks.
                   case "$version" in
                     *-*) echo "dist-tag=next" >> "$GITHUB_OUTPUT" ;;
@@ -74,8 +77,8 @@ jobs:
                   esac
                   echo "version=$version" >> "$GITHUB_OUTPUT"
 
-            # The whole suite: create-jaad is tested through jaad, jaad through
-            # the site, and core, astro and jaad through their packed tarballs.
+            # The whole suite: the scaffolder is tested through the projects it
+            # writes, jaad through the site, and every package through its tarball.
             - name: Check and test
               run: |
                   pnpm check
