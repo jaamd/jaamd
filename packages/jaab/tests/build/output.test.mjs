@@ -163,6 +163,12 @@ test('each post has its Markdown, and llms.txt lists them', () => {
     assert.match(built('llms-full.txt'), /Source: https:\/\/blog\.example\.com\/introducing-jaab\.md/)
 })
 
+test("a post's Markdown shows its images where the build put them", () => {
+    const [, src] = built('introducing-jaab.md').match(/!\[The index of a blog\]\(([^)]+)\)/) ?? []
+    assert.match(src ?? '', /^https:\/\/blog\.example\.com\/_astro\/index\.[\w-]+\.webp$/)
+    assert.ok(existsSync(join(DIST, new URL(src).pathname)), `${src} was not built`)
+})
+
 test('the 404 is the blog’s, mounted at the root', () => {
     assert.match(built('404.html'), /class="site-not-found/)
 })

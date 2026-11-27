@@ -8,7 +8,11 @@ export interface PageHeading {
 /** What Astro's renderer leaves on a markdown entry. */
 export interface RenderedMarkdown {
     html: string
-    metadata?: { headings?: { depth: number; slug: string; text: string }[] }
+    metadata?: {
+        headings?: { depth: number; slug: string; text: string }[]
+        /** The local images the Markdown writes, by their path. */
+        localImagePaths?: string[]
+    }
 }
 
 /** Elements whose text is not prose: code, controls, icons, and in-page navigation. */
@@ -19,7 +23,7 @@ const BLOCK =
 
 const NAMED: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' }
 
-function decodeEntities(text: string): string {
+export function decodeEntities(text: string): string {
     return text.replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, name: string) => {
         if (name[0] !== '#') {
             return NAMED[name.toLowerCase()] ?? entity

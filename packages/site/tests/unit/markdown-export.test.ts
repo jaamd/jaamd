@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { exportMarkdown, sourceKey, type MarkdownExportContext } from '../../src/markdown-export.ts'
+import { builtImageUrls, exportMarkdown, sourceKey, type MarkdownExportContext } from '../../src/markdown-export.ts'
 
 const CONTEXT: MarkdownExportContext = {
     markdownUrls: new Map([
@@ -41,6 +41,36 @@ test('root-relative links and images get the origin, without one they stay as wr
         /\[Home\]\(https:\/\/d\.dev\/\) !\[Logo\]\(https:\/\/d\.dev\/logo\.svg\)/,
     )
     assert.match(exported('[Home](/)', { ...CONTEXT, origin: null }), /\[Home\]\(\/\)/)
+})
+
+test('a local image leads where the build put it', () => {
+    const images = new Map([['./shot.png', '/_astro/shot.Ab12.webp']])
+    const markdown = exported('![Shot](./shot.png) ![Other](./other.png)\n\n![Ref][s]\n\n[s]: ./shot.png', CONTEXT, {
+        images,
+    })
+    assert.match(markdown, /!\[Shot\]\(https:\/\/d\.dev\/_astro\/shot\.Ab12\.webp\)/)
+    assert.match(markdown, /!\[Other\]\(\.\/other\.png\)/)
+    assert.match(markdown, /\[s\]: https:\/\/d\.dev\/_astro\/shot\.Ab12\.webp/)
+})
+
+// Astro leaves a placeholder for each local image, and fills it in on render.
+test('the built images pair with the placeholders in order, raw images included', () => {
+    const placeholder = (src: string) => {
+        return `<img __ASTRO_IMAGE_="{&quot;alt&quot;:&quot;A&quot;,&quot;src&quot;:&quot;${src}&quot;,&quot;index&quot;:0}">`
+    }
+    const collection = `<p>${placeholder('./a.png')}<img src="/raw.png">${placeholder('./b&amp;c.png')}</p>`
+    const rendered =
+        '<p><img src="/_astro/a.1.webp" alt="A"><img src="/raw.png"><img alt="A" src="/_astro/b.2.webp?x=1&amp;y=2"></p>'
+
+    assert.deepEqual(
+        builtImageUrls(collection, rendered),
+        new Map([
+            ['./a.png', '/_astro/a.1.webp'],
+            ['./b&c.png', '/_astro/b.2.webp?x=1&y=2'],
+        ]),
+    )
+    // Tags that do not line up pair nothing, rather than the wrong images.
+    assert.deepEqual(builtImageUrls(collection, '<p><img src="/_astro/a.1.webp"></p>'), new Map())
 })
 
 test('links that are not to a known page are left alone', () => {

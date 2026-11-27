@@ -4,6 +4,7 @@ import type { DocsSourceEntry } from './collection.ts'
 import type { DocsPage } from './model/tree.ts'
 import type { FullPage } from '@jaamd/site/llms.ts'
 import type { MarkdownExportContext } from '@jaamd/site/markdown-export.ts'
+import { entryImageUrls } from '@jaamd/site/entry-html.ts'
 import { absoluteHref, llmsDocument, llmsFullDocument, llmsLine, textResponse } from '@jaamd/site/llms.ts'
 import { exportMarkdown, sourceKey } from '@jaamd/site/markdown-export.ts'
 import { pageDescription } from '@jaamd/site/rendered.ts'
@@ -49,6 +50,7 @@ export async function pageMarkdown(page: DocsPage<DocsSourceEntry>, site: URL | 
             description: page.data.description,
             body: page.source.body ?? '',
             filePath: page.source.filePath,
+            images: await entryImageUrls(page.source),
         },
         await markdownContext(site),
     )

@@ -37,7 +37,10 @@ const DOCS = {
         '',
         'Second page.',
         '',
+        '![A diagram](./diagram.svg)',
+        '',
     ].join('\n'),
+    'docs/02-guides/diagram.svg': '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"/>\n',
     'public/logo.svg': '<svg xmlns="http://www.w3.org/2000/svg"/>\n',
 }
 
@@ -105,6 +108,12 @@ describe('docs at the root, with frontmatter and a header', () => {
         assert.match(home, /<meta name="keywords" content="alpha, beta"/)
         assert.match(home, /"keywords":\["alpha","beta"\]/)
         assert.deepEqual(JSON.parse(site.read('search-index.json')).pages[0].keywords, ['alpha', 'beta'])
+    })
+
+    test("a page's Markdown shows its images where the build put them", () => {
+        const [, src] = site.read('guides/deep-dive.md').match(/!\[A diagram\]\(([^)]+)\)/) ?? []
+        assert.match(src ?? '', /^https:\/\/example\.dev\/_astro\/diagram\.[\w-]+\.svg$/)
+        assert.ok(site.files.includes(new URL(src).pathname), `${src} was not built`)
     })
 
     // A date in frontmatter that nothing renders is a field nobody would set.

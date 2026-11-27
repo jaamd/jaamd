@@ -57,7 +57,8 @@ Then run a build and read below the changes since the version you upgrade from.
 
 The `.md` of a page is now written to read on its own, not served as its
 source: it opens with the title and the frontmatter description, its links
-lead to other pages' Markdown, and code tabs, tables of contents and spoilers
+lead to other pages' Markdown, its local images to the files the build wrote,
+and code tabs, tables of contents and spoilers
 become plain Markdown. A tool that read the `.md` as the page's source file
 should read the file in the repository instead.
 

@@ -10,6 +10,7 @@ import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
 import { unified } from 'unified'
 import { SKIP, visit } from 'unist-util-visit'
+import { decodeEntities } from './rendered.ts'
 
 export interface ExportablePage {
     title: string
@@ -19,6 +20,8 @@ export interface ExportablePage {
     body: string
     /** The source file, relative to the project root. */
     filePath?: string | undefined
+    /** The built URL of each local image, by the path the Markdown writes. */
+    images?: Map<string, string> | undefined
 }
 
 export interface MarkdownExportContext {
@@ -26,6 +29,50 @@ export interface MarkdownExportContext {
     markdownUrls: Map<string, string>
     /** The site's origin, as `https://example.dev`, for root-relative URLs; null leaves them as they are. */
     origin: string | null
+}
+
+const IMG = /<img\b[^>]*>/gi
+
+/** An attribute of an `<img>` tag, decoded; null when the tag lacks it. */
+function imgAttribute(tag: string, name: string): string | null {
+    const value = new RegExp(`\\s${name}="([^"]*)"`).exec(tag)?.[1]
+    return value === undefined ? null : decodeEntities(value)
+}
+
+/** The path of the local image an `<img>` of the collection's HTML stands
+ *  for: Astro leaves a placeholder, filled in when the entry is rendered. */
+function placeholderSource(tag: string): string | null {
+    const placeholder = imgAttribute(tag, '__ASTRO_IMAGE_')
+    if (placeholder === null) {
+        return null
+    }
+    try {
+        const { src } = JSON.parse(placeholder) as { src?: unknown }
+        return typeof src === 'string' ? src : null
+    } catch {
+        return null
+    }
+}
+
+/** The built URL of each local image, by the path the Markdown writes: the
+ *  collection's HTML and the rendered HTML hold the same `<img>` tags in the
+ *  same order, with the placeholders filled in. Empty when they do not. */
+export function builtImageUrls(collectionHtml: string, renderedHtml: string): Map<string, string> {
+    const placeholders = collectionHtml.match(IMG) ?? []
+    const images = renderedHtml.match(IMG) ?? []
+    const urls = new Map<string, string>()
+    if (placeholders.length !== images.length) {
+        return urls
+    }
+
+    for (const [at, tag] of placeholders.entries()) {
+        const source = placeholderSource(tag)
+        const built = imgAttribute(images[at] ?? '', 'src')
+        if (source !== null && built !== null) {
+            urls.set(source, built)
+        }
+    }
+    return urls
 }
 
 /** The same key for `docs/a.md` and `./docs/a.md`, on any OS. */
@@ -149,9 +196,14 @@ export function exportMarkdown(page: ExportablePage, context: MarkdownExportCont
     })
 
     visit(tree, ['link', 'definition', 'image'], (node) => {
-        if ('url' in node && typeof node.url === 'string') {
-            node.url = rewriteUrl(node.url, page, context)
+        if (!('url' in node) || typeof node.url !== 'string') {
+            return
         }
+
+        // A local image is served where the build put it, not beside the Markdown;
+        // a definition can hold one for an image reference.
+        const built = node.type === 'link' ? undefined : page.images?.get(node.url)
+        node.url = rewriteUrl(built ?? node.url, page, context)
     })
 
     const intro: RootContent[] = []
