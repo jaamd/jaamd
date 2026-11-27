@@ -126,6 +126,12 @@ test('the feed carries every post in full, with absolute URLs and its tags', () 
     // The local image, rendered as on the page and then made absolute.
     assert.match(feed, /src=&quot;https:\/\/blog\.example\.com\/_astro\/index\.[^&]+\.webp&quot;/)
     assert.doesNotMatch(feed, /__ASTRO_IMAGE_/)
+    // Readers show a heading's link as a stray icon, and the marker as text.
+    assert.doesNotMatch(feed, /jaamd-heading-link|&lt;!-- more/)
+    assert.match(
+        feed,
+        /<atom:link href="https:\/\/blog\.example\.com\/rss\.xml" rel="self" type="application\/rss\+xml"\/>/,
+    )
 })
 
 test("the feed names each post's authors, as Dublin Core creators", () => {

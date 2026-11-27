@@ -10,8 +10,10 @@ import { absoluteHref, llmsDocument, llmsFullDocument, llmsLine, textResponse } 
 import { exportMarkdown, sourceKey } from '@jaamd/site/markdown-export.ts'
 import { oncePerBuild } from '@jaamd/site/runtime.ts'
 import config from 'virtual:jaab/config'
-import { absoluteUrls, withoutTitle } from './model/html.ts'
+import { absoluteUrls, feedContent } from './model/html.ts'
 import { getPosts } from './posts.ts'
+import { blogUrls } from './runtime.ts'
+import { blogFileHref } from './urls.ts'
 
 /** Where every post's Markdown is. */
 const markdownContext = oncePerBuild(async (site: URL | undefined): Promise<MarkdownExportContext> => {
@@ -70,13 +72,13 @@ export async function llmsFullResponse(site: URL | undefined): Promise<Response>
 
 let warnedFallback = false
 
-/** A post's HTML for the feed, without the title its item already carries.
- *  Rendered, so its local images resolve; should Astro fail to, the
- *  collection's HTML without those images keeps the feed building. */
+/** A post's HTML for the feed, as `feedContent` trims it. Rendered, so its
+ *  local images resolve; should Astro fail to, the collection's HTML without
+ *  those images keeps the feed building. */
 async function feedHtml(post: BlogPost, renderEntry: EntryRenderer): Promise<string> {
     const rendered = await renderEntry(post.entry)
     if (rendered !== null) {
-        return withoutTitle(rendered)
+        return feedContent(rendered)
     }
 
     if (!warnedFallback) {
@@ -84,10 +86,11 @@ async function feedHtml(post: BlogPost, renderEntry: EntryRenderer): Promise<str
         console.warn('jaab: rss.xml could not render the posts, so their local images are left out of it.')
     }
     const html = post.entry.rendered?.html ?? ''
-    return withoutTitle(html.replace(/<img\b[^>]*__ASTRO_IMAGE_[^>]*>/g, ''))
+    return feedContent(html.replace(/<img\b[^>]*__ASTRO_IMAGE_[^>]*>/g, ''))
 }
 
 const DUBLIN_CORE = 'http://purl.org/dc/elements/1.1/'
+const ATOM = 'http://www.w3.org/2005/Atom'
 
 /** A post's authors as the feed names them: RSS's own `<author>` is an email
  *  address, so each is a Dublin Core `<dc:creator>`, as feeds commonly write it. */
@@ -101,6 +104,8 @@ function creators(post: BlogPost): string {
 
 /** `rss.xml`: the newest posts in full. Only routed when `site` is set. */
 export async function rssResponse(site: URL): Promise<Response> {
+    // Its own address, which feed validators ask for.
+    const self = new URL(blogFileHref('rss.xml', blogUrls()), site).href
     const limit = config.blog.feed?.limit ?? 0
     const posts = (await getPosts()).slice(0, limit)
     const renderEntry = await entryRenderer()
@@ -124,8 +129,10 @@ export async function rssResponse(site: URL): Promise<Response> {
         description: config.description ?? config.title,
         site,
         items,
-        customData: `<language>${config.lang}</language>`,
-        xmlns: { dc: DUBLIN_CORE },
+        customData:
+            `<language>${config.lang}</language>` +
+            `<atom:link href="${escapeHtml(self)}" rel="self" type="application/rss+xml"/>`,
+        xmlns: { dc: DUBLIN_CORE, atom: ATOM },
         trailingSlash: config.blog.trailingSlash,
     })
 }
