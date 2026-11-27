@@ -12,15 +12,19 @@ import { BOTH_COLLECTIONS, built, inline, project, removeProjects } from './proj
 const URL_OF_SITE = 'https://example.dev'
 
 /** The options both packages share, as `defineSiteConfig` holds them. */
-const SITE = { title: 'Both', description: 'Docs and a blog.' }
+const SITE = {
+    title: 'Both',
+    description: 'Docs and a blog.',
+    authors: { ada: { name: 'Ada Lovelace', url: 'https://ada.example' } },
+}
 
 /** Docs and a blog, with a page or two each and `files` on top. */
 function both(files = {}) {
     return project({
         'src/content.config.ts': BOTH_COLLECTIONS,
         'docs/01-intro.md': '# Intro\n\nThe docs open here.\n',
-        'docs/02-guide.md': '# Guide\n\nThe docs.\n',
-        'blog/2026-11-22-first.md': '---\ntitle: First post\ndate: 2026-11-22\n---\n\nThe blog.\n',
+        'docs/02-guide.md': '---\nauthors: ada\n---\n\n# Guide\n\nThe docs.\n',
+        'blog/2026-11-22-first.md': '---\ntitle: First post\ndate: 2026-11-22\nauthors: ada\n---\n\nThe blog.\n',
         ...files,
     })
 }
@@ -79,6 +83,12 @@ describe('docs at the root and a blog at /blog', () => {
         }
         assert.match(docs, /<site-search/)
         assert.doesNotMatch(post, /<site-search/)
+    })
+
+    test('the docs and the blog name the same people', () => {
+        const author = /<a href="https:\/\/ada\.example" rel="author">Ada Lovelace<\/a>/
+        assert.match(read('guide/index.html'), author)
+        assert.match(read('blog/first/index.html'), author)
     })
 
     test('the footer credits both', () => {

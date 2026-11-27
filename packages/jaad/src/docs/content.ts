@@ -1,6 +1,7 @@
 /// <reference path="../env.d.ts" />
 
 import { frontmatterFields } from '@jaamd/astro/frontmatter'
+import { authorsField } from '@jaamd/site/authors.ts'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 import { defineCollection } from 'astro:content'
@@ -31,6 +32,8 @@ const docs = (base: string, section?: string) => {
             translationKey: z.string().optional(),
             /** Replaces the filename prefix number. */
             order: z.number().int().optional(),
+            /** Who wrote the page: keys of the site's `authors`, names, or names with a url. */
+            authors: authorsField,
         }),
     })
 }

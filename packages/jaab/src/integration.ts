@@ -112,8 +112,8 @@ const indented = (lines: string[]): string => {
 }
 
 /** Stops the build on what the posts get wrong, each line with its remedy. */
-function assertPosts(posts: PostFile[], config: JaabResolvedConfig, reserved: ReservedPath[]): void {
-    const errors = postErrors(posts, { authors: Object.keys(config.blog.authors) })
+function assertPosts(posts: PostFile[], reserved: ReservedPath[]): void {
+    const errors = postErrors(posts)
     if (errors.length > 0) {
         throw new Error(`jaab: the posts need fixing\n${indented(errors)}`)
     }
@@ -194,7 +194,7 @@ export function createJaabIntegration(options: JaabUserConfig, site: SiteIntegra
 
                 const member = siteMember(site)
                 const coordinator = siteCoordinator(site)
-                assertPosts(posts, config, coordinator.reservedInside(member))
+                assertPosts(posts, coordinator.reservedInside(member))
 
                 const routes = getInjectedRoutes(config.blog.base, {
                     llms: config.blog.llms,

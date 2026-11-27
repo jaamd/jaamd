@@ -28,6 +28,8 @@ export const docsConfigShape = {
         })
         .optional(),
     editLink: z.union([z.boolean(), z.string()]).default(true),
+    /** The key in the site's `authors` of a page's author when it names none. */
+    author: z.string().optional(),
     /** `llms.txt`, `llms-full.txt` and the Markdown alternate of each page; false leaves them out. */
     llms: z.boolean().default(true),
     /** Only when detection guesses wrong: pin the set, or false to switch it off. */
@@ -57,6 +59,8 @@ export interface DocsResolvedConfig {
     trailingSlash: boolean
     /** Whether the files for language models are written. */
     llms: boolean
+    /** The key in the site's `authors` of a page's author when it names none. */
+    author: string | null
 }
 
 export interface DocsSection {
@@ -134,6 +138,7 @@ export function resolveDocsConfig(
         // Astro's defaults, `trailingSlash: 'ignore'` with directories, until the integration knows better.
         trailingSlash: true,
         llms: config.llms,
+        author: config.author ?? null,
     }
 
     const roots = docsRoots(docs, cwd)

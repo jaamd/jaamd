@@ -1,4 +1,5 @@
 ---
+import type { Author } from '@jaamd/site/authors.ts'
 import StructuredData from '@jaamd/site/components/StructuredData.astro'
 import config from 'virtual:jaad/config'
 import { slugToTitle } from '../model/ids.ts'
@@ -10,7 +11,7 @@ interface Props {
     description: string
     chapter?: string | undefined
     keywords?: string[] | undefined
-    author?: string | undefined
+    authors?: Author[] | undefined
     modified?: Date | undefined
     /** BCP-47 tag of this page's locale. */
     language?: string | undefined

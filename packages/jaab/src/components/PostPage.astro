@@ -1,6 +1,7 @@
 ---
 import type { BlogPostProps } from '../layout.ts'
 import MarkdownContent from '@jaamd/astro/components'
+import Authors from '@jaamd/site/components/Authors.astro'
 import Footer from '@jaamd/site/components/Footer.astro'
 import PageActions from '@jaamd/site/components/PageActions.astro'
 import StructuredData from '@jaamd/site/components/StructuredData.astro'
@@ -10,7 +11,6 @@ import { ui } from '@jaamd/site/runtime.ts'
 import config from 'virtual:jaab/config'
 import Layout from '../layouts/Blog.astro'
 import { formatPostDay } from '../model/posts.ts'
-import { namesAuthors } from '../posts.ts'
 import PostNav from './PostNav.astro'
 
 type Props = BlogPostProps
@@ -20,9 +20,6 @@ const t = ui()
 
 // The shell writes the whole title and description from the page's own.
 const { title: _title, description: _description, ...head } = meta.head
-const authorNames = post.authors.map((author) => {
-    return author.name
-})
 // Passed through to the element; the component's props name only `as` and `class`.
 const contentAttrs = { id: 'content' }
 ---
@@ -43,8 +40,15 @@ const contentAttrs = { id: 'content' }
                             <span>{fill(t('blog.minutes'), { minutes: post.readingTime })}</span>
                         </>
                     )}
+                    {post.authors.length > 0 && (
+                        <>
+                            <span aria-hidden="true">·</span>
+                            <span>
+                                <Authors authors={post.authors} />
+                            </span>
+                        </>
+                    )}
                 </p>
-                {namesAuthors() && authorNames.length > 0 && <p class="blog-post-byline">{authorNames.join(', ')}</p>}
 
                 <MarkdownContent {...contentAttrs} class="blog-content">
                     {!ownHeading && <h1>{post.title}</h1>}

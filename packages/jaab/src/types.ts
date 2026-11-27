@@ -1,3 +1,4 @@
+import type { AuthorsField } from '@jaamd/site/authors.ts'
 import type { RenderedMarkdown } from '@jaamd/site/rendered.ts'
 
 /** Resolved frontmatter of a post. Mirrors the schema in content.ts. */
@@ -6,9 +7,10 @@ export interface PostData {
     description?: string
     date: Date
     tags: string[]
-    authors?: string | string[]
+    authors?: AuthorsField
     aliases: string[]
     keywords: string[]
+    /** The older single name; `authors` is the field to write. */
     author?: string
     ogImage?: string | false
     lastUpdated?: Date

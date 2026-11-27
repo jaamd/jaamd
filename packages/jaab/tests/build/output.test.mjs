@@ -57,9 +57,30 @@ test('a relative link to another post, or to the index, becomes its url', () => 
     assert.match(hello, /<a href="\/">the index<\/a>/)
 })
 
-test('with several authors, a post names its own', () => {
-    assert.match(built('oxlint/index.html'), /class="blog-post-byline">Ada Lovelace, Grace Hopper</)
-    assert.match(built('introducing-jaab/index.html'), /class="blog-post-byline">Ada Lovelace</)
+test('a post names its authors beside its date, each with a url a link to it', () => {
+    assert.match(
+        built('oxlint/index.html'),
+        /<span>Ada Lovelace and <a href="https:\/\/example\.com\/grace" rel="author">Grace Hopper<\/a><\/span><\/p>/,
+    )
+    // The blog's default author, alone: still named.
+    assert.match(
+        built('introducing-jaab/index.html'),
+        /<span aria-hidden="true">·<\/span><span>Ada Lovelace<\/span><\/p>/,
+    )
+})
+
+test("a post's authors are in its head, its structured data and its Open Graph", () => {
+    const post = built('oxlint/index.html')
+    assert.match(post, /<meta name="author" content="Ada Lovelace"><meta name="author" content="Grace Hopper">/)
+    assert.match(post, /<link rel="author" href="https:\/\/example\.com\/grace">/)
+    assert.match(
+        post,
+        /<meta property="article:author" content="Ada Lovelace"><meta property="article:author" content="https:\/\/example\.com\/grace">/,
+    )
+    assert.match(
+        post,
+        /"author":\[\{"@type":"Person","name":"Ada Lovelace"\},\{"@type":"Person","name":"Grace Hopper","url":"https:\/\/example\.com\/grace"\}\]/,
+    )
 })
 
 test('a post has the table of contents and the page actions beside it', () => {
@@ -102,6 +123,14 @@ test('the feed carries every post in full, with absolute URLs and its tags', () 
     // The local image, rendered as on the page and then made absolute.
     assert.match(feed, /src=&quot;https:\/\/blog\.example\.com\/_astro\/index\.[^&]+\.webp&quot;/)
     assert.doesNotMatch(feed, /__ASTRO_IMAGE_/)
+})
+
+test("the feed names each post's authors, as Dublin Core creators", () => {
+    const feed = built('rss.xml')
+    assert.match(feed, /<rss version="2.0"[^>]* xmlns:dc="http:\/\/purl\.org\/dc\/elements\/1\.1\/"/)
+    assert.match(feed, /<dc:creator>Ada Lovelace<\/dc:creator><dc:creator>Grace Hopper<\/dc:creator>/)
+    // RSS's own <author> takes an email address, which the site does not have.
+    assert.doesNotMatch(feed, /<author>/)
 })
 
 test('every page links the feed: in the head, the header and the footer', () => {

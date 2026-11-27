@@ -1,7 +1,9 @@
 /// <reference path="../env.d.ts" />
 
 import type { DocsSection } from './config.ts'
+import type { DocsPageData } from './types.ts'
 import type { DocsUrlOptions } from './urls.ts'
+import { pageAuthors, type Author } from '@jaamd/site/authors.ts'
 import { DEFAULT_LOCALE } from '@jaamd/site/runtime.ts'
 import config from 'virtual:jaad/config'
 
@@ -17,4 +19,9 @@ export function docsUrls(locale?: string): DocsUrlOptions {
         defaultLocale: DEFAULT_LOCALE,
         trailingSlash: config.docs.trailingSlash,
     }
+}
+
+/** Who wrote a page: those it names, else the docs' default author. */
+export function docsPageAuthors(data: DocsPageData): Author[] {
+    return pageAuthors(data, config.authors, config.docs.author)
 }

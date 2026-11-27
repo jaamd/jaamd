@@ -16,7 +16,7 @@ import DocsFrame from 'virtual:jaad/docs-frame'
 import { getLocaleAlternates } from '../collection.ts'
 import DocsSidebarLeft from '../components/DocsSidebarLeft.astro'
 import DocsStructuredData from '../components/DocsStructuredData.astro'
-import { docsUrls } from '../runtime.ts'
+import { docsPageAuthors, docsUrls } from '../runtime.ts'
 import { docsFileHref, docsMarkdownHref } from '../urls.ts'
 import '@jaamd/site/site.css'
 import '../../../dist/jaad.css'
@@ -42,6 +42,8 @@ const pageTitle = title ? `${title} | ${config.title}` : config.title
 
 const description =
     page.data.description ?? pageDescription(page.source.rendered, page.title) ?? config.description ?? config.title
+
+const authors = docsPageAuthors(page.data)
 
 const locale = page.locale ?? DEFAULT_LOCALE
 const language = languageOf(locale)
@@ -78,6 +80,7 @@ const frameProps: DocsFrameProps = {
         section: page.section,
         chapter: page.chapter,
         data: page.data,
+        authors,
     },
     headings,
     navigation,
@@ -91,7 +94,7 @@ const frameProps: DocsFrameProps = {
             title={pageTitle}
             description={description}
             keywords={page.data.keywords}
-            author={page.data.author}
+            {authors}
             image={page.data.ogImage}
             modified={page.data.lastUpdated}
             language={language}
@@ -104,7 +107,7 @@ const frameProps: DocsFrameProps = {
             description={description}
             chapter={page.chapter}
             keywords={page.data.keywords}
-            author={page.data.author}
+            {authors}
             modified={page.data.lastUpdated}
             {language}
             {locale}

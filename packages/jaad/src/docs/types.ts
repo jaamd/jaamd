@@ -1,3 +1,4 @@
+import type { AuthorsField } from '@jaamd/site/authors.ts'
 import type { PageHeading, RenderedMarkdown } from '@jaamd/site/rendered.ts'
 
 export interface DocsNavItem {
@@ -21,6 +22,8 @@ export interface DocsPageData {
     order?: number
     draft: boolean
     keywords: string[]
+    authors?: AuthorsField
+    /** The older single name; `authors` is the field to write. */
     author?: string
     ogImage?: string | false
     lastUpdated?: Date

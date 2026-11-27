@@ -1,9 +1,10 @@
 /// <reference path="./env.d.ts" />
 
-import type { BlogAuthor } from './config.ts'
 import type { IntroEntry, PostEntry } from './types.ts'
+import type { Author } from '@jaamd/site/authors.ts'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { pageAuthors } from '@jaamd/site/authors.ts'
 import { readFrontmatter } from '@jaamd/site/frontmatter.ts'
 import { editUrl } from '@jaamd/site/infer.ts'
 import { htmlText, pageDescription, renderedTitle } from '@jaamd/site/rendered.ts'
@@ -30,7 +31,7 @@ export interface BlogPost {
     tags: string[]
     keywords: string[]
     /** Resolved from `authors`; the site's author when the post names none. */
-    authors: BlogAuthor[]
+    authors: Author[]
     readingTime: number
     href: string
     markdownHref: string
@@ -55,14 +56,6 @@ function describe(entry: PostEntry, title: string): string | null {
         return htmlText(withoutTitle(html.slice(0, more))) || null
     }
     return pageDescription(entry.rendered, title)
-}
-
-function authorsOf(entry: PostEntry): BlogAuthor[] {
-    const keys = [entry.data.authors ?? config.blog.author ?? []].flat()
-    return keys.flatMap((key) => {
-        const author = config.blog.authors[key]
-        return author ? [author] : []
-    })
 }
 
 /** Where a post's file is edited: its path below `blogDir`. */
@@ -101,7 +94,7 @@ function toPost(entry: PostEntry): BlogPost {
         ...writtenDays(entry),
         tags: entry.data.tags,
         keywords: entry.data.keywords,
-        authors: authorsOf(entry),
+        authors: pageAuthors(entry.data, config.authors, config.blog.author),
         readingTime: readingMinutes(text),
         href: blogPageHref(entry.id, urls),
         markdownHref: blogFileHref(`${entry.id}.md`, urls),
@@ -129,9 +122,4 @@ export const getPosts = oncePerBuild(readPosts)
 export async function getIntro(): Promise<IntroEntry | undefined> {
     const [intro] = (await getCollection('blogIndex' as never)) as unknown as IntroEntry[]
     return intro
-}
-
-/** Whether the site has more than one author, so a post names its own. */
-export function namesAuthors(): boolean {
-    return Object.keys(config.blog.authors).length > 1
 }
