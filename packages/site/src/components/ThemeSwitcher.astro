@@ -52,7 +52,11 @@ const t = ui(Astro.props.locale)
 
             this.querySelector('button')?.addEventListener('click', () => {
                 const isDark = document.documentElement.classList.toggle('dark')
-                localStorage.setItem('theme', isDark ? 'dark' : 'light')
+                try {
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light')
+                } catch {
+                    // Blocked storage: the choice lasts until the next page.
+                }
             })
         }
     }

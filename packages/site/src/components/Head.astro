@@ -11,9 +11,17 @@ type Props = MetaProps
 const favicon = config.favicon ? withDeploymentBase(config.favicon, import.meta.env.BASE_URL) : null
 
 // Applied before the first paint, so the page never flashes the wrong theme.
+// Storage throws when the browser blocks the site's data: the system's choice applies.
 const themeScript = `(function () {
+  function storedTheme() {
+    try {
+      return localStorage.getItem("theme");
+    } catch (e) {
+      return null;
+    }
+  }
   function isDark() {
-    var t = localStorage.getItem("theme");
+    var t = storedTheme();
     return (
       t === "dark" || (!t && matchMedia("(prefers-color-scheme: dark)").matches)
     );

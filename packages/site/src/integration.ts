@@ -63,7 +63,7 @@ export function loadTailwindPlugin(root: string, registered: VitePlugins | undef
             throw error
         }
         throw new Error(
-            'jaad: `tailwind: true` needs Tailwind in your project:\n  npm i -D tailwindcss @tailwindcss/vite',
+            'jaamd: `tailwind: true` needs Tailwind in your project:\n  npm i -D tailwindcss @tailwindcss/vite',
             { cause: error },
         )
     }
@@ -233,6 +233,14 @@ export function assertNoOwnJaamd(integrations: { name: string }[], members: Site
     )
 }
 
+/** Whether the project adds `@astrojs/sitemap` itself: its options are kept,
+ *  and a second one would write the same files after it. */
+export function hasOwnSitemap(integrations: { name: string }[]): boolean {
+    return integrations.some((integration) => {
+        return integration.name === '@astrojs/sitemap'
+    })
+}
+
 /** What the first site integration of the project, `owner`, sets up once for every
  *  package: JAAMD, the virtual modules, Tailwind, the fonts, the root files
  *  and the sitemap. */
@@ -313,7 +321,11 @@ async function setupSite(
 
     // `site` may come from Astro's own config: read once it is merged.
     if (astroConfig.site) {
-        updateConfig({ integrations: [sitemap()] })
+        if (hasOwnSitemap(astroConfig.integrations)) {
+            logger.info('@astrojs/sitemap is in the project: the site adds no sitemap of its own.')
+        } else {
+            updateConfig({ integrations: [sitemap()] })
+        }
     }
 
     return contributions

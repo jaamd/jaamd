@@ -238,7 +238,7 @@ test('tailwind: missing packages name the install command', () => {
         writeFileSync(join(root, 'package.json'), '{}')
         assert.throws(() => {
             return loadTailwindPlugin(root, [])
-        }, /npm i -D tailwindcss @tailwindcss\/vite/)
+        }, /^Error: jaamd: `tailwind: true` needs Tailwind[\s\S]*npm i -D tailwindcss @tailwindcss\/vite/)
     } finally {
         rmSync(root, { recursive: true })
     }

@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { pathToFileURL } from 'node:url'
-import { projectClashes, projectFileAt } from '../../src/integration.ts'
+import { hasOwnSitemap, projectClashes, projectFileAt } from '../../src/integration.ts'
 import {
     assertOneVersion,
     assertSameOptions,
@@ -157,4 +157,9 @@ test("a project's own page, or a file in public, answers at a path", () => {
     } finally {
         rmSync(root, { recursive: true })
     }
+})
+
+test("the project's own sitemap is the only one", () => {
+    assert.equal(hasOwnSitemap([{ name: '@jaamd/site' }, { name: '@astrojs/sitemap' }]), true)
+    assert.equal(hasOwnSitemap([{ name: '@jaamd/site' }, { name: '@jaamd/jaad' }]), false)
 })
