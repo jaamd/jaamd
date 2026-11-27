@@ -68,11 +68,13 @@ export interface Registration {
 
 /** Names of a Sätteri entry: definitions carry `name`, groups nest, factories have none. */
 const satteriNames = (entry: unknown): string[] => {
-    return Array.isArray(entry)
-        ? entry.flatMap(satteriNames)
-        : entry && typeof entry === 'object' && 'name' in entry
-          ? [String(entry.name)]
-          : []
+    if (Array.isArray(entry)) {
+        return entry.flatMap(satteriNames)
+    }
+    if (entry && typeof entry === 'object' && 'name' in entry) {
+        return [String(entry.name)]
+    }
+    return []
 }
 
 /** Name of a unified entry: the plugin function or module, alone or as `[plugin, options]`.
