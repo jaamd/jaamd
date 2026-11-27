@@ -2,7 +2,6 @@ import type { UiCatalog } from '../ui.ts'
 
 export const ITALIAN_UI = {
     'blog.label': 'Blog',
-    'blog.minutes': '{minutes} min di lettura',
     'blog.newer': 'Post più recenti',
     'blog.older': 'Post meno recenti',
     'blog.page': 'Pagina {page} di {pages}',
@@ -20,6 +19,7 @@ export const ITALIAN_UI = {
     'page.copy': 'Copia',
     'page.edit': 'Modifica',
     'page.lastUpdated': 'Ultimo aggiornamento il',
+    'page.minutes': '{minutes} min di lettura',
     'search.all': 'Tutte',
     'search.close': 'chiudi',
     'search.empty': 'Nessun risultato per',

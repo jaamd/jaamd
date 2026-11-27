@@ -75,16 +75,6 @@ export function formatPostDay(day: string, language: string): string {
     return new Intl.DateTimeFormat(language, { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(day))
 }
 
-const WORDS_PER_MINUTE = 200
-
-/** Minutes to read `text`, at least one. */
-export function readingMinutes(text: string): number {
-    const words = text.split(/\s+/).filter((word) => {
-        return /[\p{L}\p{N}]/u.test(word)
-    })
-    return Math.max(1, Math.ceil(words.length / WORDS_PER_MINUTE))
-}
-
 /** Newest first; on the same date, by slug. */
 export function comparePosts(a: { date: Date; slug: string }, b: { date: Date; slug: string }): number {
     const difference = b.date.getTime() - a.date.getTime()

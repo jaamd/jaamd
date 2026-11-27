@@ -37,7 +37,7 @@ const contentAttrs = { id: 'content' }
                     {config.blog.readingTime && (
                         <>
                             <span aria-hidden="true">·</span>
-                            <span>{fill(t('blog.minutes'), { minutes: post.readingTime })}</span>
+                            <span>{fill(t('page.minutes'), { minutes: post.readingTime })}</span>
                         </>
                     )}
                     {post.authors.length > 0 && (

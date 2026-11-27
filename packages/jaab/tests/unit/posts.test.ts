@@ -8,7 +8,6 @@ import {
     parsePostDate,
     postErrors,
     postSlug,
-    readingMinutes,
     writtenDay,
     type PostFile,
 } from '../../src/model/posts.ts'
@@ -53,14 +52,6 @@ test('a post is dated the day it is written on, whatever the offset', () => {
 test('a day reads the same in every zone', () => {
     assert.equal(formatPostDay('2026-11-22', 'en'), 'Nov 22, 2026')
     assert.equal(formatPostDay('2026-11-22', 'it'), '22 nov 2026')
-})
-
-test('reading time is at least a minute, then one per 200 words', () => {
-    assert.equal(readingMinutes(''), 1)
-    assert.equal(readingMinutes('word '.repeat(200)), 1)
-    assert.equal(readingMinutes('word '.repeat(201)), 2)
-    // Punctuation on its own is no word.
-    assert.equal(readingMinutes(`${'word '.repeat(200)} — — —`), 1)
 })
 
 test('posts run newest first, and by slug on the same day', () => {
