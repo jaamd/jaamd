@@ -1,0 +1,39 @@
+{
+    "name": "@jaamd/create-jaab",
+    "version": "1.1.0",
+    "private": true,
+    "description": "Scaffold a JAAB blog, alone or beside JAAD's docs.",
+    "keywords": [
+        "astro",
+        "blog",
+        "jaab",
+        "scaffold"
+    ],
+    "homepage": "https://docs.jaamd.org/jaab",
+    "bugs": "https://github.com/jaamd/jaamd/issues",
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
+        "directory": "packages/create-jaab"
+    },
+    "bin": {
+        "create-jaab": "./index.mjs"
+    },
+    "files": [
+        "index.mjs",
+        "README.md",
+        "LICENSE"
+    ],
+    "type": "module",
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@jaamd/create": "workspace:*"
+    },
+    "engines": {
+        "node": ">=22.23.4"
+    }
+}

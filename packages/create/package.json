@@ -1,0 +1,53 @@
+{
+    "name": "@jaamd/create",
+    "version": "1.1.0",
+    "private": true,
+    "description": "Scaffold a site from folders of markdown: docs with JAAD, a blog with JAAB, or both.",
+    "keywords": [
+        "astro",
+        "blog",
+        "docs",
+        "documentation",
+        "jaab",
+        "jaad",
+        "scaffold"
+    ],
+    "homepage": "https://docs.jaamd.org",
+    "bugs": "https://github.com/jaamd/jaamd/issues",
+    "license": "MIT",
+    "author": "Kasui92 <info@lucapattocchio.dev>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jaamd/jaamd.git",
+        "directory": "packages/create"
+    },
+    "bin": {
+        "create-jaamd": "./index.mjs"
+    },
+    "files": [
+        "index.mjs",
+        "cli.mjs",
+        "lib.mjs",
+        "templates.mjs",
+        "templates",
+        "README.md",
+        "LICENSE"
+    ],
+    "type": "module",
+    "exports": {
+        "./cli.mjs": "./cli.mjs"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "test": "node --test \"tests/*.test.mjs\"",
+        "test:consumer": "pnpm --filter \"@jaamd/jaad...\" --filter \"@jaamd/jaab...\" run build && node --test \"tests/consumer/**/*.test.mjs\""
+    },
+    "dependencies": {
+        "@clack/prompts": "^1.7.0"
+    },
+    "engines": {
+        "node": ">=22.23.4"
+    }
+}

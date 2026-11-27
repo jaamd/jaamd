@@ -16,9 +16,17 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { after, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { localDay } from '../lib.mjs'
 
 const CREATE_PKG = fileURLToPath(new URL('..', import.meta.url))
+/** `npm create @jaamd`, which offers every template. */
 const CLI = join(CREATE_PKG, 'index.mjs')
+/** `npm create @jaamd/jaad` and `npm create @jaamd/jaab`. */
+const JAAD_CLI = join(CREATE_PKG, '..', 'create-jaad', 'index.mjs')
+const JAAB_CLI = join(CREATE_PKG, '..', 'create-jaab', 'index.mjs')
+const TEMPLATE_NAMES = ['docs', 'site', 'blog', 'docs-blog']
+// The commands it prints name the package manager that ran it: npm, not the one running the tests.
+const ENV = { ...process.env, npm_config_user_agent: 'npm/11.0.0 node/v24.0.0' }
 
 const temporaryDirectories = new Set()
 
@@ -56,12 +64,17 @@ const versionOf = (dir) => {
     return JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version
 }
 
+/** The command's output, with the status it exited with. */
+function scaffold(cli, args, cwd) {
+    const result = spawnSync('node', [cli, ...args], { cwd, encoding: 'utf8', env: ENV })
+    return { status: result.status, output: `${result.stdout}\n${result.stderr}` }
+}
+
 function runScaffolderHere(project, template = 'site') {
     return spawnSync('node', [CLI, '--here', '--template', template, '--title', 'Existing Project', '--no-install'], {
         cwd: project,
         encoding: 'utf8',
-        // The commands it prints name the package manager that ran it: npm, not the one running the tests.
-        env: { ...process.env, npm_config_user_agent: 'npm/11.0.0 node/v24.0.0' },
+        env: ENV,
     })
 }
 
@@ -121,11 +134,12 @@ test('no template depends on tailwind', () => {
 
 // The scaffolder pins the version it installs by hand, and a release that
 // bumps the package without it ships a project on the previous version.
-test('the scaffolder installs JAAD at its own version', () => {
+test('the scaffolder installs JAAD and JAAB at its own version', () => {
     const dir = join(temporaryDirectory('jaad-version-'), 'site')
-    run('node', [CLI, dir, '--template', 'docs', '--title', 'T', '--no-install'], dirname(dir))
+    run('node', [CLI, dir, '--template', 'docs-blog', '--title', 'T', '--no-install'], dirname(dir))
     const { dependencies } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
     assert.equal(dependencies['@jaamd/jaad'], `^${versionOf(CREATE_PKG)}`)
+    assert.equal(dependencies['@jaamd/jaab'], `^${versionOf(CREATE_PKG)}`)
 })
 
 // The templates are only files on disk: nothing fails locally when `files`
@@ -140,8 +154,10 @@ test('the published scaffolder carries its templates', () => {
         'templates/_shared/CLAUDE.md',
         'templates/_shared/tsconfig.json',
         'templates/_shared/public/favicon.svg',
+        'templates/_docs/docs/01-introduction.md',
+        'templates/_blog/blog/index.md',
+        'templates/_blog/blog/hello-world.md',
         'templates/docs/jaad.config.ts',
-        'templates/docs/docs/01-introduction.md',
         'templates/docs/AGENTS.md',
         'templates/site/AGENTS.md',
         'templates/site/jaad.config.ts',
@@ -149,6 +165,10 @@ test('the published scaffolder carries its templates', () => {
         'templates/site/src/pages/index.astro',
         'templates/site/src/styles/site.css',
         'templates/site/src/utils/base.ts',
+        'templates/blog/AGENTS.md',
+        'templates/blog/jaab.config.ts',
+        'templates/docs-blog/AGENTS.md',
+        'templates/docs-blog/site.config.ts',
     ]) {
         assert.ok(packed.includes(file), `${file} is missing from the tarball`)
     }
@@ -164,7 +184,7 @@ test('the published scaffolder carries its templates', () => {
 })
 
 test('a scaffolded project ignores what it should not commit', () => {
-    for (const template of ['docs', 'site']) {
+    for (const template of TEMPLATE_NAMES) {
         const parent = temporaryDirectory(`jaad-gitignore-${template}-`)
         const result = spawnSync(
             'node',
@@ -186,7 +206,7 @@ test('a scaffolded project ignores what it should not commit', () => {
 // Astro reads `.astro/types.d.ts` only through a tsconfig, so without one the
 // editor loses `import.meta.env`, `astro:*` and the collection types.
 test('a scaffolded project is set up for the editor', () => {
-    for (const template of ['docs', 'site']) {
+    for (const template of TEMPLATE_NAMES) {
         const parent = temporaryDirectory(`jaad-tsconfig-${template}-`)
         const result = spawnSync('node', [CLI, 'project', '--template', template, '--title', 'Typed', '--no-install'], {
             cwd: parent,
@@ -217,9 +237,9 @@ test('--here leaves an existing favicon in charge', () => {
     )
 })
 
-test('the docs template is the one you get without asking', () => {
+test('the docs template is the one npm create @jaamd/jaad gives without asking', () => {
     const parent = temporaryDirectory('jaad-default-template-')
-    const result = spawnSync('node', [CLI, 'project', '--title', 'Defaulted', '--no-install'], {
+    const result = spawnSync('node', [JAAD_CLI, 'project', '--title', 'Defaulted', '--no-install'], {
         cwd: parent,
         encoding: 'utf8',
     })
@@ -331,13 +351,13 @@ test('non-interactive requests are complete before files are written', () => {
         {
             name: 'missing answers',
             args: ['project', '--no-install'],
-            message: /missing answers.*title/s,
+            message: /missing answers.*template.*title/s,
             target: 'project',
         },
         {
             name: 'unknown template',
-            args: ['project', '--template', 'blog', '--title', 'Invalid', '--no-install'],
-            message: /unknown template blog/,
+            args: ['project', '--template', 'wiki', '--title', 'Invalid', '--no-install'],
+            message: /unknown template wiki; available: docs, site, blog, docs-blog/,
             target: 'project',
         },
         {
@@ -425,4 +445,116 @@ test('a file that is a symlink is kept, even one that points nowhere yet', () =>
     assert.equal(result.status, 0, output)
     assert.match(output, /kept\s+CLAUDE\.md/)
     assert.equal(existsSync(outside), false, 'the scaffolder wrote through the symlink')
+})
+
+// ── The blog templates and the aliases ───────────────────────────────────────
+
+test('the blog template installs JAAB alone, with a first post dated today', () => {
+    const parent = temporaryDirectory('jaab-blog-')
+    const { status, output } = scaffold(
+        CLI,
+        ['notes', '--template', 'blog', '--title', 'My "Notes"', '--no-install'],
+        parent,
+    )
+    assert.equal(status, 0, output)
+    assert.match(output, /Start writing in blog\/hello-world\.md/)
+
+    const project = join(parent, 'notes')
+    const { dependencies } = JSON.parse(readFileSync(join(project, 'package.json'), 'utf8'))
+    assert.deepEqual(Object.keys(dependencies), ['astro', '@jaamd/jaab'])
+    assert.equal(
+        readFileSync(join(project, 'astro.config.mjs'), 'utf8'),
+        'export { default } from "@jaamd/jaab/site";\n',
+    )
+    assert.match(readFileSync(join(project, 'jaab.config.ts'), 'utf8'), /title: "My \\"Notes\\"",/)
+    assert.match(
+        readFileSync(join(project, 'blog', 'hello-world.md'), 'utf8'),
+        new RegExp(`^date: ${localDay(new Date())}$`, 'm'),
+    )
+    assert.equal(existsSync(join(project, 'docs')), false)
+})
+
+test('the docs-blog template sets up both packages from one site config', () => {
+    const parent = temporaryDirectory('jaab-docs-blog-')
+    const { status, output } = scaffold(
+        CLI,
+        ['both', '--template', 'docs-blog', '--title', 'Both', '--no-install'],
+        parent,
+    )
+    assert.equal(status, 0, output)
+    assert.match(output, /Start writing in docs\/01-introduction\.md and blog\/hello-world\.md/)
+
+    const project = join(parent, 'both')
+    const astroConfig = readFileSync(join(project, 'astro.config.mjs'), 'utf8')
+    assert.match(astroConfig, /jaad\(\{ \.\.\.site, routeBase: "\/" \}\)/)
+    assert.match(astroConfig, /jaab\(\{ \.\.\.site, routeBase: "\/blog" \}\)/)
+    assert.match(readFileSync(join(project, 'site.config.ts'), 'utf8'), /defineSiteConfig\(\{\n {2}title: "Both",/)
+    assert.match(readFileSync(join(project, 'src', 'content.config.ts'), 'utf8'), /\{ \.\.\.docs, \.\.\.blog \}/)
+    assert.equal(existsSync(join(project, 'jaad.config.ts')), false)
+    assert.equal(existsSync(join(project, 'jaab.config.ts')), false)
+})
+
+test('--here recognizes its own docs-blog configurations on rerun', () => {
+    const parent = temporaryDirectory('jaab-docs-blog-rerun-')
+    run('node', [CLI, 'both', '--template', 'docs-blog', '--title', 'Both', '--no-install'], parent)
+    const project = join(parent, 'both')
+    const before = snapshotFiles(project)
+
+    const result = runScaffolderHere(project, 'docs-blog')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 0, output)
+    assert.match(output, /kept\s+astro\.config\.mjs/)
+    assert.match(output, /kept\s+site\.config\.ts/)
+    assert.match(output, /found\s+1 markdown file\(s\) in docs\//)
+    assert.match(output, /found\s+2 markdown file\(s\) in blog\//)
+    assert.deepEqual(snapshotFiles(project), before)
+})
+
+// Its astro.config.mjs is JAAD's, and the scaffolder never rewrites a file.
+test('--here will not add a blog to a JAAD project, and says where to read how', () => {
+    const parent = temporaryDirectory('jaab-onto-jaad-')
+    run('node', [CLI, 'docs', '--template', 'docs', '--title', 'Docs', '--no-install'], parent)
+    const project = join(parent, 'docs')
+    const before = snapshotFiles(project)
+
+    const result = runScaffolderHere(project, 'docs-blog')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 1, output)
+    assert.match(output, /astro\.config\.mjs sets up the docs template, not docs-blog/)
+    assert.match(output, /Integrate JAAD and JAAB manually: \S+\/jaab\/getting-started\/installation#docs-and-a-blog/)
+    assert.deepEqual(snapshotFiles(project), before)
+})
+
+test('--here keeps the posts a blog already has', () => {
+    const project = temporaryDirectory('jaab-here-posts-')
+    mkdirSync(join(project, 'blog'))
+    writeFileSync(join(project, 'blog', 'first.md'), '---\ndate: 2026-01-01\n---\n\nMine.\n')
+
+    const result = runScaffolderHere(project, 'blog')
+    const output = `${result.stdout}\n${result.stderr}`
+    assert.equal(result.status, 0, output)
+    assert.match(output, /found\s+1 markdown file\(s\) in blog\//)
+    assert.match(output, /Start writing in blog\//)
+    assert.equal(existsSync(join(project, 'blog', 'hello-world.md')), false)
+    assert.equal(existsSync(join(project, 'blog', 'index.md')), false)
+})
+
+test('each alias offers the templates of its package', () => {
+    const parent = temporaryDirectory('jaamd-aliases-')
+
+    const blog = scaffold(JAAB_CLI, ['blog', '--title', 'Blog', '--no-install'], parent)
+    assert.equal(blog.status, 0, blog.output)
+    assert.equal(existsSync(join(parent, 'blog', 'jaab.config.ts')), true, 'create-jaab did not default to a blog')
+
+    const refused = scaffold(JAAD_CLI, ['refused', '--template', 'blog', '--title', 'No', '--no-install'], parent)
+    assert.equal(refused.status, 1)
+    assert.match(
+        refused.output,
+        /^create-jaad: blog is not a template of @jaamd\/jaad; available: docs, site, docs-blog\. npm create @jaamd offers every template\./m,
+    )
+    assert.equal(existsSync(join(parent, 'refused')), false)
+
+    const help = scaffold(JAAB_CLI, ['--help'], parent)
+    assert.match(help.output, /^Usage: npm create @jaamd\/jaab@latest/)
+    assert.match(help.output, /blog +posts at \/ \(default\)\n +docs-blog +docs at \/, blog at \/blog\n/)
 })

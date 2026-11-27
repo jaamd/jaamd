@@ -1,24 +1,44 @@
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
+import { TEMPLATES } from './templates.mjs'
 
-export const TEMPLATES = ['docs', 'site']
-export const DEFAULT_TEMPLATE = 'docs'
+// Where the help's descriptions start, under the options'.
+const HELP_COLUMN = ' '.repeat(30)
 
-export const HELP = `Usage: npm create @jaamd/jaad@latest [directory] -- [options]
+/** The templates' column of the help: each name, padded, then what it makes. */
+function templateLines(preset) {
+    const width = Math.max(
+        ...preset.templates.map((name) => {
+            return name.length
+        }),
+    )
+    return preset.templates
+        .map((name) => {
+            const isDefault = name === preset.defaultTemplate ? ' (default)' : ''
+            return `${HELP_COLUMN}${name.padEnd(width)}  ${TEMPLATES[name].hint}${isDefault}`
+        })
+        .join('\n')
+}
+
+/** The usage of the entry point `preset` describes. */
+export function helpOf(preset) {
+    return `Usage: npm create ${preset.create}@latest [directory] -- [options]
 
 npm hands options on only after --; pnpm, yarn and bun need no --.
 
-  --here                    Set up JAAD in the current directory.
-  --template <docs|site>    Docs at / (default), or a landing page with
-                            docs at /docs.
+  --here                    Set up the project in the current directory.
+  --template <name>         What to create:
+${templateLines(preset)}
   --title <title>           Site title.
   --install                 Install dependencies.
   --no-install              Write the files and stop.
   -h, --help                Show this.
 `
+}
 
+/** Errors are thrown without the command's name, which the entry point adds. */
 export function fail(message) {
-    throw new Error(`create-jaad: ${message}`)
+    throw new Error(message)
 }
 
 function takeValue(argv, index, option) {
@@ -53,7 +73,7 @@ export function normaliseDir(args) {
     return args
 }
 
-export function parseArgs(argv) {
+export function parseArgs(argv, preset) {
     const args = {
         here: false,
         install: null,
@@ -100,11 +120,19 @@ export function parseArgs(argv) {
         fail('--here cannot be used together with a directory.')
     }
     normaliseDir(args)
-    if (args.template && !TEMPLATES.includes(args.template)) {
-        fail(`unknown template ${args.template}; available: ${TEMPLATES.join(', ')}.`)
+    if (args.template && !preset.templates.includes(args.template)) {
+        fail(unknownTemplate(args.template, preset))
     }
 
     return args
+}
+
+function unknownTemplate(template, preset) {
+    const available = `available: ${preset.templates.join(', ')}.`
+    if (template in TEMPLATES) {
+        return `${template} is not a template of ${preset.create}; ${available} npm create @jaamd offers every template.`
+    }
+    return `unknown template ${template}; ${available}`
 }
 
 /** Quotes a path for the commands we print. */
@@ -122,7 +150,7 @@ export const titleFrom = (name) => {
             .map((word) => {
                 return word[0].toUpperCase() + word.slice(1)
             })
-            .join(' ') || 'Documentation'
+            .join(' ') || 'My Site'
     )
 }
 
@@ -159,7 +187,7 @@ const SCRIPTS = {
 }
 
 /**
- * The manifest with what JAAD needs added: the missing scripts, after the
+ * The manifest with what the template needs added: the missing scripts, after the
  * existing ones, and the missing dependencies. `type` is set only on a manifest
  * we create: adding it to someone's library would change how Node reads every
  * file in it, and `astro.config.mjs` is ESM either way.
@@ -192,10 +220,13 @@ export function formatManifest(manifest, source = null) {
     return JSON.stringify(manifest, null, indent) + '\n'
 }
 
-export function missingAnswers(args) {
+export function missingAnswers(args, preset) {
     const missing = []
     if (!args.here && !args.dir) {
         missing.push('directory ([directory] or --here)')
+    }
+    if (!args.template && !preset.defaultTemplate) {
+        missing.push('template (--template <name>)')
     }
     if (!args.title) {
         missing.push('title (--title <title>)')
@@ -204,4 +235,13 @@ export function missingAnswers(args) {
         missing.push('installation (--install or --no-install)')
     }
     return missing
+}
+
+const pad = (value) => {
+    return String(value).padStart(2, '0')
+}
+
+/** The day of `date` where its author is, as `2026-11-22`, as `jaab new` dates a post. */
+export function localDay(date) {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }

@@ -1,5 +1,5 @@
 import { defineJaadConfig } from "@jaamd/jaad";
 
 export default defineJaadConfig({
-  title: "__JAAD_TITLE__",
+  title: "__SITE_TITLE__",
 });
