@@ -140,13 +140,6 @@ export function postErrors(posts: PostFile[]): string[] {
             )
         }
 
-        if (data.draft !== undefined) {
-            errors.push(
-                `${file} sets draft, which JAAB does not read: a post is published when it is in the blog. ` +
-                    'Remove the field, or keep the file out of the blog until it is ready.',
-            )
-        }
-
         if (post.slug === '') {
             errors.push(
                 `${file} would be served as the blog's index: its name has no letter or digit. Rename the file.`,

@@ -56,8 +56,8 @@ layout.
   today. `--dir` makes a directory with an `index.md`, for images beside it.
 - The file name is the address: `hello-world.md` is `/blog/hello-world/`. A
   date in front, as in `2026-11-22-hello-world.md`, is left out of it.
-- A post is published when it is in `blog/`: there are no drafts, and the
-  build stops on a `draft` field. Keep a post elsewhere until it is ready.
+- A post is published when it is in `blog/`: there are no drafts. Keep a post
+  elsewhere until it is ready.
 - `date` is the only field a post needs. `title`, `description`, `tags`,
   `authors`, `aliases`, `lastUpdated` and `ogImage` are optional.
 - `blog/index.md` is the text above the list: its title heads the index.

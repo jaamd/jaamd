@@ -54,8 +54,7 @@ becomes that post's address; a link to a file that does not exist stops the
 build.
 
 Aliases are Astro redirects: the dev server restarts on its own when one changes.
-JAAB does not read `draft`, and the build stops if a post sets it: keep a post
-out of `blog/` until it is ready.
+There are no drafts: keep a post out of `blog/` until it is ready.
 
 ## The index
 

@@ -27,6 +27,14 @@ bun add @jaamd/astro@latest
 
 :::
 
+## From 1.1
+
+### No `draft` in the frontmatter fields
+
+`frontmatterFields(z)` no longer declares `draft`, which JAAMD only declared
+and never read. A site that leaves its own drafts out of the build adds the
+field to its schema, next to the spread: `draft: z.boolean().default(false)`.
+
 ## From 1.0
 
 ### Node 22.23.4

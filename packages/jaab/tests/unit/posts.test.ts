@@ -95,11 +95,6 @@ test('a missing or wrong date says how to write one', () => {
     assert.match(wrong, /blog\/a\.md has the date "yesterday", which is not one\. Write a day/)
 })
 
-test('draft is refused: a post in the blog is published', () => {
-    const [error] = errorsOf([post('a.md', { draft: true })])
-    assert.match(error, /blog\/a\.md sets draft, which JAAB does not read/)
-})
-
 test('two posts on one slug name both files', () => {
     const [error] = errorsOf([post('2026-01-01-hello.md'), post('hello/index.md')])
     assert.match(error, /blog\/2026-01-01-hello\.md and blog\/hello\/index\.md are both served at \/hello/)

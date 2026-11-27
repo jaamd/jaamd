@@ -8,8 +8,6 @@ export function frontmatterFields(z: typeof Zod) {
     return {
         title: z.string().optional(),
         description: z.string().optional(),
-        /** For the site to leave out of production builds: JAAMD only declares it. */
-        draft: z.boolean().default(false),
         /** For the site's metadata and search; never rendered. */
         keywords: z.array(z.string()).default([]),
         author: z.string().optional(),

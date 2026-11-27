@@ -36,8 +36,8 @@ into this project.
   today. `--dir` makes a directory with an `index.md`, for images beside it.
 - The file name is the address: `hello-world.md` is `/hello-world/`. A date in
   front, as in `2026-11-22-hello-world.md`, is left out of it.
-- A post is published when it is in `blog/`: there are no drafts, and the
-  build stops on a `draft` field. Keep a post elsewhere until it is ready.
+- A post is published when it is in `blog/`: there are no drafts. Keep a post
+  elsewhere until it is ready.
 - Link to another post by its file: `[the first post](hello-world.md)`. JAAB
   turns it into the post's address; a link to a missing file stops the build.
 - `blog/index.md` is the text above the list: its title heads the index.
