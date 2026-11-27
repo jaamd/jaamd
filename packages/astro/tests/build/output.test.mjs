@@ -154,7 +154,7 @@ check(
     'the anchor icon stays invisible on the deeper levels',
 )
 
-// ─── markup that no longer waits for the client script ───────────────────────
+// ─── markup that does not wait for the client script ─────────────────────────
 
 check(
     'tables: wrapped at build',
