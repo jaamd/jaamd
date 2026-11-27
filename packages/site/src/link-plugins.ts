@@ -21,11 +21,11 @@ export function rehypeLinks(name: string, resolve: LinkResolver) {
             }
 
             const visit = (node: HastNode) => {
-                const href = node.tagName === 'a' ? node.properties?.href : undefined
-                if (typeof href === 'string') {
-                    const resolved = resolve(href, from)
+                const { properties } = node
+                if (node.tagName === 'a' && properties && typeof properties.href === 'string') {
+                    const resolved = resolve(properties.href, from)
                     if (resolved) {
-                        node.properties!.href = resolved
+                        properties.href = resolved
                     }
                 }
                 node.children?.forEach(visit)

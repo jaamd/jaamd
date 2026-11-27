@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { UI_CATALOGS, UI_DEFAULTS, UI_KEYS, UI_SUPPORTED_LOCALES, uiString } from '../../src/ui.ts'
+import { UI_CATALOGS, UI_DEFAULTS, UI_KEYS, uiString } from '../../src/ui.ts'
 import { ITALIAN_UI } from '../../src/ui/it.ts'
 
 test("a locale's override wins over its bundled catalogue", () => {
@@ -40,7 +40,7 @@ test('exact and base overrides precede bundled catalogues', () => {
 })
 
 test('every bundled catalogue is complete and non-empty', () => {
-    assert.ok(UI_SUPPORTED_LOCALES.includes('en'), 'English is the fallback')
+    assert.ok('en' in UI_CATALOGS, 'English is the fallback')
 
     for (const [code, catalogue] of Object.entries(UI_CATALOGS)) {
         assert.deepEqual(Object.keys(catalogue), UI_KEYS, code)

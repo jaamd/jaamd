@@ -1,4 +1,4 @@
-/** The canonical UI catalogue: its keys define every catalogue JAAD accepts. */
+/** The canonical UI catalogue: its keys define every catalogue the site accepts. */
 export const ENGLISH_UI = {
     'blog.label': 'Blog',
     'blog.newer': 'Newer posts',

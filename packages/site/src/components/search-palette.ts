@@ -58,25 +58,25 @@ class SiteSearch extends HTMLElement {
         for (const sel of ['[data-trigger-desktop]', '[data-trigger-icon]']) {
             const trigger = this.querySelector<HTMLElement>(sel)!
             trigger.addEventListener('click', () => {
-                return this.#setOpen(true)
+                this.#setOpen(true)
             })
             trigger.addEventListener('mouseenter', () => {
-                return void this.#loadIndex()
+                void this.#loadIndex()
             })
             trigger.addEventListener('focus', () => {
-                return void this.#loadIndex()
+                void this.#loadIndex()
             })
         }
 
         this.querySelector('[data-backdrop]')!.addEventListener('click', () => {
-            return this.#setOpen(false)
+            this.#setOpen(false)
         })
         // Escape closes a modal dialog on its own: the cleanup runs on every close.
         this.#overlay.addEventListener('close', () => {
-            return this.#onClose()
+            this.#onClose()
         })
         this.querySelector('[data-close]')!.addEventListener('click', () => {
-            return this.#setOpen(false)
+            this.#setOpen(false)
         })
         this.#filters.addEventListener('click', (e) => {
             const button = (e.target as Element).closest<HTMLButtonElement>('[data-filter]')
@@ -86,10 +86,10 @@ class SiteSearch extends HTMLElement {
         })
 
         this.#input.addEventListener('input', () => {
-            return this.#render()
+            this.#render()
         })
         this.#input.addEventListener('keydown', (e) => {
-            return this.#onInputKey(e)
+            this.#onInputKey(e)
         })
     }
 
@@ -169,7 +169,7 @@ class SiteSearch extends HTMLElement {
         this.#overlay.showModal()
         this.#input.focus()
         void this.#loadIndex().then(() => {
-            return this.#render()
+            this.#render()
         })
         this.#render()
     }
@@ -220,9 +220,9 @@ class SiteSearch extends HTMLElement {
         if (option) {
             this.#input.setAttribute('aria-activedescendant', option.li.id)
         }
-        this.#options.forEach(({ li }, n) => {
-            return li.setAttribute('aria-selected', String(n === i))
-        })
+        for (const [n, { li }] of this.#options.entries()) {
+            li.setAttribute('aria-selected', String(n === i))
+        }
         option?.li.scrollIntoView({ block: 'nearest' })
     }
 
@@ -291,10 +291,10 @@ class SiteSearch extends HTMLElement {
         li.setAttribute('role', 'option')
         li.className = 'site-search-result jaad-search-result'
         li.addEventListener('click', () => {
-            return this.#go(href)
+            this.#go(href)
         })
         li.addEventListener('mouseenter', () => {
-            return this.#select(i)
+            this.#select(i)
         })
         li.append(content)
         this.#list.append(li)

@@ -86,10 +86,10 @@ export const siteConfigShape = {
         })
         .default('auto'),
 
-    /** Registers Tailwind (the site's own install) and exposes JAAD's tokens to it. */
+    /** Registers Tailwind (the project's own install) and exposes the site's tokens to it. */
     tailwind: z.boolean().default(false),
 
-    /** Per-locale overrides for JAAD's bundled interface strings. */
+    /** Per-locale overrides for the bundled interface strings. */
     ui: z
         .record(
             z.string().refine(isLocale, { message: 'not a locale code' }),

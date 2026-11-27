@@ -26,16 +26,22 @@ const {
 } = Astro.props
 const canonical = Astro.site ? Astro.url.href : null
 
-// Open Graph rejects relative paths, so these have to be absolute.
-const resolvedImage = image ?? config.ogImage
-const ogImage =
-    resolvedImage === false
-        ? null
-        : /^https?:\/\//.test(resolvedImage)
-          ? resolvedImage
-          : Astro.site
-            ? new URL(withDeploymentBase(resolvedImage, import.meta.env.BASE_URL), Astro.site).href
-            : null
+/** The page's image, absolute: Open Graph rejects relative paths, so a path
+ *  without `site` gives none. */
+function absoluteImage(chosen: string | false): string | null {
+    if (chosen === false) {
+        return null
+    }
+    if (/^https?:\/\//.test(chosen)) {
+        return chosen
+    }
+    if (!Astro.site) {
+        return null
+    }
+    return new URL(withDeploymentBase(chosen, import.meta.env.BASE_URL), Astro.site).href
+}
+
+const ogImage = absoluteImage(image ?? config.ogImage)
 const authorLinks = authors.flatMap((author) => {
     const href = authorHref(author, import.meta.env.BASE_URL)
     return href ? [href] : []

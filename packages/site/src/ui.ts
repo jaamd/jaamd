@@ -1,7 +1,7 @@
 import { ENGLISH_UI } from './ui/en.ts'
 import { ITALIAN_UI } from './ui/it.ts'
 
-/** Every string JAAD puts on a page itself. */
+/** Every string the site's packages put on a page themselves. */
 export const UI_DEFAULTS = ENGLISH_UI
 
 export type UiKey = keyof typeof UI_DEFAULTS
@@ -50,6 +50,3 @@ export function uiString(overrides: UiOverrides, locale: string, key: UiKey): st
 }
 
 export const UI_KEYS = Object.keys(UI_DEFAULTS) as UiKey[]
-
-/** Kept internal: consumers customise strings through `ui`. */
-export const UI_SUPPORTED_LOCALES = Object.keys(UI_CATALOGS)
